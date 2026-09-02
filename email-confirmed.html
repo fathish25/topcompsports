@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopCompSports - Email Confirmed</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: #151d2b;
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            margin: 0 auto 30px;
+            animation: scaleIn 0.5s ease-out;
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        h1 { font-size: 36px; margin-bottom: 20px; color: #10b981; }
+        p { font-size: 18px; color: rgba(255,255,255,0.8); line-height: 1.7; margin-bottom: 30px; }
+        .btn-primary {
+            background: linear-gradient(135deg, #2563EB, #1d4ed8);
+            color: #fff;
+            padding: 16px 40px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            display: inline-block;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5); }
+        .loading { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 20px 0; }
+        .spinner {
+            width: 30px; height: 30px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #2563EB;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .lang-switcher { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; }
+        .lang-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .lang-btn.active { background: #2563EB; border-color: #2563EB; }
+    </style>
+</head>
+<body>
+
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn" onclick="setLanguage('ar')">AR</button>
+    </div>
+
+    <div class="container">
+        <div class="success-icon">✓</div>
+        <h1 id="title" data-en="Email Confirmed!" data-ar="تم تأكيد البريد!">Email Confirmed!</h1>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <span id="loadingText" data-en="Processing your account..." data-ar="جاري معالجة حسابك...">Processing your account...</span>
+        </div>
+        <p id="message" data-en="Your email has been successfully verified. You can now complete your profile and start using TopCompSports." data-ar="تم التحقق من بريدك الإلكتروني بنجاح. يمكنك الآن إكمال ملفك الشخصي والبدء في استخدام TopCompSports.">Your email has been successfully verified.</p>
+        <a href="login.html" class="btn-primary" id="btn" style="display:none;" data-en="Continue to Login →" data-ar="← المتابعة لتسجيل الدخول">Continue to Login →</a>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentLang = 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const text = el.getAttribute(`data-${lang}`);
+                if (text) el.textContent = text;
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        window.onload = async () => {
+            try {
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                const accessToken = hashParams.get('access_token');
+                
+                if (accessToken) {
+                    const { data: { session }, error } = await supabase.auth.setSession({
+                        access_token: accessToken,
+                        refresh_token: hashParams.get('refresh_token')
+                    });
+
+                    if (error) throw error;
+
+                    const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('role, registration_step')
+                        .eq('id', session.user.id)
+                        .single();
+
+                    await supabase
+                        .from('profiles')
+                        .update({ registration_step: 2, email_confirmed: true })
+                        .eq('id', session.user.id);
+
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('btn').style.display = 'inline-block';
+                    
+                    setTimeout(() => {
+                        if (profile) {
+                            if (profile.role === 'athlete') window.location.href = 'index.html';
+                            else if (profile.role === 'coach') window.location.href = 'complete-coach.html';
+                            else if (profile.role === 'organizer') window.location.href = 'complete-organizer.html';
+                            else window.location.href = 'login.html';
+                        } else {
+                            window.location.href = 'login.html';
+                        }
+                    }, 3000);
+                } else {
+                    document.getElementById('title').textContent = currentLang === 'ar' ? 'رابط غير صالح' : 'Invalid Link';
+                    document.getElementById('message').textContent = currentLang === 'ar' 
+                        ? 'رابط التأكيد غير صالح أو منتهي الصلاحية.'
+                        : 'This confirmation link is invalid or has expired.';
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('btn').style.display = 'inline-block';
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                document.getElementById('title').textContent = currentLang === 'ar' ? 'خطأ' : 'Error';
+                document.getElementById('message').textContent = currentLang === 'ar'
+                    ? 'حدث خطأ أثناء تأكيد بريدك الإلكتروني.'
+                    : 'An error occurred while confirming your email.';
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('btn').style.display = 'inline-block';
+            }
+        };
+    </script>
+</body>
+</html>
