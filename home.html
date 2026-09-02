@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopCompSports - The Competition Platform</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #0a0e17;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: #151d2b;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #2a3548;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-img {
+            height: 50px;
+            width: auto;
+        }
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        .nav-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover {
+            color: #f1c40f;
+        }
+        .btn-login {
+            background: #2563EB;
+            color: #fff;
+            padding: 10px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-login:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+        .btn-signup {
+            background: transparent;
+            color: #fff;
+            padding: 10px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            border: 2px solid #2563EB;
+            transition: all 0.3s;
+        }
+        .btn-signup:hover {
+            background: #2563EB;
+        }
+        .lang-switcher {
+            display: flex;
+            gap: 10px;
+        }
+        .lang-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .lang-btn.active {
+            background: #2563EB;
+            border-color: #2563EB;
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            padding: 80px 50px;
+            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 50%, #0a0e17 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.1) 0%, transparent 50%);
+        }
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-text h1 {
+            font-size: 72px;
+            font-weight: bold;
+            line-height: 1.1;
+            margin-bottom: 25px;
+        }
+        .hero-text h1 .highlight {
+            color: #f1c40f;
+        }
+        .hero-text p {
+            font-size: 18px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+        }
+        .btn-primary {
+            background: #2563EB;
+            color: #fff;
+            padding: 16px 35px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            padding: 16px 35px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        .btn-secondary:hover {
+            border-color: #f1c40f;
+            color: #f1c40f;
+        }
+        .hero-image {
+            position: relative;
+        }
+        .hero-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+        .hero-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .hero-badge .live-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Stats Section */
+        .stats {
+            background: #151d2b;
+            padding: 60px 50px;
+            border-top: 2px solid #2a3548;
+            border-bottom: 2px solid #2a3548;
+        }
+        .stats-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #f1c40f;
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 100px 50px;
+            background: #0a0e17;
+        }
+        .features-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .section-title h2 {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .section-title h2 .highlight {
+            color: #2563EB;
+        }
+        .section-title p {
+            color: rgba(255,255,255,0.7);
+            font-size: 18px;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        .feature-card {
+            background: #151d2b;
+            border: 1px solid #2a3548;
+            border-radius: 16px;
+            padding: 40px;
+            transition: all 0.3s;
+        }
+        .feature-card:hover {
+            border-color: #2563EB;
+            transform: translateY(-5px);
+        }
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        .feature-card p {
+            color: rgba(255,255,255,0.7);
+            line-height: 1.7;
+        }
+        
+        /* Events Section */
+        .events {
+            padding: 100px 50px;
+            background: #151d2b;
+        }
+        .events-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 60px;
+        }
+        .event-card {
+            background: #0a0e17;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #2a3548;
+            transition: all 0.3s;
+        }
+        .event-card:hover {
+            transform: translateY(-5px);
+            border-color: #f1c40f;
+        }
+        .event-image {
+            height: 200px;
+            background: linear-gradient(135deg, #2563EB, #1e40af);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+        .event-content {
+            padding: 25px;
+        }
+        .event-date {
+            color: #f1c40f;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+        .event-content h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        .event-location {
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .event-link {
+            color: #2563EB;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #0a0e17;
+            padding: 60px 50px 30px;
+            border-top: 2px solid #2a3548;
+        }
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .footer-brand img {
+            height: 40px;
+            margin-bottom: 15px;
+        }
+        .footer-brand p {
+            color: rgba(255,255,255,0.7);
+            line-height: 1.7;
+        }
+        .footer-links h4 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        .footer-links a {
+            display: block;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            margin-bottom: 12px;
+            transition: color 0.3s;
+        }
+        .footer-links a:hover {
+            color: #f1c40f;
+        }
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-top: 30px;
+            border-top: 1px solid #2a3548;
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+            }
+            .hero-text h1 {
+                font-size: 48px;
+            }
+            .features-grid, .events-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .footer-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-container">
+            <img src="logo.png" alt="TopCompSports" class="logo-img">
+            <span class="logo-text">TopCompSports</span>
+        </div>
+        <nav class="nav-links">
+            <a href="#" data-en="Find Events" data-ar="ابحث عن الأحداث">Find Events</a>
+            <a href="#" data-en="For Athletes" data-ar="لللاعبين">For Athletes</a>
+            <a href="#" data-en="For Organizers" data-ar="للمنظمين">For Organizers</a>
+            <a href="#" data-en="About" data-ar="عن المنصة">About</a>
+            <div class="lang-switcher">
+                <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+                <button class="lang-btn" onclick="setLanguage('ar')">AR</button>
+            </div>
+            <a href="login.html" class="btn-login" data-en="Sign In" data-ar="تسجيل الدخول">Sign In</a>
+            <a href="signup.html" class="btn-signup" data-en="Sign Up" data-ar="إنشاء حساب">Sign Up</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 data-en='EARN YOUR <span class="highlight">PLACE.</span>' data-ar='اكسب <span class="highlight">مكانك.</span>'>EARN YOUR <span class="highlight">PLACE.</span></h1>
+                <p data-en="Find real published tournaments, build your private competition profile, and manage every event through a secure workspace." data-ar="اكتشف البطولات المنشورة الحقيقية، وابنِ ملفك التنافسي الخاص، وأدر كل حدث من خلال مساحة عمل آمنة.">Find real published tournaments, build your private competition profile, and manage every event through a secure workspace.</p>
+                <div class="hero-buttons">
+                    <a href="#events" class="btn-primary" data-en="Find Your Event →" data-ar="ابحث عن حدثك ←">Find Your Event →</a>
+                    <a href="complete-athlete.html" class="btn-secondary" data-en="Run an Event →" data-ar="أدر حدثاً ←">Run an Event →</a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="hero-badge">
+                    <span class="live-dot"></span>
+                    <span data-en="Live data only" data-ar="بيانات مباشرة فقط">Live data only</span>
+                </div>
+                <img src="https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800" alt="BJJ Competition" style="width:100%; border-radius:20px;">
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-number">81</div>
+                <div class="stat-label" data-en="Published Events" data-ar="بطولة منشورة">Published Events</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">32</div>
+                <div class="stat-label" data-en="Sports Represented" data-ar="رياضة ممثلة">Sports Represented</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">64</div>
+                <div class="stat-label" data-en="Locations" data-ar="موقع">Locations</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">2.5K+</div>
+                <div class="stat-label" data-en="Athletes" data-ar="لاعب">Athletes</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="features-container">
+            <div class="section-title">
+                <h2 data-en='Built for the <span class="highlight">next round</span>' data-ar='مبني <span class="highlight">للمستقبل</span>'>Built for the <span class="highlight">next round</span></h2>
+                <p data-en="Everything you need to compete, organize, and rise." data-ar="كل ما تحتاجه للمنافسة والتنظيم والتفوق.">Everything you need to compete, organize, and rise.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 data-en="Secure by Default" data-ar="أمان افتراضي">Secure by Default</h3>
+                    <p data-en="Access is governed by Supabase authentication and row-level security." data-ar="الوصول محكوم بمصادقة Supabase وأمان مستوى الصفوف.">Access is governed by Supabase authentication and row-level security.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👤</div>
+                    <h3 data-en="Private Profiles" data-ar="ملفات خاصة">Private Profiles</h3>
+                    <p data-en="Athletes see their own profile; personal information is not published as a directory." data-ar="اللاعبون يرون ملفاتهم فقط؛ المعلومات الشخصية لا تنشر كدليل.">Athletes see their own profile; personal information is not published as a directory.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3 data-en="Real Events" data-ar="أحداث حقيقية">Real Events</h3>
+                    <p data-en="The public event directory only displays tournament records that organizers publish." data-ar="دليل الأحداث العام يعرض فقط سجلات البطولات التي ينشرها المنظمون.">The public event directory only displays tournament records that organizers publish.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section class="events" id="events">
+        <div class="events-container">
+            <div class="section-title">
+                <h2 data-en='Find the <span class="highlight">Right Fight</span>' data-ar='ابحث عن <span class="highlight">النزال المناسب</span>'>Find the <span class="highlight">Right Fight</span></h2>
+                <p data-en="Every card below is a real published tournament record from Supabase." data-ar="كل بطاقة أدناه هي سجل بطولة حقيقي منشور من Supabase.">Every card below is a real published tournament record from Supabase.</p>
+            </div>
+            <div class="events-grid">
+                <div class="event-card">
+                    <div class="event-image"></div>
+                    <div class="event-content">
+                        <div class="event-date">AUG 26, 2026</div>
+                        <h3 data-en="Cairo BJJ Open 2026" data-ar="كايرو BJJ Open 2026">Cairo BJJ Open 2026</h3>
+                        <div class="event-location">📍 Cairo Sample Arena · Cairo · Egypt</div>
+                        <a href="#" class="event-link" data-en="View event →" data-ar="عرض الحدث ←">View event →</a>
+                    </div>
+                </div>
+                <div class="event-card">
+                    <div class="event-image">🥋</div>
+                    <div class="event-content">
+                        <div class="event-date">SEP 1, 2026</div>
+                        <h3>Test Tournament 2026</h3>
+                        <div class="event-location">📍 Cairo · Cairo · Egypt</div>
+                        <a href="#" class="event-link" data-en="View event →" data-ar="عرض الحدث ←">View event →</a>
+                    </div>
+                </div>
+                <div class="event-card">
+                    <div class="event-image">🥋</div>
+                    <div class="event-content">
+                        <div class="event-date">SEP 15, 2026</div>
+                        <h3 data-en="بطولة 1" data-ar="بطولة 1">بطولة 1</h3>
+                        <div class="event-location" data-en="📍 Al-Qahira · Mansoura · Egypt" data-ar="📍 القاهرة · المنصورة · مصر"> Al-Qahira · Mansoura · Egypt</div>
+                        <a href="#" class="event-link" data-en="View event →" data-ar="عرض الحدث ←">View event →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <img src="logo.png" alt="TopCompSports">
+                <p data-en="The home of modern martial arts competition." data-ar="موطن المنافسات الحديثة في الرياضات القتالية.">The home of modern martial arts competition.</p>
+            </div>
+            <div class="footer-links">
+                <h4 data-en="Platform" data-ar="المنصة">Platform</h4>
+                <a href="#" data-en="Find Events" data-ar="ابحث عن الأحداث">Find Events</a>
+                <a href="#" data-en="For Athletes" data-ar="لللاعبين">For Athletes</a>
+                <a href="#" data-en="For Organizers" data-ar="للمنظمين">For Organizers</a>
+            </div>
+            <div class="footer-links">
+                <h4 data-en="Company" data-ar="الشركة">Company</h4>
+                <a href="#" data-en="About" data-ar="عن المنصة">About</a>
+                <a href="#" data-en="Contact" data-ar="تواصل">Contact</a>
+                <a href="#" data-en="Careers" data-ar="وظائف">Careers</a>
+            </div>
+            <div class="footer-links">
+                <h4 data-en="Legal" data-ar="قانوني">Legal</h4>
+                <a href="#" data-en="Privacy" data-ar="الخصوصية">Privacy</a>
+                <a href="#" data-en="Terms" data-ar="الشروط">Terms</a>
+                <a href="#" data-en="Security" data-ar="الأمان">Security</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>© 2026 TopCompSports</span>
+            <span data-en="The home of modern martial arts competition." data-ar="موطن المنافسات الحديثة في الرياضات القتالية.">The home of modern martial arts competition.</span>
+        </div>
+    </footer>
+
+    <script>
+        let currentLang = 'en';
+        
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.lang = lang;
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const text = el.getAttribute(`data-${lang}`);
+                if (text) el.innerHTML = text;
+            });
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
