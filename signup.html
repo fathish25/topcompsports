@@ -406,42 +406,74 @@
             const confirmPassword = document.getElementById('confirmPassword').value;
             
             if (password !== confirmPassword) {
-                showAlert('error', currentLang === 'ar' ? 'كلمتا المرور غير متطابقتين' : 'Passwords do not match');
+                showAlert('error', currentLang === 'ar' ? '❌ كلمتا المرور غير متطابقتين' : '❌ Passwords do not match');
+                return;
+            }
+
+            if (password.length < 8) {
+                showAlert('error', currentLang === 'ar' ? '❌ كلمة المرور يجب أن تكون 8 أحرف على الأقل' : '❌ Password must be at least 8 characters');
                 return;
             }
 
             const btn = document.getElementById('signupBtn');
             btn.disabled = true;
-            btn.textContent = currentLang === 'ar' ? 'جاري الإنشاء...' : 'Creating...';
+            const originalText = btn.textContent;
+            btn.textContent = currentLang === 'ar' ? '⏳ جاري الإنشاء...' : '⏳ Creating...';
 
-            const { data, error } = await supabase.auth.signUp({
-                email: document.getElementById('email').value,
-                password: password,
-                options: {
-                    data: {
-                        full_name: document.getElementById('fullName').value,
-                        role: document.getElementById('role').value,
-                        date_of_birth: document.getElementById('dob').value,
-                        gender: document.getElementById('gender').value,
-                        country: document.getElementById('country').value,
-                        phone: document.getElementById('phone').value,
-                        registration_step: 1
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email: document.getElementById('email').value,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: document.getElementById('fullName').value,
+                            role: document.getElementById('role').value,
+                            date_of_birth: document.getElementById('dob').value,
+                            gender: document.getElementById('gender').value,
+                            country: document.getElementById('country').value,
+                            phone: document.getElementById('phone').value,
+                            registration_step: 1
+                        },
+                        emailRedirectTo: window.location.origin + '/email-confirmed.html'
+                    }
+                });
+
+                if (error) throw error;
+
+                const email = document.getElementById('email').value;
+                const role = document.getElementById('role').value;
+                const roleName = role === 'athlete' ? (currentLang === 'ar' ? 'لاعب' : 'Athlete') :
+                                role === 'coach' ? (currentLang === 'ar' ? 'مدرب' : 'Coach') :
+                                (currentLang === 'ar' ? 'منظم' : 'Organizer');
+
+                const successMsg = currentLang === 'ar' 
+                    ? `✅ تم إنشاء حساب ${roleName} بنجاح!\n\n📧 يرجى فحص بريدك الإلكتروني:\n${email}\n\nاضغط على رابط التأكيد في البريد لتفعيل حسابك وإكمال بياناتك.`
+                    : `✅ ${roleName} account created successfully!\n\n📧 Please check your email:\n${email}\n\nClick the confirmation link in the email to activate your account and complete your profile.`;
+
+                showAlert('success', successMsg);
+
+                document.getElementById('signupForm').querySelectorAll('input, select, button').forEach(el => {
+                    el.disabled = true;
+                });
+
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 6000);
+
+            } catch (err) {
+                console.error('Signup error:', err);
+                let errorMsg = err.message;
+                
+                if (currentLang === 'ar') {
+                    if (errorMsg.includes('User already registered')) {
+                        errorMsg = '❌ هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول.';
                     }
                 }
-            });
-
-            if (error) {
-                showAlert('error', error.message);
+                
+                showAlert('error', errorMsg);
                 btn.disabled = false;
-                btn.textContent = currentLang === 'ar' ? 'CREATE ACCOUNT →' : 'CREATE ACCOUNT →';
-                return;
+                btn.textContent = originalText;
             }
-
-            showAlert('success', currentLang === 'ar' ? '✅ تم إنشاء الحساب! يرجى التحقق من بريدك الإلكتروني.' : '✅ Account created! Please check your email.');
-            
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 3000);
         }
 
         function showAlert(type, message) {
