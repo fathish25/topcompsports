@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopCompSports - Create Account</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+        }
+        
+        /* Left Panel */
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 80px;
+            position: relative;
+            z-index: 1;
+        }
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: #fff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #2563EB;
+        }
+        .logo-text {
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .left-content {
+            position: relative;
+            z-index: 1;
+        }
+        .left-tagline {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+        .left-title {
+            color: #fff;
+            font-size: 64px;
+            font-weight: bold;
+            line-height: 1.1;
+            margin-bottom: 30px;
+        }
+        .left-description {
+            color: rgba(255,255,255,0.9);
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+        
+        /* Right Panel */
+        .right-panel {
+            flex: 1;
+            background: #0f172a;
+            padding: 60px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+        .lang-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .lang-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .lang-btn.active {
+            background: #2563EB;
+            border-color: #2563EB;
+        }
+        .right-header {
+            margin-bottom: 40px;
+        }
+        .right-tagline {
+            color: #2563EB;
+            font-size: 12px;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+        .right-title {
+            color: #fff;
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        /* Role Selection */
+        .role-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .role-card {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .role-card:hover {
+            border-color: rgba(37, 99, 235, 0.5);
+            background: rgba(37, 99, 235, 0.1);
+        }
+        .role-card.selected {
+            border-color: #2563EB;
+            background: rgba(37, 99, 235, 0.2);
+        }
+        .role-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .role-name {
+            color: #fff;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-label {
+            display: block;
+            color: rgba(255,255,255,0.9);
+            font-size: 12px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #2563EB;
+            background: rgba(37, 99, 235, 0.1);
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #2563EB, #1d4ed8);
+            color: #fff;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+        }
+        
+        /* Alert */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+        .alert.show {
+            display: block;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+        }
+        .form-footer a {
+            color: #2563EB;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 1024px) {
+            .left-panel { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn" onclick="setLanguage('ar')">AR</button>
+    </div>
+
+    <div class="left-panel">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <div class="left-content">
+            <div class="left-tagline" data-en="JOIN THE COMMUNITY" data-ar="انضم للمجتمع">JOIN THE COMMUNITY</div>
+            <h1 class="left-title" data-en="Start your journey today." data-ar="ابدأ رحلتك اليوم.">Start your journey today.</h1>
+            <p class="left-description" data-en="Join thousands of athletes, coaches, and organizers building the future of competition." data-ar="انضم إلى الآلاف من اللاعبين والمدربين والمنظمين الذين يبنون مستقبل المنافسات.">Join thousands of athletes, coaches, and organizers building the future of competition.</p>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <div class="right-header">
+            <div class="right-tagline" data-en="CREATE YOUR ACCOUNT" data-ar="إنشاء حسابك">CREATE YOUR ACCOUNT</div>
+            <h1 class="right-title" data-en="Make your mark." data-ar="اترك بصمتك.">Make your mark.</h1>
+        </div>
+
+        <div class="alert" id="alert"></div>
+
+        <form id="signupForm" onsubmit="handleSignup(event)">
+            <!-- Role Selection -->
+            <div class="form-group">
+                <label class="form-label" data-en="I AM JOINING AS" data-ar="أنا أنضم كـ">I AM JOINING AS</label>
+                <div class="role-selector">
+                    <div class="role-card selected" onclick="selectRole('athlete', this)">
+                        <div class="role-icon">🥋</div>
+                        <div class="role-name" data-en="Athlete" data-ar="لاعب">Athlete</div>
+                    </div>
+                    <div class="role-card" onclick="selectRole('coach', this)">
+                        <div class="role-icon">👨‍🏫</div>
+                        <div class="role-name" data-en="Coach" data-ar="مدرب">Coach</div>
+                    </div>
+                    <div class="role-card" onclick="selectRole('organizer', this)">
+                        <div class="role-icon">🏆</div>
+                        <div class="role-name" data-en="Organizer" data-ar="منظم">Organizer</div>
+                    </div>
+                </div>
+                <input type="hidden" id="role" value="athlete">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" data-en="FULL NAME" data-ar="الاسم الكامل">FULL NAME</label>
+                    <input type="text" class="form-input" id="fullName" required data-placeholder-en="Your full name" data-placeholder-ar="اسمك الكامل">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-en="EMAIL ADDRESS" data-ar="البريد الإلكتروني">EMAIL ADDRESS</label>
+                    <input type="email" class="form-input" id="email" required placeholder="you@example.com">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" data-en="PASSWORD" data-ar="كلمة المرور">PASSWORD</label>
+                    <input type="password" class="form-input" id="password" required minlength="8" data-placeholder-en="At least 8 characters" data-placeholder-ar="8 أحرف على الأقل">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-en="CONFIRM PASSWORD" data-ar="تأكيد كلمة المرور">CONFIRM PASSWORD</label>
+                    <input type="password" class="form-input" id="confirmPassword" required data-placeholder-en="Repeat your password" data-placeholder-ar="أعد كتابة كلمة المرور">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" data-en="DATE OF BIRTH" data-ar="تاريخ الميلاد">DATE OF BIRTH</label>
+                    <input type="date" class="form-input" id="dob" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-en="GENDER" data-ar="النوع">GENDER</label>
+                    <select class="form-select" id="gender" required>
+                        <option value="" data-en="Select gender" data-ar="اختر النوع">Select gender</option>
+                        <option value="male" data-en="Male" data-ar="ذكر">Male</option>
+                        <option value="female" data-en="Female" data-ar="أنثى">Female</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" data-en="COUNTRY" data-ar="الدولة">COUNTRY</label>
+                    <select class="form-select" id="country" required>
+                        <option value="">Select country</option>
+                        <option value="Egypt">Egypt / مصر</option>
+                        <option value="UAE">UAE / الإمارات</option>
+                        <option value="Saudi Arabia">Saudi Arabia / السعودية</option>
+                        <option value="Jordan">Jordan / الأردن</option>
+                        <option value="Lebanon">Lebanon / لبنان</option>
+                        <option value="Morocco">Morocco / المغرب</option>
+                        <option value="Other">Other / أخرى</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-en="PHONE NUMBER" data-ar="رقم الهاتف">PHONE NUMBER</label>
+                    <input type="tel" class="form-input" id="phone" required data-placeholder-en="+20 1XX XXX XXXX" data-placeholder-ar="+20 1XX XXX XXXX">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="signupBtn" data-en="CREATE ACCOUNT →" data-ar="← إنشاء حساب">CREATE ACCOUNT →</button>
+        </form>
+
+        <div class="form-footer">
+            <span data-en="Already have an account?" data-ar="لديك حساب بالفعل؟">Already have an account?</span>
+            <a href="login.html" data-en="Sign in" data-ar="تسجيل الدخول">Sign in</a>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentLang = 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.lang = lang;
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                if (el.tagName === 'INPUT' && el.getAttribute(`data-placeholder-${lang}`)) {
+                    el.placeholder = el.getAttribute(`data-placeholder-${lang}`);
+                } else {
+                    const text = el.getAttribute(`data-${lang}`);
+                    if (text) el.textContent = text;
+                }
+            });
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function selectRole(role, element) {
+            document.getElementById('role').value = role;
+            document.querySelectorAll('.role-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        async function handleSignup(event) {
+            event.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                showAlert('error', currentLang === 'ar' ? 'كلمتا المرور غير متطابقتين' : 'Passwords do not match');
+                return;
+            }
+
+            const btn = document.getElementById('signupBtn');
+            btn.disabled = true;
+            btn.textContent = currentLang === 'ar' ? 'جاري الإنشاء...' : 'Creating...';
+
+            const { data, error } = await supabase.auth.signUp({
+                email: document.getElementById('email').value,
+                password: password,
+                options: {
+                    data: {
+                        full_name: document.getElementById('fullName').value,
+                        role: document.getElementById('role').value,
+                        date_of_birth: document.getElementById('dob').value,
+                        gender: document.getElementById('gender').value,
+                        country: document.getElementById('country').value,
+                        phone: document.getElementById('phone').value,
+                        registration_step: 1
+                    }
+                }
+            });
+
+            if (error) {
+                showAlert('error', error.message);
+                btn.disabled = false;
+                btn.textContent = currentLang === 'ar' ? 'CREATE ACCOUNT →' : 'CREATE ACCOUNT →';
+                return;
+            }
+
+            showAlert('success', currentLang === 'ar' ? '✅ تم إنشاء الحساب! يرجى التحقق من بريدك الإلكتروني.' : '✅ Account created! Please check your email.');
+            
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 3000);
+        }
+
+        function showAlert(type, message) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+    </script>
+</body>
+</html>
