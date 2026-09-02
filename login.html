@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopCompSports - Sign In</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+        }
+        
+        /* Left Panel */
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 700px;
+            height: 700px;
+            border: 2px solid rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 80px;
+            position: relative;
+            z-index: 1;
+        }
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: #fff;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #2563EB;
+        }
+        .logo-text {
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .logo-subtitle {
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+        .left-content {
+            position: relative;
+            z-index: 1;
+        }
+        .left-tagline {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+        .left-title {
+            color: #fff;
+            font-size: 64px;
+            font-weight: bold;
+            line-height: 1.1;
+            margin-bottom: 30px;
+        }
+        .left-description {
+            color: rgba(255,255,255,0.9);
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+        .left-footer {
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+        
+        /* Right Panel */
+        .right-panel {
+            flex: 1;
+            background: #0f172a;
+            padding: 60px;
+            overflow-y: auto;
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .lang-switcher {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .lang-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .lang-btn.active {
+            background: #2563EB;
+            border-color: #2563EB;
+        }
+        .right-header {
+            margin-bottom: 40px;
+        }
+        .right-tagline {
+            color: #2563EB;
+            font-size: 12px;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+        .right-title {
+            color: #fff;
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .right-description {
+            color: rgba(255,255,255,0.7);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        /* Form */
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-label {
+            display: block;
+            color: rgba(255,255,255,0.9);
+            font-size: 12px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .form-input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #2563EB;
+            background: rgba(37, 99, 235, 0.1);
+        }
+        .form-input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        /* Password field with eye icon */
+        .password-wrapper {
+            position: relative;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.5);
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        /* Remember me & Forgot */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+        }
+        .remember-me input {
+            width: 18px;
+            height: 18px;
+            accent-color: #2563EB;
+        }
+        .forgot-link {
+            color: #2563EB;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .forgot-link:hover {
+            color: #f1c40f;
+        }
+        
+        /* Buttons */
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #2563EB, #1d4ed8);
+            color: #fff;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+        .divider span {
+            padding: 0 20px;
+        }
+        
+        /* Social Buttons */
+        .social-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .social-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .social-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.3);
+        }
+        
+        /* Footer */
+        .form-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+        }
+        .form-footer a {
+            color: #2563EB;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .form-footer a:hover {
+            color: #f1c40f;
+        }
+        
+        /* Alert */
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+        .alert.show {
+            display: block;
+        }
+        
+        /* RTL Support */
+        body[dir="rtl"] .left-panel {
+            order: 2;
+        }
+        body[dir="rtl"] .right-panel {
+            order: 1;
+        }
+        body[dir="rtl"] .lang-switcher {
+            right: auto;
+            left: 20px;
+        }
+        body[dir="rtl"] .toggle-password {
+            right: auto;
+            left: 15px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .left-panel {
+                display: none;
+            }
+            .right-panel {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Language Switcher -->
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+        <span style="color: rgba(255,255,255,0.5);">|</span>
+        <button class="lang-btn" onclick="setLanguage('ar')">AR</button>
+    </div>
+
+    <!-- Left Panel -->
+    <div class="left-panel">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div>
+                <div class="logo-text">TopCompSports</div>
+                <div class="logo-subtitle" data-en="COMPETITION PLATFORM" data-ar="منصة المنافسات">COMPETITION PLATFORM</div>
+            </div>
+        </div>
+        <div class="left-content">
+            <div class="left-tagline" data-en="WELCOME BACK" data-ar="مرحباً بعودتك">WELCOME BACK</div>
+            <h1 class="left-title" data-en="Ready to compete?" data-ar="مستعد للمنافسة؟">Ready to compete?</h1>
+            <p class="left-description" data-en="Sign in to access your profile, manage your events, and track your progress in the competition." data-ar="سجل دخولك للوصول إلى ملفك الشخصي، وإدارة أحداثك، ومتابعة تقدمك في المنافسة.">Sign in to access your profile, manage your events, and track your progress in the competition.</p>
+            <div class="left-footer" data-en="SECURE ACCESS FOR THE COMPETITION COMMUNITY" data-ar="وصول آمن لمجتمع المنافسات">SECURE ACCESS FOR THE COMPETITION COMMUNITY</div>
+        </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+        <div class="right-header">
+            <div class="right-tagline" data-en="SIGN IN TO YOUR ACCOUNT" data-ar="تسجيل الدخول إلى حسابك">SIGN IN TO YOUR ACCOUNT</div>
+            <h1 class="right-title" data-en="Welcome back." data-ar="مرحباً بعودتك.">Welcome back.</h1>
+            <p class="right-description" data-en="Enter your credentials to access your TopCompSports account." data-ar="أدخل بياناتك للوصول إلى حسابك في TopCompSports.">Enter your credentials to access your TopCompSports account.</p>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert" id="alert"></div>
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label class="form-label" data-en="EMAIL ADDRESS" data-ar="البريد الإلكتروني">EMAIL ADDRESS</label>
+                <input type="email" class="form-input" id="email" required placeholder="you@example.com" data-placeholder-en="you@example.com" data-placeholder-ar="example@email.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" data-en="PASSWORD" data-ar="كلمة المرور">PASSWORD</label>
+                <div class="password-wrapper">
+                    <input type="password" class="form-input" id="password" required placeholder="Enter your password" data-placeholder-en="Enter your password" data-placeholder-ar="أدخل كلمة المرور">
+                    <button type="button" class="toggle-password" onclick="togglePassword()">️</button>
+                </div>
+            </div>
+
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <span data-en="Remember me" data-ar="تذكرني">Remember me</span>
+                </label>
+                <a href="#" class="forgot-link" onclick="handleForgotPassword(event)" data-en="Forgot password?" data-ar="نسيت كلمة المرور؟">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn-primary" id="loginBtn" data-en="SIGN IN →" data-ar="← تسجيل الدخول">SIGN IN →</button>
+        </form>
+
+        <div class="divider">
+            <span data-en="OR CONTINUE WITH" data-ar="أو المتابعة عبر">OR CONTINUE WITH</span>
+        </div>
+
+        <div class="social-buttons">
+            <button class="social-btn" onclick="socialLogin('google')">
+                <span style="color: #4285f4;">G</span>
+                <span>Google</span>
+            </button>
+            <button class="social-btn" onclick="socialLogin('facebook')">
+                <span style="color: #1877f2;">f</span>
+                <span>Facebook</span>
+            </button>
+        </div>
+
+        <div class="form-footer">
+            <span data-en="Don't have an account?" data-ar="ليس لديك حساب؟">Don't have an account?</span>
+            <a href="signup.html" data-en="Create one" data-ar="أنشئ حساباً">Create one</a>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let currentLang = 'en';
+
+        // Language Switcher
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.lang = lang;
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                if (el.tagName === 'INPUT' && el.getAttribute(`data-placeholder-${lang}`)) {
+                    el.placeholder = el.getAttribute(`data-placeholder-${lang}`);
+                } else {
+                    const text = el.getAttribute(`data-${lang}`);
+                    if (text) el.textContent = text;
+                }
+            });
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Toggle Password Visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+        }
+
+        // Handle Login
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            const originalText = btn.textContent;
+            btn.textContent = currentLang === 'ar' ? 'جاري تسجيل الدخول...' : 'Signing in...';
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
+
+                // Get user profile to determine role
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('role, registration_step')
+                    .eq('id', data.user.id)
+                    .single();
+
+                if (profileError) throw profileError;
+
+                showAlert('success', currentLang === 'ar' ? '✅ تم تسجيل الدخول بنجاح!' : '✅ Login successful!');
+
+                // Redirect based on role and registration step
+                setTimeout(() => {
+                    if (profile.registration_step < 2) {
+                        // User needs to complete registration
+                        if (profile.role === 'athlete') {
+                            window.location.href = 'index.html';
+                        } else if (profile.role === 'coach') {
+                            window.location.href = 'complete-coach.html';
+                        } else if (profile.role === 'organizer') {
+                            window.location.href = 'complete-organizer.html';
+                        } else {
+                            window.location.href = 'home.html';
+                        }
+                    } else {
+                        // User has completed registration, go to dashboard
+                        if (profile.role === 'athlete') {
+                            window.location.href = 'athlete-dashboard.html';
+                        } else if (profile.role === 'coach') {
+                            window.location.href = 'coach-dashboard.html';
+                        } else if (profile.role === 'organizer') {
+                            window.location.href = 'organizer-dashboard.html';
+                        } else {
+                            window.location.href = 'home.html';
+                        }
+                    }
+                }, 1000);
+
+            } catch (err) {
+                console.error('Login error:', err);
+                let errorMsg = err.message;
+                
+                // Translate common errors
+                if (currentLang === 'ar') {
+                    if (errorMsg.includes('Invalid login credentials')) {
+                        errorMsg = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+                    } else if (errorMsg.includes('Email not confirmed')) {
+                        errorMsg = 'لم يتم تأكيد البريد الإلكتروني. تحقق من بريدك الوارد.';
+                    }
+                }
+                
+                showAlert('error', errorMsg);
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        // Handle Forgot Password
+        async function handleForgotPassword(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            
+            if (!email) {
+                showAlert('error', currentLang === 'ar' ? 'يرجى إدخال البريد الإلكتروني أولاً' : 'Please enter your email first');
+                return;
+            }
+
+            try {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin + '/reset-password.html'
+                });
+
+                if (error) throw error;
+
+                showAlert('success', currentLang === 'ar' ? '✅ تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك' : '✅ Password reset link sent to your email');
+            } catch (err) {
+                showAlert('error', err.message);
+            }
+        }
+
+        // Social Login (placeholder)
+        async function socialLogin(provider) {
+            try {
+                const { error } = await supabase.auth.signInWithOAuth({
+                    provider: provider,
+                    options: {
+                        redirectTo: window.location.origin + '/home.html'
+                    }
+                });
+
+                if (error) throw error;
+            } catch (err) {
+                showAlert('error', err.message);
+            }
+        }
+
+        // Show Alert
+        function showAlert(type, message) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        // Check if already logged in
+        window.onload = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                // Already logged in, redirect to appropriate page
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role, registration_step')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (profile) {
+                    if (profile.registration_step < 2) {
+                        if (profile.role === 'athlete') window.location.href = 'index.html';
+                        else if (profile.role === 'coach') window.location.href = 'complete-coach.html';
+                        else if (profile.role === 'organizer') window.location.href = 'complete-organizer.html';
+                    } else {
+                        if (profile.role === 'athlete') window.location.href = 'athlete-dashboard.html';
+                        else if (profile.role === 'coach') window.location.href = 'coach-dashboard.html';
+                        else if (profile.role === 'organizer') window.location.href = 'organizer-dashboard.html';
+                        else window.location.href = 'home.html';
+                    }
+                }
+            }
+        };
+    </script>
+</body>
+</html>
