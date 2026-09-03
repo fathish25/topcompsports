@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TopCompSports Tournament System</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; padding: 10px; min-height: 100vh; }
+.app-container { max-width: 1400px; margin: 0 auto; }
+.btn { padding: 12px 22px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.95rem; transition: all 0.2s; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: inline-flex; align-items: center; gap: 8px; }
+.btn:active { transform: scale(0.95); }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.3); }
+.btn-primary { background: linear-gradient(135deg, #27ae60, #2ecc71); color: #fff; }
+.btn-secondary { background: linear-gradient(135deg, #34495e, #5d6d7e); color: #fff; }
+.btn-danger { background: linear-gradient(135deg, #c0392b, #e74c3c); color: #fff; }
+.btn-warning { background: linear-gradient(135deg, #f39c12, #f1c40f); color: #000; }
+.btn-info { background: linear-gradient(135deg, #2980b9, #3498db); color: #fff; }
+.btn-purple { background: linear-gradient(135deg, #8e44ad, #9b59b6); color: #fff; }
+.btn-small { padding: 6px 12px; font-size: 0.85rem; }
+.btn-add { background: #27ae60; color: #fff; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.btn-add:hover { background: #2ecc71; }
+.section { background: linear-gradient(135deg, #1a1f2e 0%, #252f3e 100%); border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 8px 25px rgba(0,0,0,0.3); border: 1px solid #2a3548; }
+.section-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 20px; color: #f1c40f; border-bottom: 3px solid #2a3548; padding-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.app-header { background: linear-gradient(135deg, #151d2b 0%, #1e2a3a 100%); padding: 20px 30px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.4); border: 1px solid #2a3548; }
+.app-title { font-size: 1.8rem; font-weight: bold; color: #f1c40f; }
+.app-subtitle { font-size: 0.9rem; color: #8899aa; margin-top: 5px; }
+.header-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+.view { display: none; }
+.view.active { display: block; animation: fadeIn 0.5s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.players-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+.players-table th, .players-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #2a3548; }
+.players-table th { background: #151d2b; color: #8899aa; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; position: sticky; top: 0; }
+.players-table tr:hover { background: rgba(241,196,15,0.05); }
+.players-table input, .players-table select { background: #0f1724; border: 1px solid #2a3548; color: #fff; padding: 8px 10px; border-radius: 6px; font-size: 0.85rem; width: 100%; }
+.players-table input:focus, .players-table select:focus { outline: none; border-color: #f1c40f; }
+.player-number { font-weight: bold; color: #f1c40f; text-align: center; width: 50px; }
+.ranking-input { width: 70px !important; text-align: center; font-weight: bold; }
+.table-wrapper { max-height: 500px; overflow-y: auto; border-radius: 8px; border: 1px solid #2a3548; }
+.mats-count-selector { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+.mats-count-selector label { font-weight: bold; color: #f1c40f; }
+.mats-count-selector select { background: #0f1724; border: 2px solid #2a3548; color: #fff; padding: 10px 15px; border-radius: 8px; font-size: 1rem; font-weight: bold; min-width: 100px; }
+.mats-count-selector select:focus { outline: none; border-color: #f1c40f; }
+.mats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; }
+.mat-card { background: linear-gradient(135deg, #151d2b, #1e2a3a); border-radius: 12px; padding: 20px; border: 2px solid #2a3548; transition: all 0.3s; position: relative; }
+.mat-card:hover { border-color: #f1c40f; transform: translateY(-3px); box-shadow: 0 8px 25px rgba(241,196,15,0.2); }
+.mat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #2a3548; }
+.mat-title { font-size: 1.3rem; font-weight: bold; color: #f1c40f; }
+.mat-number { background: linear-gradient(135deg, #f1c40f, #f39c12); color: #000; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
+.mat-section-label { font-size: 0.8rem; color: #8899aa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; font-weight: bold; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+.tag-container { display: flex; flex-wrap: wrap; gap: 6px; min-height: 30px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 6px; }
+.tag { background: rgba(241,196,15,0.15); border: 1px solid rgba(241,196,15,0.4); color: #f1c40f; padding: 4px 10px; border-radius: 15px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px; }
+.tag .remove-tag { cursor: pointer; color: #e74c3c; font-weight: bold; font-size: 1rem; }
+.tag-empty { color: #556; font-style: italic; font-size: 0.85rem; }
+.add-tag-row { display: flex; gap: 6px; margin-top: 6px; }
+.add-tag-row select { flex: 1; background: #0f1724; border: 1px solid #2a3548; color: #fff; padding: 8px 10px; border-radius: 6px; font-size: 0.9rem; }
+.mat-stats { background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; color: #8899aa; margin-top: 10px; }
+.mat-stats span { color: #f1c40f; font-weight: bold; }
+.delete-mat-btn { position: absolute; top: 10px; right: 10px; background: #c0392b; color: #fff; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-weight: bold; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.delete-mat-btn:hover { background: #e74c3c; transform: scale(1.1); }
+.mat-view-btn { background: linear-gradient(135deg, #2980b9, #3498db); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%; transition: all 0.2s; }
+.mat-view-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(41,128,185,0.4); }
+.back-btn { background: linear-gradient(135deg, #2980b9, #3498db); color: #fff; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 8px; }
+.back-btn:hover { transform: translateY(-2px); }
+.mat-view-header { background: linear-gradient(135deg, #1e2a3a, #253447); padding: 25px; border-radius: 12px; margin-bottom: 20px; border-left: 5px solid #f1c40f; }
+.mat-view-header h1 { color: #f1c40f; font-size: 2rem; margin-bottom: 10px; }
+.mat-view-header .mat-info { color: #8899aa; font-size: 1rem; }
+.category-card { background: linear-gradient(135deg, #151d2b, #1e2a3a); border: 2px solid #2a3548; border-radius: 10px; padding: 20px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s; }
+.category-card:hover { border-color: #f1c40f; transform: translateY(-3px); box-shadow: 0 8px 25px rgba(241,196,15,0.2); }
+.category-card h3 { color: #f1c40f; margin-bottom: 10px; font-size: 1.3rem; }
+.category-card .category-info { color: #8899aa; margin-bottom: 10px; }
+.category-card .player-count { background: rgba(241,196,15,0.15); color: #f1c40f; padding: 5px 12px; border-radius: 15px; font-size: 0.9rem; font-weight: bold; display: inline-block; }
+.bracket-container { overflow-x: auto; padding: 20px 0; background: linear-gradient(135deg, #0d1117, #151d2b); border-radius: 10px; margin-top: 20px; }
+.bracket { display: flex; gap: 40px; min-width: max-content; padding: 20px; }
+.bracket-round { display: flex; flex-direction: column; justify-content: space-around; min-width: 220px; }
+.round-title { text-align: center; font-size: 1rem; font-weight: bold; color: #f1c40f; margin-bottom: 15px; padding: 10px; background: rgba(241,196,15,0.1); border-radius: 8px; border: 2px solid rgba(241,196,15,0.3); }
+.match-card { background: linear-gradient(135deg, #151d2b, #1e2a3a); border: 2px solid #2a3548; border-radius: 10px; padding: 12px; margin: 8px 0; cursor: pointer; transition: all 0.3s; }
+.match-card:hover { border-color: #f1c40f; transform: translateY(-3px); box-shadow: 0 8px 25px rgba(241,196,15,0.3); }
+.match-card.active { border-color: #f1c40f; background: linear-gradient(135deg, #1e2a3a, #253447); }
+.match-card.completed { opacity: 0.8; border-color: #27ae60; }
+.match-number { font-size: 0.75rem; color: #8899aa; text-align: center; margin-bottom: 8px; font-weight: bold; }
+.match-player { padding: 8px 10px; border-radius: 6px; margin: 4px 0; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.match-player.red-side { background: rgba(196,18,48,0.25); border-left: 4px solid #c41230; }
+.match-player.blue-side { background: rgba(26,111,181,0.25); border-left: 4px solid #1a6fb5; }
+.match-player.winner { background: rgba(39,174,96,0.35); border-left-color: #27ae60; font-weight: bold; }
+.match-player.empty { color: #556; font-style: italic; background: rgba(127,140,141,0.1); }
+.match-player .player-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.match-player .player-score { font-weight: bold; min-width: 30px; text-align: right; }
+.match-player.bye { background: rgba(127,140,141,0.2); color: #888; font-style: italic; }
+.play-btn { background: linear-gradient(135deg, #27ae60, #2ecc71); color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; margin-top: 8px; width: 100%; }
+.play-btn:hover { background: linear-gradient(135deg, #2ecc71, #58d68d); }
+.standings-table { width: 100%; border-collapse: collapse; }
+.standings-table th, .standings-table td { padding: 8px 10px; text-align: center; border-bottom: 1px solid #2a3548; font-size: 0.9rem; }
+.standings-table th { background: rgba(155,89,182,0.2); color: #9b59b6; }
+.standings-table tr:nth-child(1) { background: rgba(241,196,15,0.15); }
+.standings-table tr:nth-child(2) { background: rgba(189,195,199,0.15); }
+.player-cell { text-align: left !important; font-weight: 500; }
+.scoreboard-section { display: none; }
+.scoreboard-section.active { display: block; animation: fadeIn 0.5s; }
+.match-setup { padding: 20px; background: linear-gradient(135deg, #151d2b, #1e2a3a); border-bottom: 2px solid #2a3548; display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; }
+.setup-group { display: flex; flex-direction: column; gap: 6px; min-width: 140px; }
+.setup-label { font-size: 0.75rem; color: #8899aa; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+.match-setup select, .match-setup input { background: #0f1724; border: 2px solid #2a3548; color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 0.95rem; }
+.match-setup select { cursor: pointer; min-width: 160px; }
+.match-setup input { min-width: 140px; }
+.match-setup select:focus, .match-setup input:focus { outline: none; border-color: #f1c40f; }
+.player-row-main { display: flex; align-items: center; padding: 15px 20px; border-bottom: 2px solid #2a3548; gap: 15px; background: linear-gradient(135deg, #1a1f2e, #252f3e); }
+.player-info-main { flex: 1; display: flex; align-items: center; gap: 15px; min-width: 0; }
+.team-logo-main { width: 55px; height: 55px; border-radius: 50%; background: linear-gradient(135deg, #2a3548, #34495e); border: 3px solid #3a4558; overflow: hidden; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.team-logo-main img { width: 100%; height: 100%; object-fit: cover; }
+.team-logo-main .placeholder { color: #556; font-size: 0.65rem; text-align: center; }
+.player-text { flex: 1; min-width: 0; }
+.player-name-main { background: transparent; border: none; color: #fff; font-size: 1.7rem; font-weight: 700; width: 100%; padding: 3px 0; text-transform: uppercase; letter-spacing: 1px; }
+.player-name-main:focus { outline: none; border-bottom: 3px solid #f1c40f; }
+.player-name-main::placeholder { color: #556; }
+.team-name-main { background: transparent; border: none; color: #8899aa; font-size: 0.95rem; width: 100%; padding: 2px 0; text-transform: uppercase; }
+.team-name-main:focus { outline: none; color: #b0bec5; }
+.team-name-main::placeholder { color: #445; }
+.score-box-main { width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 4rem; font-weight: bold; color: #fff; border-radius: 12px; flex-shrink: 0; box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+.player-row-main.red .score-box-main { background: linear-gradient(135deg, #c41230, #e74c3c); }
+.player-row-main.blue .score-box-main { background: linear-gradient(135deg, #1a6fb5, #3498db); }
+.ticker-bar { display: flex; align-items: center; background: linear-gradient(135deg, #0d1117, #151d2b); border-top: 3px solid #2a3548; border-bottom: 3px solid #2a3548; height: 55px; overflow: hidden; }
+.ticker-content { flex: 1; overflow: hidden; white-space: nowrap; position: relative; height: 100%; display: flex; align-items: center; }
+.ticker-text { display: inline-block; padding-left: 100%; animation: tickerScroll 25s linear infinite; color: #b0bec5; font-size: 1.05rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+.ticker-text span { color: #f1c40f; margin: 0 10px; font-weight: bold; }
+@keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+.timer-main { font-size: 2.8rem; font-weight: bold; font-variant-numeric: tabular-nums; color: #f1c40f; padding: 0 25px; flex-shrink: 0; letter-spacing: 3px; background: linear-gradient(135deg, #0d1117, #151d2b); border-left: 3px solid #2a3548; height: 100%; display: flex; align-items: center; text-shadow: 0 0 20px rgba(241,196,15,0.5); }
+.scoring-panels { display: grid; grid-template-columns: 1fr 1fr; background: linear-gradient(135deg, #0d1117, #151d2b); }
+.scoring-panel { padding: 18px; }
+.scoring-panel.red-panel { border-right: 3px solid #2a3548; }
+.panel-header { text-align: center; font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 3px solid; text-transform: uppercase; }
+.red-panel .panel-header { color: #e74c3c; border-color: #c41230; }
+.blue-panel .panel-header { color: #3498db; border-color: #1a6fb5; }
+.counters-row { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
+.counter-box { flex: 1; max-width: 170px; background: linear-gradient(135deg, #1e2a3a, #253447); border-radius: 10px; padding: 10px; text-align: center; border: 2px solid #2a3548; }
+.counter-label { font-size: 0.9rem; font-weight: bold; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.counter-value { font-size: 1.8rem; font-weight: bold; }
+.counter-box.adv .counter-label, .counter-box.adv .counter-value { color: #f1c40f; }
+.counter-box.pen .counter-label, .counter-box.pen .counter-value { color: #e74c3c; }
+.buttons-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px; }
+.buttons-grid button { padding: 14px 5px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.2rem; color: #fff; background: linear-gradient(135deg, #3a5a7a, #5d6d7e); }
+.buttons-grid button:active { transform: scale(0.95); }
+.buttons-grid button:hover { filter: brightness(1.2); transform: translateY(-2px); }
+.btn-plus { background: linear-gradient(135deg, #34495e, #5d6d7e) !important; }
+.btn-minus { background: linear-gradient(135deg, #5a7a9a, #7f8c8d) !important; opacity: 0.9; }
+.action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.action-row button { padding: 16px 8px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; color: #fff; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.action-row button:active { transform: scale(0.95); }
+.action-row button:hover { filter: brightness(1.15); transform: translateY(-2px); }
+.action-row .icon { font-size: 1.5rem; }
+.btn-adv-action { background: linear-gradient(135deg, #f1c40f, #f39c12) !important; color: #000 !important; }
+.btn-pen-action { background: linear-gradient(135deg, #e74c3c, #c0392b) !important; color: #fff !important; }
+.undo-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1rem; background: linear-gradient(135deg, #5a7a9a, #7f8c8d) !important; color: #fff; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.undo-btn:active { transform: scale(0.98); }
+.undo-btn:hover { filter: brightness(1.15); }
+.logo-input { display: none; }
+.control-bar { padding: 12px 20px; background: linear-gradient(135deg, #151d2b, #1e2a3a); display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px; border-top: 3px solid #2a3548; }
+.control-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; }
+.modal-overlay.active { display: flex; }
+.modal { background: linear-gradient(135deg, #1a1f2e, #252f3e); border-radius: 15px; padding: 30px; max-width: 420px; width: 90%; text-align: center; border: 3px solid #f1c40f; }
+.modal h2 { color: #f1c40f; margin-bottom: 15px; }
+.modal-match-info { background: rgba(241,196,15,0.1); padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 2px solid rgba(241,196,15,0.3); }
+.modal-buttons { display: flex; flex-direction: column; gap: 10px; }
+.modal-btn { padding: 15px; border: none; border-radius: 10px; font-weight: bold; font-size: 1.05rem; cursor: pointer; }
+.modal-btn:active { transform: scale(0.95); }
+.modal-btn:hover { transform: translateY(-2px); }
+.modal-btn.red { background: linear-gradient(135deg, #c41230, #e74c3c); color: #fff; }
+.modal-btn.blue { background: linear-gradient(135deg, #1a6fb5, #3498db); color: #fff; }
+.modal-btn.cancel { background: linear-gradient(135deg, #7f8c8d, #95a5a6); color: #fff; }
+@media (max-width: 900px) { .scoring-panels { grid-template-columns: 1fr; } .scoring-panel.red-panel { border-right: none; border-bottom: 3px solid #2a3548; } .player-name-main { font-size: 1.2rem; } .score-box-main { width: 70px; height: 70px; font-size: 3rem; } .timer-main { font-size: 2rem; padding: 0 15px; } .bracket { gap: 25px; } .bracket-round { min-width: 180px; } }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <div class="app-header">
+    <div>
+      <div class="app-title">🏆 TopCompSports Tournament System</div>
+      <div class="app-subtitle" id="headerSubtitle">Step 1: Players Registration</div>
+    </div>
+    <div class="header-buttons">
+      <button class="btn btn-info" onclick="navigateTo('players')">👥 Players</button>
+      <button class="btn btn-purple" onclick="navigateTo('mats')">🥋 Mats</button>
+      <button class="btn btn-warning" onclick="saveAllData()">💾 Save</button>
+      <button class="btn btn-secondary" onclick="loadAllData()"> Load</button>
+      <button class="btn btn-danger" onclick="clearAllData()">🗑️ Clear</button>
+    </div>
+  </div>
+
+  <div id="view-players" class="view active">
+    <div class="section">
+      <div class="section-title"> Players Registration (AJP Official Divisions) <span style="font-size: 1rem; color: #8899aa; margin-left: 10px;" id="playerCountBadge">0 / 100</span></div>
+      <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="addPlayerRow()">➕ Add Player</button>
+        <button class="btn btn-secondary" onclick="addMultiplePlayers()">➕ Add 10 Players</button>
+        <button class="btn btn-danger btn-small" onclick="clearAllPlayers()">️ Clear All</button>
+      </div>
+      <div class="table-wrapper">
+        <table class="players-table">
+          <thead><tr><th>#</th><th>Player Name</th><th>Team</th><th>Age Group</th><th>Gender</th><th>Weight</th><th>Belt</th><th>Ranking</th><th>Action</th></tr></thead>
+          <tbody id="playersTableBody"></tbody>
+        </table>
+      </div>
+      <button class="btn btn-primary" onclick="navigateTo('mats')" style="width: 100%; margin-top: 15px; padding: 15px; font-size: 1.1rem;">🥋 Proceed to Mats Setup →</button>
+    </div>
+  </div>
+
+  <div id="view-mats" class="view">
+    <div class="section">
+      <div class="section-title">🥋 Mats Setup - Configure Tournament Mats</div>
+      <div class="mats-count-selector">
+        <label for="matsCount">Number of Mats:</label>
+        <select id="matsCount" onchange="updateMatsCount()">
+          <option value="1">1 Mat</option><option value="2">2 Mats</option><option value="3">3 Mats</option><option value="4">4 Mats</option>
+          <option value="5">5 Mats</option><option value="6">6 Mats</option><option value="7">7 Mats</option><option value="8">8 Mats</option>
+        </select>
+        <span style="color: #8899aa; margin-left: 15px;">💡 Select weights, divisions, and belts from registered players data</span>
+      </div>
+      <div class="mats-grid" id="matsGrid"></div>
+      <button class="btn btn-primary" onclick="navigateTo('mat-overview')" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 1.1rem;">🏆 View Mats Overview →</button>
+    </div>
+  </div>
+
+  <div id="view-mat-overview" class="view">
+    <button class="back-btn" onclick="navigateTo('mats')">️ Back to Mats Setup</button>
+    <div class="section"><div class="section-title"> Mats Overview - Click Any Category to Start Bracket</div><div id="matOverviewContent"></div></div>
+  </div>
+
+  <div id="view-mat-view" class="view">
+    <button class="back-btn" onclick="navigateTo('mat-overview')">⬅️ Back to Mats Overview</button>
+    <div id="matViewContent"></div>
+  </div>
+
+  <div id="view-bracket" class="view">
+    <button class="back-btn" onclick="goBackFromBracket()">⬅️ Back</button>
+    <div id="bracketPageContent"></div>
+  </div>
+
+  <div id="view-scoreboard" class="view">
+    <div class="section" style="padding: 0; overflow: hidden; border-radius: 12px;">
+      <div class="match-setup">
+        <div class="setup-group"><span class="setup-label">Age Group</span><select id="divisionSelect" onchange="updateTicker()"></select></div>
+        <div class="setup-group"><span class="setup-label">Gender</span><select id="genderSelect" onchange="updateTicker()"><option value="Boys">Boys</option><option value="Girls">Girls</option><option value="Men">Men</option><option value="Women">Women</option></select></div>
+        <div class="setup-group"><span class="setup-label">Weight</span><input type="text" id="weightInput" placeholder="e.g. -77kg" oninput="updateTicker()"></div>
+        <div class="setup-group"><span class="setup-label">Belt</span><select id="beltSelect" onchange="updateTicker()"></select></div>
+        <div class="setup-group"><span class="setup-label">Level</span><select id="levelSelect" onchange="updateTicker()"><option value="Professional">Professional</option><option value="Amateur">Amateur</option><option value="Hobbyist">Hobbyist</option></select></div>
+        <div class="setup-group"><span class="setup-label">Round</span><select id="roundSelect" onchange="updateTicker()"><option value="Pool Match">Pool Match</option><option value="Elimination">Elimination</option><option value="Round of 32">Round of 32</option><option value="Round of 16">Round of 16</option><option value="Quarterfinals">Quarterfinals</option><option value="Semifinals">Semifinals</option><option value="Repechage">Repechage</option><option value="Bronze Medal">Bronze Medal</option><option value="Finals">Finals</option></select></div>
+      </div>
+      <div class="player-row-main red" id="panelRed">
+        <div class="player-info-main">
+          <div class="team-logo-main" onclick="document.getElementById('logoRed').click()"><img id="logoDisplayRed" style="display:none;"><span class="placeholder" id="logoPlaceholderRed">Logo</span></div>
+          <input type="file" class="logo-input" id="logoRed" accept="image/*" onchange="handleLogoUpload('Red', this)">
+          <div class="player-text"><input type="text" class="player-name-main" placeholder="PLAYER NAME" id="nameRed" oninput="updateTicker()"><input type="text" class="team-name-main" placeholder="Team Name" id="teamRed" oninput="updateTicker()"></div>
+        </div>
+        <div class="score-box-main" id="scoreRed">0</div>
+      </div>
+      <div class="player-row-main blue" id="panelBlue">
+        <div class="player-info-main">
+          <div class="team-logo-main" onclick="document.getElementById('logoBlue').click()"><img id="logoDisplayBlue" style="display:none;"><span class="placeholder" id="logoPlaceholderBlue">Logo</span></div>
+          <input type="file" class="logo-input" id="logoBlue" accept="image/*" onchange="handleLogoUpload('Blue', this)">
+          <div class="player-text"><input type="text" class="player-name-main" placeholder="PLAYER NAME" id="nameBlue" oninput="updateTicker()"><input type="text" class="team-name-main" placeholder="Team Name" id="teamBlue" oninput="updateTicker()"></div>
+        </div>
+        <div class="score-box-main" id="scoreBlue">0</div>
+      </div>
+      <div class="ticker-bar"><div class="ticker-content"><div class="ticker-text" id="tickerText"><span>⚔️</span> ADULT / — KG <span>•</span> WHITE BELT <span>•</span> ELIMINATION <span>•</span> RED PLAYER VS BLUE PLAYER</div></div><div class="timer-main" id="timer">05:00</div></div>
+      <div class="scoring-panels">
+        <div class="scoring-panel red-panel">
+          <div class="panel-header">🔴 Red Player</div>
+          <div class="counters-row"><div class="counter-box adv"><div class="counter-label">⭐ Advantage</div><div class="counter-value" id="counterAdvRed">0</div></div><div class="counter-box pen"><div class="counter-label"> Penalty</div><div class="counter-value" id="counterPenRed">0</div></div></div>
+          <div class="buttons-grid"><button class="btn-plus" onclick="addPoints('Red', 1)">+1</button><button class="btn-plus" onclick="addPoints('Red', 2)">+2</button><button class="btn-plus" onclick="addPoints('Red', 3)">+3</button><button class="btn-plus" onclick="addPoints('Red', 4)">+4</button><button class="btn-minus" onclick="subtractPoints('Red', 1)">-1</button><button class="btn-minus" onclick="subtractPoints('Red', 2)">-2</button><button class="btn-minus" onclick="subtractPoints('Red', 3)">-3</button><button class="btn-minus" onclick="subtractPoints('Red', 4)">-4</button></div>
+          <div class="action-row"><button class="btn-adv-action" onclick="addAdvantage('Red')"><span class="icon">⭐</span><span>Advantage</span></button><button class="btn-pen-action" onclick="addWarning('Red')"><span class="icon">🟥</span><span>Penalty</span></button></div>
+          <button class="undo-btn" onclick="undo('Red')">↩️ Undo</button>
+        </div>
+        <div class="scoring-panel blue-panel">
+          <div class="panel-header">🔵 Blue Player</div>
+          <div class="counters-row"><div class="counter-box adv"><div class="counter-label">⭐ Advantage</div><div class="counter-value" id="counterAdvBlue">0</div></div><div class="counter-box pen"><div class="counter-label">🟥 Penalty</div><div class="counter-value" id="counterPenBlue">0</div></div></div>
+          <div class="buttons-grid"><button class="btn-plus" onclick="addPoints('Blue', 1)">+1</button><button class="btn-plus" onclick="addPoints('Blue', 2)">+2</button><button class="btn-plus" onclick="addPoints('Blue', 3)">+3</button><button class="btn-plus" onclick="addPoints('Blue', 4)">+4</button><button class="btn-minus" onclick="subtractPoints('Blue', 1)">-1</button><button class="btn-minus" onclick="subtractPoints('Blue', 2)">-2</button><button class="btn-minus" onclick="subtractPoints('Blue', 3)">-3</button><button class="btn-minus" onclick="subtractPoints('Blue', 4)">-4</button></div>
+          <div class="action-row"><button class="btn-adv-action" onclick="addAdvantage('Blue')"><span class="icon">⭐</span><span>Advantage</span></button><button class="btn-pen-action" onclick="addWarning('Blue')"><span class="icon"></span><span>Penalty</span></button></div>
+          <button class="undo-btn" onclick="undo('Blue')">↩️ Undo</button>
+        </div>
+      </div>
+      <div class="control-bar"><div class="control-buttons"><button class="btn btn-info" onclick="backFromScoreboard()">⬅️ Back to Bracket</button><button class="btn btn-primary" onclick="startTimer()">▶ Start</button><button class="btn btn-warning" onclick="stopTimer()">⏸ Pause</button><button class="btn btn-danger" onclick="finishFight()">🏁 Finish</button><button class="btn btn-secondary" onclick="swapAll()">🔄 Swap</button><button class="btn btn-secondary" onclick="resetMatch()">↺ Reset</button></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="winnerModal">
+  <div class="modal">
+    <h2>🏆 Select Winner</h2>
+    <div class="modal-match-info"><p id="modalPlayers" style="font-size: 1.15rem; margin-bottom: 8px;"></p><p id="modalRound" style="color: #8899aa;"></p></div>
+    <div class="modal-buttons"><button class="modal-btn red" onclick="declareWinner('Red')">🔴 Red Player Wins</button><button class="modal-btn blue" onclick="declareWinner('Blue')">🔵 Blue Player Wins</button><button class="modal-btn cancel" onclick="closeModal()">❌ Cancel</button></div>
+  </div>
+</div>
+
+<script>
+const MAX_PLAYERS = 100;
+let players = [];
+let mats = [];
+let currentMatchId = null;
+let currentBracketKey = null;
+let matchDuration = 300, timeLeft = 300, timerInterval = null, isRunning = false;
+let state = {
+  Red: { score: 0, advantages: 0, warnings: 0, history: [], isDQ: false },
+  Blue: { score: 0, advantages: 0, warnings: 0, history: [], isDQ: false }
+};
+
+// ===== AJP OFFICIAL AGE GROUPS =====
+const AGE_GROUPS = {
+  'Kids 1': { age: '4-5', fightTime: 2, category: 'under16' },
+  'Kids 2': { age: '6-7', fightTime: 2, category: 'under16' },
+  'Kids 3': { age: '8-9', fightTime: 2, category: 'under16' },
+  'Infant': { age: '10-11', fightTime: 3, category: 'under16' },
+  'Junior': { age: '12-13', fightTime: 3, category: 'under16' },
+  'Teen': { age: '14-15', fightTime: 3, category: 'under16' },
+  'Youth': { age: '16-17', fightTime: 4, category: 'over16' },
+  'Amateur/Professional': { age: '18-29', fightTime: 5, category: 'over16' },
+  'Master 1': { age: '30-35', fightTime: 5, category: 'over16' },
+  'Master 2': { age: '36-40', fightTime: 5, category: 'over16' },
+  'Master 3': { age: '41-45', fightTime: 5, category: 'over16' },
+  'Master 4': { age: '46+', fightTime: 5, category: 'over16' }
+};
+
+// ===== AJP OFFICIAL BELT LEVELS =====
+const BELT_LEVELS = {
+  'Kids': ['White', 'Grey', 'Yellow', 'Orange', 'Green'],
+  'Youth': ['White', 'Blue', 'Purple'],
+  'AmateurProfessional': ['White', 'Blue', 'Purple', 'Brown', 'Black'],
+  'Master': ['White', 'Blue', 'Purple', 'Brown', 'Black']
+};
+
+// ===== AJP OFFICIAL WEIGHT CLASSES (2026) =====
+// Format: [weightValue, weightName]
+const WEIGHT_CLASSES = {
+  'Boys': {
+    'Teen': [['-38kg','Rooster'],['-42kg','Light Feather'],['-46kg','Feather'],['-50kg','Light'],['-54kg','Welter'],['-62kg','Middle'],['-67kg','Light Heavy'],['-72kg','Heavy'],['+72kg','Super Heavy']],
+    'Junior': [['-34kg','Rooster'],['-37kg','Light Feather'],['-41kg','Feather'],['-45kg','Light'],['-50kg','Welter'],['-55kg','Middle'],['-60kg','Light Heavy'],['-65kg','Heavy'],['+65kg','Super Heavy']],
+    'Infant': [['-24kg','Rooster'],['-27kg','Light Feather'],['-30kg','Feather'],['-34kg','Light'],['-38kg','Welter'],['-42kg','Middle'],['-46kg','Light Heavy'],['-50kg','Heavy'],['+50kg','Super Heavy']],
+    'Kids 3': [['-21kg','Rooster'],['-24kg','Light Feather'],['-27kg','Feather'],['-30kg','Light'],['-34kg','Welter'],['-38kg','Middle'],['-42kg','Light Heavy'],['-46kg','Heavy'],['+46kg','Super Heavy']],
+    'Kids 2': [['-18kg','Rooster'],['-20kg','Light Feather'],['-23kg','Feather'],['-26kg','Light'],['-30kg','Welter'],['-34kg','Middle'],['-38kg','Light Heavy'],['-42kg','Heavy'],['+42kg','Super Heavy']],
+    'Kids 1': [['-16kg','Rooster'],['-18kg','Light Feather'],['-21kg','Feather'],['-24kg','Light'],['-28kg','Welter'],['-32kg','Middle'],['-36kg','Light Heavy'],['-40kg','Heavy'],['+40kg','Super Heavy']]
+  },
+  'Girls': {
+    'Teen': [['-38kg','Rooster'],['-40kg','Light Feather'],['-44kg','Feather'],['-48kg','Light'],['-53kg','Welter'],['-57kg','Middle'],['-63kg','Light Heavy'],['-68kg','Heavy'],['+68kg','Super Heavy']],
+    'Junior': [['-32kg','Rooster'],['-34kg','Light Feather'],['-40kg','Feather'],['-44kg','Light'],['-48kg','Welter'],['-52kg','Middle'],['-57kg','Light Heavy'],['-63kg','Heavy'],['+63kg','Super Heavy']],
+    'Infant': [['-22kg','Rooster'],['-25kg','Light Feather'],['-28kg','Feather'],['-32kg','Light'],['-36kg','Welter'],['-40kg','Middle'],['-44kg','Light Heavy'],['-48kg','Heavy'],['+48kg','Super Heavy']],
+    'Kids 3': [['-20kg','Rooster'],['-22kg','Light Feather'],['-25kg','Feather'],['-28kg','Light'],['-32kg','Welter'],['-36kg','Middle'],['-40kg','Light Heavy'],['-44kg','Heavy'],['+44kg','Super Heavy']],
+    'Kids 2': [['-17kg','Rooster'],['-19kg','Light Feather'],['-22kg','Feather'],['-24kg','Light'],['-27kg','Welter'],['-32kg','Middle'],['-37kg','Light Heavy'],['-42kg','Heavy'],['+42kg','Super Heavy']],
+    'Kids 1': [['-16kg','Rooster'],['-18kg','Light Feather'],['-21kg','Feather'],['-24kg','Light'],['-26kg','Welter'],['-32kg','Middle'],['-36kg','Light Heavy'],['-42kg','Heavy'],['+42kg','Super Heavy']]
+  },
+  'Men': {
+    'Master 4': [['-56kg','Light Feather'],['-62kg','Feather'],['-67kg','Light'],['-77kg','Welter'],['-82kg','Middle'],['-88kg','Light Heavy'],['-94kg','Heavy'],['-120kg','Super Heavy'],['+120kg','Absolute']],
+    'Master 3': [['-56kg','Light Feather'],['-62kg','Feather'],['-67kg','Light'],['-77kg','Welter'],['-82kg','Middle'],['-88kg','Light Heavy'],['-94kg','Heavy'],['-120kg','Super Heavy'],['+120kg','Absolute']],
+    'Master 2': [['-56kg','Light Feather'],['-62kg','Feather'],['-67kg','Light'],['-77kg','Welter'],['-82kg','Middle'],['-88kg','Light Heavy'],['-94kg','Heavy'],['-120kg','Super Heavy'],['+120kg','Absolute']],
+    'Master 1': [['-56kg','Light Feather'],['-62kg','Feather'],['-67kg','Light'],['-77kg','Welter'],['-82kg','Middle'],['-88kg','Light Heavy'],['-94kg','Heavy'],['-120kg','Super Heavy'],['+120kg','Absolute']],
+    'Amateur/Professional': [['-56kg','Light Feather'],['-62kg','Feather'],['-67kg','Light'],['-77kg','Welter'],['-82kg','Middle'],['-88kg','Light Heavy'],['-94kg','Heavy'],['-120kg','Super Heavy'],['+120kg','Absolute']],
+    'Youth': [['-44kg','Rooster'],['-50kg','Light Feather'],['-55kg','Feather'],['-60kg','Light'],['-67kg','Welter'],['-73kg','Middle'],['-81kg','Light Heavy'],['-89kg','Heavy'],['-94kg','Super Heavy'],['+94kg','Absolute']]
+  },
+  'Women': {
+    'Master': [['-47kg','Rooster'],['-55kg','Light Feather'],['-62kg','Light'],['-70kg','Welter'],['-80kg','Middle'],['-90kg','Light Heavy'],['-95kg','Heavy'],['+95kg','Absolute']],
+    'Amateur/Professional': [['-47kg','Rooster'],['-55kg','Light Feather'],['-62kg','Light'],['-70kg','Welter'],['-80kg','Middle'],['-90kg','Light Heavy'],['-95kg','Heavy'],['+95kg','Absolute']],
+    'Youth': [['-40kg','Rooster'],['-44kg','Light Feather'],['-48kg','Feather'],['-52kg','Light'],['-57kg','Welter'],['-63kg','Middle'],['-70kg','Light Heavy'],['-82kg','Heavy'],['+82kg','Absolute']]
+  }
+};
+
+function getFightTime(ageGroup) {
+  if (AGE_GROUPS[ageGroup]) return AGE_GROUPS[ageGroup].fightTime;
+  return 5;
+}
+
+function getBeltOptions(ageGroup) {
+  if (!ageGroup) return ['White', 'Blue', 'Purple', 'Brown', 'Black'];
+  if (['Kids 1','Kids 2','Kids 3','Infant','Junior','Teen'].includes(ageGroup)) return BELT_LEVELS['Kids'];
+  if (ageGroup === 'Youth') return BELT_LEVELS['Youth'];
+  if (ageGroup === 'Amateur/Professional') return BELT_LEVELS['AmateurProfessional'];
+  if (['Master 1','Master 2','Master 3','Master 4'].includes(ageGroup)) return BELT_LEVELS['Master'];
+  return ['White', 'Blue', 'Purple', 'Brown', 'Black'];
+}
+
+function getWeightOptions(gender, ageGroup) {
+  if (!gender || !ageGroup) return [];
+  if (WEIGHT_CLASSES[gender] && WEIGHT_CLASSES[gender][ageGroup]) {
+    return WEIGHT_CLASSES[gender][ageGroup];
+  }
+  return [];
+}
+
+function navigateTo(viewName, params) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + viewName).classList.add('active');
+  const subtitle = document.getElementById('headerSubtitle');
+  if (viewName === 'players') subtitle.innerText = 'Step 1: Players Registration';
+  else if (viewName === 'mats') { subtitle.innerText = 'Step 2: Mats Setup'; renderMatsGrid(); }
+  else if (viewName === 'mat-overview') { subtitle.innerText = 'Mats Overview'; renderMatOverview(); }
+  else if (viewName === 'mat-view') { subtitle.innerText = 'Mat ' + params.matId + ' Details'; renderMatView(params.matId); }
+  else if (viewName === 'bracket') { subtitle.innerText = 'Bracket - ' + params.category; renderBracketPage(params); }
+  else if (viewName === 'scoreboard') { subtitle.innerText = 'Scoreboard'; }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBackFromBracket() {
+  const params = JSON.parse(sessionStorage.getItem('currentBracketParams') || '{}');
+  if (params.matId) navigateTo('mat-view', { matId: params.matId });
+  else navigateTo('mat-overview');
+}
+
+function backFromScoreboard() {
+  const params = JSON.parse(sessionStorage.getItem('currentBracketParams') || '{}');
+  if (params.category) navigateTo('bracket', params);
+  else navigateTo('mat-overview');
+}
+
+function addPlayerRow() {
+  if (players.length >= MAX_PLAYERS) { alert('Maximum ' + MAX_PLAYERS + ' players!'); return; }
+  players.push({ id: Date.now() + players.length, name: '', team: '', ageGroup: 'Amateur/Professional', gender: 'Men', weight: '', belt: 'White', ranking: players.length + 1 });
+  renderPlayersTable();
+}
+
+function addMultiplePlayers() {
+  if (players.length + 10 > MAX_PLAYERS) { alert('Cannot add 10 players. Maximum reached.'); return; }
+  for (let i = 0; i < 10; i++) addPlayerRow();
+}
+
+function renderPlayersTable() {
+  const tbody = document.getElementById('playersTableBody');
+  tbody.innerHTML = '';
+  players.forEach((p, i) => {
+    const row = document.createElement('tr');
+    const weightOptions = getWeightOptions(p.gender, p.ageGroup);
+    let weightHTML = '<option value="">-- Weight --</option>';
+    weightOptions.forEach(w => {
+      weightHTML += '<option value="' + w[0] + '" ' + (p.weight===w[0]?'selected':'') + '>' + w[1] + ' ' + w[0] + '</option>';
+    });
+    
+    row.innerHTML = '<td class="player-number">' + (i + 1) + '</td>' +
+      '<td><input type="text" placeholder="Player Name" value="' + p.name + '" onchange="updatePlayer(' + i + ', \'name\', this.value)"></td>' +
+      '<td><input type="text" placeholder="Team" value="' + p.team + '" onchange="updatePlayer(' + i + ', \'team\', this.value)"></td>' +
+      '<td><select onchange="updatePlayer(' + i + ', \'ageGroup\', this.value); players[' + i + '].weight=\'\'; renderPlayersTable();">' + 
+        Object.keys(AGE_GROUPS).map(d => '<option value="' + d + '" ' + (p.ageGroup===d?'selected':'') + '>' + d + ' (' + AGE_GROUPS[d].age + ')</option>').join('') + 
+      '</select></td>' +
+      '<td><select onchange="updatePlayer(' + i + ', \'gender\', this.value); players[' + i + '].weight=\'\'; renderPlayersTable();">' + 
+        ['Boys','Girls','Men','Women'].map(g => '<option value="' + g + '" ' + (p.gender===g?'selected':'') + '>' + g + '</option>').join('') + 
+      '</select></td>' +
+      '<td><select onchange="updatePlayer(' + i + ', \'weight\', this.value);">' + weightHTML + '</select></td>' +
+      '<td><select onchange="updatePlayer(' + i + ', \'belt\', this.value);">' + 
+        getBeltOptions(p.ageGroup).map(b => '<option value="' + b + '" ' + (p.belt===b?'selected':'') + '>' + b + '</option>').join('') +
+      '</select></td>' +
+      '<td><input type="number" class="ranking-input" min="1" max="100" value="' + p.ranking + '" onchange="updatePlayer(' + i + ', \'ranking\', this.value)"></td>' +
+      '<td><button class="btn btn-danger btn-small" onclick="removePlayer(' + i + ')">✕</button></td>';
+    tbody.appendChild(row);
+  });
+  document.getElementById('playerCountBadge').innerText = players.length + ' / ' + MAX_PLAYERS;
+}
+
+function updatePlayer(idx, field, value) { players[idx][field] = field === 'ranking' ? parseInt(value) || 999 : value; }
+function removePlayer(idx) { players.splice(idx, 1); renderPlayersTable(); }
+function clearAllPlayers() { if (confirm('Clear all players?')) { players = []; renderPlayersTable(); } }
+
+function getUniqueFromPlayers(field) {
+  return [...new Set(players.map(p => p[field]).filter(v => v && v.trim() !== ''))].sort();
+}
+
+function updateMatsCount() {
+  const count = parseInt(document.getElementById('matsCount').value);
+  const existingMats = [...mats];
+  mats = [];
+  for (let i = 1; i <= count; i++) {
+    const existing = existingMats.find(m => m.id === i);
+    mats.push(existing || { id: i, weights: [], ageGroups: [], belts: [], genders: [] });
+  }
+  renderMatsGrid();
+}
+
+function renderMatsGrid() {
+  const grid = document.getElementById('matsGrid');
+  grid.innerHTML = '';
+  const uniqueWeights = getUniqueFromPlayers('weight');
+  const uniqueAgeGroups = getUniqueFromPlayers('ageGroup');
+  const uniqueBelts = getUniqueFromPlayers('belt');
+  const uniqueGenders = getUniqueFromPlayers('gender');
+
+  mats.forEach(mat => {
+    const card = document.createElement('div');
+    card.className = 'mat-card';
+    card.innerHTML = '<button class="delete-mat-btn" onclick="deleteMat(' + mat.id + ')" title="Delete Mat">✕</button>' +
+      '<div class="mat-header"><div class="mat-title">Mat ' + mat.id + '</div><div class="mat-number">' + mat.id + '</div></div>' +
+      '<div class="mat-section-label">️ WEIGHTS (' + uniqueWeights.length + ' AVAILABLE)</div>' +
+      '<div class="tag-container" id="weights-' + mat.id + '">' +
+      (mat.weights.length === 0 ? '<span class="tag-empty">No weights selected</span>' :
+        mat.weights.map((w, i) => '<span class="tag">' + w + ' <span class="remove-tag" onclick="removeMatTag(' + mat.id + ', \'weights\', ' + i + ')">×</span></span>').join('')) +
+      '</div>' +
+      '<div class="add-tag-row"><select id="newWeight-' + mat.id + '"><option value="">-- Select Weight --</option>' +
+      uniqueWeights.map(w => '<option value="' + w + '" ' + (mat.weights.includes(w)?'disabled':'') + '>' + w + '</option>').join('') +
+      '</select><button class="btn-add" onclick="addMatTag(' + mat.id + ', \'weights\')">Add</button></div>' +
+      '<div class="mat-section-label">🥋 AGE GROUPS (' + uniqueAgeGroups.length + ' AVAILABLE)</div>' +
+      '<div class="tag-container" id="ageGroups-' + mat.id + '">' +
+      (mat.ageGroups.length === 0 ? '<span class="tag-empty">No age groups selected</span>' :
+        mat.ageGroups.map((d, i) => '<span class="tag">' + d + ' <span class="remove-tag" onclick="removeMatTag(' + mat.id + ', \'ageGroups\', ' + i + ')">×</span></span>').join('')) +
+      '</div>' +
+      '<div class="add-tag-row"><select id="newAgeGroup-' + mat.id + '"><option value="">-- Select Age Group --</option>' +
+      uniqueAgeGroups.map(d => '<option value="' + d + '" ' + (mat.ageGroups.includes(d)?'disabled':'') + '>' + d + '</option>').join('') +
+      '</select><button class="btn-add" onclick="addMatTag(' + mat.id + ', \'ageGroups\')">Add</button></div>' +
+      '<div class="mat-section-label">⚧ GENDER (' + uniqueGenders.length + ' AVAILABLE)</div>' +
+      '<div class="tag-container" id="genders-' + mat.id + '">' +
+      (mat.genders.length === 0 ? '<span class="tag-empty">No genders selected</span>' :
+        mat.genders.map((g, i) => '<span class="tag">' + g + ' <span class="remove-tag" onclick="removeMatTag(' + mat.id + ', \'genders\', ' + i + ')">×</span></span>').join('')) +
+      '</div>' +
+      '<div class="add-tag-row"><select id="newGender-' + mat.id + '"><option value="">-- Select Gender --</option>' +
+      uniqueGenders.map(g => '<option value="' + g + '" ' + (mat.genders.includes(g)?'disabled':'') + '>' + g + '</option>').join('') +
+      '</select><button class="btn-add" onclick="addMatTag(' + mat.id + ', \'genders\')">Add</button></div>' +
+      '<div class="mat-section-label">🎗️ BELTS (' + uniqueBelts.length + ' AVAILABLE)</div>' +
+      '<div class="tag-container" id="belts-' + mat.id + '">' +
+      (mat.belts.length === 0 ? '<span class="tag-empty">No belts selected</span>' :
+        mat.belts.map((b, i) => '<span class="tag">' + b + ' <span class="remove-tag" onclick="removeMatTag(' + mat.id + ', \'belts\', ' + i + ')">×</span></span>').join('')) +
+      '</div>' +
+      '<div class="add-tag-row"><select id="newBelt-' + mat.id + '"><option value="">-- Select Belt --</option>' +
+      uniqueBelts.map(b => '<option value="' + b + '" ' + (mat.belts.includes(b)?'disabled':'') + '>' + b + '</option>').join('') +
+      '</select><button class="btn-add" onclick="addMatTag(' + mat.id + ', \'belts\')">Add</button></div>' +
+      '<div class="mat-stats"><span>' + mat.weights.length + '</span> weights • <span>' + mat.ageGroups.length + '</span> age groups • <span>' + mat.genders.length + '</span> genders • <span>' + mat.belts.length + '</span> belts</div>' +
+      '<button class="mat-view-btn" onclick="navigateTo(\'mat-view\', { matId: ' + mat.id + ' })">🥋 View Mat ' + mat.id + ' & Start Brackets</button>';
+    grid.appendChild(card);
+  });
+}
+
+function deleteMat(matId) {
+  if (confirm('Delete Mat ' + matId + '?')) {
+    mats = mats.filter(m => m.id !== matId);
+    mats.forEach((m, i) => m.id = i + 1);
+    document.getElementById('matsCount').value = mats.length;
+    renderMatsGrid();
+  }
+}
+
+function addMatTag(matId, type) {
+  const mat = mats.find(m => m.id === matId);
+  if (!mat) return;
+  let selectId;
+  if (type === 'weights') selectId = 'newWeight-' + matId;
+  else if (type === 'ageGroups') selectId = 'newAgeGroup-' + matId;
+  else if (type === 'genders') selectId = 'newGender-' + matId;
+  else if (type === 'belts') selectId = 'newBelt-' + matId;
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  const value = select.value;
+  if (!value) { alert('Please select a value first!'); return; }
+  if (!mat[type].includes(value)) { mat[type].push(value); renderMatsGrid(); }
+  else { alert('This value is already added!'); }
+}
+
+function removeMatTag(matId, type, index) {
+  const mat = mats.find(m => m.id === matId);
+  if (!mat) return;
+  mat[type].splice(index, 1);
+  renderMatsGrid();
+}
+
+function renderMatOverview() {
+  const container = document.getElementById('matOverviewContent');
+  container.innerHTML = '';
+  if (mats.length === 0) { container.innerHTML = '<div style="text-align:center; padding: 40px; color: #8899aa;">No mats configured yet.</div>'; return; }
+  mats.forEach(mat => {
+    const matSection = document.createElement('div');
+    matSection.className = 'mat-card';
+    matSection.style.marginBottom = '20px';
+    matSection.style.cursor = 'default';
+    const allCombinations = [];
+    mat.weights.forEach(w => { mat.ageGroups.forEach(a => { mat.genders.forEach(g => { mat.belts.forEach(b => {
+      const matchingPlayers = players.filter(p => p.weight === w && p.ageGroup === a && p.gender === g && p.belt === b && p.name.trim() !== '');
+      allCombinations.push({ weight: w, ageGroup: a, gender: g, belt: b, players: matchingPlayers });
+    }); }); }); });
+    let categoriesHTML = '';
+    if (allCombinations.length === 0) { categoriesHTML = '<div style="color: #8899aa; padding: 15px;">No categories configured for this mat yet.</div>'; }
+    else {
+      categoriesHTML = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-top: 15px;">';
+      allCombinations.forEach(cat => {
+        categoriesHTML += '<div class="category-card" onclick="navigateTo(\'bracket\', { matId: ' + mat.id + ', weight: \'' + cat.weight + '\', ageGroup: \'' + cat.ageGroup + '\', gender: \'' + cat.gender + '\', belt: \'' + cat.belt + '\', category: \'Mat ' + mat.id + ' - ' + cat.gender + ' - ' + cat.ageGroup + ' - ' + cat.weight + ' - ' + cat.belt + '\' })">' +
+          '<h3>⚧ ' + cat.gender + ' |  ' + cat.ageGroup + ' | ️ ' + cat.weight + ' | 🎗️ ' + cat.belt + '</h3>' +
+          '<div class="category-info">Fight Time: ' + getFightTime(cat.ageGroup) + ' min | Click to view bracket</div>' +
+          '<div class="player-count">' + cat.players.length + ' Players</div></div>';
+      });
+      categoriesHTML += '</div>';
+    }
+    matSection.innerHTML = '<div class="mat-header" style="margin-bottom: 15px;"><div class="mat-title">🥋 Mat ' + mat.id + '</div><div class="mat-number">' + mat.id + '</div></div>' +
+      '<div style="color: #8899aa; margin-bottom: 10px;"><strong style="color: #f1c40f;">Weights:</strong> ' + (mat.weights.length > 0 ? mat.weights.join(', ') : 'None') + '<br>' +
+      '<strong style="color: #f1c40f;">Age Groups:</strong> ' + (mat.ageGroups.length > 0 ? mat.ageGroups.join(', ') : 'None') + '<br>' +
+      '<strong style="color: #f1c40f;">Genders:</strong> ' + (mat.genders.length > 0 ? mat.genders.join(', ') : 'None') + '<br>' +
+      '<strong style="color: #f1c40f;">Belts:</strong> ' + (mat.belts.length > 0 ? mat.belts.join(', ') : 'None') + '</div>' + categoriesHTML;
+    container.appendChild(matSection);
+  });
+}
+
+function renderMatView(matId) {
+  const mat = mats.find(m => m.id === matId);
+  const container = document.getElementById('matViewContent');
+  if (!mat) { container.innerHTML = '<div class="section"><h2>Mat not found</h2></div>'; return; }
+  const allCombinations = [];
+  mat.weights.forEach(w => { mat.ageGroups.forEach(a => { mat.genders.forEach(g => { mat.belts.forEach(b => {
+    const matchingPlayers = players.filter(p => p.weight === w && p.ageGroup === a && p.gender === g && p.belt === b && p.name.trim() !== '');
+    allCombinations.push({ weight: w, ageGroup: a, gender: g, belt: b, players: matchingPlayers });
+  }); }); }); });
+  let categoriesHTML = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">';
+  allCombinations.forEach(cat => {
+    categoriesHTML += '<div class="category-card" onclick="navigateTo(\'bracket\', { matId: ' + mat.id + ', weight: \'' + cat.weight + '\', ageGroup: \'' + cat.ageGroup + '\', gender: \'' + cat.gender + '\', belt: \'' + cat.belt + '\', category: \'Mat ' + mat.id + ' - ' + cat.gender + ' - ' + cat.ageGroup + ' - ' + cat.weight + ' - ' + cat.belt + '\' })">' +
+      '<h3>⚧ ' + cat.gender + ' |  ' + cat.ageGroup + ' | ️ ' + cat.weight + ' | 🎗️ ' + cat.belt + '</h3>' +
+      '<div class="category-info">Fight Time: ' + getFightTime(cat.ageGroup) + ' min | Click to view bracket</div>' +
+      '<div class="player-count">' + cat.players.length + ' Players</div></div>';
+  });
+  categoriesHTML += '</div>';
+  container.innerHTML = '<div class="mat-view-header"><h1>🥋 Mat ' + mat.id + '</h1><div class="mat-info"><strong>Weights:</strong> ' + (mat.weights.length > 0 ? mat.weights.join(', ') : 'None') + '<br><strong>Age Groups:</strong> ' + (mat.ageGroups.length > 0 ? mat.ageGroups.join(', ') : 'None') + '<br><strong>Genders:</strong> ' + (mat.genders.length > 0 ? mat.genders.join(', ') : 'None') + '<br><strong>Belts:</strong> ' + (mat.belts.length > 0 ? mat.belts.join(', ') : 'None') + '</div></div><div class="section"><div class="section-title">📋 Categories in Mat ' + mat.id + '</div>' + categoriesHTML + '</div>';
+}
+
+function getBracketKey(matId, weight, ageGroup, gender, belt) { return 'bracket_' + matId + '_' + weight + '_' + ageGroup + '_' + gender + '_' + belt; }
+function getBracketData(key) { const saved = localStorage.getItem('topcomp_bracket_' + key); if (saved) return JSON.parse(saved); return null; }
+function saveBracketData(key, data) { localStorage.setItem('topcomp_bracket_' + key, JSON.stringify(data)); }
+
+function renderBracketPage(params) {
+  sessionStorage.setItem('currentBracketParams', JSON.stringify(params));
+  const container = document.getElementById('bracketPageContent');
+  const matchingPlayers = players.filter(p => p.weight === params.weight && p.ageGroup === params.ageGroup && p.gender === params.gender && p.belt === params.belt && p.name.trim() !== '').sort((a, b) => a.ranking - b.ranking);
+  const bracketKey = getBracketKey(params.matId, params.weight, params.ageGroup, params.gender, params.belt);
+  let bracketData = getBracketData(bracketKey);
+  if (!bracketData) { bracketData = generateBracketData(matchingPlayers); saveBracketData(bracketKey, bracketData); }
+  currentBracketKey = bracketKey;
+  const fightTime = getFightTime(params.ageGroup);
+  let html = '<div class="mat-view-header"><h1>🥋 Mat ' + params.matId + ' - ' + params.gender + ' - ' + params.ageGroup + ' - ' + params.weight + ' - ' + params.belt + '</h1><div class="mat-info">' + matchingPlayers.length + ' Players | Fight Time: ' + fightTime + ' min | Click any match to start</div></div>';
+  if (matchingPlayers.length < 2) { html += '<div class="section"><div style="text-align:center; padding: 40px; color: #8899aa;">Need at least 2 players. Current: ' + matchingPlayers.length + '</div></div>'; container.innerHTML = html; return; }
+  html += '<div class="section"><div class="bracket-container"><div class="bracket" id="bracketDisplay_' + bracketKey + '"></div></div></div>';
+  container.innerHTML = html;
+  renderBracketInContainer('bracketDisplay_' + bracketKey, bracketData, params);
+}
+
+function generateBracketData(matchingPlayers) {
+  if (matchingPlayers.length === 2) { return { type: 'finals', rounds: [[{ id: 'FINAL', round: 1, player1: matchingPlayers[0], player2: matchingPlayers[1], winner: null, score1: 0, score2: 0, isFinal: true }]] }; }
+  else if (matchingPlayers.length >= 3 && matchingPlayers.length <= 5) {
+    const poolMatches = []; let matchNum = 1;
+    for (let i = 0; i < matchingPlayers.length; i++) { for (let j = i + 1; j < matchingPlayers.length; j++) { poolMatches.push({ id: 'Pool_M' + matchNum, player1: matchingPlayers[i], player2: matchingPlayers[j], winner: null, score1: 0, score2: 0 }); matchNum++; } }
+    return { type: 'pool', players: matchingPlayers, standings: matchingPlayers.map(p => ({ player: p, wins: 0, losses: 0, points: 0, advantages: 0, penalties: 0 })), matches: poolMatches };
+  } else {
+    let bracketSize = 2; while (bracketSize < matchingPlayers.length) bracketSize *= 2;
+    const firstRound = [];
+    for (let i = 0; i < bracketSize / 2; i++) {
+      const p1 = matchingPlayers[i] || null; const p2 = matchingPlayers[bracketSize - 1 - i] || null;
+      let match = { id: 'R1_M' + (i+1), round: 1, player1: p1, player2: p2, winner: null, score1: 0, score2: 0 };
+      if (!p2 && p1) { match.winner = 'Red'; match.bye = true; } else if (!p1 && p2) { match.winner = 'Blue'; match.bye = true; }
+      firstRound.push(match);
+    }
+    const rounds = [firstRound]; let currentRoundSize = firstRound.length, roundNum = 2;
+    while (currentRoundSize > 1) { const nextRound = []; for (let i = 0; i < currentRoundSize / 2; i++) { nextRound.push({ id: 'R' + roundNum + '_M' + (i+1), round: roundNum, player1: null, player2: null, winner: null, score1: 0, score2: 0 }); } rounds.push(nextRound); currentRoundSize = nextRound.length; roundNum++; }
+    propagateBracketWinners(rounds);
+    return { type: 'bracket', rounds: rounds, repechage: [] };
+  }
+}
+
+function propagateBracketWinners(rounds) {
+  for (let r = 0; r < rounds.length - 1; r++) {
+    const currentRound = rounds[r], nextRound = rounds[r + 1];
+    for (let i = 0; i < currentRound.length; i++) {
+      const match = currentRound[i], nextMatchIdx = Math.floor(i / 2), isPlayer1Slot = i % 2 === 0;
+      if (match.winner) { const winnerPlayer = match.winner === 'Red' ? match.player1 : match.player2; if (isPlayer1Slot) nextRound[nextMatchIdx].player1 = winnerPlayer; else nextRound[nextMatchIdx].player2 = winnerPlayer; }
+      else { if (isPlayer1Slot) nextRound[nextMatchIdx].player1 = null; else nextRound[nextMatchIdx].player2 = null; }
+    }
+  }
+}
+
+function renderBracketInContainer(containerId, bracketData, params) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  if (bracketData.type === 'finals') {
+    const roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
+    const title = document.createElement('div'); title.className = 'round-title'; title.innerText = '🏆 Finals'; roundDiv.appendChild(title);
+    roundDiv.appendChild(createMatchCard(bracketData.rounds[0][0], params, bracketData));
+    container.appendChild(roundDiv);
+  } else if (bracketData.type === 'pool') {
+    const standingsDiv = document.createElement('div'); standingsDiv.className = 'bracket-round'; standingsDiv.style.minWidth = '400px';
+    const title = document.createElement('div'); title.className = 'round-title'; title.innerText = '📊 Pool Standings'; standingsDiv.appendChild(title);
+    const standingsTable = document.createElement('table'); standingsTable.className = 'standings-table'; standingsTable.style.width = '100%';
+    standingsTable.innerHTML = '<thead><tr><th>#</th><th>Player</th><th>W</th><th>L</th><th>Pts</th></tr></thead><tbody>' + bracketData.standings.map((s, idx) => '<tr><td>' + (idx + 1) + '</td><td class="player-cell">' + s.player.name + '</td><td>' + s.wins + '</td><td>' + s.losses + '</td><td><strong>' + s.points + '</strong></td></tr>').join('') + '</tbody>';
+    standingsDiv.appendChild(standingsTable); container.appendChild(standingsDiv);
+    const matchesDiv = document.createElement('div'); matchesDiv.className = 'bracket-round'; matchesDiv.style.minWidth = '300px';
+    const matchesTitle = document.createElement('div'); matchesTitle.className = 'round-title'; matchesTitle.innerText = '🤼 Pool Matches'; matchesDiv.appendChild(matchesTitle);
+    bracketData.matches.forEach(match => { matchesDiv.appendChild(createMatchCard(match, params, bracketData)); });
+    container.appendChild(matchesDiv);
+  } else if (bracketData.type === 'bracket') {
+    const roundNames = getRoundNames(bracketData.rounds.length);
+    bracketData.rounds.forEach((round, rIdx) => {
+      const roundDiv = document.createElement('div'); roundDiv.className = 'bracket-round';
+      const title = document.createElement('div'); title.className = 'round-title'; title.innerText = roundNames[rIdx] || 'Round ' + (rIdx + 1); roundDiv.appendChild(title);
+      round.forEach(match => { roundDiv.appendChild(createMatchCard(match, params, bracketData)); });
+      container.appendChild(roundDiv);
+    });
+    if (bracketData.repechage && bracketData.repechage.length > 0) {
+      const repDiv = document.createElement('div'); repDiv.className = 'bracket-round';
+      const repTitle = document.createElement('div'); repTitle.className = 'round-title'; repTitle.innerText = '🥉 Repechage'; repDiv.appendChild(repTitle);
+      bracketData.repechage.forEach(match => { repDiv.appendChild(createMatchCard(match, params, bracketData)); });
+      container.appendChild(repDiv);
+    }
+  }
+}
+
+function createMatchCard(match, params, bracketData) {
+  const card = document.createElement('div'); card.className = 'match-card';
+  if (match.winner) card.classList.add('completed');
+  if (currentMatchId === match.id) card.classList.add('active');
+  const p1Name = match.player1 ? match.player1.name : 'TBD';
+  const p2Name = match.player2 ? match.player2.name : 'TBD';
+  const p1Class = match.player1 ? 'red-side' : 'empty';
+  const p2Class = match.player2 ? 'blue-side' : 'empty';
+  const p1Winner = match.winner === 'Red' ? 'winner' : '';
+  const p2Winner = match.winner === 'Blue' ? 'winner' : '';
+  const byeClass = match.bye ? 'bye' : '';
+  card.innerHTML = '<div class="match-number">' + match.id + '</div>' +
+    '<div class="match-player ' + p1Class + ' ' + p1Winner + ' ' + byeClass + '"><span class="player-name">' + p1Name + '</span><span class="player-score">' + (match.score1 || '') + '</span></div>' +
+    '<div class="match-player ' + p2Class + ' ' + p2Winner + ' ' + byeClass + '"><span class="player-name">' + p2Name + '</span><span class="player-score">' + (match.score2 || '') + '</span></div>' +
+    (!match.winner && match.player1 && match.player2 ? '<button class="play-btn" onclick="openMatchForBracket(\'' + match.id + '\')">▶ Play Match</button>' : match.bye ? '<div style="text-align:center;font-size:0.75rem;color:#888;margin-top:8px;font-weight:bold;">BYE</div>' : '');
+  card.onclick = (e) => { if (e.target.tagName !== 'BUTTON') { currentMatchId = match.id; const containerId = 'bracketDisplay_' + currentBracketKey; const container = document.getElementById(containerId); const params2 = JSON.parse(sessionStorage.getItem('currentBracketParams') || '{}'); const bd = getBracketData(currentBracketKey); renderBracketInContainer(containerId, bd, params2); } };
+  return card;
+}
+
+function getRoundNames(totalRounds) { const names = []; for (let i = 0; i < totalRounds; i++) { const remaining = totalRounds - i; if (remaining === 1) names.push('🏆 Finals'); else if (remaining === 2) names.push('Semifinals'); else if (remaining === 3) names.push('Quarterfinals'); else if (remaining === 4) names.push('Round of 16'); else if (remaining === 5) names.push('Round of 32'); else names.push('Round ' + (i + 1)); } return names; }
+
+function openMatchForBracket(matchId) {
+  const params = JSON.parse(sessionStorage.getItem('currentBracketParams') || '{}');
+  const bracketData = getBracketData(currentBracketKey);
+  let match = null;
+  if (bracketData.type === 'finals') match = bracketData.rounds[0][0];
+  else if (bracketData.type === 'pool') match = bracketData.matches.find(m => m.id === matchId);
+  else if (bracketData.type === 'bracket') { for (const round of bracketData.rounds) { match = round.find(m => m.id === matchId); if (match) break; } if (!match && bracketData.repechage) match = bracketData.repechage.find(m => m.id === matchId); }
+  if (!match || !match.player1 || !match.player2) { alert('Both players must be determined first!'); return; }
+  currentMatchId = matchId;
+  document.getElementById('nameRed').value = match.player1.name || '';
+  document.getElementById('teamRed').value = match.player1.team || '';
+  document.getElementById('nameBlue').value = match.player2.name || '';
+  document.getElementById('teamBlue').value = match.player2.team || '';
+  document.getElementById('weightInput').value = match.player1.weight || '';
+  document.getElementById('beltSelect').value = match.player1.belt || 'White';
+  setAgeGroupFromPlayer(match.player1);
+  document.getElementById('genderSelect').value = match.player1.gender || 'Men';
+  const fightTime = getFightTime(match.player1.ageGroup);
+  matchDuration = fightTime * 60; timeLeft = matchDuration; updateDisplay();
+  if (bracketData.type === 'pool') document.getElementById('roundSelect').value = 'Pool Match';
+  else { const roundNames = getRoundNames(bracketData.rounds.length); document.getElementById('roundSelect').value = roundNames[match.round - 1] || 'Elimination'; }
+  resetMatch(); navigateTo('scoreboard');
+}
+
+function setAgeGroupFromPlayer(player) { const select = document.getElementById('divisionSelect'); const options = select.options; for (let i = 0; i < options.length; i++) { if (options[i].value === player.ageGroup) { select.selectedIndex = i; return; } } }
+
+function populateDivisionSelect() { const select = document.getElementById('divisionSelect'); select.innerHTML = ''; Object.keys(AGE_GROUPS).forEach(ag => { const opt = document.createElement('option'); opt.value = ag; opt.innerText = ag + ' (' + AGE_GROUPS[ag].age + ') - ' + AGE_GROUPS[ag].fightTime + ' min'; select.appendChild(opt); }); }
+function populateBeltSelect() { const select = document.getElementById('beltSelect'); select.innerHTML = ''; ['White','Grey','Yellow','Orange','Green','Blue','Purple','Brown','Black'].forEach(b => { const opt = document.createElement('option'); opt.value = b; opt.innerText = b; select.appendChild(opt); }); }
+
+function finishFight() {
+  stopTimer(); timeLeft = 0; updateDisplay();
+  if (!currentMatchId) { alert('No match selected!'); return; }
+  const params = JSON.parse(sessionStorage.getItem('currentBracketParams') || '{}');
+  const bracketData = getBracketData(currentBracketKey);
+  let match = null;
+  if (bracketData.type === 'finals') match = bracketData.rounds[0][0];
+  else if (bracketData.type === 'pool') match = bracketData.matches.find(m => m.id === currentMatchId);
+  else if (bracketData.type === 'bracket') { for (const round of bracketData.rounds) { match = round.find(m => m.id === currentMatchId); if (match) break; } if (!match && bracketData.repechage) match = bracketData.repechage.find(m => m.id === currentMatchId); }
+  if (!match || !match.player1 || !match.player2) return;
+  document.getElementById('modalPlayers').innerText = match.player1.name + ' vs ' + match.player2.name;
+  document.getElementById('modalRound').innerText = params.category || 'Match';
+  document.getElementById('winnerModal').classList.add('active');
+}
+
+function declareWinner(side) {
+  if (!currentMatchId) return;
+  const params = JSON.parse(sessionStorage.getItem('currentBracketParams') || '{}');
+  const bracketData = getBracketData(currentBracketKey);
+  let match = null;
+  if (bracketData.type === 'finals') match = bracketData.rounds[0][0];
+  else if (bracketData.type === 'pool') match = bracketData.matches.find(m => m.id === currentMatchId);
+  else if (bracketData.type === 'bracket') { for (const round of bracketData.rounds) { match = round.find(m => m.id === currentMatchId); if (match) break; } if (!match && bracketData.repechage) match = bracketData.repechage.find(m => m.id === currentMatchId); }
+  if (!match) return;
+  match.winner = side; match.score1 = state.Red.score; match.score2 = state.Blue.score;
+  if (bracketData.type === 'pool') {
+    const p1 = bracketData.standings.find(s => s.player.id === match.player1.id);
+    const p2 = bracketData.standings.find(s => s.player.id === match.player2.id);
+    if (side === 'Red') { p1.wins++; p1.points += 3; p2.losses++; } else { p2.wins++; p2.points += 3; p1.losses++; }
+    bracketData.standings.sort((a, b) => { if (b.points !== a.points) return b.points - a.points; if (b.advantages !== a.advantages) return b.advantages - a.advantages; return a.penalties - b.penalties; });
+  } else if (bracketData.type === 'bracket') {
+    if (bracketData.rounds.length >= 2 && match.round === bracketData.rounds.length - 1) {
+      const loser = side === 'Red' ? match.player2 : match.player1;
+      if (!bracketData.repechage.find(m => m.player1 === loser || m.player2 === loser)) { bracketData.repechage.push({ id: 'Rep_M' + (bracketData.repechage.length + 1), player1: loser, player2: null, winner: null, score1: 0, score2: 0 }); }
+    }
+    propagateBracketWinners(bracketData.rounds);
+  }
+  saveBracketData(currentBracketKey, bracketData); closeModal();
+  if (bracketData.type === 'bracket') { const finalMatch = bracketData.rounds[bracketData.rounds.length - 1][0]; if (finalMatch.winner) { const champion = finalMatch.winner === 'Red' ? finalMatch.player1 : finalMatch.player2; setTimeout(() => alert('🏆 Champion: ' + champion.name + '!'), 500); } }
+  backFromScoreboard();
+}
+
+function closeModal() { document.getElementById('winnerModal').classList.remove('active'); }
+
+function updateDisplay() {
+  document.getElementById('scoreRed').innerText = state.Red.score;
+  document.getElementById('scoreBlue').innerText = state.Blue.score;
+  document.getElementById('counterAdvRed').innerText = state.Red.advantages;
+  document.getElementById('counterPenRed').innerText = state.Red.warnings;
+  document.getElementById('counterAdvBlue').innerText = state.Blue.advantages;
+  document.getElementById('counterPenBlue').innerText = state.Blue.warnings;
+  let m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+  document.getElementById('timer').innerText = m.toString().padStart(2,'0') + ':' + s.toString().padStart(2,'0');
+}
+
+function updateTicker() {
+  const nameRed = document.getElementById('nameRed').value || 'Red Player';
+  const nameBlue = document.getElementById('nameBlue').value || 'Blue Player';
+  const teamRed = document.getElementById('teamRed').value || '';
+  const teamBlue = document.getElementById('teamBlue').value || '';
+  const weight = document.getElementById('weightInput').value || '—';
+  const belt = document.getElementById('beltSelect').value || 'White';
+  const level = document.getElementById('levelSelect').value || 'Professional';
+  const round = document.getElementById('roundSelect').value || 'Elimination';
+  const ageGroup = document.getElementById('divisionSelect').value || 'Amateur/Professional';
+  const gender = document.getElementById('genderSelect').value || 'Men';
+  document.getElementById('tickerText').innerHTML = '<span>️</span> ' + level.toUpperCase() + ' / ' + gender.toUpperCase() + ' / ' + ageGroup.toUpperCase() + ' / ' + weight.toUpperCase() + ' <span>•</span> ' + belt.toUpperCase() + ' BELT <span>•</span> ' + round.toUpperCase() + ' <span>•</span> ' + nameRed.toUpperCase() + (teamRed ? ' (' + teamRed.toUpperCase() + ')' : '') + ' <span>VS</span> ' + nameBlue.toUpperCase() + (teamBlue ? ' (' + teamBlue.toUpperCase() + ')' : '');
+}
+
+function startTimer() { if (!isRunning && timeLeft > 0 && !state.Red.isDQ && !state.Blue.isDQ) { isRunning = true; timerInterval = setInterval(() => { timeLeft--; updateDisplay(); if (timeLeft <= 0) stopTimer(); }, 1000); } }
+function stopTimer() { isRunning = false; clearInterval(timerInterval); }
+
+function swapAll() {
+  const nameRed = document.getElementById('nameRed').value, nameBlue = document.getElementById('nameBlue').value;
+  document.getElementById('nameRed').value = nameBlue; document.getElementById('nameBlue').value = nameRed;
+  const teamRed = document.getElementById('teamRed').value, teamBlue = document.getElementById('teamBlue').value;
+  document.getElementById('teamRed').value = teamBlue; document.getElementById('teamBlue').value = teamRed;
+  const tempState = JSON.parse(JSON.stringify(state.Red)); state.Red = JSON.parse(JSON.stringify(state.Blue)); state.Blue = tempState;
+  updateDisplay(); updateTicker();
+}
+
+function addPoints(p, v) { if (state[p].isDQ) return; state[p].history.push({ type: 'score', value: v }); state[p].score += v; updateDisplay(); }
+function subtractPoints(p, v) { if (state[p].isDQ) return; state[p].history.push({ type: 'subtract', value: v }); state[p].score = Math.max(0, state[p].score - v); updateDisplay(); }
+function addAdvantage(p) { if (state[p].isDQ) return; state[p].history.push({ type: 'advantage' }); state[p].advantages++; updateDisplay(); }
+function addWarning(p) { if (state[p].isDQ) return; state[p].history.push({ type: 'warning' }); state[p].warnings++; if (state[p].warnings >= 3) { state[p].isDQ = true; stopTimer(); timeLeft = 0; updateDisplay(); setTimeout(() => finishFight(), 500); } updateDisplay(); }
+function undo(p) { const h = state[p].history; if (h.length === 0) return; const last = h.pop(); if (last.type === 'score') state[p].score -= last.value; else if (last.type === 'subtract') state[p].score += last.value; else if (last.type === 'advantage') state[p].advantages--; else if (last.type === 'warning') { state[p].warnings--; if (state[p].warnings < 3) state[p].isDQ = false; } state[p].score = Math.max(0, state[p].score); updateDisplay(); }
+function resetMatch() { stopTimer(); timeLeft = matchDuration; state = { Red: { score: 0, advantages: 0, warnings: 0, history: [], isDQ: false }, Blue: { score: 0, advantages: 0, warnings: 0, history: [], isDQ: false } }; updateDisplay(); }
+
+function handleLogoUpload(p, input) { const file = input.files[0]; if (file) { const reader = new FileReader(); reader.onload = e => { document.getElementById('logoDisplay' + p).src = e.target.result; document.getElementById('logoDisplay' + p).style.display = 'block'; document.getElementById('logoPlaceholder' + p).style.display = 'none'; }; reader.readAsDataURL(file); } }
+
+function saveAllData() { const data = { players: players, mats: mats }; localStorage.setItem('topcompSportsData', JSON.stringify(data)); alert('✅ All data saved successfully!'); }
+function loadAllData() { const saved = localStorage.getItem('topcompSportsData'); if (saved) { const data = JSON.parse(saved); players = data.players || []; mats = data.mats || []; renderPlayersTable(); if (mats.length > 0) { document.getElementById('matsCount').value = mats.length; renderMatsGrid(); } alert('✅ Data loaded successfully!'); } else { alert('❌ No saved data found!'); } }
+function clearAllData() { if (confirm('⚠️ Clear ALL data?')) { players = []; mats = []; localStorage.removeItem('topcompSportsData'); Object.keys(localStorage).forEach(key => { if (key.startsWith('topcomp_bracket_')) localStorage.removeItem(key); }); renderPlayersTable(); navigateTo('players'); alert('🗑️ All data cleared!'); } }
+
+populateDivisionSelect();
+populateBeltSelect();
+renderPlayersTable();
+updateDisplay();
+updateTicker();
+</script>
+
+</body>
+</html>
