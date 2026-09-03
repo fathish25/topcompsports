@@ -2,222 +2,81 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TopCompSports - Admin Login</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .login-container {
-            background: #151d2b;
-            border-radius: 20px;
-            padding: 40px;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-        .logo { text-align: center; margin-bottom: 40px; }
-        .logo-icon {
-            width: 80px; height: 80px;
-            background: linear-gradient(135deg, #f1c40f, #d4a017);
-            border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 40px; font-weight: bold; color: #0a0e17;
-            margin: 0 auto 20px;
-        }
+        body { font-family: Arial; background: #0a0e17; color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .box { background: #151d2b; padding: 40px; border-radius: 20px; width: 400px; }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo-icon { width: 80px; height: 80px; background: #f1c40f; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; color: #0a0e17; margin: 0 auto 20px; }
         .logo-text { font-size: 28px; font-weight: bold; color: #f1c40f; }
-        .logo-subtitle { color: rgba(255,255,255,0.6); font-size: 14px; margin-top: 5px; }
-        .form-group { margin-bottom: 25px; }
-        .form-label {
-            display: block; margin-bottom: 10px;
-            color: rgba(255,255,255,0.8); font-size: 14px; font-weight: 600;
-        }
-        .form-input {
-            width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.1);
-            color: #fff; padding: 15px; border-radius: 10px; font-size: 15px;
-        }
-        .form-input:focus { outline: none; border-color: #f1c40f; }
-        .btn {
-            width: 100%; padding: 15px; border-radius: 10px;
-            border: none; font-weight: bold; font-size: 16px;
-            cursor: pointer; transition: all 0.3s;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #f1c40f, #d4a017);
-            color: #0a0e17;
-        }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(241, 196, 15, 0.3); }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .alert {
-            padding: 15px; border-radius: 10px; margin-bottom: 20px;
-            display: none; font-size: 14px;
-        }
-        .alert-error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; }
-        .alert-success { background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #10b981; }
-        .alert.show { display: block; }
-        .back-link { text-align: center; margin-top: 20px; }
-        .back-link a { color: rgba(255,255,255,0.6); text-decoration: none; }
-        .back-link a:hover { color: #f1c40f; }
+        input { width: 100%; padding: 15px; margin: 10px 0; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: #fff; border-radius: 10px; font-size: 15px; }
+        button { width: 100%; padding: 15px; background: #f1c40f; color: #0a0e17; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        .msg { padding: 15px; border-radius: 10px; margin: 10px 0; display: none; }
+        .err { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .ok { background: rgba(16,185,129,0.2); color: #10b981; }
     </style>
 </head>
 <body>
-
-    <div class="login-container">
+    <div class="box">
         <div class="logo">
             <div class="logo-icon">T</div>
             <div class="logo-text">TopCompSports</div>
-            <div class="logo-subtitle">Admin Control Panel</div>
+            <div style="color: rgba(255,255,255,0.6); margin-top: 5px;">Admin Control Panel</div>
         </div>
-
-        <div class="alert alert-error" id="errorAlert"></div>
-        <div class="alert alert-success" id="successAlert"></div>
-
-        <form id="loginForm">
-            <div class="form-group">
-                <label class="form-label">البريد الإلكتروني</label>
-                <input type="email" class="form-input" id="email" placeholder="admin@topcompsports.com" value="admin@topcompsports.com" required>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">كلمة المرور</label>
-                <input type="password" class="form-input" id="password" placeholder="••••••••" value="TCS@2026!Admin" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary" id="loginBtn">🔐 تسجيل الدخول</button>
-        </form>
-
-        <div class="back-link">
-            <a href="index.html">← العودة للموقع الرئيسي</a>
-        </div>
+        <div class="msg err" id="err"></div>
+        <div class="msg ok" id="ok"></div>
+        <input type="email" id="email" placeholder="البريد الإلكتروني" value="admin@topcompsports.com">
+        <input type="password" id="pass" placeholder="كلمة المرور" value="TCS@2026!Admin">
+        <button onclick="login()">تسجيل الدخول</button>
     </div>
-
     <script>
-        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const sb = window.supabase.createClient('https://ngiclnkmbvzjhylwhzyn.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w');
         
-        // ✅ استخدام supabaseClient لتجنب التعارض مع CDN
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // التحقق من الجلسة الحالية عند تحميل الصفحة
-        window.addEventListener('DOMContentLoaded', async function() {
-            console.log('🔍 Checking session...');
-            const { data: { session } } = await supabaseClient.auth.getSession();
+        async function login() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('pass').value;
+            const err = document.getElementById('err');
+            const ok = document.getElementById('ok');
             
-            if (session && session.user) {
-                console.log('✅ Session found:', session.user.email);
-                await verifyAdmin(session.user);
-            }
-        });
-
-        // معالجة تسجيل الدخول
-        document.getElementById('loginForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
+            err.style.display = 'none';
+            ok.style.display = 'none';
             
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const errorAlert = document.getElementById('errorAlert');
-            const successAlert = document.getElementById('successAlert');
-            const loginBtn = document.getElementById('loginBtn');
-
-            errorAlert.classList.remove('show');
-            successAlert.classList.remove('show');
-
-            loginBtn.disabled = true;
-            loginBtn.textContent = '⏳ جاري تسجيل الدخول...';
-
-            console.log('🔐 Attempting login for:', email);
-
             try {
-                // تسجيل الدخول
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
+                const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+                
                 if (error) {
-                    console.error('❌ Login error:', error);
-                    errorAlert.textContent = '❌ خطأ: ' + error.message;
-                    errorAlert.classList.add('show');
-                    loginBtn.disabled = false;
-                    loginBtn.textContent = '🔐 تسجيل الدخول';
+                    err.textContent = 'خطأ: ' + error.message;
+                    err.style.display = 'block';
                     return;
                 }
-
-                console.log('✅ Login successful! User:', data.user.id);
-                successAlert.textContent = '✅ تم تسجيل الدخول! جاري التحقق...';
-                successAlert.classList.add('show');
-
-                // التحقق من صلاحيات المدير
-                await verifyAdmin(data.user);
-
-            } catch (err) {
-                console.error('❌ Unexpected error:', err);
-                errorAlert.textContent = ' خطأ: ' + err.message;
-                errorAlert.classList.add('show');
-                loginBtn.disabled = false;
-                loginBtn.textContent = '🔐 تسجيل الدخول';
-            }
-        });
-
-        async function verifyAdmin(user) {
-            const errorAlert = document.getElementById('errorAlert');
-            const successAlert = document.getElementById('successAlert');
-            const loginBtn = document.getElementById('loginBtn');
-
-            console.log('🔍 Checking admin profile for:', user.id);
-
-            try {
-                const { data: admin, error: adminError } = await supabaseClient
-                    .from('admin_profiles')
-                    .select('*')
-                    .eq('id', user.id)
-                    .maybeSingle();
-
-                if (adminError) {
-                    console.error('❌ Database error:', adminError);
-                    errorAlert.textContent = '❌ خطأ في قاعدة البيانات: ' + adminError.message;
-                    errorAlert.classList.add('show');
-                    successAlert.classList.remove('show');
-                    loginBtn.disabled = false;
-                    loginBtn.textContent = '🔐 تسجيل الدخول';
+                
+                ok.textContent = 'تم تسجيل الدخول! جاري التحويل...';
+                ok.style.display = 'block';
+                
+                // التحقق من admin_profiles
+                const { data: admin, error: adminErr } = await sb.from('admin_profiles').select('*').eq('id', data.user.id).maybeSingle();
+                
+                if (adminErr) {
+                    err.textContent = 'خطأ في قاعدة البيانات: ' + adminErr.message;
+                    err.style.display = 'block';
                     return;
                 }
-
+                
                 if (!admin) {
-                    console.error('❌ No admin profile found for user:', user.id);
-                    errorAlert.textContent = '⚠️ هذا الحساب ليس لديه صلاحيات مدير';
-                    errorAlert.classList.add('show');
-                    successAlert.classList.remove('show');
-                    await supabaseClient.auth.signOut();
-                    loginBtn.disabled = false;
-                    loginBtn.textContent = '🔐 تسجيل الدخول';
+                    err.textContent = 'هذا الحساب ليس مدير';
+                    err.style.display = 'block';
                     return;
                 }
-
-                console.log('✅ Admin verified:', admin.role, admin.full_name);
-                successAlert.textContent = '✅ مرحباً ' + admin.full_name + '! جاري التحويل...';
-
-                // التحويل إلى لوحة التحكم
+                
                 setTimeout(() => {
                     window.location.href = 'admin-dashboard.html';
                 }, 1000);
-
-            } catch (err) {
-                console.error('❌ Error verifying admin:', err);
-                errorAlert.textContent = ' خطأ: ' + err.message;
-                errorAlert.classList.add('show');
-                loginBtn.disabled = false;
-                loginBtn.textContent = '🔐 تسجيل الدخول';
+                
+            } catch (e) {
+                err.textContent = 'خطأ: ' + e.message;
+                err.style.display = 'block';
             }
         }
     </script>
