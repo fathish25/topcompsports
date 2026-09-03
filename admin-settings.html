@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعدادات الموقع - TopCompSports Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; }
+        .sidebar { width: 280px; background: rgba(21, 29, 43, 0.98); border-left: 2px solid #2563EB; position: fixed; height: 100vh; padding: 20px; right: 0; overflow-y: auto; }
+        .logo { display: flex; align-items: center; gap: 15px; padding: 20px; margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #f1c40f, #d4a017); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: #0a0e17; }
+        .logo-text { font-size: 22px; font-weight: bold; }
+        .nav-menu { display: flex; flex-direction: column; gap: 10px; }
+        .nav-item { padding: 15px 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; font-size: 15px; text-decoration: none; color: #fff; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); }
+        .nav-item.active { background: linear-gradient(135deg, #2563EB, #1d4ed8); }
+        .main-content { margin-right: 280px; padding: 40px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .page-title { font-size: 32px; font-weight: bold; }
+        .section { background: #151d2b; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
+        .section-title { font-size: 24px; font-weight: bold; margin-bottom: 25px; color: #f1c40f; display: flex; align-items: center; gap: 10px; }
+        .btn { padding: 12px 24px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 14px; }
+        .btn-primary { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3); }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 10px; color: rgba(255,255,255,0.8); font-size: 14px; font-weight: 600; }
+        .form-input, .form-select, textarea { width: 100%; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .form-input:focus, .form-select:focus, textarea:focus { outline: none; border-color: #f1c40f; }
+        textarea { min-height: 100px; resize: vertical; }
+        .settings-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
+        .toggle-switch { display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 10px; margin-bottom: 15px; }
+        .toggle { position: relative; width: 60px; height: 30px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.2); border-radius: 30px; transition: 0.3s; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background: white; border-radius: 50%; transition: 0.3s; }
+        input:checked + .slider { background: #10b981; }
+        input:checked + .slider:before { transform: translateX(30px); }
+        .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; }
+        .alert-success { background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #10b981; }
+        .alert.show { display: block; }
+        .file-upload { border: 2px dashed rgba(255,255,255,0.2); border-radius: 10px; padding: 30px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .file-upload:hover { border-color: #f1c40f; background: rgba(241, 196, 15, 0.05); }
+        .file-upload input { display: none; }
+        .preview-image { max-width: 200px; margin-top: 15px; border-radius: 10px; }
+        @media (max-width: 1024px) {
+            .sidebar { width: 100%; position: relative; height: auto; }
+            .main-content { margin-right: 0; }
+            .settings-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <div class="nav-menu">
+            <a class="nav-item" href="admin-dashboard.html">📊 لوحة التحكم</a>
+            <a class="nav-item" href="admin-tournaments.html">🏆 البطولات</a>
+            <a class="nav-item" href="admin-users.html">👥 المستخدمون</a>
+            <a class="nav-item" href="admin-registrations.html">📝 التسجيلات</a>
+            <a class="nav-item" href="admin-organizations.html">🏢 الجهات المنظمة</a>
+            <a class="nav-item" href="admin-reports.html">📈 التقارير</a>
+            <a class="nav-item active">️ الإعدادات</a>
+            <a class="nav-item" onclick="logout()">🚪 تسجيل الخروج</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">إعدادات الموقع</h1>
+            <button class="btn btn-primary" onclick="saveAllSettings()"> حفظ جميع الإعدادات</button>
+        </div>
+
+        <div class="alert alert-success" id="successAlert">✅ تم حفظ الإعدادات بنجاح!</div>
+
+        <div class="settings-grid">
+            <!-- الإعدادات العامة -->
+            <div class="section">
+                <h2 class="section-title">⚙️ الإعدادات العامة</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">اسم الموقع</label>
+                    <input type="text" class="form-input" id="siteName" value="TopCompSports">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">وصف الموقع</label>
+                    <textarea id="siteDescription" placeholder="وصف قصير للموقع">منصة شاملة لإدارة بطولات الجوجيتسو والجرابلنج</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">الشعار (Logo)</label>
+                    <div class="file-upload" onclick="document.getElementById('logoUpload').click()">
+                        <input type="file" id="logoUpload" accept="image/*" onchange="previewImage(this, 'logoPreview')">
+                        <div>📁 اضغط لرفع الشعار</div>
+                        <img id="logoPreview" class="preview-image" style="display: none;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">اللغة الافتراضية</label>
+                    <select class="form-select" id="defaultLang">
+                        <option value="ar">العربية</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- معلومات الاتصال -->
+            <div class="section">
+                <h2 class="section-title">📞 معلومات الاتصال</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني للتواصل</label>
+                    <input type="email" class="form-input" id="contactEmail" placeholder="info@topcompsports.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">رقم الهاتف</label>
+                    <input type="tel" class="form-input" id="contactPhone" placeholder="+966 XX XXX XXXX">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">العنوان</label>
+                    <textarea id="siteAddress" placeholder="العنوان الكامل"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">روابط التواصل الاجتماعي</label>
+                    <input type="text" class="form-input" id="socialLinks" placeholder="https://twitter.com/..., https://instagram.com/...">
+                </div>
+            </div>
+
+            <!-- إعدادات الدفع -->
+            <div class="section">
+                <h2 class="section-title">💰 إعدادات الدفع</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">العملة الافتراضية</label>
+                    <select class="form-select" id="defaultCurrency">
+                        <option value="USD">USD - دولار أمريكي</option>
+                        <option value="SAR">SAR - ريال سعودي</option>
+                        <option value="AED">AED - درهم إماراتي</option>
+                        <option value="EGP">EGP - جنيه مصري</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">حد التسجيل المبكر (خصم %)</label>
+                    <input type="number" class="form-input" id="earlyBirdDiscount" value="10" min="0" max="100">
+                </div>
+
+                <div class="toggle-switch">
+                    <label class="toggle">
+                        <input type="checkbox" id="enablePayments">
+                        <span class="slider"></span>
+                    </label>
+                    <span>تفعيل نظام الدفع الإلكتروني</span>
+                </div>
+
+                <div class="toggle-switch">
+                    <label class="toggle">
+                        <input type="checkbox" id="enableRefunds">
+                        <span class="slider"></span>
+                    </label>
+                    <span>السماح باسترداد الرسوم</span>
+                </div>
+            </div>
+
+            <!-- إعدادات التسجيل -->
+            <div class="section">
+                <h2 class="section-title"> إعدادات التسجيل</h2>
+                
+                <div class="toggle-switch">
+                    <label class="toggle">
+                        <input type="checkbox" id="requireEmailVerification">
+                        <span class="slider"></span>
+                    </label>
+                    <span>التحقق من البريد الإلكتروني إلزامي</span>
+                </div>
+
+                <div class="toggle-switch">
+                    <label class="toggle">
+                        <input type="checkbox" id="autoApproveRegistrations">
+                        <span class="slider"></span>
+                    </label>
+                    <span>الموافقة التلقائية على التسجيلات</span>
+                </div>
+
+                <div class="toggle-switch">
+                    <label class="toggle">
+                        <input type="checkbox" id="allowTeamRegistration">
+                        <span class="slider"></span>
+                    </label>
+                    <span>السماح بالتسجيل كفرق</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">الحد الأقصى للمشاركين في البطولة</label>
+                    <input type="number" class="form-input" id="maxParticipants" value="200" min="1">
+                </div>
+            </div>
+
+            <!-- إعدادات النظام -->
+            <div class="section">
+                <h2 class="section-title">🔧 إعدادات النظام</h2>
+                
+                <div class="toggle-switch">
+                    <label class="toggle">
+                        <input type="checkbox" id="maintenanceMode">
+                        <span class="slider"></span>
+                    </label>
+                    <span>وضع الصيانة (إغلاق الموقع)</span>
+                </div>
+
+                <div class="toggle-switch">
+                    <label class="toggle">
+                        <input type="checkbox" id="enableNotifications">
+                        <span class="slider"></span>
+                    </label>
+                    <span>تفعيل الإشعارات بالبريد الإلكتروني</span>
+                </div>
+
+                <div class="toggle-switch">
+                    <label class="toggle">
+                        <input type="checkbox" id="enableLogs">
+                        <span class="slider"></span>
+                    </label>
+                    <span>تسجيل جميع الأنشطة</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">مدة الجلسة (دقائق)</label>
+                    <input type="number" class="form-input" id="sessionDuration" value="60" min="5">
+                </div>
+            </div>
+
+            <!-- النصوص القانونية -->
+            <div class="section">
+                <h2 class="section-title">📄 النصوص القانونية</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">شروط الاستخدام</label>
+                    <textarea id="termsOfService" placeholder="اكتب شروط الاستخدام هنا..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">سياسة الخصوصية</label>
+                    <textarea id="privacyPolicy" placeholder="اكتب سياسة الخصوصية هنا..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn btn-success" onclick="saveAllSettings()" style="padding: 15px 40px; font-size: 16px;">💾 حفظ جميع الإعدادات</button>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        window.onload = async () => {
+            await checkAuth();
+            await loadSettings();
+        };
+
+        async function checkAuth() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) { window.location.href = 'admin-login.html'; return; }
+            const { data: admin } = await supabaseClient.from('admin_profiles').select('*').eq('id', user.id).maybeSingle();
+            if (!admin) { window.location.href = 'index.html'; return; }
+        }
+
+        async function loadSettings() {
+            const { data, error } = await supabaseClient.from('site_settings').select('*');
+            
+            if (error || !data) {
+                console.log('No settings found, using defaults');
+                return;
+            }
+
+            // تحميل الإعدادات
+            data.forEach(setting => {
+                const value = setting.setting_value;
+                switch(setting.setting_key) {
+                    case 'site_name':
+                        document.getElementById('siteName').value = value.en || value.ar || '';
+                        break;
+                    case 'site_description':
+                        document.getElementById('siteDescription').value = value.ar || value.en || '';
+                        break;
+                    case 'contact_email':
+                        document.getElementById('contactEmail').value = value.value || '';
+                        break;
+                    case 'contact_phone':
+                        document.getElementById('contactPhone').value = value.value || '';
+                        break;
+                    case 'default_language':
+                        document.getElementById('defaultLang').value = value.value || 'ar';
+                        break;
+                    case 'default_currency':
+                        document.getElementById('defaultCurrency').value = value.value || 'USD';
+                        break;
+                    case 'maintenance_mode':
+                        document.getElementById('maintenanceMode').checked = value.value || false;
+                        break;
+                    case 'max_participants':
+                        document.getElementById('maxParticipants').value = value.value || 200;
+                        break;
+                }
+            });
+        }
+
+        async function saveAllSettings() {
+            const settings = [
+                { key: 'site_name', value: { en: document.getElementById('siteName').value, ar: document.getElementById('siteName').value } },
+                { key: 'site_description', value: { ar: document.getElementById('siteDescription').value, en: document.getElementById('siteDescription').value } },
+                { key: 'contact_email', value: { value: document.getElementById('contactEmail').value } },
+                { key: 'contact_phone', value: { value: document.getElementById('contactPhone').value } },
+                { key: 'default_language', value: { value: document.getElementById('defaultLang').value } },
+                { key: 'default_currency', value: { value: document.getElementById('defaultCurrency').value } },
+                { key: 'maintenance_mode', value: { value: document.getElementById('maintenanceMode').checked } },
+                { key: 'max_participants', value: { value: parseInt(document.getElementById('maxParticipants').value) } },
+                { key: 'early_bird_discount', value: { value: parseInt(document.getElementById('earlyBirdDiscount').value) } },
+                { key: 'enable_payments', value: { value: document.getElementById('enablePayments').checked } },
+                { key: 'enable_refunds', value: { value: document.getElementById('enableRefunds').checked } },
+                { key: 'require_email_verification', value: { value: document.getElementById('requireEmailVerification').checked } },
+                { key: 'auto_approve_registrations', value: { value: document.getElementById('autoApproveRegistrations').checked } },
+                { key: 'allow_team_registration', value: { value: document.getElementById('allowTeamRegistration').checked } },
+                { key: 'enable_notifications', value: { value: document.getElementById('enableNotifications').checked } },
+                { key: 'enable_logs', value: { value: document.getElementById('enableLogs').checked } },
+                { key: 'session_duration', value: { value: parseInt(document.getElementById('sessionDuration').value) } },
+                { key: 'terms_of_service', value: { ar: document.getElementById('termsOfService').value, en: document.getElementById('termsOfService').value } },
+                { key: 'privacy_policy', value: { ar: document.getElementById('privacyPolicy').value, en: document.getElementById('privacyPolicy').value } }
+            ];
+
+            let successCount = 0;
+            for (const setting of settings) {
+                const { error } = await supabaseClient
+                    .from('site_settings')
+                    .upsert({
+                        setting_key: setting.key,
+                        setting_value: setting.value,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'setting_key' });
+
+                if (!error) successCount++;
+            }
+
+            if (successCount === settings.length) {
+                const alert = document.getElementById('successAlert');
+                alert.classList.add('show');
+                setTimeout(() => alert.classList.remove('show'), 3000);
+            } else {
+                alert(`تم حفظ ${successCount} من ${settings.length} إعداد`);
+            }
+        }
+
+        function previewImage(input, previewId) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById(previewId);
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
