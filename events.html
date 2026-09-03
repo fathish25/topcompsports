@@ -201,7 +201,8 @@
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // ✅ تم تغيير الاسم من supabase إلى supabaseClient لتجنب التعارض
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentLang = 'en';
 
         function setLanguage(lang) {
@@ -220,7 +221,7 @@
             console.log('Loading filters from database...');
             
             // 1. Load Age Divisions
-            const { data: ageDivisions, error: ageError } = await supabase
+            const { data: ageDivisions, error: ageError } = await supabaseClient
                 .from('age_divisions')
                 .select('*')
                 .order('min_age');
@@ -233,7 +234,7 @@
             }
 
             // 2. Load Belt Levels
-            const { data: beltLevels, error: beltError } = await supabase
+            const { data: beltLevels, error: beltError } = await supabaseClient
                 .from('belt_levels')
                 .select('*, age_divisions(name)')
                 .order('name');
@@ -255,7 +256,7 @@
             }
 
             // 3. Load Countries dynamically from existing tournaments
-            const { data: tournaments, error: tourError } = await supabase
+            const { data: tournaments, error: tourError } = await supabaseClient
                 .from('tournaments')
                 .select('country')
                 .not('country', 'is', null);
@@ -273,7 +274,7 @@
         }
 
         async function loadEvents() {
-            const { data: tournaments, error } = await supabase
+            const { data: tournaments, error } = await supabaseClient
                 .from('tournaments')
                 .select(`
                     *,
@@ -359,7 +360,7 @@
         }
 
         async function registerForEvent(tournamentId) {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } } = await supabaseClient.auth.getUser();
             
             if (!user) {
                 alert(currentLang === 'ar' ? '⚠️ يرجى تسجيل الدخول أولاً' : '⚠️ Please login first');
@@ -367,19 +368,19 @@
                 return;
             }
 
-            const { data: athlete } = await supabase
+            const { data: athlete } = await supabaseClient
                 .from('athletes')
                 .select('id')
                 .eq('user_id', user.id)
                 .single();
 
             if (!athlete) {
-                alert(currentLang === 'ar' ? '⚠️ يرجى إكمال ملفك الشخصي أولاً' : '⚠️ Please complete your profile first');
+                alert(currentLang === 'ar' ? '️ يرجى إكمال ملفك الشخصي أولاً' : '⚠️ Please complete your profile first');
                 window.location.href = 'complete-athlete.html';
                 return;
             }
 
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('tournament_registrations')
                 .insert({
                     tournament_id: tournamentId,
