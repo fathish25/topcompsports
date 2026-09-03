@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التقارير الشاملة - TopCompSports Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; }
+        .sidebar { width: 280px; background: rgba(21, 29, 43, 0.98); border-left: 2px solid #2563EB; position: fixed; height: 100vh; padding: 20px; right: 0; overflow-y: auto; }
+        .logo { display: flex; align-items: center; gap: 15px; padding: 20px; margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #f1c40f, #d4a017); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: #0a0e17; }
+        .logo-text { font-size: 22px; font-weight: bold; }
+        .nav-menu { display: flex; flex-direction: column; gap: 10px; }
+        .nav-item { padding: 15px 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; font-size: 15px; text-decoration: none; color: #fff; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); }
+        .nav-item.active { background: linear-gradient(135deg, #2563EB, #1d4ed8); }
+        .main-content { margin-right: 280px; padding: 40px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
+        .page-title { font-size: 32px; font-weight: bold; }
+        .section { background: #151d2b; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
+        .section-title { font-size: 24px; font-weight: bold; margin-bottom: 25px; color: #f1c40f; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 14px; }
+        .btn-primary { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; }
+        .btn-info { background: linear-gradient(135deg, #2563EB, #1d4ed8); color: #fff; }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #151d2b; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
+        .stat-value { font-size: 32px; font-weight: bold; color: #f1c40f; }
+        .stat-label { color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 5px; }
+        .stat-change { font-size: 12px; margin-top: 5px; }
+        .stat-up { color: #10b981; }
+        .stat-down { color: #ef4444; }
+        .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+        .chart-container { background: #151d2b; border-radius: 12px; padding: 20px; }
+        .chart-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #f1c40f; }
+        .filters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
+        .form-input, .form-select { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; }
+        .form-label { display: block; margin-bottom: 8px; color: rgba(255,255,255,0.8); font-size: 13px; }
+        .report-tabs { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
+        .tab { padding: 12px 24px; background: rgba(255,255,255,0.05); border-radius: 8px; cursor: pointer; transition: all 0.3s; border: 2px solid transparent; }
+        .tab.active { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; font-weight: bold; }
+        .tab:hover { border-color: #f1c40f; }
+        .report-content { display: none; }
+        .report-content.active { display: block; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
+        th { background: rgba(241, 196, 15, 0.1); color: #f1c40f; font-weight: bold; }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        .export-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+        .loading { text-align: center; padding: 40px; color: rgba(255,255,255,0.5); }
+        @media (max-width: 1024px) {
+            .sidebar { width: 100%; position: relative; height: auto; }
+            .main-content { margin-right: 0; }
+            .stats-row, .charts-grid, .filters { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <div class="nav-menu">
+            <a class="nav-item" href="admin-dashboard.html">📊 لوحة التحكم</a>
+            <a class="nav-item" href="admin-tournaments.html">🏆 البطولات</a>
+            <a class="nav-item" href="admin-users.html"> المستخدمون</a>
+            <a class="nav-item" href="admin-registrations.html">📝 التسجيلات</a>
+            <a class="nav-item" href="admin-organizations.html">🏢 الجهات المنظمة</a>
+            <a class="nav-item active">📈 التقارير</a>
+            <a class="nav-item" href="admin-settings.html">⚙️ الإعدادات</a>
+            <a class="nav-item" onclick="logout()">🚪 تسجيل الخروج</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title"> التقارير الشاملة</h1>
+            <div class="export-buttons">
+                <button class="btn btn-info" onclick="exportReport('csv')"> تصدير CSV</button>
+                <button class="btn btn-primary" onclick="loadAllReports()">🔄 تحديث</button>
+            </div>
+        </div>
+
+        <!-- الإحصائيات العامة -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value" id="totalUsers">0</div>
+                <div class="stat-label">إجمالي المستخدمين</div>
+                <div class="stat-change stat-up" id="usersChange">+0 هذا الشهر</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalTournaments">0</div>
+                <div class="stat-label">البطولات</div>
+                <div class="stat-change stat-up" id="tournamentsChange">+0 نشطة</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalRegistrations">0</div>
+                <div class="stat-label">التسجيلات</div>
+                <div class="stat-change stat-up" id="registrationsChange">+0 هذا الشهر</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalRevenue">$0</div>
+                <div class="stat-label">الإيرادات</div>
+                <div class="stat-change stat-up" id="revenueChange">+0%</div>
+            </div>
+        </div>
+
+        <!-- التبويبات -->
+        <div class="report-tabs">
+            <div class="tab active" onclick="switchTab('overview')">📊 نظرة عامة</div>
+            <div class="tab" onclick="switchTab('tournaments')">🏆 البطولات</div>
+            <div class="tab" onclick="switchTab('players')">🥋 اللاعبون</div>
+            <div class="tab" onclick="switchTab('organizers')">🏢 المنظمون</div>
+            <div class="tab" onclick="switchTab('financial')">💰 المالية</div>
+        </div>
+
+        <!-- نظرة عامة -->
+        <div id="overview" class="report-content active">
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-title">📈 نمو المستخدمين (آخر 7 أيام)</div>
+                    <canvas id="usersChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title"> حالة البطولات</div>
+                    <canvas id="tournamentsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title"> توزيع المستخدمين حسب الدور</div>
+                    <canvas id="rolesChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">💰 الإيرادات (آخر 7 أيام)</div>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- تقارير البطولات -->
+        <div id="tournaments" class="report-content">
+            <div class="section">
+                <h2 class="section-title">🏆 تقارير البطولات</h2>
+                <div class="filters">
+                    <div>
+                        <label class="form-label">الفترة</label>
+                        <select class="form-select" id="tournamentPeriod" onchange="loadTournamentReport()">
+                            <option value="7">آخر 7 أيام</option>
+                            <option value="30">آخر 30 يوم</option>
+                            <option value="90">آخر 3 أشهر</option>
+                            <option value="365">آخر سنة</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">الحالة</label>
+                        <select class="form-select" id="tournamentStatus" onchange="loadTournamentReport()">
+                            <option value="">جميع الحالات</option>
+                            <option value="active">نشطة</option>
+                            <option value="completed">مكتملة</option>
+                            <option value="upcoming">قادمة</option>
+                        </select>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>البطولة</th>
+                            <th>التاريخ</th>
+                            <th>المشاركين</th>
+                            <th>الإيرادات</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tournamentsReportTable">
+                        <tr><td colspan="5" class="loading">جاري التحميل...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- تقارير اللاعبين -->
+        <div id="players" class="report-content">
+            <div class="section">
+                <h2 class="section-title">🥋 تقارير اللاعبين</h2>
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-title">📊 توزيع اللاعبين حسب الفئة العمرية</div>
+                        <canvas id="ageChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">🥋 توزيع اللاعبين حسب الحزام</div>
+                        <canvas id="beltChart"></canvas>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اللاعب</th>
+                            <th>الفئة العمرية</th>
+                            <th>الحزام</th>
+                            <th>الوزن</th>
+                            <th>البطولات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="playersReportTable">
+                        <tr><td colspan="5" class="loading">جاري التحميل...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- تقارير المنظمين -->
+        <div id="organizers" class="report-content">
+            <div class="section">
+                <h2 class="section-title">🏢 تقارير المنظمين</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>المنظم</th>
+                            <th>البريد</th>
+                            <th>البطولات</th>
+                            <th>المشاركين</th>
+                            <th>الإيرادات</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="organizersReportTable">
+                        <tr><td colspan="6" class="loading">جاري التحميل...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- التقارير المالية -->
+        <div id="financial" class="report-content">
+            <div class="section">
+                <h2 class="section-title">💰 التقارير المالية</h2>
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalRevenueMonth">$0</div>
+                        <div class="stat-label">إيرادات هذا الشهر</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="pendingPayments">0</div>
+                        <div class="stat-label">مدفوعات معلقة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="completedPayments">0</div>
+                        <div class="stat-label">مدفوعات مكتملة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgRevenue">$0</div>
+                        <div class="stat-label">متوسط الإيرادات</div>
+                    </div>
+                </div>
+                <div class="chart-container" style="margin-top: 20px;">
+                    <div class="chart-title"> الإيرادات الشهرية</div>
+                    <canvas id="monthlyRevenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let charts = {};
+        let reportData = {};
+
+        window.onload = async () => {
+            await checkAuth();
+            await loadAllReports();
+        };
+
+        async function checkAuth() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) { window.location.href = 'admin-login.html'; return; }
+            const { data: admin } = await supabaseClient.from('admin_profiles').select('*').eq('id', user.id).maybeSingle();
+            if (!admin) { window.location.href = 'index.html'; return; }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.report-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        async function loadAllReports() {
+            await loadOverviewStats();
+            await loadTournamentReport();
+            await loadPlayersReport();
+            await loadOrganizersReport();
+            await loadFinancialReport();
+        }
+
+        async function loadOverviewStats() {
+            // تحميل الإحصائيات العامة
+            const { count: usersCount } = await supabaseClient.from('athletes').select('*', { count: 'exact', head: true });
+            const { count: orgCount } = await supabaseClient.from('organizers').select('*', { count: 'exact', head: true });
+            const { count: coachCount } = await supabaseClient.from('coaches').select('*', { count: 'exact', head: true });
+            const { count: tournamentsCount } = await supabaseClient.from('tournaments').select('*', { count: 'exact', head: true });
+            const { count: registrationsCount } = await supabaseClient.from('tournament_registrations').select('*', { count: 'exact', head: true });
+
+            const totalUsers = (usersCount || 0) + (orgCount || 0) + (coachCount || 0);
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('totalTournaments').textContent = tournamentsCount || 0;
+            document.getElementById('totalRegistrations').textContent = registrationsCount || 0;
+
+            // رسم بياني للأدوار
+            renderChart('rolesChart', 'doughnut', {
+                labels: ['لاعبون', 'منظمون', 'مدربون'],
+                datasets: [{
+                    data: [usersCount || 0, orgCount || 0, coachCount || 0],
+                    backgroundColor: ['#2563EB', '#10b981', '#a855f7']
+                }]
+            });
+
+            // رسم بياني للبطولات
+            const { data: tournaments } = await supabaseClient.from('tournaments').select('status');
+            const statusCounts = { active: 0, completed: 0, upcoming: 0 };
+            tournaments?.forEach(t => { if (statusCounts[t.status] !== undefined) statusCounts[t.status]++; });
+            
+            renderChart('tournamentsChart', 'pie', {
+                labels: ['نشطة', 'مكتملة', 'قادمة'],
+                datasets: [{
+                    data: [statusCounts.active, statusCounts.completed, statusCounts.upcoming],
+                    backgroundColor: ['#10b981', '#6b7280', '#2563EB']
+                }]
+            });
+
+            // رسم بياني لنمو المستخدمين (بيانات تجريبية - يمكن ربطها بـ activity_logs)
+            const days = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+            renderChart('usersChart', 'line', {
+                labels: days,
+                datasets: [{
+                    label: 'مستخدمين جدد',
+                    data: [5, 8, 12, 7, 15, 10, 18],
+                    borderColor: '#f1c40f',
+                    backgroundColor: 'rgba(241, 196, 15, 0.1)',
+                    fill: true
+                }]
+            });
+
+            // رسم بياني للإيرادات
+            renderChart('revenueChart', 'bar', {
+                labels: days,
+                datasets: [{
+                    label: 'الإيرادات ($)',
+                    data: [150, 280, 420, 350, 520, 380, 650],
+                    backgroundColor: '#10b981'
+                }]
+            });
+        }
+
+        async function loadTournamentReport() {
+            const { data: tournaments } = await supabaseClient.from('tournaments').select('*').order('created_at', { ascending: false });
+            const tbody = document.getElementById('tournamentsReportTable');
+            
+            if (!tournaments || tournaments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="loading">لا توجد بيانات</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = tournaments.map(t => {
+                const statusClass = t.status === 'active' ? 'stat-up' : t.status === 'completed' ? '' : 'stat-down';
+                const statusText = { active: 'نشطة', completed: 'مكتملة', upcoming: 'قادمة' }[t.status] || t.status;
+                return `
+                    <tr>
+                        <td>${t.name || '-'}</td>
+                        <td>${t.event_date || '-'}</td>
+                        <td>${t.max_participants || 0}</td>
+                        <td>$${t.registration_fee || 0}</td>
+                        <td class="${statusClass}">${statusText}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            reportData.tournaments = tournaments;
+        }
+
+        async function loadPlayersReport() {
+            const { data: players } = await supabaseClient.from('athletes').select('*');
+            const tbody = document.getElementById('playersReportTable');
+            
+            if (!players || players.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="loading">لا توجد بيانات</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = players.slice(0, 20).map(p => `
+                <tr>
+                    <td>${p.full_name || '-'}</td>
+                    <td>${p.age_group || '-'}</td>
+                    <td>${p.belt_level || '-'}</td>
+                    <td>${p.weight || '-'} kg</td>
+                    <td>${p.tournaments_count || 0}</td>
+                </tr>
+            `).join('');
+
+            // رسم بياني للأعمار
+            const ageGroups = {};
+            players.forEach(p => {
+                const age = p.age_group || 'غير محدد';
+                ageGroups[age] = (ageGroups[age] || 0) + 1;
+            });
+            
+            renderChart('ageChart', 'bar', {
+                labels: Object.keys(ageGroups),
+                datasets: [{
+                    label: 'عدد اللاعبين',
+                    data: Object.values(ageGroups),
+                    backgroundColor: '#2563EB'
+                }]
+            });
+
+            // رسم بياني للأحزمة
+            const belts = {};
+            players.forEach(p => {
+                const belt = p.belt_level || 'غير محدد';
+                belts[belt] = (belts[belt] || 0) + 1;
+            });
+            
+            renderChart('beltChart', 'doughnut', {
+                labels: Object.keys(belts),
+                datasets: [{
+                    data: Object.values(belts),
+                    backgroundColor: ['#ffffff', '#2563EB', '#a855f7', '#f59e0b', '#000000']
+                }]
+            });
+
+            reportData.players = players;
+        }
+
+        async function loadOrganizersReport() {
+            const { data: organizers } = await supabaseClient.from('organizers').select('*');
+            const tbody = document.getElementById('organizersReportTable');
+            
+            if (!organizers || organizers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="loading">لا توجد بيانات</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = organizers.map(o => {
+                const statusClass = o.status === 'verified' ? 'stat-up' : o.status === 'suspended' ? 'stat-down' : '';
+                const statusText = { verified: 'مُتحقق', pending: 'قيد الانتظار', suspended: 'موقوف' }[o.status] || o.status;
+                return `
+                    <tr>
+                        <td>${o.org_name || o.full_name || '-'}</td>
+                        <td>${o.email || '-'}</td>
+                        <td>${o.tournament_count || 0}</td>
+                        <td>${o.total_participants || 0}</td>
+                        <td>$${o.total_revenue || 0}</td>
+                        <td class="${statusClass}">${statusText}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            reportData.organizers = organizers;
+        }
+
+        async function loadFinancialReport() {
+            const { data: registrations } = await supabaseClient.from('tournament_registrations').select('*');
+            
+            const paid = registrations?.filter(r => r.payment_status === 'paid').length || 0;
+            const pending = registrations?.filter(r => r.payment_status === 'pending').length || 0;
+            
+            document.getElementById('pendingPayments').textContent = pending;
+            document.getElementById('completedPayments').textContent = paid;
+            document.getElementById('avgRevenue').textContent = '$' + Math.round((paid * 50));
+
+            // رسم بياني شهري
+            const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'];
+            renderChart('monthlyRevenueChart', 'line', {
+                labels: months,
+                datasets: [{
+                    label: 'الإيرادات ($)',
+                    data: [1200, 1900, 3000, 5000, 4500, 6200],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true
+                }]
+            });
+
+            reportData.financial = { paid, pending, registrations };
+        }
+
+        function renderChart(chartId, type, data) {
+            if (charts[chartId]) {
+                charts[chartId].destroy();
+            }
+            const ctx = document.getElementById(chartId).getContext('2d');
+            charts[chartId] = new Chart(ctx, {
+                type: type,
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { labels: { color: '#fff' } }
+                    },
+                    scales: type !== 'pie' && type !== 'doughnut' ? {
+                        x: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        y: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                    } : {}
+                }
+            });
+        }
+
+        function exportReport(format) {
+            if (format === 'csv') {
+                let csv = 'نوع التقرير,البيانات\n';
+                
+                if (reportData.tournaments) {
+                    csv += 'البطولات,\n';
+                    reportData.tournaments.forEach(t => {
+                        csv += `${t.name},${t.status},${t.event_date}\n`;
+                    });
+                }
+
+                const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `report_${new Date().toISOString().split('T')[0]}.csv`;
+                link.click();
+            }
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
