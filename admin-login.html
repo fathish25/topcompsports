@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopCompSports - Admin Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            background: #151d2b;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #f1c40f, #d4a017);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            color: #0a0e17;
+            margin: 0 auto 20px;
+        }
+        .logo-text { font-size: 28px; font-weight: bold; color: #f1c40f; }
+        .logo-subtitle { color: rgba(255,255,255,0.6); font-size: 14px; margin-top: 5px; }
+        .form-group { margin-bottom: 25px; }
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .form-input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #f1c40f;
+            background: rgba(241, 196, 15, 0.05);
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f1c40f, #d4a017);
+            color: #0a0e17;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(241, 196, 15, 0.3); }
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+        .alert.show { display: block; }
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-link a {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .back-link a:hover { color: #f1c40f; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+            <div class="logo-subtitle">Admin Control Panel</div>
+        </div>
+
+        <div class="alert alert-error" id="errorAlert"></div>
+
+        <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label class="form-label">البريد الإلكتروني</label>
+                <input type="email" class="form-input" id="email" placeholder="admin@topcompsports.com" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">كلمة المرور</label>
+                <input type="password" class="form-input" id="password" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary"> تسجيل الدخول</button>
+        </form>
+
+        <div class="back-link">
+            <a href="index.html">← العودة للموقع الرئيسي</a>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Check if already logged in
+        window.onload = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                // Check if user is admin
+                const { data: admin } = await supabase
+                    .from('admin_profiles')
+                    .select('*')
+                    .eq('id', user.id)
+                    .single();
+
+                if (admin) {
+                    window.location.href = 'admin-dashboard.html';
+                }
+            }
+        };
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorAlert = document.getElementById('errorAlert');
+
+            // Hide error
+            errorAlert.classList.remove('show');
+
+            // Login
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (error) {
+                errorAlert.textContent = '❌ خطأ في البريد الإلكتروني أو كلمة المرور';
+                errorAlert.classList.add('show');
+                return;
+            }
+
+            // Check if user is admin
+            const { data: admin } = await supabase
+                .from('admin_profiles')
+                .select('*')
+                .eq('id', data.user.id)
+                .single();
+
+            if (!admin) {
+                errorAlert.textContent = '⚠️ هذا الحساب ليس لديه صلاحيات مدير';
+                errorAlert.classList.add('show');
+                await supabase.auth.signOut();
+                return;
+            }
+
+            // Success - redirect to dashboard
+            window.location.href = 'admin-dashboard.html';
+        }
+    </script>
+</body>
+</html>
