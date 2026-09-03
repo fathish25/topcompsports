@@ -531,7 +531,7 @@
                         } else if (profile.role === 'organizer') {
                             window.location.href = 'complete-organizer.html';
                         } else {
-                            window.location.href = 'home.html';
+                            window.location.href = 'index.html';
                         }
                     } else {
                         // User has completed registration, go to dashboard
@@ -542,7 +542,7 @@
                         } else if (profile.role === 'organizer') {
                             window.location.href = 'organizer-dashboard.html';
                         } else {
-                            window.location.href = 'home.html';
+                            window.location.href = 'index.html';
                         }
                     }
                 }, 1000);
@@ -596,7 +596,7 @@
                 const { error } = await supabase.auth.signInWithOAuth({
                     provider: provider,
                     options: {
-                        redirectTo: window.location.origin + '/home.html'
+                        redirectTo: window.location.origin + '/index.html'
                     }
                 });
 
@@ -634,7 +634,7 @@
                         if (profile.role === 'athlete') window.location.href = 'athlete-dashboard.html';
                         else if (profile.role === 'coach') window.location.href = 'coach-dashboard.html';
                         else if (profile.role === 'organizer') window.location.href = 'organizer-dashboard.html';
-                        else window.location.href = 'home.html';
+                        else window.location.href = 'index.html';
                     }
                 }
             }
