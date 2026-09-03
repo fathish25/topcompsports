@@ -81,16 +81,24 @@
             color: #0a0e17;
         }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(241, 196, 15, 0.3); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .alert {
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 20px;
             display: none;
+            font-size: 14px;
+            white-space: pre-line;
         }
         .alert-error {
             background: rgba(239, 68, 68, 0.2);
             border: 1px solid #ef4444;
             color: #ef4444;
+        }
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            color: #10b981;
         }
         .alert.show { display: block; }
         .back-link {
@@ -103,6 +111,16 @@
             transition: color 0.3s;
         }
         .back-link a:hover { color: #f1c40f; }
+        .debug-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            display: none;
+        }
+        .debug-info.show { display: block; }
     </style>
 </head>
 <body>
@@ -115,8 +133,9 @@
         </div>
 
         <div class="alert alert-error" id="errorAlert"></div>
+        <div class="alert alert-success" id="successAlert"></div>
 
-        <form onsubmit="handleLogin(event)">
+        <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label class="form-label">البريد الإلكتروني</label>
                 <input type="email" class="form-input" id="email" placeholder="admin@topcompsports.com" required>
@@ -127,8 +146,10 @@
                 <input type="password" class="form-input" id="password" placeholder="••••••••" required>
             </div>
 
-            <button type="submit" class="btn btn-primary"> تسجيل الدخول</button>
+            <button type="submit" class="btn btn-primary" id="loginBtn">🔐 تسجيل الدخول</button>
         </form>
+
+        <div class="debug-info" id="debugInfo"></div>
 
         <div class="back-link">
             <a href="index.html">← العودة للموقع الرئيسي</a>
@@ -141,18 +162,33 @@
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Check if already logged in
+        // Check if already logged in as admin
         window.onload = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
+            console.log('🔍 Checking existing session...');
+            const { data: { user }, error } = await supabase.auth.getUser();
+            
+            if (error) {
+                console.log(' No existing session:', error.message);
+                return;
+            }
+
             if (user) {
+                console.log('✅ Found user:', user.email);
                 // Check if user is admin
-                const { data: admin } = await supabase
+                const { data: admin, error: adminError } = await supabase
                     .from('admin_profiles')
                     .select('*')
                     .eq('id', user.id)
                     .single();
 
+                if (adminError) {
+                    console.log('❌ Not an admin:', adminError.message);
+                    await supabase.auth.signOut();
+                    return;
+                }
+
                 if (admin) {
+                    console.log('✅ Admin found, redirecting...');
                     window.location.href = 'admin-dashboard.html';
                 }
             }
@@ -161,41 +197,87 @@
         async function handleLogin(event) {
             event.preventDefault();
             
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+            const loginBtn = document.getElementById('loginBtn');
+            const debugInfo = document.getElementById('debugInfo');
 
-            // Hide error
+            // Hide alerts
             errorAlert.classList.remove('show');
+            successAlert.classList.remove('show');
 
-            // Login
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
+            // Disable button
+            loginBtn.disabled = true;
+            loginBtn.textContent = ' جاري تسجيل الدخول...';
 
-            if (error) {
-                errorAlert.textContent = '❌ خطأ في البريد الإلكتروني أو كلمة المرور';
+            console.log('🔐 Attempting login for:', email);
+
+            try {
+                // Step 1: Sign in
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    console.error('❌ Login error:', error);
+                    errorAlert.textContent = '❌ خطأ: ' + error.message;
+                    errorAlert.classList.add('show');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '🔐 تسجيل الدخول';
+                    return;
+                }
+
+                console.log('✅ Login successful, user:', data.user.id);
+                successAlert.textContent = '✅ تم تسجيل الدخول بنجاح! جاري التحقق من الصلاحيات...';
+                successAlert.classList.add('show');
+
+                // Step 2: Check if user is admin
+                const { data: admin, error: adminError } = await supabase
+                    .from('admin_profiles')
+                    .select('*')
+                    .eq('id', data.user.id)
+                    .single();
+
+                if (adminError) {
+                    console.error('❌ Admin check error:', adminError);
+                    errorAlert.textContent = '⚠️ هذا الحساب ليس لديه صلاحيات مدير\n\nتفاصيل: ' + adminError.message;
+                    errorAlert.classList.add('show');
+                    successAlert.classList.remove('show');
+                    await supabase.auth.signOut();
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = ' تسجيل الدخول';
+                    return;
+                }
+
+                if (!admin) {
+                    console.error('❌ No admin profile found');
+                    errorAlert.textContent = '⚠️ هذا الحساب ليس لديه صلاحيات مدير';
+                    errorAlert.classList.add('show');
+                    successAlert.classList.remove('show');
+                    await supabase.auth.signOut();
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = ' تسجيل الدخول';
+                    return;
+                }
+
+                console.log('✅ Admin verified:', admin.role);
+                successAlert.textContent = '✅ تم التحقق! جاري التحويل إلى لوحة التحكم...';
+
+                // Step 3: Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = 'admin-dashboard.html';
+                }, 1000);
+
+            } catch (err) {
+                console.error('❌ Unexpected error:', err);
+                errorAlert.textContent = '❌ خطأ غير متوقع: ' + err.message;
                 errorAlert.classList.add('show');
-                return;
+                loginBtn.disabled = false;
+                loginBtn.textContent = '🔐 تسجيل الدخول';
             }
-
-            // Check if user is admin
-            const { data: admin } = await supabase
-                .from('admin_profiles')
-                .select('*')
-                .eq('id', data.user.id)
-                .single();
-
-            if (!admin) {
-                errorAlert.textContent = '⚠️ هذا الحساب ليس لديه صلاحيات مدير';
-                errorAlert.classList.add('show');
-                await supabase.auth.signOut();
-                return;
-            }
-
-            // Success - redirect to dashboard
-            window.location.href = 'admin-dashboard.html';
         }
     </script>
 </body>
