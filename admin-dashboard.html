@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopCompSports - Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 280px;
+            background: rgba(21, 29, 43, 0.98);
+            border-left: 2px solid #2563EB;
+            position: fixed;
+            height: 100vh;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #f1c40f, #d4a017);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #0a0e17;
+        }
+        .logo-text { font-size: 22px; font-weight: bold; }
+        .nav-menu { display: flex; flex-direction: column; gap: 10px; }
+        .nav-item {
+            padding: 15px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.05); }
+        .nav-item.active { background: linear-gradient(135deg, #2563EB, #1d4ed8); }
+        .nav-icon { font-size: 20px; }
+        .main-content {
+            margin-right: 280px;
+            padding: 40px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        .page-title { font-size: 32px; font-weight: bold; }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(255,255,255,0.05);
+            padding: 15px 25px;
+            border-radius: 10px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: #151d2b;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #f1c40f;
+            box-shadow: 0 10px 30px rgba(241, 196, 15, 0.2);
+        }
+        .stat-icon { font-size: 32px; margin-bottom: 15px; }
+        .stat-value { font-size: 36px; font-weight: bold; color: #f1c40f; margin-bottom: 5px; }
+        .stat-label { color: rgba(255,255,255,0.7); font-size: 14px; }
+        .section {
+            background: #151d2b;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #f1c40f;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f1c40f, #d4a017);
+            color: #0a0e17;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3); }
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        th {
+            background: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+            font-weight: bold;
+        }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        .hidden { display: none; }
+        .form-group { margin-bottom: 20px; }
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="showSection('dashboard')">
+                <span class="nav-icon"></span>
+                <span>لوحة التحكم</span>
+            </div>
+            <div class="nav-item" onclick="showSection('tournaments')">
+                <span class="nav-icon">🏆</span>
+                <span>البطولات</span>
+            </div>
+            <div class="nav-item" onclick="showSection('users')">
+                <span class="nav-icon">👥</span>
+                <span>المستخدمون</span>
+            </div>
+            <div class="nav-item" onclick="showSection('registrations')">
+                <span class="nav-icon">📝</span>
+                <span>التسجيلات</span>
+            </div>
+            <div class="nav-item" onclick="showSection('admins')">
+                <span class="nav-icon">️</span>
+                <span>المسؤولون</span>
+            </div>
+            <div class="nav-item" onclick="showSection('organizations')">
+                <span class="nav-icon">🏢</span>
+                <span>الجهات المنظمة</span>
+            </div>
+            <div class="nav-item" onclick="showSection('reports')">
+                <span class="nav-icon">📈</span>
+                <span>التقارير</span>
+            </div>
+            <div class="nav-item" onclick="showSection('settings')">
+                <span class="nav-icon">⚙️</span>
+                <span>الإعدادات</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">لوحة تحكم المدير</h1>
+            <div class="user-info">
+                <span id="adminName">جاري التحميل...</span>
+                <button class="btn btn-danger" onclick="handleLogout()">تسجيل الخروج</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection" class="section-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-value" id="totalUsers">0</div>
+                    <div class="stat-label">إجمالي المستخدمين</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-value" id="totalTournaments">0</div>
+                    <div class="stat-label">البطولات</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-value" id="totalRegistrations">0</div>
+                    <div class="stat-label">التسجيلات</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value" id="totalRevenue">$0</div>
+                    <div class="stat-label">الإيرادات</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">النشاط الأخير</h2>
+                <div id="recentActivity">
+                    <p style="text-align: center; color: rgba(255,255,255,0.5);">جاري التحميل...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admins Section -->
+        <div id="adminsSection" class="section-content hidden">
+            <div class="section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h2 class="section-title">إدارة المسؤولين</h2>
+                    <button class="btn btn-primary" onclick="showCreateAdminModal()">➕ إنشاء مدير فرعي</button>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الاسم</th>
+                            <th>البريد الإلكتروني</th>
+                            <th>الدور</th>
+                            <th>تاريخ الإنشاء</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminsTable">
+                        <tr><td colspan="5" style="text-align: center;">جاري التحميل...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Create Admin Modal -->
+        <div id="createAdminModal" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+            <div class="section" style="max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                <h2 class="section-title">إنشاء مدير فرعي جديد</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">الاسم الكامل</label>
+                    <input type="text" class="form-input" id="newAdminName" placeholder="أدخل الاسم الكامل">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني</label>
+                    <input type="email" class="form-input" id="newAdminEmail" placeholder="admin@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">كلمة المرور</label>
+                    <input type="password" class="form-input" id="newAdminPassword" placeholder="••••••••">
+                </div>
+
+                <h3 style="margin: 20px 0 10px; color: #f1c40f;">الصلاحيات</h3>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="perm_tournaments">
+                        <span>إدارة البطولات</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="perm_users">
+                        <span>إدارة المستخدمين</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="perm_registrations">
+                        <span>إدارة التسجيلات</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="perm_organizations">
+                        <span>إدارة الجهات المنظمة</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="perm_reports">
+                        <span>عرض التقارير</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="perm_settings">
+                        <span>إدارة الإعدادات</span>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 30px;">
+                    <button class="btn btn-primary" onclick="createSubAdmin()" style="flex: 1;">✅ إنشاء</button>
+                    <button class="btn btn-danger" onclick="closeCreateAdminModal()" style="flex: 1;">❌ إلغاء</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other Sections (Tournaments, Users, etc.) -->
+        <div id="tournamentsSection" class="section-content hidden">
+            <div class="section">
+                <h2 class="section-title">إدارة البطولات</h2>
+                <p>قريباً...</p>
+            </div>
+        </div>
+
+        <div id="usersSection" class="section-content hidden">
+            <div class="section">
+                <h2 class="section-title">إدارة المستخدمين</h2>
+                <p>قريباً...</p>
+            </div>
+        </div>
+
+        <div id="registrationsSection" class="section-content hidden">
+            <div class="section">
+                <h2 class="section-title">إدارة التسجيلات</h2>
+                <p>قريباً...</p>
+            </div>
+        </div>
+
+        <div id="organizationsSection" class="section-content hidden">
+            <div class="section">
+                <h2 class="section-title">إدارة الجهات المنظمة</h2>
+                <p>قريباً...</p>
+            </div>
+        </div>
+
+        <div id="reportsSection" class="section-content hidden">
+            <div class="section">
+                <h2 class="section-title">التقارير الشاملة</h2>
+                <p>قريباً...</p>
+            </div>
+        </div>
+
+        <div id="settingsSection" class="section-content hidden">
+            <div class="section">
+                <h2 class="section-title">إعدادات الموقع</h2>
+                <p>قريباً...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentAdmin = null;
+
+        window.onload = async () => {
+            await checkAuth();
+            await loadDashboard();
+            await loadAdmins();
+        };
+
+        async function checkAuth() {
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const { data: admin } = await supabase
+                .from('admin_profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            if (!admin) {
+                alert('غير مصرح لك بالدخول');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            currentAdmin = admin;
+            document.getElementById('adminName').textContent = admin.full_name;
+        }
+
+        async function loadDashboard() {
+            // Load stats
+            const { count: usersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+            const { count: tournamentsCount } = await supabase.from('tournaments').select('*', { count: 'exact', head: true });
+            const { count: registrationsCount } = await supabase.from('tournament_registrations').select('*', { count: 'exact', head: true });
+
+            document.getElementById('totalUsers').textContent = usersCount || 0;
+            document.getElementById('totalTournaments').textContent = tournamentsCount || 0;
+            document.getElementById('totalRegistrations').textContent = registrationsCount || 0;
+
+            // Load recent activity
+            const { data: activities } = await supabase
+                .from('activity_logs')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(10);
+
+            const activityDiv = document.getElementById('recentActivity');
+            if (activities && activities.length > 0) {
+                activityDiv.innerHTML = activities.map(act => `
+                    <div style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <div style="font-weight: bold;">${act.action}</div>
+                        <div style="font-size: 12px; color: rgba(255,255,255,0.6);">${new Date(act.created_at).toLocaleString('ar-SA')}</div>
+                    </div>
+                `).join('');
+            } else {
+                activityDiv.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.5);">لا يوجد نشاط حديث</p>';
+            }
+        }
+
+        async function loadAdmins() {
+            const { data: admins } = await supabase
+                .from('admin_profiles')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            const tbody = document.getElementById('adminsTable');
+            if (admins && admins.length > 0) {
+                tbody.innerHTML = admins.map(admin => `
+                    <tr>
+                        <td>${admin.full_name}</td>
+                        <td>${admin.email}</td>
+                        <td>${admin.role === 'super_admin' ? 'مدير رئيسي' : 'مدير فرعي'}</td>
+                        <td>${new Date(admin.created_at).toLocaleDateString('ar-SA')}</td>
+                        <td>
+                            ${admin.role !== 'super_admin' ? `<button class="btn btn-danger" onclick="deleteAdmin('${admin.id}')" style="padding: 5px 10px; font-size: 12px;">حذف</button>` : '-'}
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">لا يوجد مدراء</td></tr>';
+            }
+        }
+
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            // Show selected section
+            document.getElementById(section + 'Section').classList.remove('hidden');
+            event.target.closest('.nav-item').classList.add('active');
+        }
+
+        function showCreateAdminModal() {
+            document.getElementById('createAdminModal').classList.remove('hidden');
+        }
+
+        function closeCreateAdminModal() {
+            document.getElementById('createAdminModal').classList.add('hidden');
+            // Clear form
+            document.getElementById('newAdminName').value = '';
+            document.getElementById('newAdminEmail').value = '';
+            document.getElementById('newAdminPassword').value = '';
+        }
+
+        async function createSubAdmin() {
+            const name = document.getElementById('newAdminName').value;
+            const email = document.getElementById('newAdminEmail').value;
+            const password = document.getElementById('newAdminPassword').value;
+
+            if (!name || !email || !password) {
+                alert('الرجاء ملء جميع الحقول');
+                return;
+            }
+
+            // Create user in Supabase Auth
+            const { data: userData, error: authError } = await supabase.auth.admin.createUser({
+                email: email,
+                password: password,
+                email_confirm: true
+            });
+
+            if (authError) {
+                alert('خطأ في إنشاء المستخدم: ' + authError.message);
+                return;
+            }
+
+            // Get permissions
+            const permissions = {
+                manage_tournaments: document.getElementById('perm_tournaments').checked,
+                manage_users: document.getElementById('perm_users').checked,
+                manage_registrations: document.getElementById('perm_registrations').checked,
+                manage_organizations: document.getElementById('perm_organizations').checked,
+                view_reports: document.getElementById('perm_reports').checked,
+                manage_settings: document.getElementById('perm_settings').checked,
+                manage_brackets: document.getElementById('perm_tournaments').checked,
+                manage_matches: document.getElementById('perm_tournaments').checked
+            };
+
+            // Create admin profile
+            const { error: profileError } = await supabase
+                .from('admin_profiles')
+                .insert({
+                    id: userData.user.id,
+                    full_name: name,
+                    email: email,
+                    role: 'sub_admin',
+                    permissions: permissions,
+                    created_by: currentAdmin.id
+                });
+
+            if (profileError) {
+                alert('خطأ في إنشاء الملف: ' + profileError.message);
+                return;
+            }
+
+            // Log activity
+            await supabase.rpc('log_activity', {
+                p_user_id: currentAdmin.id,
+                p_action: 'create_sub_admin',
+                p_table_name: 'admin_profiles',
+                p_record_id: userData.user.id,
+                p_details: { email: email, name: name }
+            });
+
+            alert('تم إنشاء المدير الفرعي بنجاح!');
+            closeCreateAdminModal();
+            await loadAdmins();
+        }
+
+        async function deleteAdmin(adminId) {
+            if (!confirm('هل أنت متأكد من حذف هذا المدير؟')) return;
+
+            const { error } = await supabase
+                .from('admin_profiles')
+                .delete()
+                .eq('id', adminId);
+
+            if (error) {
+                alert('خطأ في الحذف: ' + error.message);
+                return;
+            }
+
+            await loadAdmins();
+        }
+
+        async function handleLogout() {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
