@@ -14,6 +14,7 @@
             min-height: 100vh;
             display: flex;
         }
+        
         .left-panel {
             flex: 1;
             background: linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
@@ -55,11 +56,7 @@
             font-weight: bold;
             color: #2563EB;
         }
-        .logo-text {
-            color: #fff;
-            font-size: 24px;
-            font-weight: bold;
-        }
+        .logo-text { color: #fff; font-size: 24px; font-weight: bold; }
         .left-content { position: relative; z-index: 1; }
         .left-tagline { color: rgba(255,255,255,0.8); font-size: 14px; letter-spacing: 3px; margin-bottom: 20px; }
         .left-title { color: #fff; font-size: 64px; font-weight: bold; line-height: 1.1; margin-bottom: 30px; }
@@ -74,8 +71,13 @@
         }
         .lang-switcher { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; }
         .lang-btn {
-            background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #fff;
-            padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
         }
         .lang-btn.active { background: #2563EB; border-color: #2563EB; }
         .right-header { margin-bottom: 40px; }
@@ -84,8 +86,13 @@
         
         .role-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
         .role-card {
-            background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
         }
         .role-card:hover { border-color: rgba(37, 99, 235, 0.5); background: rgba(37, 99, 235, 0.1); }
         .role-card.selected { border-color: #2563EB; background: rgba(37, 99, 235, 0.2); }
@@ -95,16 +102,72 @@
         .form-group { margin-bottom: 20px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .form-label { display: block; color: rgba(255,255,255,0.9); font-size: 12px; letter-spacing: 2px; margin-bottom: 10px; font-weight: bold; }
-        .form-input, .form-select {
-            width: 100%; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1);
-            color: #fff; padding: 14px 18px; border-radius: 8px; font-size: 15px; transition: all 0.3s;
+        
+        /* ✅ تنسيق الحقول النصية */
+        .form-input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
         }
-        .form-input:focus, .form-select:focus { outline: none; border-color: #2563EB; background: rgba(37, 99, 235, 0.1); }
+        .form-input:focus {
+            outline: none;
+            border-color: #2563EB;
+            background: rgba(37, 99, 235, 0.1);
+        }
+        
+        /* ✅ تنسيق القوائم المنسدلة - محسّن */
+        .form-select {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            color: #fff !important;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 40px 14px 18px;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23ffffff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+        }
+        .form-select:focus {
+            outline: none;
+            border-color: #2563EB;
+            background-color: rgba(37, 99, 235, 0.2) !important;
+        }
+        
+        /* ✅ تنسيق خيارات القائمة المنسدلة */
+        .form-select option {
+            background-color: #1a1f2e !important;
+            color: #fff !important;
+            padding: 10px;
+        }
+        .form-select optgroup {
+            background-color: #0f172a !important;
+            color: #fff !important;
+            font-weight: bold;
+        }
         
         .btn-primary {
-            width: 100%; background: linear-gradient(135deg, #2563EB, #1d4ed8); color: #fff;
-            border: none; padding: 16px; border-radius: 8px; font-size: 16px; font-weight: bold;
-            cursor: pointer; transition: all 0.3s; margin-top: 20px;
+            width: 100%;
+            background: linear-gradient(135deg, #2563EB, #1d4ed8);
+            color: #fff;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
         }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5); }
         
@@ -118,7 +181,6 @@
         
         @media (max-width: 1024px) { .left-panel { display: none; } }
     </style>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -160,7 +222,7 @@
                         <div class="role-name" data-en="Coach" data-ar="مدرب">Coach</div>
                     </div>
                     <div class="role-card" onclick="selectRole('organizer', this)">
-                        <div class="role-icon">🏆</div>
+                        <div class="role-icon"></div>
                         <div class="role-name" data-en="Organizer" data-ar="منظم">Organizer</div>
                     </div>
                 </div>
@@ -271,7 +333,7 @@
             const confirmPassword = document.getElementById('confirmPassword').value;
             
             if (password !== confirmPassword) {
-                showAlert('error', currentLang === 'ar' ? '❌ كلمتا المرور غير متطابقتين' : '❌ Passwords do not match');
+                showAlert('error', currentLang === 'ar' ? ' كلمتا المرور غير متطابقتين' : '❌ Passwords do not match');
                 return;
             }
 
@@ -329,7 +391,6 @@
                 console.error('Signup error:', err);
                 let errorMsg = err.message;
                 
-                // 🛡️ فحص متقدم لتكرار البريد الإلكتروني
                 const isDuplicate = errorMsg.toLowerCase().includes('user already registered') || 
                                     errorMsg.toLowerCase().includes('email already registered') || 
                                     errorMsg.toLowerCase().includes('duplicate key');
