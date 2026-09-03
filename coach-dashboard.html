@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopCompSports - Coach Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .header {
+            background: rgba(21, 29, 43, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #2a3548;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo-icon {
+            width: 45px; height: 45px;
+            background: linear-gradient(135deg, #2563EB, #1e40af);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: bold; color: #fff;
+        }
+        .logo-text { font-size: 22px; font-weight: bold; }
+        .user-menu { display: flex; align-items: center; gap: 20px; }
+        .user-name { color: rgba(255,255,255,0.9); font-weight: 600; }
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-logout:hover { background: #ef4444; color: #fff; }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 50px; }
+        
+        .welcome-section {
+            background: linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
+            padding: 40px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -20%;
+            width: 400px; height: 400px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        .welcome-title { font-size: 32px; font-weight: bold; margin-bottom: 10px; position: relative; z-index: 1; }
+        .welcome-subtitle { color: rgba(255,255,255,0.9); font-size: 16px; position: relative; z-index: 1; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: #151d2b;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #2563EB;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+        }
+        .stat-icon { font-size: 32px; margin-bottom: 15px; }
+        .stat-value { font-size: 36px; font-weight: bold; color: #f1c40f; margin-bottom: 5px; }
+        .stat-label { color: rgba(255,255,255,0.7); font-size: 14px; }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+        
+        .profile-card {
+            background: #151d2b;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+        }
+        .profile-photo {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            border: 4px solid #2563EB;
+        }
+        .profile-name { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+        .profile-role { color: #f1c40f; font-size: 14px; margin-bottom: 20px; }
+        .profile-info { text-align: left; margin-top: 20px; }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .info-label { color: rgba(255,255,255,0.7); font-size: 14px; }
+        .info-value { font-weight: 600; }
+        .btn-edit {
+            width: 100%;
+            background: #2563EB;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        .btn-edit:hover { background: #1d4ed8; }
+        
+        .team-section {
+            background: #151d2b;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 30px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .section-title { font-size: 24px; font-weight: bold; }
+        .btn-primary {
+            background: linear-gradient(135deg, #2563EB, #1d4ed8);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
+        
+        .athletes-list { display: flex; flex-direction: column; gap: 15px; }
+        .athlete-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        .athlete-item:hover {
+            border-color: #2563EB;
+            background: rgba(37, 99, 235, 0.05);
+        }
+        .athlete-info h4 { font-size: 18px; margin-bottom: 5px; }
+        .athlete-info p { color: rgba(255,255,255,0.7); font-size: 14px; }
+        .belt-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            background: rgba(37, 99, 235, 0.2);
+            color: #2563EB;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255,255,255,0.5);
+        }
+        .empty-state-icon { font-size: 64px; margin-bottom: 20px; }
+        
+        .lang-switcher { display: flex; gap: 10px; }
+        .lang-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .lang-btn.active { background: #2563EB; border-color: #2563EB; }
+        
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <div class="user-menu">
+            <div class="lang-switcher">
+                <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+                <button class="lang-btn" onclick="setLanguage('ar')">AR</button>
+            </div>
+            <span class="user-name" id="userName">Loading...</span>
+            <button class="btn-logout" onclick="handleLogout()" data-en="Logout" data-ar="تسجيل الخروج">Logout</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="welcome-section">
+            <h1 class="welcome-title" data-en="Welcome back, Coach!" data-ar="مرحباً بعودتك، مدرب!">Welcome back, Coach!</h1>
+            <p class="welcome-subtitle" data-en="Manage your team and track your athletes' progress." data-ar="أدر فريقك وتابع تقدم لاعبيك.">Manage your team and track your athletes' progress.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="statAthletes">0</div>
+                <div class="stat-label" data-en="Athletes" data-ar="لاعبين">Athletes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"></div>
+                <div class="stat-value" id="statTournaments">0</div>
+                <div class="stat-label" data-en="Tournaments" data-ar="بطولات">Tournaments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🥋</div>
+                <div class="stat-value" id="statBelt">-</div>
+                <div class="stat-label" data-en="Belt Level" data-ar="لون الحزام">Belt Level</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-value" id="statExperience">-</div>
+                <div class="stat-label" data-en="Years Experience" data-ar="سنوات الخبرة">Years Experience</div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="profile-card">
+                <img src="" alt="Profile" class="profile-photo" id="profilePhoto" style="display:none;">
+                <div class="profile-photo" id="profilePhotoPlaceholder" style="background: #2563EB; display:flex; align-items:center; justify-content:center; font-size:48px; color:#fff;">‍🏫</div>
+                <h2 class="profile-name" id="profileName">Loading...</h2>
+                <p class="profile-role" data-en="Coach" data-ar="مدرب">Coach</p>
+                
+                <div class="profile-info">
+                    <div class="info-item">
+                        <span class="info-label" data-en="Email" data-ar="البريد">Email</span>
+                        <span class="info-value" id="profileEmail">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label" data-en="Phone" data-ar="الهاتف">Phone</span>
+                        <span class="info-value" id="profilePhone">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label" data-en="Team" data-ar="الفريق">Team</span>
+                        <span class="info-value" id="profileTeam">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label" data-en="Certification" data-ar="الشهادة">Certification</span>
+                        <span class="info-value" id="profileCert">-</span>
+                    </div>
+                </div>
+                
+                <button class="btn-edit" onclick="window.location.href='complete-coach.html'" data-en="Edit Profile" data-ar="تعديل الملف">Edit Profile</button>
+            </div>
+
+            <div class="team-section">
+                <div class="section-header">
+                    <h2 class="section-title" data-en="My Athletes" data-ar="لاعبي">My Athletes</h2>
+                    <button class="btn-primary" data-en="Add Athlete →" data-ar="إضافة لاعب ←">Add Athlete →</button>
+                </div>
+                
+                <div class="athletes-list" id="athletesList">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👥</div>
+                        <p data-en="No athletes in your team yet." data-ar="لا يوجد لاعبين في فريقك بعد.">No athletes in your team yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentLang = 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.lang = lang;
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const text = el.getAttribute(`data-${lang}`);
+                if (text) el.textContent = text;
+            });
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        async function loadProfile() {
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const { data: coach, error } = await supabase
+                .from('coaches')
+                .select('*')
+                .eq('user_id', user.id)
+                .single();
+
+            if (error || !coach) {
+                window.location.href = 'complete-coach.html';
+                return;
+            }
+
+            document.getElementById('userName').textContent = coach.full_name;
+            document.getElementById('profileName').textContent = coach.full_name;
+            document.getElementById('profileEmail').textContent = coach.email;
+            document.getElementById('profilePhone').textContent = coach.phone || '-';
+            document.getElementById('profileTeam').textContent = coach.team_name || '-';
+            document.getElementById('profileCert').textContent = coach.certification_level || '-';
+            
+            if (coach.profile_photo_url) {
+                document.getElementById('profilePhoto').src = coach.profile_photo_url;
+                document.getElementById('profilePhoto').style.display = 'block';
+                document.getElementById('profilePhotoPlaceholder').style.display = 'none';
+            }
+
+            document.getElementById('statBelt').textContent = coach.belt_level || '-';
+            document.getElementById('statExperience').textContent = coach.years_of_experience || '-';
+
+            await loadAthletes(coach.id);
+        }
+
+        async function loadAthletes(coachId) {
+            const { data: athletes, error } = await supabase
+                .from('athletes')
+                .select('*')
+                .eq('coach_id', coachId)
+                .order('full_name');
+
+            if (error) {
+                console.error('Error loading athletes:', error);
+                return;
+            }
+
+            const list = document.getElementById('athletesList');
+            
+            if (!athletes || athletes.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👥</div>
+                        <p data-en="No athletes in your team yet." data-ar="لا يوجد لاعبين في فريقك بعد.">No athletes in your team yet.</p>
+                    </div>
+                `;
+                document.getElementById('statAthletes').textContent = '0';
+                return;
+            }
+
+            document.getElementById('statAthletes').textContent = athletes.length;
+
+            list.innerHTML = athletes.map(athlete => `
+                <div class="athlete-item">
+                    <div class="athlete-info">
+                        <h4>${athlete.full_name}</h4>
+                        <p>${athlete.country || '-'} • ${athlete.weight ? athlete.weight + ' kg' : '-'}</p>
+                    </div>
+                    <span class="belt-badge">${athlete.belt_level || '-'}</span>
+                </div>
+            `).join('');
+        }
+
+        async function handleLogout() {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        window.onload = loadProfile;
+    </script>
+</body>
+</html>
