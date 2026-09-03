@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopCompSports - Browse Events</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .header {
+            background: rgba(21, 29, 43, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #2a3548;
+        }
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo-icon {
+            width: 45px; height: 45px;
+            background: linear-gradient(135deg, #2563EB, #1e40af);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: bold; color: #fff;
+        }
+        .logo-text { font-size: 22px; font-weight: bold; }
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #f1c40f; }
+        .btn-primary {
+            background: linear-gradient(135deg, #2563EB, #1d4ed8);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 50px; }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .page-title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #2563EB, #f1c40f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .page-subtitle {
+            color: rgba(255,255,255,0.7);
+            font-size: 18px;
+        }
+        
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+            background: rgba(255,255,255,0.03);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .filter-group { display: flex; flex-direction: column; gap: 8px; }
+        .filter-label {
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .filter-select {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .filter-select:focus {
+            outline: none;
+            border-color: #2563EB;
+        }
+        .filter-select option {
+            background-color: #1a1f2e;
+            color: #fff;
+        }
+        
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        .event-card {
+            background: #151d2b;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .event-card:hover {
+            transform: translateY(-10px);
+            border-color: #2563EB;
+            box-shadow: 0 20px 60px rgba(37, 99, 235, 0.3);
+        }
+        .event-image {
+            height: 200px;
+            background: linear-gradient(135deg, #2563EB, #1e40af);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+        }
+        .event-content { padding: 25px; }
+        .event-date {
+            color: #f1c40f;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .event-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .event-location {
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .event-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+        }
+        .btn-register {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            grid-column: 1 / -1;
+        }
+        .empty-state-icon { font-size: 96px; margin-bottom: 20px; opacity: 0.5; }
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: rgba(255,255,255,0.8);
+        }
+        .empty-state p { color: rgba(255,255,255,0.6); }
+        
+        .lang-switcher { display: flex; gap: 10px; }
+        .lang-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .lang-btn.active { background: #2563EB; border-color: #2563EB; }
+        
+        @media (max-width: 1024px) {
+            .filters { grid-template-columns: repeat(2, 1fr); }
+            .events-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html" data-en="Home" data-ar="الرئيسية">Home</a>
+            <a href="events.html" data-en="Events" data-ar="البطولات">Events</a>
+            <div class="lang-switcher">
+                <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+                <button class="lang-btn" onclick="setLanguage('ar')">AR</button>
+            </div>
+            <a href="login.html" class="btn-primary" data-en="Sign In" data-ar="تسجيل الدخول">Sign In</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title" data-en="Find Your Next Competition" data-ar="ابحث عن بطولتك القادمة">Find Your Next Competition</h1>
+            <p class="page-subtitle" data-en="Browse upcoming tournaments and register to compete" data-ar="تصفح البطولات القادمة وسجل للمنافسة">Browse upcoming tournaments and register to compete</p>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label class="filter-label" data-en="Sport" data-ar="الرياضة">Sport</label>
+                <select class="filter-select" id="sportFilter">
+                    <option value="">All Sports</option>
+                    <option value="bjj">Brazilian Jiu-Jitsu</option>
+                    <option value="mma">MMA</option>
+                    <option value="boxing">Boxing</option>
+                    <option value="wrestling">Wrestling</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label" data-en="Location" data-ar="الموقع">Location</label>
+                <select class="filter-select" id="locationFilter">
+                    <option value="">All Locations</option>
+                    <option value="egypt">Egypt</option>
+                    <option value="uae">UAE</option>
+                    <option value="saudi">Saudi Arabia</option>
+                    <option value="jordan">Jordan</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label" data-en="Date" data-ar="التاريخ">Date</label>
+                <select class="filter-select" id="dateFilter">
+                    <option value="">All Dates</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="this-month">This Month</option>
+                    <option value="next-month">Next Month</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label" data-en="Belt Level" data-ar="لون الحزام">Belt Level</label>
+                <select class="filter-select" id="beltFilter">
+                    <option value="">All Levels</option>
+                    <option value="white">White</option>
+                    <option value="blue">Blue</option>
+                    <option value="purple">Purple</option>
+                    <option value="brown">Brown</option>
+                    <option value="black">Black</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="events-grid" id="eventsGrid">
+            <div class="empty-state">
+                <div class="empty-state-icon">🏆</div>
+                <h3 data-en="No tournaments found" data-ar="لم يتم العثور على بطولات">No tournaments found</h3>
+                <p data-en="Check back soon for upcoming events" data-ar="تحقق قريباً من البطولات القادمة">Check back soon for upcoming events</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentLang = 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.lang = lang;
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const text = el.getAttribute(`data-${lang}`);
+                if (text) el.textContent = text;
+            });
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        async function loadEvents() {
+            const { data: tournaments, error } = await supabase
+                .from('tournaments')
+                .select('*')
+                .eq('status', 'active')
+                .order('event_date', { ascending: true });
+
+            if (error) {
+                console.error('Error loading events:', error);
+                return;
+            }
+
+            const grid = document.getElementById('eventsGrid');
+            
+            if (!tournaments || tournaments.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏆</div>
+                        <h3 data-en="No tournaments found" data-ar="لم يتم العثور على بطولات">No tournaments found</h3>
+                        <p data-en="Check back soon for upcoming events" data-ar="تحقق قريباً من البطولات القادمة">Check back soon for upcoming events</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = tournaments.map(t => `
+                <div class="event-card">
+                    <div class="event-image">🥋</div>
+                    <div class="event-content">
+                        <div class="event-date">📅 ${t.event_date || 'TBA'}</div>
+                        <h3 class="event-title">${t.name || 'Tournament'}</h3>
+                        <div class="event-location">📍 ${t.location || 'TBA'}</div>
+                        <div class="event-stats">
+                            <div class="stat-item">
+                                <span>👥</span>
+                                <span>${t.max_participants || '∞'} ${currentLang === 'ar' ? 'مشارك' : 'Participants'}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>💰</span>
+                                <span>$${t.registration_fee || '0'}</span>
+                            </div>
+                        </div>
+                        <button class="btn-register" onclick="registerForEvent('${t.id}')" data-en="Register Now →" data-ar="سجل الآن ←">Register Now →</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function registerForEvent(tournamentId) {
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            if (!user) {
+                alert(currentLang === 'ar' ? '⚠️ يرجى تسجيل الدخول أولاً' : '⚠️ Please login first');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const { data: athlete } = await supabase
+                .from('athletes')
+                .select('id')
+                .eq('user_id', user.id)
+                .single();
+
+            if (!athlete) {
+                alert(currentLang === 'ar' ? '⚠️ يرجى إكمال ملفك الشخصي أولاً' : '⚠️ Please complete your profile first');
+                window.location.href = 'complete-athlete.html';
+                return;
+            }
+
+            const { error } = await supabase
+                .from('tournament_registrations')
+                .insert({
+                    tournament_id: tournamentId,
+                    athlete_id: athlete.id,
+                    status: 'pending'
+                });
+
+            if (error) {
+                alert(currentLang === 'ar' ? '❌ حدث خطأ أثناء التسجيل' : '❌ Error registering for event');
+                return;
+            }
+
+            alert(currentLang === 'ar' ? '✅ تم التسجيل بنجاح! سيتم مراجعة طلبك.' : '✅ Registration successful! Your request will be reviewed.');
+        }
+
+        window.onload = loadEvents;
+    </script>
+</body>
+</html>
