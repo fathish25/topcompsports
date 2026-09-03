@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المستخدمين - TopCompSports Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; }
+        .sidebar { width: 280px; background: rgba(21, 29, 43, 0.98); border-left: 2px solid #2563EB; position: fixed; height: 100vh; padding: 20px; right: 0; overflow-y: auto; }
+        .logo { display: flex; align-items: center; gap: 15px; padding: 20px; margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #f1c40f, #d4a017); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: #0a0e17; }
+        .logo-text { font-size: 22px; font-weight: bold; }
+        .nav-menu { display: flex; flex-direction: column; gap: 10px; }
+        .nav-item { padding: 15px 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; font-size: 15px; text-decoration: none; color: #fff; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); }
+        .nav-item.active { background: linear-gradient(135deg, #2563EB, #1d4ed8); }
+        .main-content { margin-right: 280px; padding: 40px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
+        .page-title { font-size: 32px; font-weight: bold; }
+        .section { background: #151d2b; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
+        .section-title { font-size: 24px; font-weight: bold; margin-bottom: 25px; color: #f1c40f; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 14px; }
+        .btn-primary { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+        .btn-warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+        .btn-info { background: linear-gradient(135deg, #2563EB, #1d4ed8); color: #fff; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
+        th { background: rgba(241, 196, 15, 0.1); color: #f1c40f; font-weight: bold; }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        .status-badge { padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; }
+        .status-active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .status-suspended { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .role-badge { padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+        .role-athlete { background: rgba(37, 99, 235, 0.2); color: #60a5fa; }
+        .role-organizer { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .role-coach { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+        .filters { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 15px; margin-bottom: 25px; align-items: end; }
+        .form-input, .form-select { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: #f1c40f; }
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #151d2b; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
+        .stat-value { font-size: 32px; font-weight: bold; color: #f1c40f; }
+        .stat-label { color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 5px; }
+        .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
+        .page-btn { padding: 8px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 6px; cursor: pointer; }
+        .page-btn.active { background: #2563EB; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: #151d2b; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; }
+        .modal-title { font-size: 22px; font-weight: bold; color: #f1c40f; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; margin-bottom: 8px; color: rgba(255,255,255,0.8); font-size: 14px; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .modal-actions .btn { flex: 1; }
+        @media (max-width: 1024px) {
+            .sidebar { width: 100%; position: relative; height: auto; }
+            .main-content { margin-right: 0; }
+            .filters { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <div class="nav-menu">
+            <a class="nav-item" href="admin-dashboard.html">📊 لوحة التحكم</a>
+            <a class="nav-item" href="admin-tournaments.html">🏆 البطولات</a>
+            <a class="nav-item active">👥 المستخدمون</a>
+            <a class="nav-item" href="admin-registrations.html">📝 التسجيلات</a>
+            <a class="nav-item" href="admin-organizations.html"> الجهات المنظمة</a>
+            <a class="nav-item" href="admin-reports.html"> التقارير</a>
+            <a class="nav-item" href="admin-settings.html">⚙️ الإعدادات</a>
+            <a class="nav-item" onclick="logout()">🚪 تسجيل الخروج</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">إدارة المستخدمين</h1>
+            <button class="btn btn-primary" onclick="showCreateModal()">➕ إنشاء حساب جديد</button>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-label">إجمالي المستخدمين</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statAthletes">0</div>
+                <div class="stat-label">اللاعبون</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statOrganizers">0</div>
+                <div class="stat-label">المنظمون</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statCoaches">0</div>
+                <div class="stat-label">المدربون</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">قائمة المستخدمين</h2>
+            
+            <div class="filters">
+                <div>
+                    <label class="form-label">بحث</label>
+                    <input type="text" class="form-input" id="searchUser" placeholder="ابحث بالاسم أو البريد..." onkeyup="loadUsers()">
+                </div>
+                <div>
+                    <label class="form-label">الحالة</label>
+                    <select class="form-select" id="filterStatus" onchange="loadUsers()">
+                        <option value="">جميع الحالات</option>
+                        <option value="active">نشط</option>
+                        <option value="suspended">موقوف</option>
+                        <option value="pending">قيد الانتظار</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">الدور</label>
+                    <select class="form-select" id="filterRole" onchange="loadUsers()">
+                        <option value="">جميع الأدوار</option>
+                        <option value="athlete">لاعب</option>
+                        <option value="organizer">منظم</option>
+                        <option value="coach">مدرب</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">تصدير</label>
+                    <button class="btn btn-info" onclick="exportUsers()" style="width: 100%;">📥 CSV</button>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الاسم</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>الدور</th>
+                        <th>الحالة</th>
+                        <th>تاريخ التسجيل</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTable">
+                    <tr><td colspan="7" style="text-align: center;">جاري التحميل...</td></tr>
+                </tbody>
+            </table>
+
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <!-- Modal إنشاء مستخدم -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal">
+            <h3 class="modal-title">إنشاء حساب جديد</h3>
+            <div class="form-group">
+                <label class="form-label">الاسم الكامل</label>
+                <input type="text" class="form-input" id="newUserName" placeholder="أدخل الاسم">
+            </div>
+            <div class="form-group">
+                <label class="form-label">البريد الإلكتروني</label>
+                <input type="email" class="form-input" id="newUserEmail" placeholder="email@example.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">كلمة المرور</label>
+                <input type="password" class="form-input" id="newUserPassword" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+                <label class="form-label">الدور</label>
+                <select class="form-select" id="newUserRole">
+                    <option value="athlete">لاعب</option>
+                    <option value="organizer">منظم</option>
+                    <option value="coach">مدرب</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-success" onclick="createUser()">✅ إنشاء</button>
+                <button class="btn btn-danger" onclick="closeModal()">❌ إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let allUsers = [];
+        let currentPage = 1;
+        const perPage = 20;
+
+        window.onload = async () => {
+            await checkAuth();
+            await loadUsers();
+        };
+
+        async function checkAuth() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) { window.location.href = 'admin-login.html'; return; }
+            const { data: admin } = await supabaseClient.from('admin_profiles').select('*').eq('id', user.id).maybeSingle();
+            if (!admin) { window.location.href = 'index.html'; return; }
+        }
+
+        async function loadUsers() {
+            const search = document.getElementById('searchUser').value.toLowerCase();
+            const statusFilter = document.getElementById('filterStatus').value;
+            const roleFilter = document.getElementById('filterRole').value;
+
+            // تحميل من جداول athletes, organizers, coaches
+            const [athletesRes, organizersRes, coachesRes] = await Promise.all([
+                supabaseClient.from('athletes').select('*'),
+                supabaseClient.from('organizers').select('*'),
+                supabaseClient.from('coaches').select('*')
+            ]);
+
+            let users = [];
+
+            if (athletesRes.data) {
+                athletesRes.data.forEach(a => {
+                    users.push({
+                        id: a.id,
+                        name: a.full_name || a.name || '-',
+                        email: a.email || '-',
+                        role: 'athlete',
+                        status: a.status || 'active',
+                        created_at: a.created_at
+                    });
+                });
+            }
+
+            if (organizersRes.data) {
+                organizersRes.data.forEach(o => {
+                    users.push({
+                        id: o.id,
+                        name: o.full_name || o.org_name || '-',
+                        email: o.email || '-',
+                        role: 'organizer',
+                        status: o.status || 'active',
+                        created_at: o.created_at
+                    });
+                });
+            }
+
+            if (coachesRes.data) {
+                coachesRes.data.forEach(c => {
+                    users.push({
+                        id: c.id,
+                        name: c.full_name || c.name || '-',
+                        email: c.email || '-',
+                        role: 'coach',
+                        status: c.status || 'active',
+                        created_at: c.created_at
+                    });
+                });
+            }
+
+            // تطبيق الفلاتر
+            if (search) {
+                users = users.filter(u => 
+                    u.name.toLowerCase().includes(search) || 
+                    u.email.toLowerCase().includes(search)
+                );
+            }
+            if (statusFilter) users = users.filter(u => u.status === statusFilter);
+            if (roleFilter) users = users.filter(u => u.role === roleFilter);
+
+            allUsers = users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            // تحديث الإحصائيات
+            document.getElementById('statTotal').textContent = allUsers.length;
+            document.getElementById('statAthletes').textContent = allUsers.filter(u => u.role === 'athlete').length;
+            document.getElementById('statOrganizers').textContent = allUsers.filter(u => u.role === 'organizer').length;
+            document.getElementById('statCoaches').textContent = allUsers.filter(u => u.role === 'coach').length;
+
+            renderPage();
+        }
+
+        function renderPage() {
+            const totalPages = Math.ceil(allUsers.length / perPage);
+            const start = (currentPage - 1) * perPage;
+            const pageUsers = allUsers.slice(start, start + perPage);
+
+            const tbody = document.getElementById('usersTable');
+            
+            if (pageUsers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا يوجد مستخدمون</td></tr>';
+            } else {
+                tbody.innerHTML = pageUsers.map((u, i) => {
+                    const statusClass = u.status === 'active' ? 'status-active' : 
+                                       u.status === 'suspended' ? 'status-suspended' : 'status-pending';
+                    const statusText = { active: 'نشط', suspended: 'موقوف', pending: 'قيد الانتظار' }[u.status] || u.status;
+                    const roleClass = `role-${u.role}`;
+                    const roleText = { athlete: 'لاعب', organizer: 'منظم', coach: 'مدرب' }[u.role] || u.role;
+
+                    return `
+                        <tr>
+                            <td>${start + i + 1}</td>
+                            <td>${u.name}</td>
+                            <td>${u.email}</td>
+                            <td><span class="role-badge ${roleClass}">${roleText}</span></td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td>${u.created_at ? new Date(u.created_at).toLocaleDateString('ar-SA') : '-'}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn btn-warning" onclick="toggleStatus('${u.id}', '${u.role}', '${u.status}')" style="padding: 5px 10px; font-size: 12px;">
+                                        ${u.status === 'suspended' ? '✅ تفعيل' : '⏸️ إيقاف'}
+                                    </button>
+                                    <button class="btn btn-danger" onclick="deleteUser('${u.id}', '${u.role}')" style="padding: 5px 10px; font-size: 12px;">️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Pagination
+            const pagination = document.getElementById('pagination');
+            if (totalPages > 1) {
+                pagination.innerHTML = Array.from({length: totalPages}, (_, i) => 
+                    `<button class="page-btn ${i + 1 === currentPage ? 'active' : ''}" onclick="goToPage(${i + 1})">${i + 1}</button>`
+                ).join('');
+            } else {
+                pagination.innerHTML = '';
+            }
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderPage();
+        }
+
+        async function toggleStatus(id, role, currentStatus) {
+            const newStatus = currentStatus === 'suspended' ? 'active' : 'suspended';
+            const table = role === 'athlete' ? 'athletes' : role === 'organizer' ? 'organizers' : 'coaches';
+            
+            const { error } = await supabaseClient.from(table).update({ status: newStatus }).eq('id', id);
+            if (error) { alert('خطأ: ' + error.message); return; }
+            
+            alert(newStatus === 'suspended' ? 'تم إيقاف المستخدم' : 'تم تفعيل المستخدم');
+            loadUsers();
+        }
+
+        async function deleteUser(id, role) {
+            if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
+            const table = role === 'athlete' ? 'athletes' : role === 'organizer' ? 'organizers' : 'coaches';
+            
+            const { error } = await supabaseClient.from(table).delete().eq('id', id);
+            if (error) { alert('خطأ: ' + error.message); return; }
+            
+            alert('تم الحذف بنجاح');
+            loadUsers();
+        }
+
+        function showCreateModal() {
+            document.getElementById('createModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('createModal').classList.remove('active');
+            document.getElementById('newUserName').value = '';
+            document.getElementById('newUserEmail').value = '';
+            document.getElementById('newUserPassword').value = '';
+        }
+
+        async function createUser() {
+            const name = document.getElementById('newUserName').value;
+            const email = document.getElementById('newUserEmail').value;
+            const password = document.getElementById('newUserPassword').value;
+            const role = document.getElementById('newUserRole').value;
+
+            if (!name || !email || !password) {
+                alert('الرجاء ملء جميع الحقول');
+                return;
+            }
+
+            // إنشاء المستخدم في Supabase Auth
+            const { data: userData, error: authError } = await supabaseClient.auth.admin.createUser({
+                email: email,
+                password: password,
+                email_confirm: true
+            });
+
+            if (authError) {
+                alert('خطأ في إنشاء الحساب: ' + authError.message);
+                return;
+            }
+
+            // إضافة إلى الجدول المناسب
+            const table = role === 'athlete' ? 'athletes' : role === 'organizer' ? 'organizers' : 'coaches';
+            const insertData = {
+                id: userData.user.id,
+                email: email,
+                status: 'active',
+                created_at: new Date().toISOString()
+            };
+
+            if (role === 'athlete') insertData.full_name = name;
+            else if (role === 'organizer') { insertData.full_name = name; insertData.org_name = name; }
+            else insertData.full_name = name;
+
+            const { error: insertError } = await supabaseClient.from(table).insert(insertData);
+            if (insertError) {
+                alert('خطأ: ' + insertError.message);
+                return;
+            }
+
+            alert('تم إنشاء الحساب بنجاح!');
+            closeModal();
+            loadUsers();
+        }
+
+        function exportUsers() {
+            if (allUsers.length === 0) { alert('لا توجد بيانات للتصدير'); return; }
+            
+            const csv = [
+                ['الاسم', 'البريد', 'الدور', 'الحالة', 'تاريخ التسجيل'],
+                ...allUsers.map(u => [u.name, u.email, u.role, u.status, u.created_at])
+            ].map(row => row.join(',')).join('\n');
+
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `users_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
