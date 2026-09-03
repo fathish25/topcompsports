@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة البطولات - TopCompSports Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; }
+        .sidebar { width: 280px; background: rgba(21, 29, 43, 0.98); border-left: 2px solid #2563EB; position: fixed; height: 100vh; padding: 20px; right: 0; }
+        .logo { display: flex; align-items: center; gap: 15px; padding: 20px; margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #f1c40f, #d4a017); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: #0a0e17; }
+        .logo-text { font-size: 22px; font-weight: bold; }
+        .nav-menu { display: flex; flex-direction: column; gap: 10px; }
+        .nav-item { padding: 15px 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; font-size: 15px; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); }
+        .nav-item.active { background: linear-gradient(135deg, #2563EB, #1d4ed8); }
+        .main-content { margin-right: 280px; padding: 40px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .page-title { font-size: 32px; font-weight: bold; }
+        .section { background: #151d2b; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
+        .section-title { font-size: 24px; font-weight: bold; margin-bottom: 25px; color: #f1c40f; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { background: rgba(241, 196, 15, 0.1); color: #f1c40f; font-weight: bold; }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        .status-badge { padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .status-active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .status-upcoming { background: rgba(37, 99, 235, 0.2); color: #2563EB; }
+        .status-completed { background: rgba(107, 114, 128, 0.2); color: #6b7280; }
+        .filters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .form-input, .form-select { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item" onclick="window.location.href='admin-dashboard.html'">📊 لوحة التحكم</div>
+            <div class="nav-item active">🏆 البطولات</div>
+            <div class="nav-item" onclick="window.location.href='admin-users.html'">👥 المستخدمين</div>
+            <div class="nav-item" onclick="window.location.href='admin-registrations.html'">📝 التسجيلات</div>
+            <div class="nav-item" onclick="window.location.href='admin-dashboard.html#adminsSection'">المسؤولون</div>
+            <div class="nav-item" onclick="window.location.href='admin-organizations.html'">🏢 الجهات المنظمة</div>
+            <div class="nav-item" onclick="window.location.href='admin-reports.html'">📈 التقارير</div>
+            <div class="nav-item" onclick="window.location.href='admin-settings.html'">⚙️ الإعدادات</div>
+            <div class="nav-item" onclick="logout()">🚪 تسجيل الخروج</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">إدارة البطولات</h1>
+            <button class="btn btn-primary" onclick="createTournament()">➕ إنشاء بطولة جديدة</button>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">قائمة البطولات</h2>
+            
+            <div class="filters">
+                <input type="text" class="form-input" id="searchTournament" placeholder="البحث بالاسم أو المدينة..." onkeyup="loadTournaments()">
+                <select class="form-select" id="filterStatus" onchange="loadTournaments()">
+                    <option value="">جميع الحالات</option>
+                    <option value="active">نشطة</option>
+                    <option value="upcoming">قادمة</option>
+                    <option value="completed">مكتملة</option>
+                    <option value="cancelled">ملغاة</option>
+                </select>
+                <select class="form-select" id="filterSport" onchange="loadTournaments()">
+                    <option value="">جميع الرياضات</option>
+                    <option value="bjj-gi">BJJ (Gi)</option>
+                    <option value="bjj-no-gi">BJJ (No Gi)</option>
+                    <option value="grappling">Grappling</option>
+                </select>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>التاريخ</th>
+                        <th>الموقع</th>
+                        <th>الرياضة</th>
+                        <th>الحالة</th>
+                        <th>المشاركين</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="tournamentsTable">
+                    <tr><td colspan="7" style="text-align: center;">جاري التحميل...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        window.onload = async () => {
+            await checkAuth();
+            await loadTournaments();
+        };
+
+        async function checkAuth() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) { window.location.href = 'admin-login.html'; return; }
+            
+            const { data: admin } = await supabaseClient.from('admin_profiles').select('*').eq('id', user.id).maybeSingle();
+            if (!admin) { alert('غير مصرح'); window.location.href = 'index.html'; return; }
+        }
+
+        async function loadTournaments() {
+            const search = document.getElementById('searchTournament').value;
+            const status = document.getElementById('filterStatus').value;
+            const sport = document.getElementById('filterSport').value;
+
+            let query = supabaseClient.from('tournaments').select('*');
+            
+            if (status) query = query.eq('status', status);
+            if (sport) query = query.eq('sport_type', sport);
+            
+            const { data, error } = await query.order('created_at', { ascending: false });
+
+            if (error) { console.error(error); return; }
+
+            const tbody = document.getElementById('tournamentsTable');
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد بطولات</td></tr>';
+                return;
+            }
+
+            let filtered = data;
+            if (search) {
+                filtered = data.filter(t => 
+                    (t.name && t.name.toLowerCase().includes(search.toLowerCase())) ||
+                    (t.location && t.location.toLowerCase().includes(search.toLowerCase()))
+                );
+            }
+
+            tbody.innerHTML = filtered.map(t => {
+                const statusClass = t.status === 'active' ? 'status-active' : 
+                                   t.status === 'completed' ? 'status-completed' : 
+                                   t.status === 'cancelled' ? 'status-cancelled' : 'status-upcoming';
+                const statusText = {
+                    'active': 'نشطة',
+                    'upcoming': 'قادمة',
+                    'completed': 'مكتملة',
+                    'cancelled': 'ملغاة'
+                }[t.status] || t.status;
+
+                return `
+                    <tr>
+                        <td>${t.name || 'بدون اسم'}</td>
+                        <td>${t.event_date || 'غير محدد'}</td>
+                        <td>${t.location || '-'}</td>
+                        <td>${t.sport_type || '-'}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>${t.max_participants || '∞'}</td>
+                        <td>
+                            <button class="btn btn-success" onclick="editTournament('${t.id}')" style="padding: 5px 10px; margin-left: 5px;">✏️ تعديل</button>
+                            <button class="btn btn-danger" onclick="deleteTournament('${t.id}')" style="padding: 5px 10px;">🗑️ حذف</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function createTournament() {
+            window.location.href = 'create-tournament.html';
+        }
+
+        function editTournament(id) {
+            window.location.href = `create-tournament.html?id=${id}`;
+        }
+
+        async function deleteTournament(id) {
+            if (!confirm('هل أنت متأكد من حذف هذه البطولة؟')) return;
+            
+            const { error } = await supabaseClient.from('tournaments').delete().eq('id', id);
+            if (error) { alert('خطأ: ' + error.message); return; }
+            
+            alert('تم الحذف بنجاح');
+            loadTournaments();
+        }
+
+        async function logout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
