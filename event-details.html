@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopCompSports - Tournament Details</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .header {
+            background: rgba(21, 29, 43, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #2a3548;
+        }
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo-icon {
+            width: 45px; height: 45px;
+            background: linear-gradient(135deg, #2563EB, #1e40af);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: bold; color: #fff;
+        }
+        .logo-text { font-size: 22px; font-weight: bold; }
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: #f1c40f; }
+        .btn-back {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-back:hover { background: rgba(255,255,255,0.2); }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 50px; }
+        
+        .event-header {
+            background: linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
+            padding: 50px;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .event-header::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -20%;
+            width: 500px; height: 500px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        .event-sport {
+            display: inline-block;
+            background: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .event-title {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .event-meta {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+        .meta-icon { font-size: 20px; }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .main-content {
+            background: #151d2b;
+            border-radius: 16px;
+            padding: 30px;
+        }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .info-card {
+            background: #151d2b;
+            border-radius: 16px;
+            padding: 25px;
+        }
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #f1c40f;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .info-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .info-label { color: rgba(255,255,255,0.6); }
+        .info-value { font-weight: 600; color: #fff; }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 30px 0 20px;
+            color: #f1c40f;
+        }
+        .description {
+            color: rgba(255,255,255,0.8);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+        
+        .divisions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .division-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        .division-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2563EB;
+        }
+        .division-info {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .btn-register {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+        }
+        .btn-register:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .participants-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .participant-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .participant-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563EB, #1e40af);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .participant-name { flex: 1; }
+        .participant-belt {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            background: rgba(37, 99, 235, 0.2);
+            color: #2563EB;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .stat-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #f1c40f;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .lang-switcher { display: flex; gap: 10px; }
+        .lang-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .lang-btn.active { background: #2563EB; border-color: #2563EB; }
+        
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            color: rgba(255,255,255,0.6);
+        }
+        .loading-icon { font-size: 64px; margin-bottom: 20px; animation: spin 2s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        @media (max-width: 1024px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .event-title { font-size: 32px; }
+            .divisions-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <nav class="nav-links">
+            <div class="lang-switcher">
+                <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+                <button class="lang-btn" onclick="setLanguage('ar')">AR</button>
+            </div>
+            <a href="events.html" class="btn-back" data-en="← Back to Events" data-ar="العودة للبطولات ←">← Back to Events</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div id="loadingState" class="loading">
+            <div class="loading-icon">⏳</div>
+            <p data-en="Loading tournament details..." data-ar="جاري تحميل تفاصيل البطولة...">Loading tournament details...</p>
+        </div>
+
+        <div id="eventContent" style="display:none;">
+            <div class="event-header">
+                <div class="event-sport" id="eventSport">BJJ (With Gi)</div>
+                <h1 class="event-title" id="eventTitle">Tournament Name</h1>
+                <div class="event-meta">
+                    <div class="meta-item">
+                        <span class="meta-icon">📅</span>
+                        <span id="eventDate">Date</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-icon">📍</span>
+                        <span id="eventLocation">Location</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-icon"></span>
+                        <span id="eventCountry">Country</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="main-content">
+                    <h2 class="card-title">
+                        <span>📋</span>
+                        <span data-en="Tournament Details" data-ar="تفاصيل البطولة">Tournament Details</span>
+                    </h2>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <span class="info-label" data-en="Sport Type" data-ar="نوع الرياضة">Sport Type</span>
+                            <span class="info-value" id="detailSport">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label" data-en="Age Division" data-ar="الفئة العمرية">Age Division</span>
+                            <span class="info-value" id="detailDivision">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label" data-en="Fight Duration" data-ar="مدة المباراة">Fight Duration</span>
+                            <span class="info-value" id="detailFightTime">- min</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label" data-en="Golden Score" data-ar="الوقت الذهبي">Golden Score</span>
+                            <span class="info-value" id="detailGoldenTime">- min</span>
+                        </div>
+                    </div>
+
+                    <div class="section-title" data-en="Description" data-ar="الوصف">Description</div>
+                    <p class="description" id="eventDescription">No description available.</p>
+
+                    <h3 class="section-title" data-en="Available Divisions" data-ar="الفئات المتاحة">Available Divisions</h3>
+                    <div class="divisions-grid" id="divisionsGrid">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="info-card">
+                        <h3 class="card-title">
+                            <span>📊</span>
+                            <span data-en="Tournament Info" data-ar="معلومات البطولة">Tournament Info</span>
+                        </h3>
+                        <div class="info-list">
+                            <div class="info-item">
+                                <span class="info-label" data-en="Max Participants" data-ar="الحد الأقصى">Max Participants</span>
+                                <span class="info-value" id="infoMaxParticipants">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label" data-en="Registered" data-ar="مسجلين">Registered</span>
+                                <span class="info-value" id="infoRegistered">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label" data-en="Registration Fee" data-ar="رسوم التسجيل">Registration Fee</span>
+                                <span class="info-value" id="infoFee">$-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label" data-en="Status" data-ar="الحالة">Status</span>
+                                <span class="info-value" id="infoStatus">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3 class="card-title">
+                            <span>👥</span>
+                            <span data-en="Registered Athletes" data-ar="اللاعبين المسجلين">Registered Athletes</span>
+                        </h3>
+                        <div class="participants-list" id="participantsList">
+                            <p style="color: rgba(255,255,255,0.5); text-align: center;" data-en="No participants yet" data-ar="لا يوجد مشاركين بعد">No participants yet</p>
+                        </div>
+                    </div>
+
+                    <button class="btn-register" id="registerBtn" onclick="registerForEvent()" data-en="Register Now →" data-ar="سجل الآن ←">Register Now →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentLang = 'en';
+        let tournamentId = null;
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.lang = lang;
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const text = el.getAttribute(`data-${lang}`);
+                if (text) el.textContent = text;
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function getSportName(sportType) {
+            const sports = {
+                'bjj-gi': 'BJJ (With Gi)',
+                'bjj-no-gi': 'BJJ (No Gi)',
+                'grappling': 'Grappling'
+            };
+            return sports[sportType] || sportType;
+        }
+
+        async function loadTournament() {
+            const urlParams = new URLSearchParams(window.location.search);
+            tournamentId = urlParams.get('id');
+
+            if (!tournamentId) {
+                window.location.href = 'events.html';
+                return;
+            }
+
+            const { data: tournament, error } = await supabase
+                .from('tournaments')
+                .select(`
+                    *,
+                    age_divisions (
+                        name,
+                        min_age,
+                        max_age,
+                        fight_duration,
+                        golden_score_duration
+                    ),
+                    organizers (
+                        org_name,
+                        full_name
+                    )
+                `)
+                .eq('id', tournamentId)
+                .single();
+
+            if (error || !tournament) {
+                window.location.href = 'events.html';
+                return;
+            }
+
+            // Update UI
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('eventContent').style.display = 'block';
+
+            document.getElementById('eventSport').textContent = getSportName(tournament.sport_type);
+            document.getElementById('eventTitle').textContent = tournament.name;
+            document.getElementById('eventDate').textContent = tournament.event_date || 'TBA';
+            document.getElementById('eventLocation').textContent = tournament.location || 'TBA';
+            document.getElementById('eventCountry').textContent = tournament.country || '';
+            
+            document.getElementById('detailSport').textContent = getSportName(tournament.sport_type);
+            document.getElementById('detailDivision').textContent = tournament.age_divisions?.name || '-';
+            document.getElementById('detailFightTime').textContent = (tournament.fight_duration || tournament.age_divisions?.fight_duration || 5) + ' min';
+            document.getElementById('detailGoldenTime').textContent = (tournament.golden_score_duration || tournament.age_divisions?.golden_score_duration || 3) + ' min';
+            document.getElementById('eventDescription').textContent = tournament.description || 'No description available.';
+            
+            document.getElementById('infoMaxParticipants').textContent = tournament.max_participants || '∞';
+            document.getElementById('infoFee').textContent = '$' + (tournament.registration_fee || '0');
+            document.getElementById('infoStatus').textContent = tournament.status || 'upcoming';
+
+            await loadParticipants();
+        }
+
+        async function loadParticipants() {
+            const { data: registrations, error } = await supabase
+                .from('tournament_registrations')
+                .select(`
+                    *,
+                    athletes (
+                        full_name,
+                        belt_level
+                    )
+                `)
+                .eq('tournament_id', tournamentId);
+
+            if (error) {
+                console.error('Error loading participants:', error);
+                return;
+            }
+
+            document.getElementById('infoRegistered').textContent = registrations?.length || 0;
+
+            const list = document.getElementById('participantsList');
+            if (!registrations || registrations.length === 0) {
+                list.innerHTML = '<p style="color: rgba(255,255,255,0.5); text-align: center;" data-en="No participants yet" data-ar="لا يوجد مشاركين بعد">No participants yet</p>';
+            } else {
+                list.innerHTML = registrations.map(reg => `
+                    <div class="participant-item">
+                        <div class="participant-avatar">${reg.athletes?.full_name?.charAt(0) || 'A'}</div>
+                        <div class="participant-name">${reg.athletes?.full_name || 'Unknown'}</div>
+                        <span class="participant-belt">${reg.athletes?.belt_level || '-'}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function registerForEvent() {
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            if (!user) {
+                alert(currentLang === 'ar' ? '⚠️ يرجى تسجيل الدخول أولاً' : '⚠️ Please login first');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const { data: athlete } = await supabase
+                .from('athletes')
+                .select('id')
+                .eq('user_id', user.id)
+                .single();
+
+            if (!athlete) {
+                alert(currentLang === 'ar' ? '️ يرجى إكمال ملفك الشخصي أولاً' : '⚠️ Please complete your profile first');
+                window.location.href = 'complete-athlete.html';
+                return;
+            }
+
+            // Check if already registered
+            const { data: existing } = await supabase
+                .from('tournament_registrations')
+                .select('id')
+                .eq('tournament_id', tournamentId)
+                .eq('athlete_id', athlete.id)
+                .single();
+
+            if (existing) {
+                alert(currentLang === 'ar' ? 'ℹ️ أنت مسجل بالفعل في هذه البطولة' : 'ℹ️ You are already registered for this tournament');
+                return;
+            }
+
+            const { error } = await supabase
+                .from('tournament_registrations')
+                .insert({
+                    tournament_id: tournamentId,
+                    athlete_id: athlete.id,
+                    status: 'pending'
+                });
+
+            if (error) {
+                alert(currentLang === 'ar' ? '❌ حدث خطأ أثناء التسجيل' : '❌ Error registering for event');
+                return;
+            }
+
+            alert(currentLang === 'ar' ? '✅ تم التسجيل بنجاح! سيتم مراجعة طلبك.' : '✅ Registration successful! Your request will be reviewed.');
+            await loadParticipants();
+        }
+
+        window.onload = loadTournament;
+    </script>
+</body>
+</html>
