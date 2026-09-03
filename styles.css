@@ -1,0 +1,25 @@
+/* Global Dropdown Styles */
+select, .form-select {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: #fff !important;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    padding-right: 40px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23fff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+}
+
+select option, .form-select option {
+    background-color: #1a1f2e !important;
+    color: #fff !important;
+    padding: 10px;
+}
+
+select:focus, .form-select:focus {
+    border-color: #2563EB;
+    background-color: rgba(37, 99, 235, 0.2) !important;
+}
