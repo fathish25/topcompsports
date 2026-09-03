@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TopCompSports - Browse Events</title>
+    <title>TopCompSports - Browse BJJ & Grappling Tournaments</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -96,14 +96,8 @@
             font-size: 14px;
             cursor: pointer;
         }
-        .filter-select:focus {
-            outline: none;
-            border-color: #2563EB;
-        }
-        .filter-select option {
-            background-color: #1a1f2e;
-            color: #fff;
-        }
+        .filter-select:focus { outline: none; border-color: #2563EB; }
+        .filter-select option { background-color: #1a1f2e; color: #fff; }
         
         .events-grid {
             display: grid;
@@ -131,14 +125,21 @@
             font-size: 64px;
         }
         .event-content { padding: 25px; }
-        .event-date {
+        .event-sport {
             color: #f1c40f;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 4px 8px;
+            background: rgba(241, 196, 15, 0.1);
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .event-date {
+            color: #2563EB;
             font-size: 14px;
             font-weight: bold;
             margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
         .event-title {
             font-size: 22px;
@@ -149,24 +150,24 @@
             color: rgba(255,255,255,0.7);
             font-size: 14px;
             margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
-        .event-stats {
+        .event-info {
             display: flex;
-            gap: 20px;
+            flex-direction: column;
+            gap: 8px;
             margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
         }
-        .stat-item {
+        .info-row {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            justify-content: space-between;
             font-size: 14px;
-            color: rgba(255,255,255,0.8);
         }
+        .info-label { color: rgba(255,255,255,0.6); }
+        .info-value { color: #fff; font-weight: 600; }
+        .golden-score { color: #f1c40f; font-weight: bold; }
         .btn-register {
             width: 100%;
             background: linear-gradient(135deg, #10b981, #059669);
@@ -189,11 +190,7 @@
             grid-column: 1 / -1;
         }
         .empty-state-icon { font-size: 96px; margin-bottom: 20px; opacity: 0.5; }
-        .empty-state h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            color: rgba(255,255,255,0.8);
-        }
+        .empty-state h3 { font-size: 24px; margin-bottom: 10px; color: rgba(255,255,255,0.8); }
         .empty-state p { color: rgba(255,255,255,0.6); }
         
         .lang-switcher { display: flex; gap: 10px; }
@@ -235,7 +232,7 @@
     <div class="container">
         <div class="page-header">
             <h1 class="page-title" data-en="Find Your Next Competition" data-ar="ابحث عن بطولتك القادمة">Find Your Next Competition</h1>
-            <p class="page-subtitle" data-en="Browse upcoming tournaments and register to compete" data-ar="تصفح البطولات القادمة وسجل للمنافسة">Browse upcoming tournaments and register to compete</p>
+            <p class="page-subtitle" data-en="Browse BJJ & Grappling tournaments worldwide - AJP Standards" data-ar="تصفح بطولات الجوجيتسو والجرابلنج حول العالم - معايير AJP">Browse BJJ & Grappling tournaments worldwide - AJP Standards</p>
         </div>
 
         <div class="filters">
@@ -243,40 +240,27 @@
                 <label class="filter-label" data-en="Sport" data-ar="الرياضة">Sport</label>
                 <select class="filter-select" id="sportFilter">
                     <option value="">All Sports</option>
-                    <option value="bjj">Brazilian Jiu-Jitsu</option>
-                    <option value="mma">MMA</option>
-                    <option value="boxing">Boxing</option>
-                    <option value="wrestling">Wrestling</option>
+                    <option value="bjj-gi">Brazilian Jiu-Jitsu (With Gi)</option>
+                    <option value="bjj-no-gi">Brazilian Jiu-Jitsu (No Gi)</option>
+                    <option value="grappling">Grappling</option>
                 </select>
             </div>
             <div class="filter-group">
-                <label class="filter-label" data-en="Location" data-ar="الموقع">Location</label>
-                <select class="filter-select" id="locationFilter">
-                    <option value="">All Locations</option>
-                    <option value="egypt">Egypt</option>
-                    <option value="uae">UAE</option>
-                    <option value="saudi">Saudi Arabia</option>
-                    <option value="jordan">Jordan</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label class="filter-label" data-en="Date" data-ar="التاريخ">Date</label>
-                <select class="filter-select" id="dateFilter">
-                    <option value="">All Dates</option>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="this-month">This Month</option>
-                    <option value="next-month">Next Month</option>
+                <label class="filter-label" data-en="Age Division" data-ar="الفئة العمرية">Age Division</label>
+                <select class="filter-select" id="ageFilter">
+                    <option value="">All Ages</option>
                 </select>
             </div>
             <div class="filter-group">
                 <label class="filter-label" data-en="Belt Level" data-ar="لون الحزام">Belt Level</label>
                 <select class="filter-select" id="beltFilter">
-                    <option value="">All Levels</option>
-                    <option value="white">White</option>
-                    <option value="blue">Blue</option>
-                    <option value="purple">Purple</option>
-                    <option value="brown">Brown</option>
-                    <option value="black">Black</option>
+                    <option value="">All Belts</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label" data-en="Country" data-ar="الدولة">Country</label>
+                <select class="filter-select" id="countryFilter">
+                    <option value="">All Countries</option>
                 </select>
             </div>
         </div>
@@ -284,8 +268,7 @@
         <div class="events-grid" id="eventsGrid">
             <div class="empty-state">
                 <div class="empty-state-icon">🏆</div>
-                <h3 data-en="No tournaments found" data-ar="لم يتم العثور على بطولات">No tournaments found</h3>
-                <p data-en="Check back soon for upcoming events" data-ar="تحقق قريباً من البطولات القادمة">Check back soon for upcoming events</p>
+                <h3 data-en="Loading tournaments..." data-ar="جاري تحميل البطولات...">Loading tournaments...</h3>
             </div>
         </div>
     </div>
@@ -301,31 +284,76 @@
             currentLang = lang;
             document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
             document.documentElement.lang = lang;
-            
             document.querySelectorAll('[data-en]').forEach(el => {
                 const text = el.getAttribute(`data-${lang}`);
                 if (text) el.textContent = text;
             });
-            
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
+        }
+
+        async function loadFilters() {
+            // Load Age Divisions
+            const { data: ageDivisions } = await supabase
+                .from('age_divisions')
+                .select('*')
+                .order('min_age');
+            
+            const ageFilter = document.getElementById('ageFilter');
+            if (ageDivisions) {
+                ageFilter.innerHTML = '<option value="">All Ages</option>' +
+                    ageDivisions.map(d => `<option value="${d.id}">${d.name} (${d.min_age}-${d.max_age || '+'})</option>`).join('');
+            }
+
+            // Load Belt Levels
+            const { data: beltLevels } = await supabase
+                .from('belt_levels')
+                .select('*, age_divisions(name)')
+                .order('name');
+            
+            const beltFilter = document.getElementById('beltFilter');
+            if (beltLevels) {
+                const kidsBelts = beltLevels.filter(b => b.is_kids_belt);
+                const adultBelts = beltLevels.filter(b => !b.is_kids_belt);
+                
+                beltFilter.innerHTML = '<option value="">All Belts</option>' +
+                    '<optgroup label="Kids Belts">' +
+                    kidsBelts.map(b => `<option value="${b.id}">${b.name} (${b.age_divisions?.name || ''})</option>`).join('') +
+                    '</optgroup>' +
+                    '<optgroup label="Adult/Master Belts">' +
+                    adultBelts.map(b => `<option value="${b.id}">${b.name} (${b.age_divisions?.name || ''})</option>`).join('') +
+                    '</optgroup>';
+            }
+        }
+
+        function getSportName(sportType) {
+            const sports = {
+                'bjj-gi': 'BJJ (With Gi)',
+                'bjj-no-gi': 'BJJ (No Gi)',
+                'grappling': 'Grappling'
+            };
+            return sports[sportType] || sportType;
         }
 
         async function loadEvents() {
             const { data: tournaments, error } = await supabase
                 .from('tournaments')
-                .select('*')
+                .select(`
+                    *,
+                    age_divisions (
+                        name,
+                        min_age,
+                        max_age,
+                        fight_duration,
+                        golden_score_duration
+                    )
+                `)
                 .eq('status', 'active')
                 .order('event_date', { ascending: true });
 
-            if (error) {
-                console.error('Error loading events:', error);
-                return;
-            }
-
             const grid = document.getElementById('eventsGrid');
             
-            if (!tournaments || tournaments.length === 0) {
+            if (error || !tournaments || tournaments.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">🏆</div>
@@ -336,32 +364,50 @@
                 return;
             }
 
-            grid.innerHTML = tournaments.map(t => `
-                <div class="event-card">
-                    <div class="event-image">🥋</div>
-                    <div class="event-content">
-                        <div class="event-date">📅 ${t.event_date || 'TBA'}</div>
-                        <h3 class="event-title">${t.name || 'Tournament'}</h3>
-                        <div class="event-location">📍 ${t.location || 'TBA'}</div>
-                        <div class="event-stats">
-                            <div class="stat-item">
-                                <span>👥</span>
-                                <span>${t.max_participants || '∞'} ${currentLang === 'ar' ? 'مشارك' : 'Participants'}</span>
+            grid.innerHTML = tournaments.map(t => {
+                const ageDiv = t.age_divisions;
+                const fightTime = t.fight_duration || ageDiv?.fight_duration || 5;
+                const goldenTime = t.golden_score_duration || ageDiv?.golden_score_duration || 3;
+                
+                return `
+                    <div class="event-card">
+                        <div class="event-image">🥋</div>
+                        <div class="event-content">
+                            <div class="event-sport">${getSportName(t.sport_type)}</div>
+                            <div class="event-date">📅 ${t.event_date || 'TBA'}</div>
+                            <h3 class="event-title">${t.name || 'Tournament'}</h3>
+                            <div class="event-location">📍 ${t.location || 'TBA'} ${t.country ? '• ' + t.country : ''}</div>
+                            <div class="event-info">
+                                <div class="info-row">
+                                    <span class="info-label" data-en="Age Division" data-ar="الفئة">Age Division:</span>
+                                    <span class="info-value">${ageDiv?.name || 'Adult'}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label" data-en="Fight Time" data-ar="وقت المباراة">Fight Time:</span>
+                                    <span class="info-value">${fightTime} min</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label" data-en="Golden Score" data-ar="الوقت الذهبي">Golden Score:</span>
+                                    <span class="info-value golden-score">${goldenTime} min</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label" data-en="Participants" data-ar="المشاركين">Participants:</span>
+                                    <span class="info-value">${t.max_participants || '∞'}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label" data-en="Fee" data-ar="الرسوم">Fee:</span>
+                                    <span class="info-value">$${t.registration_fee || '0'}</span>
+                                </div>
                             </div>
-                            <div class="stat-item">
-                                <span>💰</span>
-                                <span>$${t.registration_fee || '0'}</span>
-                            </div>
+                            <button class="btn-register" onclick="registerForEvent('${t.id}')" data-en="Register Now →" data-ar="سجل الآن ←">Register Now →</button>
                         </div>
-                        <button class="btn-register" onclick="registerForEvent('${t.id}')" data-en="Register Now →" data-ar="سجل الآن ←">Register Now →</button>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         async function registerForEvent(tournamentId) {
             const { data: { user } } = await supabase.auth.getUser();
-            
             if (!user) {
                 alert(currentLang === 'ar' ? '⚠️ يرجى تسجيل الدخول أولاً' : '⚠️ Please login first');
                 window.location.href = 'login.html';
@@ -396,7 +442,10 @@
             alert(currentLang === 'ar' ? '✅ تم التسجيل بنجاح! سيتم مراجعة طلبك.' : '✅ Registration successful! Your request will be reviewed.');
         }
 
-        window.onload = loadEvents;
+        window.onload = async () => {
+            await loadFilters();
+            await loadEvents();
+        };
     </script>
 </body>
 </html>
