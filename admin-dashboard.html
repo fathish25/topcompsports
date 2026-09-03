@@ -21,6 +21,7 @@
             height: 100vh;
             padding: 20px;
             overflow-y: auto;
+            right: 0;
         }
         .logo {
             display: flex;
@@ -146,7 +147,7 @@
             font-weight: bold;
         }
         tr:hover { background: rgba(255,255,255,0.03); }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .form-group { margin-bottom: 20px; }
         .form-label {
             display: block;
@@ -182,6 +183,39 @@
             height: 18px;
             cursor: pointer;
         }
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #151d2b;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .role-super { background: rgba(241, 196, 15, 0.2); color: #f1c40f; }
+        .role-sub { background: rgba(37, 99, 235, 0.2); color: #2563EB; }
     </style>
 </head>
 <body>
@@ -193,7 +227,7 @@
         </div>
         <div class="nav-menu">
             <div class="nav-item active" onclick="showSection('dashboard')">
-                <span class="nav-icon"></span>
+                <span class="nav-icon">📊</span>
                 <span>لوحة التحكم</span>
             </div>
             <div class="nav-item" onclick="showSection('tournaments')">
@@ -217,11 +251,11 @@
                 <span>الجهات المنظمة</span>
             </div>
             <div class="nav-item" onclick="showSection('reports')">
-                <span class="nav-icon">📈</span>
+                <span class="nav-icon"></span>
                 <span>التقارير</span>
             </div>
             <div class="nav-item" onclick="showSection('settings')">
-                <span class="nav-icon">⚙️</span>
+                <span class="nav-icon">️</span>
                 <span>الإعدادات</span>
             </div>
         </div>
@@ -232,6 +266,7 @@
             <h1 class="page-title">لوحة تحكم المدير</h1>
             <div class="user-info">
                 <span id="adminName">جاري التحميل...</span>
+                <span id="adminRole" class="role-badge"></span>
                 <button class="btn btn-danger" onclick="handleLogout()">تسجيل الخروج</button>
             </div>
         </div>
@@ -250,7 +285,7 @@
                     <div class="stat-label">البطولات</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">📝</div>
+                    <div class="stat-icon"></div>
                     <div class="stat-value" id="totalRegistrations">0</div>
                     <div class="stat-label">التسجيلات</div>
                 </div>
@@ -274,7 +309,7 @@
             <div class="section">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                     <h2 class="section-title">إدارة المسؤولين</h2>
-                    <button class="btn btn-primary" onclick="showCreateAdminModal()">➕ إنشاء مدير فرعي</button>
+                    <button class="btn btn-primary" id="createAdminBtn" onclick="showCreateAdminModal()">➕ إنشاء مدير فرعي</button>
                 </div>
                 
                 <table>
@@ -295,8 +330,8 @@
         </div>
 
         <!-- Create Admin Modal -->
-        <div id="createAdminModal" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;">
-            <div class="section" style="max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+        <div id="createAdminModal" class="modal-overlay">
+            <div class="modal-content">
                 <h2 class="section-title">إنشاء مدير فرعي جديد</h2>
                 
                 <div class="form-group">
@@ -317,23 +352,23 @@
                 <h3 style="margin: 20px 0 10px; color: #f1c40f;">الصلاحيات</h3>
                 <div class="checkbox-group">
                     <label class="checkbox-item">
-                        <input type="checkbox" id="perm_tournaments">
+                        <input type="checkbox" id="perm_tournaments" checked>
                         <span>إدارة البطولات</span>
                     </label>
                     <label class="checkbox-item">
-                        <input type="checkbox" id="perm_users">
+                        <input type="checkbox" id="perm_users" checked>
                         <span>إدارة المستخدمين</span>
                     </label>
                     <label class="checkbox-item">
-                        <input type="checkbox" id="perm_registrations">
+                        <input type="checkbox" id="perm_registrations" checked>
                         <span>إدارة التسجيلات</span>
                     </label>
                     <label class="checkbox-item">
-                        <input type="checkbox" id="perm_organizations">
+                        <input type="checkbox" id="perm_organizations" checked>
                         <span>إدارة الجهات المنظمة</span>
                     </label>
                     <label class="checkbox-item">
-                        <input type="checkbox" id="perm_reports">
+                        <input type="checkbox" id="perm_reports" checked>
                         <span>عرض التقارير</span>
                     </label>
                     <label class="checkbox-item">
@@ -349,7 +384,7 @@
             </div>
         </div>
 
-        <!-- Other Sections (Tournaments, Users, etc.) -->
+        <!-- Other Sections -->
         <div id="tournamentsSection" class="section-content hidden">
             <div class="section">
                 <h2 class="section-title">إدارة البطولات</h2>
@@ -402,8 +437,6 @@
 
         window.onload = async () => {
             await checkAuth();
-            await loadDashboard();
-            await loadAdmins();
         };
 
         async function checkAuth() {
@@ -428,10 +461,26 @@
 
             currentAdmin = admin;
             document.getElementById('adminName').textContent = admin.full_name;
+            
+            const roleBadge = document.getElementById('adminRole');
+            if (admin.role === 'super_admin') {
+                roleBadge.textContent = 'مدير رئيسي';
+                roleBadge.className = 'role-badge role-super';
+            } else {
+                roleBadge.textContent = 'مدير فرعي';
+                roleBadge.className = 'role-badge role-sub';
+            }
+
+            // Hide create admin button for sub-admins
+            if (admin.role !== 'super_admin') {
+                document.getElementById('createAdminBtn').classList.add('hidden');
+            }
+
+            await loadDashboard();
+            await loadAdmins();
         }
 
         async function loadDashboard() {
-            // Load stats
             const { count: usersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
             const { count: tournamentsCount } = await supabase.from('tournaments').select('*', { count: 'exact', head: true });
             const { count: registrationsCount } = await supabase.from('tournament_registrations').select('*', { count: 'exact', head: true });
@@ -440,7 +489,6 @@
             document.getElementById('totalTournaments').textContent = tournamentsCount || 0;
             document.getElementById('totalRegistrations').textContent = registrationsCount || 0;
 
-            // Load recent activity
             const { data: activities } = await supabase
                 .from('activity_logs')
                 .select('*')
@@ -472,7 +520,7 @@
                     <tr>
                         <td>${admin.full_name}</td>
                         <td>${admin.email}</td>
-                        <td>${admin.role === 'super_admin' ? 'مدير رئيسي' : 'مدير فرعي'}</td>
+                        <td><span class="role-badge ${admin.role === 'super_admin' ? 'role-super' : 'role-sub'}">${admin.role === 'super_admin' ? 'مدير رئيسي' : 'مدير فرعي'}</span></td>
                         <td>${new Date(admin.created_at).toLocaleDateString('ar-SA')}</td>
                         <td>
                             ${admin.role !== 'super_admin' ? `<button class="btn btn-danger" onclick="deleteAdmin('${admin.id}')" style="padding: 5px 10px; font-size: 12px;">حذف</button>` : '-'}
@@ -485,22 +533,19 @@
         }
 
         function showSection(section) {
-            // Hide all sections
             document.querySelectorAll('.section-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
-            // Show selected section
             document.getElementById(section + 'Section').classList.remove('hidden');
             event.target.closest('.nav-item').classList.add('active');
         }
 
         function showCreateAdminModal() {
-            document.getElementById('createAdminModal').classList.remove('hidden');
+            document.getElementById('createAdminModal').classList.add('active');
         }
 
         function closeCreateAdminModal() {
-            document.getElementById('createAdminModal').classList.add('hidden');
-            // Clear form
+            document.getElementById('createAdminModal').classList.remove('active');
             document.getElementById('newAdminName').value = '';
             document.getElementById('newAdminEmail').value = '';
             document.getElementById('newAdminPassword').value = '';
@@ -516,7 +561,6 @@
                 return;
             }
 
-            // Create user in Supabase Auth
             const { data: userData, error: authError } = await supabase.auth.admin.createUser({
                 email: email,
                 password: password,
@@ -528,7 +572,6 @@
                 return;
             }
 
-            // Get permissions
             const permissions = {
                 manage_tournaments: document.getElementById('perm_tournaments').checked,
                 manage_users: document.getElementById('perm_users').checked,
@@ -540,7 +583,6 @@
                 manage_matches: document.getElementById('perm_tournaments').checked
             };
 
-            // Create admin profile
             const { error: profileError } = await supabase
                 .from('admin_profiles')
                 .insert({
@@ -557,7 +599,6 @@
                 return;
             }
 
-            // Log activity
             await supabase.rpc('log_activity', {
                 p_user_id: currentAdmin.id,
                 p_action: 'create_sub_admin',
