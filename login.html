@@ -21,52 +21,22 @@
             max-width: 500px; 
             width: 100%; 
             background: rgba(21, 29, 43, 0.95); 
-            backdrop-filter: blur(10px);
             border-radius: 16px; 
             padding: 40px; 
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5); 
         }
-        .logo { 
-            text-align: center; 
-            margin-bottom: 30px; 
-        }
+        .logo { text-align: center; margin-bottom: 30px; }
         .logo-icon { 
-            width: 60px; 
-            height: 60px; 
+            width: 60px; height: 60px; 
             background: linear-gradient(135deg, #f1c40f, #d4a017); 
             border-radius: 12px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 32px; 
-            font-weight: bold; 
-            color: #0a0e17; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 32px; font-weight: bold; color: #0a0e17; 
             margin: 0 auto 15px; 
         }
-        .title { 
-            font-size: 28px; 
-            font-weight: bold; 
-            color: #f1c40f; 
-            margin-bottom: 10px; 
-            text-align: center; 
-        }
-        .subtitle { 
-            color: rgba(255,255,255,0.7); 
-            text-align: center; 
-            margin-bottom: 30px; 
-        }
-        .form-group { 
-            margin-bottom: 20px; 
-        }
-        .form-label { 
-            display: block; 
-            color: rgba(255,255,255,0.9); 
-            font-size: 13px; 
-            font-weight: 600; 
-            margin-bottom: 8px; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
+        .title { font-size: 28px; font-weight: bold; color: #f1c40f; margin-bottom: 10px; text-align: center; }
+        .subtitle { color: rgba(255,255,255,0.7); text-align: center; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
         .form-input { 
             width: 100%; 
             background: rgba(255,255,255,0.05); 
@@ -75,13 +45,8 @@
             padding: 14px; 
             border-radius: 8px; 
             font-size: 15px; 
-            transition: all 0.3s;
         }
-        .form-input:focus { 
-            outline: none; 
-            border-color: #f1c40f; 
-            background: rgba(241, 196, 15, 0.1);
-        }
+        .form-input:focus { outline: none; border-color: #f1c40f; }
         .btn-primary { 
             width: 100%; 
             background: linear-gradient(135deg, #2563EB, #1d4ed8); 
@@ -93,70 +58,15 @@
             font-weight: bold; 
             cursor: pointer; 
             margin-top: 10px;
-            transition: all 0.3s;
         }
-        .btn-primary:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3); 
-        }
-        .btn-primary:disabled { 
-            opacity: 0.6; 
-            cursor: not-allowed; 
-            transform: none;
-        }
-        .alert { 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin-bottom: 20px; 
-            display: none; 
-        }
-        .alert-error { 
-            background: rgba(239, 68, 68, 0.2); 
-            border: 1px solid #ef4444; 
-            color: #ef4444; 
-        }
-        .alert.show { 
-            display: block; 
-        }
-        .links { 
-            text-align: center; 
-            margin-top: 20px; 
-        }
-        .links a { 
-            color: #f1c40f; 
-            text-decoration: none; 
-            margin: 0 10px; 
-            font-size: 14px;
-        }
-        .links a:hover { 
-            text-decoration: underline; 
-        }
-        .divider {
-            margin: 20px 0;
-            text-align: center;
-            color: rgba(255,255,255,0.5);
-            font-size: 13px;
-        }
-        .social-login {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .social-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.05);
-            color: #fff;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        .social-btn:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: #f1c40f;
-        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; }
+        .alert-error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; }
+        .alert-success { background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #10b981; }
+        .alert.show { display: block; }
+        .links { text-align: center; margin-top: 20px; }
+        .links a { color: #f1c40f; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -169,7 +79,7 @@
         
         <div class="alert alert-error" id="alert"></div>
         
-        <form onsubmit="handleLogin(event)">
+        <form id="loginForm">
             <div class="form-group">
                 <label class="form-label">Email Address</label>
                 <input type="email" class="form-input" id="email" required placeholder="your@email.com" value="shark.mma.egypt2@gmail.com">
@@ -178,191 +88,73 @@
                 <label class="form-label">Password</label>
                 <input type="password" class="form-input" id="password" required placeholder="••••••••">
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: rgba(255,255,255,0.7); cursor: pointer;">
-                    <input type="checkbox" style="width: 16px; height: 16px; cursor: pointer;">
-                    Remember me
-                </label>
-                <a href="#" style="color: #f1c40f; text-decoration: none; font-size: 13px;">Forgot password?</a>
-            </div>
             <button type="submit" class="btn-primary" id="submitBtn">Sign In →</button>
         </form>
         
-        <div class="divider">OR CONTINUE WITH</div>
-        
-        <div class="social-login">
-            <button class="social-btn" onclick="handleGoogleLogin()">🔍 Google</button>
-            <button class="social-btn" onclick="handleFacebookLogin()">📘 Facebook</button>
-        </div>
-        
         <div class="links">
-            <p style="color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 20px;">
-                Don't have an account? 
-                <a href="signup.html" style="font-weight: bold;">Create one</a>
+            <p style="color: rgba(255,255,255,0.7); margin-top: 20px;">
+                Don't have an account? <a href="signup.html">Create one</a>
             </p>
             <a href="index.html">← Back to Home</a>
         </div>
     </div>
 
     <script>
-        // استخدام window.supabase بدلاً من const supabase
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         
-        // إنشاء العميل مرة واحدة فقط
-        if (!window.supabaseClient) {
-            window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        }
-        const supabase = window.supabaseClient;
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        async function handleLogin(event) {
-            event.preventDefault();
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
             const btn = document.getElementById('submitBtn');
             const alert = document.getElementById('alert');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
             
             btn.disabled = true;
             btn.textContent = 'Signing in...';
             alert.classList.remove('show');
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            console.log('🔄 Attempting login for:', email);
             
             try {
-                console.log(' Attempting login for:', email);
-                
-                // تسجيل الدخول
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
                 
                 if (error) {
-                    console.error('Login error:', error);
-                    throw new Error(error.message || 'Invalid credentials');
+                    throw error;
                 }
                 
-                console.log('✅ Logged in successfully:', data.user.email);
+                console.log('✅ Login successful!', data.user);
                 
-                // التحقق من نوع المستخدم والتوجيه
-                await redirectUser(data.user);
-                
-            } catch (err) {
-                console.error('Login error:', err);
-                alert.textContent = '❌ ' + (err.message || 'Login failed. Please check your credentials.');
-                alert.classList.add('show');
-                btn.disabled = false;
-                btn.textContent = 'Sign In →';
-            }
-        }
-
-        async function redirectUser(user) {
-            const alert = document.getElementById('alert');
-            
-            try {
-                // 1. التحقق من الأدمن
-                const { data: admin } = await supabase
-                    .from('admin_profiles')
-                    .select('id')
-                    .eq('id', user.id)
-                    .maybeSingle();
-                
-                if (admin) {
-                    console.log(' Admin detected, redirecting to admin dashboard...');
-                    window.location.href = 'admin-dashboard.html';
-                    return;
-                }
-                
-                // 2. التحقق من المنظم
+                // التحقق من المنظم
                 const { data: organizer } = await supabase
                     .from('organizers')
                     .select('id')
-                    .eq('email', user.email)
-                    .maybeSingle();
+                    .eq('email', email)
+                    .single();
                 
                 if (organizer) {
-                    console.log('🏢 Organizer detected, redirecting to organizer dashboard...');
+                    console.log('🏢 Organizer found, redirecting...');
                     window.location.href = 'organizer-dashboard.html';
-                    return;
+                } else {
+                    console.log('⚠️ No organizer profile found');
+                    alert.textContent = '⚠️ No organizer profile found. Please contact support.';
+                    alert.classList.add('show');
+                    btn.disabled = false;
+                    btn.textContent = 'Sign In →';
                 }
                 
-                // 3. التحقق من اللاعب
-                const { data: athlete } = await supabase
-                    .from('athletes')
-                    .select('id')
-                    .eq('user_id', user.id)
-                    .maybeSingle();
-                
-                if (athlete) {
-                    console.log('🥋 Athlete detected, redirecting to athlete dashboard...');
-                    window.location.href = 'athlete-dashboard.html';
-                    return;
-                }
-                
-                // 4. التحقق من المدرب
-                const { data: coach } = await supabase
-                    .from('coaches')
-                    .select('id')
-                    .eq('user_id', user.id)
-                    .maybeSingle();
-                
-                if (coach) {
-                    console.log('👨🏫 Coach detected, redirecting to coach dashboard...');
-                    window.location.href = 'coach-dashboard.html';
-                    return;
-                }
-                
-                // 5. إذا لم يكن لديه ملف
-                console.log('⚠️ No profile found, redirecting to complete profile...');
-                window.location.href = 'signup.html?complete=true';
-                
-            } catch (err) {
-                console.error('Redirect error:', err);
-                alert.textContent = '⚠️ Login successful but redirect failed: ' + err.message;
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                alert.textContent = '❌ ' + error.message;
                 alert.classList.add('show');
-            }
-        }
-
-        async function handleGoogleLogin() {
-            try {
-                const { data, error } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: {
-                        redirectTo: window.location.origin + '/organizer-dashboard.html'
-                    }
-                });
-                if (error) throw error;
-            } catch (err) {
-                console.error('Google login error:', err);
-                alert('Google login failed: ' + err.message);
-            }
-        }
-
-        async function handleFacebookLogin() {
-            try {
-                const { data, error } = await supabase.auth.signInWithOAuth({
-                    provider: 'facebook',
-                    options: {
-                        redirectTo: window.location.origin + '/organizer-dashboard.html'
-                    }
-                });
-                if (error) throw error;
-            } catch (err) {
-                console.error('Facebook login error:', err);
-                alert('Facebook login failed: ' + err.message);
-            }
-        }
-
-        // التحقق من تسجيل الدخول الحالي عند تحميل الصفحة
-        window.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user) {
-                    console.log('Already logged in:', user.email);
-                    await redirectUser(user);
-                }
-            } catch (err) {
-                console.error('Auth check error:', err);
+                btn.disabled = false;
+                btn.textContent = 'Sign In →';
             }
         });
     </script>
