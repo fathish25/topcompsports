@@ -57,7 +57,7 @@
         .modal-title { font-size: 20px; font-weight: bold; color: #f1c40f; }
         .modal-close { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 18px; }
         
-        .bulk-row { display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: end; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+        .bulk-row { display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1.2fr 1.2fr auto; gap: 10px; margin-bottom: 10px; align-items: end; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px; }
         .bulk-row input, .bulk-row select { background: #1a1f2e !important; border: 1px solid rgba(255,255,255,0.1); color: #fff !important; padding: 8px; border-radius: 6px; font-size: 13px; }
         .bulk-row select option { background-color: #1a1f2e !important; color: #fff !important; }
         .remove-btn { background: #ef4444; color: #fff; border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer; }
@@ -90,11 +90,10 @@
             <h2 class="section-title">👥 Players Registration</h2>
             <div class="player-count">Players: <span id="playerCount">0</span> / <span id="maxPlayers">100</span></div>
             
-            <!-- زر رابط التسجيل الذاتي -->
             <div style="margin-bottom: 20px; padding: 15px; background: rgba(14, 165, 233, 0.1); border: 1px solid #0ea5e9; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <strong style="color: #0ea5e9;">🔗 Player Self-Registration</strong>
-                    <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 5px;">Share this link with players to let them register themselves with their weight, belt, and rank.</p>
+                    <p style="font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 5px;">Share this link with players to let them register themselves.</p>
                 </div>
                 <button class="btn btn-info" onclick="copyRegLink()">📋 Copy Link</button>
             </div>
@@ -146,21 +145,21 @@
                     <select class="form-select" id="playerWeight">
                         <option value="">Select Weight</option>
                         <optgroup label="Kids Weights (16-50kg)">
-                            <option value="16">Rooster - 16 kg</option><option value="17">Rooster - 17 kg</option><option value="18">Rooster - 18 kg</option>
-                            <option value="18.5">Light Feather - 18.5 kg</option><option value="19">Light Feather - 19 kg</option><option value="20">Rooster - 20 kg</option>
-                            <option value="21">Rooster - 21 kg</option><option value="22">Light Feather - 22 kg</option><option value="23">Feather - 23 kg</option>
-                            <option value="24">Rooster - 24 kg</option><option value="25">Light Feather - 25 kg</option><option value="26">Light - 26 kg</option>
-                            <option value="27">Feather - 27 kg</option><option value="28">Light - 28 kg</option><option value="30">Feather - 30 kg</option>
-                            <option value="32">Light Feather - 32 kg</option><option value="34">Light - 34 kg</option><option value="36">Feather - 36 kg</option>
-                            <option value="38">Light - 38 kg</option><option value="40">Feather - 40 kg</option><option value="42">Light - 42 kg</option>
-                            <option value="45">Light - 45 kg</option><option value="48">Light Feather - 48 kg</option><option value="50">Light - 50 kg</option>
+                            <option value="16">16 kg</option><option value="17">17 kg</option><option value="18">18 kg</option>
+                            <option value="18.5">18.5 kg</option><option value="19">19 kg</option><option value="20">20 kg</option>
+                            <option value="21">21 kg</option><option value="22">22 kg</option><option value="23">23 kg</option>
+                            <option value="24">24 kg</option><option value="25">25 kg</option><option value="26">26 kg</option>
+                            <option value="27">27 kg</option><option value="28">28 kg</option><option value="30">30 kg</option>
+                            <option value="32">32 kg</option><option value="34">34 kg</option><option value="36">36 kg</option>
+                            <option value="38">38 kg</option><option value="40">40 kg</option><option value="42">42 kg</option>
+                            <option value="45">45 kg</option><option value="48">48 kg</option><option value="50">50 kg</option>
                         </optgroup>
                         <optgroup label="Adult/Master Weights (50-100+kg)">
-                            <option value="52">Light Feather - 52 kg</option><option value="55">Feather - 55 kg</option><option value="58">Feather - 58 kg</option>
-                            <option value="60">Light - 60 kg</option><option value="65">Middle - 65 kg</option><option value="70">Middle - 70 kg</option>
-                            <option value="75">Welter - 75 kg</option><option value="80">Medium Heavy - 80 kg</option><option value="85">Medium Heavy - 85 kg</option>
-                            <option value="90">Heavy - 90 kg</option><option value="95">Super Heavy - 95 kg</option><option value="100">Super Heavy - 100 kg</option>
-                            <option value="100+">Super Heavy - 100+ kg</option>
+                            <option value="52">52 kg</option><option value="55">55 kg</option><option value="58">58 kg</option>
+                            <option value="60">60 kg</option><option value="65">65 kg</option><option value="70">70 kg</option>
+                            <option value="75">75 kg</option><option value="80">80 kg</option><option value="85">85 kg</option>
+                            <option value="90">90 kg</option><option value="95">95 kg</option><option value="100">100 kg</option>
+                            <option value="100+">100+ kg</option>
                         </optgroup>
                     </select>
                 </div>
@@ -204,7 +203,6 @@
             </table>
         </div>
 
-        <!-- Mats & Brackets Sections (مختصرة للتركيز على التسجيل) -->
         <div id="matsSection" class="section hidden">
             <h2 class="section-title">🥋 Mats Setup</h2>
             <div class="form-group" style="max-width: 400px; margin-bottom: 30px;">
@@ -286,7 +284,8 @@
                     <label class="form-label">Belt Level</label>
                     <select class="form-select" id="editPlayerBelt">
                         <option value="White">White</option><option value="Grey">Grey</option><option value="Yellow">Yellow</option><option value="Orange">Orange</option>
-                        <option value="Green">Green</option><option value="Blue">Blue</option><option value="Purple">Purple</option><option value="Brown">Brown</option><option value="Black">Black</option>
+                        <option value="Green">Green</option><option value="Youth Blue">Blue (Youth)</option><option value="Youth Purple">Purple (Youth)</option>
+                        <option value="Blue">Blue (Adult)</option><option value="Purple">Purple (Adult)</option><option value="Brown">Brown</option><option value="Black">Black</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -389,7 +388,7 @@
             } catch (err) { showAlert('error', '❌ ' + err.message); }
         }
 
-        // --- BULK ADD FUNCTIONS ---
+        // --- BULK ADD FUNCTIONS (تم التحديث هنا لتشمل كل الأوزان والأحزمة) ---
         function openBulkModal() {
             document.getElementById('bulkModal').classList.add('show');
             document.getElementById('bulkContainer').innerHTML = '';
@@ -403,11 +402,55 @@
             row.className = 'bulk-row';
             row.innerHTML = `
                 <input type="text" placeholder="Player Name *" class="b-name">
-                <select class="b-team"><option value="TCS Player">TCS Player</option><option value="Free Player">Free Player</option></select>
-                <select class="b-age"><option value="Adult (18-29 yrs)">Adult</option><option value="Kids 1 (4-5 yrs)">Kids 1</option><option value="Kids 2 (6-7 yrs)">Kids 2</option><option value="Kids 3 (8-9 yrs)">Kids 3</option><option value="Infant (10-11 yrs)">Infant</option><option value="Junior (12-13 yrs)">Junior</option><option value="Teen (14-15 yrs)">Teen</option></select>
-                <select class="b-gender"><option value="Male">Male</option><option value="Female">Female</option></select>
-                <select class="b-weight"><option value="50">50 kg</option><option value="60">60 kg</option><option value="70">70 kg</option><option value="80">80 kg</option><option value="90">90 kg</option><option value="100+">100+ kg</option></select>
-                <select class="b-belt"><option value="White">White</option><option value="Blue">Blue</option><option value="Purple">Purple</option><option value="Brown">Brown</option><option value="Black">Black</option></select>
+                <select class="b-team">
+                    <option value="TCS Player">TCS Player</option>
+                    <option value="Free Player">Free Player</option>
+                </select>
+                <select class="b-age">
+                    <option value="Kids 1 (4-5 yrs)">Kids 1</option>
+                    <option value="Kids 2 (6-7 yrs)">Kids 2</option>
+                    <option value="Kids 3 (8-9 yrs)">Kids 3</option>
+                    <option value="Infant (10-11 yrs)">Infant</option>
+                    <option value="Junior (12-13 yrs)">Junior</option>
+                    <option value="Teen (14-15 yrs)">Teen</option>
+                    <option value="Youth (16-17 yrs)">Youth</option>
+                    <option value="Adult (18-29 yrs)">Adult</option>
+                    <option value="Master 1 (30-35 yrs)">Master 1</option>
+                </select>
+                <select class="b-gender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+                <select class="b-weight">
+                    <option value="">Weight</option>
+                    <optgroup label="Kids (16-50kg)">
+                        <option value="16">16 kg</option><option value="18">18 kg</option><option value="20">20 kg</option>
+                        <option value="22">22 kg</option><option value="24">24 kg</option><option value="26">26 kg</option>
+                        <option value="28">28 kg</option><option value="30">30 kg</option><option value="32">32 kg</option>
+                        <option value="34">34 kg</option><option value="36">36 kg</option><option value="38">38 kg</option>
+                        <option value="40">40 kg</option><option value="45">45 kg</option><option value="50">50 kg</option>
+                    </optgroup>
+                    <optgroup label="Adult/Master (50-100+kg)">
+                        <option value="55">55 kg</option><option value="60">60 kg</option><option value="65">65 kg</option>
+                        <option value="70">70 kg</option><option value="75">75 kg</option><option value="80">80 kg</option>
+                        <option value="85">85 kg</option><option value="90">90 kg</option><option value="95">95 kg</option>
+                        <option value="100">100 kg</option><option value="100+">100+ kg</option>
+                    </optgroup>
+                </select>
+                <select class="b-belt">
+                    <option value="">Belt</option>
+                    <option value="White">White</option>
+                    <option value="Grey">Grey</option>
+                    <option value="Yellow">Yellow</option>
+                    <option value="Orange">Orange</option>
+                    <option value="Green">Green</option>
+                    <option value="Youth Blue">Blue (Youth)</option>
+                    <option value="Youth Purple">Purple (Youth)</option>
+                    <option value="Blue">Blue (Adult)</option>
+                    <option value="Purple">Purple (Adult)</option>
+                    <option value="Brown">Brown</option>
+                    <option value="Black">Black</option>
+                </select>
                 <button class="remove-btn" onclick="this.parentElement.remove()">✕</button>
             `;
             container.appendChild(row);
@@ -418,12 +461,13 @@
             let count = 0;
             for (const row of rows) {
                 const name = row.querySelector('.b-name').value.trim();
-                if (!name) continue;
+                const weight = row.querySelector('.b-weight').value;
+                if (!name || !weight) continue; // تخطي الصفوف الفارغة
                 try {
                     await supabaseClient.rpc('add_tournament_player', {
                         p_tournament_id: tournamentId, p_player_name: name,
                         p_team: row.querySelector('.b-team').value, p_age_group: row.querySelector('.b-age').value,
-                        p_gender: row.querySelector('.b-gender').value, p_weight: parseFloat(row.querySelector('.b-weight').value),
+                        p_gender: row.querySelector('.b-gender').value, p_weight: parseFloat(weight),
                         p_belt_level: row.querySelector('.b-belt').value, p_ranking: 0
                     });
                     count++;
@@ -530,7 +574,7 @@
             document.getElementById('step3').classList.add('active');
             const cats = {};
             players.forEach(p => {
-                const k = `${p.age_group} / ${p.gender} / ${p.belt_level}`;
+                const k = `${p.age_group || 'Unknown'} / ${p.gender || 'Unknown'} / ${p.belt_level || 'Unknown'}`;
                 if (!cats[k]) cats[k] = [];
                 cats[k].push(p);
             });
