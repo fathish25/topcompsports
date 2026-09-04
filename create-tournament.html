@@ -51,30 +51,30 @@
                 <div class="logo-icon">T</div>
                 <div class="logo-text">TopCompSports</div>
             </div>
-            <h1 class="page-title" data-en="Create New Tournament" data-ar="إنشاء بطولة جديدة">Create New Tournament</h1>
-            <p class="page-subtitle" data-en="Fill in the details to publish your tournament" data-ar="املأ التفاصيل لنشر بطولتك">Fill in the details to publish your tournament</p>
+            <h1 class="page-title">Create New Tournament</h1>
+            <p class="page-subtitle">Fill in the details to publish your tournament</p>
         </div>
 
         <div class="alert" id="alert"></div>
 
         <form id="tournamentForm" onsubmit="handleSubmit(event)">
             <div class="form-section">
-                <div class="section-title"><span>🏆</span><span data-en="Tournament Information" data-ar="معلومات البطولة">Tournament Information</span></div>
+                <div class="section-title"><span>🏆</span><span>Tournament Information</span></div>
                 <div class="form-group">
-                    <label class="form-label" data-en="Tournament Name" data-ar="اسم البطولة">Tournament Name</label>
-                    <input type="text" class="form-input" id="tournamentName" required data-placeholder-en="e.g., Cairo BJJ Open 2026" data-placeholder-ar="مثال: كايرو BJJ Open 2026">
+                    <label class="form-label">Tournament Name</label>
+                    <input type="text" class="form-input" id="tournamentName" required placeholder="e.g., Cairo BJJ Open 2026">
                 </div>
                 <div class="form-group">
-                    <label class="form-label" data-en="Description" data-ar="الوصف">Description</label>
-                    <textarea class="form-input" id="description" rows="4" data-placeholder-en="Describe your tournament..." data-placeholder-ar="صف بطولتك..."></textarea>
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input" id="description" rows="4" placeholder="Describe your tournament..."></textarea>
                 </div>
             </div>
 
             <div class="form-section">
-                <div class="section-title"><span>🥋</span><span data-en="Sport & Division" data-ar="الرياضة والفئة">Sport & Division</span></div>
+                <div class="section-title"><span>🥋</span><span>Sport & Division</span></div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" data-en="Sport Type" data-ar="نوع الرياضة">Sport Type</label>
+                        <label class="form-label">Sport Type</label>
                         <select class="form-select" id="sportType" required>
                             <option value="">Select sport</option>
                             <option value="bjj-gi">Brazilian Jiu-Jitsu (With Gi)</option>
@@ -83,7 +83,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" data-en="Age Division" data-ar="الفئة العمرية">Age Division</label>
+                        <label class="form-label">Age Division</label>
                         <select class="form-select" id="ageDivision" required onchange="updateFightDuration()">
                             <option value="">Loading divisions...</option>
                         </select>
@@ -91,25 +91,25 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" data-en="Fight Duration (minutes)" data-ar="مدة المباراة (دقائق)">Fight Duration (minutes)</label>
+                        <label class="form-label">Fight Duration (minutes)</label>
                         <input type="number" class="form-input" id="fightDuration" min="1" max="30" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" data-en="Golden Score Duration (minutes)" data-ar="مدة الوقت الذهبي (دقائق)">Golden Score Duration (minutes)</label>
+                        <label class="form-label">Golden Score Duration (minutes)</label>
                         <input type="number" class="form-input" id="goldenScoreDuration" min="1" max="15" required>
                     </div>
                 </div>
             </div>
 
             <div class="form-section">
-                <div class="section-title"><span>📍</span><span data-en="Date & Location" data-ar="التاريخ والموقع">Date & Location</span></div>
+                <div class="section-title"><span>📍</span><span>Date & Location</span></div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" data-en="Event Date" data-ar="تاريخ البطولة">Event Date</label>
+                        <label class="form-label">Event Date</label>
                         <input type="date" class="form-input" id="eventDate" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" data-en="Country" data-ar="الدولة">Country</label>
+                        <label class="form-label">Country</label>
                         <select class="form-select" id="country" required>
                             <option value="">Select country</option>
                             <option value="Egypt">Egypt 🇪🇬</option>
@@ -125,26 +125,26 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" data-en="Location / Venue" data-ar="المكان / الصالة">Location / Venue</label>
-                    <input type="text" class="form-input" id="location" required data-placeholder-en="e.g., Cairo Stadium Arena" data-placeholder-ar="مثال: استاد القاهرة">
+                    <label class="form-label">Location / Venue</label>
+                    <input type="text" class="form-input" id="location" required placeholder="e.g., Cairo Stadium Arena">
                 </div>
             </div>
 
             <div class="form-section">
-                <div class="section-title"><span>👥</span><span data-en="Participants & Fee" data-ar="المشاركين والرسوم">Participants & Fee</span></div>
+                <div class="section-title"><span>👥</span><span>Participants & Fee</span></div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" data-en="Max Participants" data-ar="الحد الأقصى للمشاركين">Max Participants</label>
-                        <input type="number" class="form-input" id="maxParticipants" min="1" required data-placeholder-en="e.g., 200" data-placeholder-ar="مثال: 200">
+                        <label class="form-label">Max Participants</label>
+                        <input type="number" class="form-input" id="maxParticipants" min="1" required placeholder="e.g., 200">
                     </div>
                     <div class="form-group">
-                        <label class="form-label" data-en="Registration Fee (USD)" data-ar="رسوم التسجيل (دولار)">Registration Fee (USD)</label>
-                        <input type="number" class="form-input" id="registrationFee" min="0" step="0.01" required data-placeholder-en="e.g., 100" data-placeholder-ar="مثال: 100">
+                        <label class="form-label">Registration Fee (USD)</label>
+                        <input type="number" class="form-input" id="registrationFee" min="0" step="0.01" required placeholder="e.g., 100">
                     </div>
                 </div>
             </div>
 
-            <button type="submit" class="btn-primary" id="submitBtn" data-en="Create Tournament →" data-ar="إنشاء البطولة ←">Create Tournament →</button>
+            <button type="submit" class="btn-primary" id="submitBtn">Create Tournament →</button>
         </form>
     </div>
 
@@ -159,14 +159,6 @@
             currentLang = lang;
             document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
             document.documentElement.lang = lang;
-            document.querySelectorAll('[data-en]').forEach(el => {
-                if ((el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') && el.getAttribute(`data-placeholder-${lang}`)) {
-                    el.placeholder = el.getAttribute(`data-placeholder-${lang}`);
-                } else {
-                    const text = el.getAttribute(`data-${lang}`);
-                    if (text) el.textContent = text;
-                }
-            });
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
         }
@@ -179,7 +171,6 @@
 
             if (error) {
                 console.error('Error loading divisions:', error);
-                showAlert('error', 'Failed to load age divisions. Please refresh.');
                 return;
             }
 
@@ -193,8 +184,6 @@
                     return `<option value="${d.id}" data-fight="${fight}" data-golden="${golden}">${d.name} (${d.min_age}-${d.max_age || '+'} yrs)</option>`;
                 }).join('');
                 console.log('✅ Loaded', divisions.length, 'age divisions');
-            } else {
-                options += '<option value="" disabled>No divisions found</option>';
             }
             
             select.innerHTML = options;
@@ -209,35 +198,36 @@
             }
         }
 
-        async function handleSubmit(event) {     event.preventDefault();     const btn = document.getElementById('submitBtn');     btn.disabled = true;     const originalText = btn.textContent;     btn.textContent = currentLang === 'ar' ? 'جاري الإنشاء...' : 'Creating...';      try {         const { data: { user } } = await supabaseClient.auth.getUser();         if (!user) {             showAlert('error', currentLang === 'ar' ? '⚠️ يجب تسجيل الدخول أولاً' : '⚠️ Please login first');             return;         }          // استخدام RPC Function بدلاً من .from('organizers')         const { data: organizer, error: rpcError } = await supabaseClient             .rpc('get_organizer_by_email', { target_email: user.email });          if (rpcError) throw rpcError;          const org = organizer && organizer.length > 0 ? organizer[0] : null;          if (!org) {             showAlert('error', currentLang === 'ar' ? '⚠️ يجب إكمال ملف المنظم أولاً' : '️ Please complete organizer profile first');             return;         }          const { error } = await supabaseClient.from('tournaments').insert({             name: document.getElementById('tournamentName').value,             organizer_id: org.id,             sport_type: document.getElementById('sportType').value,             event_date: document.getElementById('eventDate').value,             location: document.getElementById('location').value,             country: document.getElementById('country').value,             max_participants: parseInt(document.getElementById('maxParticipants').value),             registration_fee: parseFloat(document.getElementById('registrationFee').value),             age_division_id: document.getElementById('ageDivision').value,             fight_duration: parseInt(document.getElementById('fightDuration').value),             golden_score_duration: parseInt(document.getElementById('goldenScoreDuration').value),             description: document.getElementById('description').value,             status: 'active'         });          if (error) throw error;          showAlert('success', currentLang === 'ar' ? '✅ تم إنشاء البطولة بنجاح!' : '✅ Tournament created successfully!');         setTimeout(() => { window.location.href = 'organizer-dashboard.html'; }, 2000);      } catch (err) {         console.error('Error:', err);         showAlert('error', err.message || (currentLang === 'ar' ? 'حدث خطأ' : 'An error occurred'));     } finally {         btn.disabled = false;         btn.textContent = originalText;     } }
+        async function handleSubmit(event) {
             event.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
             const originalText = btn.textContent;
-            btn.textContent = currentLang === 'ar' ? 'جاري الإنشاء...' : 'Creating...';
+            btn.textContent = 'Creating...';
 
             try {
                 const { data: { user } } = await supabaseClient.auth.getUser();
                 if (!user) {
-                    showAlert('error', currentLang === 'ar' ? '⚠️ يجب تسجيل الدخول أولاً' : '⚠️ Please login first');
+                    showAlert('error', '️ Please login first');
                     return;
                 }
 
-                // ✅ تم الإصلاح هنا: البحث باستخدام البريد الإلكتروني بدلاً من user_id
-                const { data: organizer, error: orgError } = await supabaseClient
-                    .from('organizers')
-                    .select('id')
-                    .eq('email', user.email) 
-                    .single();
+                // استخدام RPC Function
+                const { data: organizer, error: rpcError } = await supabaseClient
+                    .rpc('get_organizer_by_email', { target_email: user.email });
 
-                if (orgError || !organizer) {
-                    showAlert('error', currentLang === 'ar' ? '⚠️ يجب إكمال ملف المنظم أولاً' : '⚠️ Please complete organizer profile first');
+                if (rpcError) throw rpcError;
+
+                const org = organizer && organizer.length > 0 ? organizer[0] : null;
+
+                if (!org) {
+                    showAlert('error', '⚠️ Please complete organizer profile first');
                     return;
                 }
 
                 const { error } = await supabaseClient.from('tournaments').insert({
                     name: document.getElementById('tournamentName').value,
-                    organizer_id: organizer.id,
+                    organizer_id: org.id,
                     sport_type: document.getElementById('sportType').value,
                     event_date: document.getElementById('eventDate').value,
                     location: document.getElementById('location').value,
@@ -253,12 +243,12 @@
 
                 if (error) throw error;
 
-                showAlert('success', currentLang === 'ar' ? '✅ تم إنشاء البطولة بنجاح!' : '✅ Tournament created successfully!');
+                showAlert('success', '✅ Tournament created successfully!');
                 setTimeout(() => { window.location.href = 'organizer-dashboard.html'; }, 2000);
 
             } catch (err) {
                 console.error('Error:', err);
-                showAlert('error', err.message || (currentLang === 'ar' ? 'حدث خطأ' : 'An error occurred'));
+                showAlert('error', '❌ ' + err.message);
             } finally {
                 btn.disabled = false;
                 btn.textContent = originalText;
