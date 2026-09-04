@@ -162,6 +162,18 @@
             transition: all 0.3s;
         }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3); }
+        .btn-manage {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-manage:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3); }
         
         .tournament-list { display: flex; flex-direction: column; gap: 15px; }
         .tournament-item {
@@ -255,7 +267,7 @@
                 <div class="stat-label" data-en="Active Events" data-ar="فعاليات نشطة">Active Events</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"></div>
+                <div class="stat-icon">💰</div>
                 <div class="stat-value" id="statRevenue">$0</div>
                 <div class="stat-label" data-en="Revenue" data-ar="الإيرادات">Revenue</div>
             </div>
@@ -296,11 +308,7 @@
             <div class="tournaments-section">
                 <div class="section-header">
                     <h2 class="section-title" data-en="My Tournaments" data-ar="بطولاتي">My Tournaments</h2>
-                    <!-- ✅ تم إضافة زر إدارة البطولة هنا -->
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn-primary" onclick="window.location.href='tournament-manager.html'" style="background: linear-gradient(135deg, #10b981, #059669);" data-en="Manage Tournament →" data-ar="إدارة البطولة ←">Manage Tournament →</button>
-                        <button class="btn-primary" onclick="window.location.href='create-tournament.html'" data-en="Create Tournament →" data-ar="إنشاء بطولة ←">Create Tournament →</button>
-                    </div>
+                    <button class="btn-primary" onclick="window.location.href='create-tournament.html'" data-en="Create Tournament →" data-ar="إنشاء بطولة ←">Create Tournament →</button>
                 </div>
                 
                 <div class="tournament-list" id="tournamentList">
@@ -395,6 +403,7 @@
             const activeCount = tournaments.filter(t => t.status === 'active').length;
             document.getElementById('statActive').textContent = activeCount;
 
+            // ✅ تم تحديث هذا الجزء لإضافة زر Manage Tournament مع tournament_id
             list.innerHTML = tournaments.map(t => {
                 const statusClass = t.status === 'active' ? 'status-active' : 
                                    t.status === 'completed' ? 'status-completed' : 'status-upcoming';
@@ -408,7 +417,12 @@
                             <h4>${t.name || 'Tournament'}</h4>
                             <p>${t.event_date || ''} • ${t.location || ''}</p>
                         </div>
-                        <span class="status-badge ${statusClass}">${statusText}</span>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                            <button class="btn-manage" onclick="window.location.href='tournament-manager.html?tournament_id=${t.id}'" data-en="Manage Tournament →" data-ar="إدارة البطولة ←">
+                                Manage Tournament →
+                            </button>
+                        </div>
                     </div>
                 `;
             }).join('');
