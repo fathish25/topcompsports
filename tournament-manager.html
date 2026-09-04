@@ -313,7 +313,7 @@
                     <label class="form-label">Team</label>
                     <select class="form-select" id="playerTeam">
                         <option value="">Select team...</option>
-                        <option value="TCS Player">🌟 TCS Player (Free)</option>
+                        <option value="TCS Player"> TCS Player (Free)</option>
                         <option value="Free Player">🆓 Free Player</option>
                     </select>
                 </div>
@@ -395,9 +395,18 @@
                     <label class="form-label">Belt Level</label>
                     <select class="form-select" id="playerBelt">
                         <option value="">Select Belt</option>
+                        <!-- Kids Belts (4-15 yrs) -->
                         <option value="White">White</option>
-                        <option value="Blue">Blue</option>
-                        <option value="Purple">Purple</option>
+                        <option value="Grey">Grey</option>
+                        <option value="Yellow">Yellow</option>
+                        <option value="Orange">Orange</option>
+                        <option value="Green">Green</option>
+                        <!-- Youth Belts (16-17 yrs) -->
+                        <option value="Youth Blue">Blue (Youth)</option>
+                        <option value="Youth Purple">Purple (Youth)</option>
+                        <!-- Adult Belts (18+ yrs) -->
+                        <option value="Blue">Blue (Adult)</option>
+                        <option value="Purple">Purple (Adult)</option>
                         <option value="Brown">Brown</option>
                         <option value="Black">Black</option>
                     </select>
@@ -406,7 +415,7 @@
                     <label class="form-label">Ranking</label>
                     <input type="number" class="form-input" id="playerRanking" placeholder="0" value="0" min="0">
                     <small class="ranking-note">
-                        📌 0 = Unranked (New) | 1-10 = Local Ranked | 1-100 = International Ranked
+                         0 = Unranked (New) | 1-10 = Local Ranked | 1-100 = International Ranked
                     </small>
                 </div>
                 <div class="form-group" style="display: flex; align-items: flex-end;">
@@ -416,9 +425,9 @@
             
             <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="btn btn-success" onclick="addBulkPlayers()">➕ Add 10 Players</button>
-                <button class="btn btn-secondary" onclick="exportToExcel()">📊 Export to Excel</button>
-                <button class="btn btn-secondary" onclick="window.print()">🖨️ Print</button>
-                <button class="btn btn-danger" onclick="clearAllPlayers()">🗑️ Clear All</button>
+                <button class="btn btn-secondary" onclick="exportToExcel()"> Export to Excel</button>
+                <button class="btn btn-secondary" onclick="window.print()">️ Print</button>
+                <button class="btn btn-danger" onclick="clearAllPlayers()">️ Clear All</button>
                 <button class="btn btn-primary" onclick="proceedToMats()" style="margin-left: auto;">🥋 Proceed to Mats Setup →</button>
             </div>
             
@@ -470,7 +479,7 @@
 
         <!-- Step 3: Mats Overview -->
         <div id="overviewSection" class="section hidden">
-            <h2 class="section-title">🏆 Mats Overview - Click Any Category to Start Bracket</h2>
+            <h2 class="section-title"> Mats Overview - Click Any Category to Start Bracket</h2>
             
             <div id="categoriesList" class="mats-grid"></div>
             
