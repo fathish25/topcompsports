@@ -208,16 +208,15 @@
             try {
                 const { data: { user } } = await supabaseClient.auth.getUser();
                 if (!user) {
-                    showAlert('error', '️ Please login first');
+                    showAlert('error', '⚠️ Please login first');
                     return;
                 }
 
-                // استخدام RPC Function
+                // 1. جلب بيانات المنظم باستخدام RPC
                 const { data: organizer, error: rpcError } = await supabaseClient
                     .rpc('get_organizer_by_email', { target_email: user.email });
 
                 if (rpcError) throw rpcError;
-
                 const org = organizer && organizer.length > 0 ? organizer[0] : null;
 
                 if (!org) {
@@ -225,26 +224,35 @@
                     return;
                 }
 
-                const { error } = await supabaseClient.from('tournaments').insert({
-                    name: document.getElementById('tournamentName').value,
-                    organizer_id: org.id,
-                    sport_type: document.getElementById('sportType').value,
-                    event_date: document.getElementById('eventDate').value,
-                    location: document.getElementById('location').value,
-                    country: document.getElementById('country').value,
-                    max_participants: parseInt(document.getElementById('maxParticipants').value),
-                    registration_fee: parseFloat(document.getElementById('registrationFee').value),
-                    age_division_id: document.getElementById('ageDivision').value,
-                    fight_duration: parseInt(document.getElementById('fightDuration').value),
-                    golden_score_duration: parseInt(document.getElementById('goldenScoreDuration').value),
-                    description: document.getElementById('description').value,
-                    status: 'active'
-                });
+                // معالجة قيمة age_division_id لتكون null إذا كانت فارغة
+                const ageDivId = document.getElementById('ageDivision').value || null;
 
-                if (error) throw error;
+                // 2. إنشاء البطولة باستخدام RPC Function (تتجاوز RLS)
+                const { data: tournamentId, error: insertError } = await supabaseClient
+                    .rpc('create_tournament', {
+                        p_name: document.getElementById('tournamentName').value,
+                        p_organizer_id: org.id,
+                        p_sport_type: document.getElementById('sportType').value,
+                        p_event_date: document.getElementById('eventDate').value,
+                        p_location: document.getElementById('location').value,
+                        p_country: document.getElementById('country').value,
+                        p_max_participants: parseInt(document.getElementById('maxParticipants').value),
+                        p_registration_fee: parseFloat(document.getElementById('registrationFee').value),
+                        p_age_division_id: ageDivId,
+                        p_fight_duration: parseInt(document.getElementById('fightDuration').value),
+                        p_golden_score_duration: parseInt(document.getElementById('goldenScoreDuration').value),
+                        p_description: document.getElementById('description').value,
+                        p_status: 'active'
+                    });
 
+                if (insertError) throw insertError;
+
+                console.log('✅ Tournament created with ID:', tournamentId);
                 showAlert('success', '✅ Tournament created successfully!');
-                setTimeout(() => { window.location.href = 'organizer-dashboard.html'; }, 2000);
+                
+                setTimeout(() => { 
+                    window.location.href = 'organizer-dashboard.html'; 
+                }, 2000);
 
             } catch (err) {
                 console.error('Error:', err);
