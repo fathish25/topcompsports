@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Results - TopCompSports</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; min-height: 100vh; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .logo { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .logo-icon { width: 60px; height: 60px; background: linear-gradient(135deg, #f1c40f, #d4a017); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: #0a0e17; }
+        .title { font-size: 32px; font-weight: bold; color: #f1c40f; margin-bottom: 10px; }
+        .section { background: #151d2b; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
+        .section-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #f1c40f; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { background: rgba(241, 196, 15, 0.1); color: #f1c40f; font-weight: bold; }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        .medal { font-size: 24px; }
+        .btn-back { display: inline-block; background: #f1c40f; color: #0a0e17; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 20px; }
+        .empty-state { text-align: center; padding: 40px; color: rgba(255,255,255,0.5); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">T</div>
+                <div style="font-size: 28px; font-weight: bold;">TopCompSports</div>
+            </div>
+            <h1 class="title">Tournament Results</h1>
+            <p style="color: rgba(255,255,255,0.7);">Official Results & Winners</p>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">🏆 Winners by Division</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Division</th>
+                        <th>🥇 Gold</th>
+                        <th>🥈 Silver</th>
+                        <th>🥉 Bronze</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTable">
+                    <tr><td colspan="4" class="empty-state">Loading results...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">📊 Match History</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Division</th>
+                        <th>Red Player</th>
+                        <th>Blue Player</th>
+                        <th>Score</th>
+                        <th>Winner</th>
+                    </tr>
+                </thead>
+                <tbody id="matchesTable">
+                    <tr><td colspan="5" class="empty-state">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="events.html" class="btn-back">← Back to Events</a>
+        </div>
+    </div>
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function loadResults() {
+            const { data: results } = await supabase.from('match_results').select('*');
+            
+            const tbody = document.getElementById('resultsTable');
+            if (!results || results.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No results yet</td></tr>';
+            } else {
+                const divisions = {};
+                results.forEach(r => {
+                    if (!divisions[r.division]) divisions[r.division] = [];
+                    divisions[r.division].push(r);
+                });
+                
+                tbody.innerHTML = Object.entries(divisions).map(([div, matches]) => {
+                    const gold = matches.find(m => m.winner)?.winner || '-';
+                    return `
+                        <tr>
+                            <td>${div}</td>
+                            <td><span class="medal">🥇</span> ${gold}</td>
+                            <td><span class="medal"></span> -</td>
+                            <td><span class="medal">🥉</span> -</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            const { data: matches } = await supabase.from('matches').select('*');
+            const matchesTbody = document.getElementById('matchesTable');
+            if (!matches || matches.length === 0) {
+                matchesTbody.innerHTML = '<tr><td colspan="5" class="empty-state">No matches yet</td></tr>';
+            } else {
+                matchesTbody.innerHTML = matches.map(m => `
+                    <tr>
+                        <td>${m.division || m.pool_letter || '-'}</td>
+                        <td>${m.red_player_name || '-'}</td>
+                        <td>${m.blue_player_name || '-'}</td>
+                        <td>${m.red_score || 0} - ${m.blue_score || 0}</td>
+                        <td>${m.status || 'pending'}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        window.onload = loadResults;
+    </script>
+</body>
+</html>
