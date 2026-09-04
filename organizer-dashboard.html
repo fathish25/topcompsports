@@ -3,318 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TopCompSports - Organizer Dashboard</title>
+    <title>Organizer Dashboard - TopCompSports</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
-            color: #fff;
-            min-height: 100vh;
-        }
-        .header {
-            background: rgba(21, 29, 43, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 20px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #2a3548;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .logo { display: flex; align-items: center; gap: 15px; }
-        .logo-icon {
-            width: 45px; height: 45px;
-            background: linear-gradient(135deg, #2563EB, #1e40af);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; font-weight: bold; color: #fff;
-        }
-        .logo-text { font-size: 22px; font-weight: bold; }
-        .user-menu { display: flex; align-items: center; gap: 20px; }
-        .user-name { color: rgba(255,255,255,0.9); font-weight: 600; }
-        .btn-logout {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid #ef4444;
-            padding: 8px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        .btn-logout:hover { background: #ef4444; color: #fff; }
-        
-        .container { max-width: 1400px; margin: 0 auto; padding: 40px 50px; }
-        
-        .welcome-section {
-            background: linear-gradient(135deg, #f1c40f 0%, #d4a017 100%);
-            padding: 40px;
-            border-radius: 16px;
-            margin-bottom: 40px;
-            position: relative;
-            overflow: hidden;
-        }
-        .welcome-section::before {
-            content: '';
-            position: absolute;
-            top: -50%; right: -20%;
-            width: 400px; height: 400px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-        }
-        .welcome-title { font-size: 32px; font-weight: bold; margin-bottom: 10px; position: relative; z-index: 1; color: #0a0e17; }
-        .welcome-subtitle { color: rgba(10,14,23,0.8); font-size: 16px; position: relative; z-index: 1; }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-        .stat-card {
-            background: #151d2b;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 25px;
-            transition: all 0.3s;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: #f1c40f;
-            box-shadow: 0 10px 30px rgba(241, 196, 15, 0.2);
-        }
-        .stat-icon { font-size: 32px; margin-bottom: 15px; }
-        .stat-value { font-size: 36px; font-weight: bold; color: #f1c40f; margin-bottom: 5px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; min-height: 100vh; padding: 40px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #f1c40f, #d4a017); border-radius: 16px; padding: 30px; margin-bottom: 30px; }
+        .header h1 { color: #0a0e17; font-size: 32px; margin-bottom: 10px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #151d2b; border-radius: 12px; padding: 25px; text-align: center; }
+        .stat-icon { font-size: 40px; margin-bottom: 15px; }
+        .stat-value { font-size: 32px; font-weight: bold; color: #f1c40f; margin-bottom: 5px; }
         .stat-label { color: rgba(255,255,255,0.7); font-size: 14px; }
-        
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-        }
-        
-        .profile-card {
-            background: #151d2b;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-        }
-        .profile-icon {
-            width: 120px; height: 120px;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            border: 4px solid #f1c40f;
-            background: #f1c40f;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 48px;
-        }
-        .profile-name { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
-        .profile-role { color: #f1c40f; font-size: 14px; margin-bottom: 20px; }
-        .profile-info { text-align: left; margin-top: 20px; }
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .info-label { color: rgba(255,255,255,0.7); font-size: 14px; }
+        .content-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
+        .profile-section { background: #151d2b; border-radius: 16px; padding: 30px; }
+        .profile-avatar { width: 100px; height: 100px; background: linear-gradient(135deg, #f1c40f, #d4a017); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 48px; }
+        .profile-name { text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 5px; }
+        .profile-role { text-align: center; color: #f1c40f; margin-bottom: 30px; }
+        .profile-info { margin-top: 20px; }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .info-label { color: rgba(255,255,255,0.7); }
         .info-value { font-weight: 600; }
-        .btn-edit {
-            width: 100%;
-            background: #f1c40f;
-            color: #0a0e17;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s;
-        }
-        .btn-edit:hover { background: #d4a017; }
-        
-        .tournaments-section {
-            background: #151d2b;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 30px;
-        }
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
+        .btn-edit { width: 100%; background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .tournaments-section { background: #151d2b; border-radius: 16px; padding: 30px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .section-title { font-size: 24px; font-weight: bold; }
-        .btn-primary {
-            background: linear-gradient(135deg, #f1c40f, #d4a017);
-            color: #0a0e17;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3); }
-        .btn-manage {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: #fff;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn-manage:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3); }
-        
-        .tournament-list { display: flex; flex-direction: column; gap: 15px; }
-        .tournament-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-        }
-        .tournament-item:hover {
-            border-color: #f1c40f;
-            background: rgba(241, 196, 15, 0.05);
-        }
-        .tournament-info h4 { font-size: 18px; margin-bottom: 5px; }
+        .btn-create { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; border: none; padding: 12px 24px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .empty-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); }
+        .empty-icon { font-size: 64px; margin-bottom: 20px; }
+        .tournament-list { display: grid; gap: 15px; }
+        .tournament-item { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .tournament-info h4 { margin-bottom: 5px; }
         .tournament-info p { color: rgba(255,255,255,0.7); font-size: 14px; }
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        .status-active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-        .status-upcoming { background: rgba(37, 99, 235, 0.2); color: #2563EB; }
-        .status-completed { background: rgba(107, 114, 128, 0.2); color: #6b7280; }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: rgba(255,255,255,0.5);
-        }
-        .empty-state-icon { font-size: 64px; margin-bottom: 20px; }
-        
-        .lang-switcher { display: flex; gap: 10px; }
-        .lang-btn {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        .lang-btn.active { background: #2563EB; border-color: #2563EB; }
-        
-        @media (max-width: 1024px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .content-grid { grid-template-columns: 1fr; }
-        }
+        .btn-manage { background: rgba(241, 196, 15, 0.2); color: #f1c40f; border: 1px solid #f1c40f; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+        .nav-bar { background: #151d2b; padding: 15px 30px; margin-bottom: 30px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: bold; }
+        .nav-actions { display: flex; gap: 10px; align-items: center; }
+        .lang-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+        .lang-btn.active { background: #f1c40f; color: #0a0e17; }
+        .btn-logout { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+        @media (max-width: 968px) { .content-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-
-    <header class="header">
-        <div class="logo">
-            <div class="logo-icon">T</div>
-            <div class="logo-text">TopCompSports</div>
+    <div class="nav-bar">
+        <div class="nav-logo">
+            <div style="width: 40px; height: 40px; background: #f1c40f; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #0a0e17; font-weight: bold; font-size: 24px;">T</div>
+            TopCompSports
         </div>
-        <div class="user-menu">
-            <div class="lang-switcher">
-                <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
-                <button class="lang-btn" onclick="setLanguage('ar')">AR</button>
-            </div>
-            <span class="user-name" id="userName">Loading...</span>
-            <button class="btn-logout" onclick="handleLogout()" data-en="Logout" data-ar="تسجيل الخروج">Logout</button>
+        <div class="nav-actions">
+            <button class="lang-btn active">EN</button>
+            <button class="lang-btn">AR</button>
+            <span id="userNameDisplay">Loading...</span>
+            <button class="btn-logout" onclick="handleLogout()">Logout</button>
         </div>
-    </header>
+    </div>
 
     <div class="container">
-        <div class="welcome-section">
-            <h1 class="welcome-title" data-en="Welcome back, Organizer!" data-ar="مرحباً بعودتك، منظم!">Welcome back, Organizer!</h1>
-            <p class="welcome-subtitle" data-en="Create and manage tournaments, track participants, and grow your events." data-ar="أنشئ وأدر البطولات، وتابع المشاركين، وطوّر فعالياتك.">Create and manage tournaments, track participants, and grow your events.</p>
+        <div class="header">
+            <h1>Welcome back, Organizer!</h1>
+            <p>Create and manage tournaments, track participants, and grow your events.</p>
         </div>
 
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon">🏆</div>
+                <div class="stat-icon"></div>
                 <div class="stat-value" id="statTournaments">0</div>
-                <div class="stat-label" data-en="Tournaments" data-ar="بطولات">Tournaments</div>
+                <div class="stat-label">Tournaments</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">👥</div>
                 <div class="stat-value" id="statParticipants">0</div>
-                <div class="stat-label" data-en="Participants" data-ar="مشاركين">Participants</div>
+                <div class="stat-label">Participants</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">✅</div>
                 <div class="stat-value" id="statActive">0</div>
-                <div class="stat-label" data-en="Active Events" data-ar="فعاليات نشطة">Active Events</div>
+                <div class="stat-label">Active Events</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon">💰</div>
                 <div class="stat-value" id="statRevenue">$0</div>
-                <div class="stat-label" data-en="Revenue" data-ar="الإيرادات">Revenue</div>
+                <div class="stat-label">Revenue</div>
             </div>
         </div>
 
         <div class="content-grid">
-            <div class="profile-card">
-                <div class="profile-icon">🏢</div>
-                <h2 class="profile-name" id="profileName">Loading...</h2>
-                <p class="profile-role" data-en="Organizer" data-ar="منظم">Organizer</p>
+            <div class="profile-section">
+                <div class="profile-avatar">🏢</div>
+                <div class="profile-name" id="profileName">Loading...</div>
+                <div class="profile-role">Organizer</div>
                 
                 <div class="profile-info">
-                    <div class="info-item">
-                        <span class="info-label" data-en="Organization" data-ar="المنظمة">Organization</span>
+                    <div class="info-row">
+                        <span class="info-label">Organization</span>
                         <span class="info-value" id="profileOrg">-</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label" data-en="Type" data-ar="النوع">Type</span>
+                    <div class="info-row">
+                        <span class="info-label">Type</span>
                         <span class="info-value" id="profileType">-</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label" data-en="Email" data-ar="البريد">Email</span>
+                    <div class="info-row">
+                        <span class="info-label">Email</span>
                         <span class="info-value" id="profileEmail">-</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label" data-en="Phone" data-ar="الهاتف">Phone</span>
+                    <div class="info-row">
+                        <span class="info-label">Phone</span>
                         <span class="info-value" id="profilePhone">-</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label" data-en="Location" data-ar="الموقع">Location</span>
+                    <div class="info-row">
+                        <span class="info-label">Location</span>
                         <span class="info-value" id="profileLocation">-</span>
                     </div>
                 </div>
                 
-                <button class="btn-edit" onclick="window.location.href='complete-organizer.html'" data-en="Edit Profile" data-ar="تعديل الملف">Edit Profile</button>
+                <button class="btn-edit" onclick="window.location.href='complete-organizer.html'">Edit Profile</button>
             </div>
 
             <div class="tournaments-section">
                 <div class="section-header">
-                    <h2 class="section-title" data-en="My Tournaments" data-ar="بطولاتي">My Tournaments</h2>
-                    <button class="btn-primary" onclick="window.location.href='create-tournament.html'" data-en="Create Tournament →" data-ar="إنشاء بطولة ←">Create Tournament →</button>
+                    <h2 class="section-title">My Tournaments</h2>
+                    <button class="btn-create" onclick="window.location.href='create-tournament.html'">Create Tournament →</button>
                 </div>
                 
-                <div class="tournament-list" id="tournamentList">
+                <div id="tournamentList" class="tournament-list">
                     <div class="empty-state">
-                        <div class="empty-state-icon">🏆</div>
-                        <p data-en="No tournaments created yet. Create your first tournament!" data-ar="لم تنشئ أي بطولة بعد. أنشئ أول بطولة!">No tournaments created yet. Create your first tournament!</p>
+                        <div class="empty-icon">🏆</div>
+                        <p>No tournaments created yet. Create your first tournament!</p>
                     </div>
                 </div>
             </div>
@@ -325,115 +141,96 @@
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        let currentLang = 'en';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        function setLanguage(lang) {
-            currentLang = lang;
-            document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-            document.documentElement.lang = lang;
-            
-            document.querySelectorAll('[data-en]').forEach(el => {
-                const text = el.getAttribute(`data-${lang}`);
-                if (text) el.textContent = text;
-            });
-            
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-        }
+        async function loadDashboard() {
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
 
-        async function loadProfile() {
-            const { data: { user } } = await supabase.auth.getUser();
-            
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
+                // جلب بيانات المنظم باستخدام RPC
+                const { data: organizerData, error: orgError } = await supabaseClient
+                    .rpc('get_organizer_by_email', { target_email: user.email });
+
+                if (orgError) throw orgError;
+
+                const org = organizerData && organizerData.length > 0 ? organizerData[0] : null;
+
+                if (org) {
+                    // تحديث بيانات البروفايل
+                    document.getElementById('profileName').textContent = org.full_name || 'Test Organizer';
+                    document.getElementById('profileOrg').textContent = org.org_name || '-';
+                    document.getElementById('profileEmail').textContent = org.email || '-';
+                    document.getElementById('userNameDisplay').textContent = org.full_name || 'Organizer';
+                }
+
+                // جلب البطولات
+                await loadTournaments(org?.id);
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
             }
-
-            const { data: organizer, error } = await supabase
-                .rpc('get_organizer_by_email', { target_email: user.email })
-                .select('*')
-                .eq('user_id', user.id)
-                .single();
-
-            if (error || !organizer) {
-                window.location.href = 'complete-organizer.html';
-                return;
-            }
-
-            document.getElementById('userName').textContent = organizer.full_name;
-            document.getElementById('profileName').textContent = organizer.full_name;
-            document.getElementById('profileOrg').textContent = organizer.org_name || '-';
-            document.getElementById('profileType').textContent = organizer.org_type || '-';
-            document.getElementById('profileEmail').textContent = organizer.email;
-            document.getElementById('profilePhone').textContent = organizer.phone || '-';
-            document.getElementById('profileLocation').textContent = 
-                (organizer.city || '') + (organizer.country ? ', ' + organizer.country : '');
-
-            await loadTournaments(organizer.id);
         }
 
         async function loadTournaments(organizerId) {
-            const { data: tournaments, error } = await supabase
-                .from('tournaments')
-                .select('*')
-                .eq('organizer_id', organizerId)
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                console.error('Error loading tournaments:', error);
+            if (!organizerId) {
+                console.log('No organizer ID found');
                 return;
             }
 
-            const list = document.getElementById('tournamentList');
-            
-            if (!tournaments || tournaments.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🏆</div>
-                        <p data-en="No tournaments created yet. Create your first tournament!" data-ar="لم تنشئ أي بطولة بعد. أنشئ أول بطولة!">No tournaments created yet. Create your first tournament!</p>
-                    </div>
-                `;
-                document.getElementById('statTournaments').textContent = '0';
-                return;
-            }
+            try {
+                const { data: tournaments, error } = await supabaseClient
+                    .from('tournaments')
+                    .select('*')
+                    .eq('organizer_id', organizerId)
+                    .order('created_at', { ascending: false });
 
-            document.getElementById('statTournaments').textContent = tournaments.length;
-            
-            const activeCount = tournaments.filter(t => t.status === 'active').length;
-            document.getElementById('statActive').textContent = activeCount;
+                if (error) throw error;
 
-            // ✅ تم تحديث هذا الجزء لإضافة زر Manage Tournament مع tournament_id
-            list.innerHTML = tournaments.map(t => {
-                const statusClass = t.status === 'active' ? 'status-active' : 
-                                   t.status === 'completed' ? 'status-completed' : 'status-upcoming';
-                const statusText = t.status === 'active' ? (currentLang === 'ar' ? 'نشطة' : 'Active') :
-                                  t.status === 'completed' ? (currentLang === 'ar' ? 'مكتملة' : 'Completed') :
-                                  (currentLang === 'ar' ? 'قادمة' : 'Upcoming');
+                const list = document.getElementById('tournamentList');
                 
-                return `
+                if (!tournaments || tournaments.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">🏆</div>
+                            <p>No tournaments created yet. Create your first tournament!</p>
+                        </div>
+                    `;
+                    document.getElementById('statTournaments').textContent = '0';
+                    return;
+                }
+
+                document.getElementById('statTournaments').textContent = tournaments.length;
+                
+                const activeCount = tournaments.filter(t => t.status === 'active').length;
+                document.getElementById('statActive').textContent = activeCount;
+
+                list.innerHTML = tournaments.map(t => `
                     <div class="tournament-item">
                         <div class="tournament-info">
-                            <h4>${t.name || 'Tournament'}</h4>
+                            <h4>${t.name}</h4>
                             <p>${t.event_date || ''} • ${t.location || ''}</p>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span class="status-badge ${statusClass}">${statusText}</span>
-                            <button class="btn-manage" onclick="window.location.href='tournament-manager.html?tournament_id=${t.id}'" data-en="Manage Tournament →" data-ar="إدارة البطولة ←">
-                                Manage Tournament →
-                            </button>
-                        </div>
+                        <button class="btn-manage" onclick="window.location.href='tournament-manager.html?tournament_id=${t.id}'">
+                            Manage Tournament →
+                        </button>
                     </div>
-                `;
-            }).join('');
+                `).join('');
+
+            } catch (err) {
+                console.error('Error loading tournaments:', err);
+            }
         }
 
         async function handleLogout() {
-            await supabase.auth.signOut();
+            await supabaseClient.auth.signOut();
             window.location.href = 'index.html';
         }
 
-        window.onload = loadProfile;
+        window.onload = loadDashboard;
     </script>
 </body>
 </html>
