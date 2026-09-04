@@ -61,8 +61,9 @@
         }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3); }
         .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; }
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; white-space: pre-line; }
         .alert-error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; }
+        .alert-success { background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #10b981; }
         .alert.show { display: block; }
         .links { text-align: center; margin-top: 20px; }
         .links a { color: #f1c40f; text-decoration: none; }
@@ -76,7 +77,7 @@
             <p class="subtitle">Sign in to your TopCompSports account</p>
         </div>
         
-        <div class="alert alert-error" id="alert"></div>
+        <div class="alert" id="alert"></div>
         
         <form id="loginForm">
             <div class="form-group">
@@ -99,7 +100,6 @@
     </div>
 
     <script>
-        // استخدام اسم مختلف لتجنب التعارض
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         
@@ -120,31 +120,60 @@
             console.log('🔄 Attempting login for:', email);
             
             try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                // 1. تسجيل الدخول
+                const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
                 
-                if (error) {
-                    throw error;
+                if (authError) {
+                    throw new Error(authError.message || 'Invalid email or password');
                 }
                 
-                console.log('✅ Login successful!', data.user);
+                console.log('✅ Login successful! User ID:', authData.user.id);
                 
-                // التحقق من المنظم
-                const { data: organizer } = await supabaseClient
+                // 2. البحث عن المنظم باستخدام maybeSingle() (الأكثر أماناً)
+                const { data: organizer, error: orgError } = await supabaseClient
                     .from('organizers')
-                    .select('id')
+                    .select('id, email, full_name, org_name')
                     .eq('email', email)
-                    .single();
+                    .maybeSingle();
+                
+                console.log('🏢 Organizer query result:', organizer);
+                console.log('❌ Organizer query error:', orgError);
+                
+                if (orgError) {
+                    throw new Error('Database error: ' + orgError.message);
+                }
                 
                 if (organizer) {
-                    console.log('🏢 Organizer found, redirecting...');
-                    window.location.href = 'organizer-dashboard.html';
+                    console.log('✅ Organizer found:', organizer.full_name);
+                    console.log('🔄 Redirecting to organizer dashboard...');
+                    
+                    alert.textContent = '✅ Login successful! Redirecting...';
+                    alert.className = 'alert alert-success show';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'organizer-dashboard.html';
+                    }, 1000);
                 } else {
-                    console.log('⚠️ No organizer profile found');
-                    alert.textContent = '️ No organizer profile found. Please contact support.';
-                    alert.classList.add('show');
+                    console.warn('⚠️ No organizer found for email:', email);
+                    
+                    // خطوة تصحيحية: جلب جميع المنظمين للتأكد من أن RLS يعمل
+                    const { data: allOrganizers, error: allError } = await supabaseClient
+                        .from('organizers')
+                        .select('email, full_name');
+                    
+                    console.log('📋 All organizers in DB:', allOrganizers);
+                    console.log('❌ All organizers error:', allError);
+                    
+                    const debugMsg = `⚠️ No organizer profile found for this email.\n\n` +
+                        `Email: ${email}\n` +
+                        `Total organizers in DB: ${allOrganizers?.length || 0}\n\n` +
+                        `Please check Supabase RLS policies or contact support.`;
+                    
+                    alert.textContent = debugMsg;
+                    alert.className = 'alert alert-error show';
                     btn.disabled = false;
                     btn.textContent = 'Sign In →';
                 }
@@ -152,7 +181,7 @@
             } catch (error) {
                 console.error('❌ Login error:', error);
                 alert.textContent = '❌ ' + error.message;
-                alert.classList.add('show');
+                alert.className = 'alert alert-error show';
                 btn.disabled = false;
                 btn.textContent = 'Sign In →';
             }
