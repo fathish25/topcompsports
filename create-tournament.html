@@ -223,10 +223,11 @@
                     return;
                 }
 
+                // ✅ تم الإصلاح هنا: البحث باستخدام البريد الإلكتروني بدلاً من user_id
                 const { data: organizer, error: orgError } = await supabaseClient
                     .from('organizers')
                     .select('id')
-                    .eq('user_id', user.id)
+                    .eq('email', user.email) 
                     .single();
 
                 if (orgError || !organizer) {
@@ -271,7 +272,6 @@
             setTimeout(() => alert.classList.remove('show'), 5000);
         }
 
-        // تحميل البيانات عند فتح الصفحة
         document.addEventListener('DOMContentLoaded', loadAgeDivisions);
     </script>
 </body>
