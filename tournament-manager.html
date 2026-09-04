@@ -130,10 +130,6 @@
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: #fff;
         }
-        .btn-info {
-            background: linear-gradient(135deg, #2563EB, #1d4ed8);
-            color: #fff;
-        }
         
         table {
             width: 100%;
@@ -261,7 +257,7 @@
         <div class="step-indicator">
             <div class="step active" id="step1">👥 Players Registration</div>
             <div class="step" id="step2">🥋 Mats Setup</div>
-            <div class="step" id="step3"> Brackets & Matches</div>
+            <div class="step" id="step3">🏆 Brackets & Matches</div>
         </div>
 
         <!-- Step 1: Player Registration -->
@@ -385,7 +381,7 @@
                 
                 <div class="player-box red-player">
                     <div>
-                        <div style="font-size: 18px; font-weight: bold;">🔴 Red Player</div>
+                        <div style="font-size: 18px; font-weight: bold;"> Red Player</div>
                         <div id="redPlayerName">Player Name</div>
                     </div>
                     <div class="score-controls">
@@ -399,7 +395,7 @@
                 
                 <div class="player-box blue-player">
                     <div>
-                        <div style="font-size: 18px; font-weight: bold;">🔵 Blue Player</div>
+                        <div style="font-size: 18px; font-weight: bold;"> Blue Player</div>
                         <div id="bluePlayerName">Player Name</div>
                     </div>
                     <div class="score-controls">
@@ -425,23 +421,33 @@
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        let currentTournamentId = null;
+        let tournamentId = null;
         let players = [];
         let currentMatch = null;
         let timerInterval = null;
-        let matchTime = 300; // 5 minutes in seconds
+        let matchTime = 300;
 
         // Initialize
         window.onload = async () => {
+            // Get tournament_id from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            tournamentId = urlParams.get('tournament_id');
+            
+            if (!tournamentId) {
+                alert('No tournament selected!');
+                window.location.href = 'organizer-dashboard.html';
+                return;
+            }
+            
             await loadAgeDivisions();
             await loadBeltLevels();
             await loadPlayers();
         };
 
         async function loadAgeDivisions() {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('age_divisions')
                 .select('*')
                 .order('min_age');
@@ -457,7 +463,7 @@
         }
 
         async function loadBeltLevels() {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('belt_levels')
                 .select('name')
                 .order('name');
@@ -474,9 +480,10 @@
         }
 
         async function loadPlayers() {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('tournament_participants')
                 .select('*')
+                .eq('tournament_id', tournamentId)
                 .order('created_at');
             
             if (error) {
@@ -507,7 +514,7 @@
                     <td>${p.weight} kg</td>
                     <td>${p.belt_level}</td>
                     <td>${p.ranking || '-'}</td>
-                    <td><button class="btn btn-danger" onclick="deletePlayer(${p.id})" style="padding: 5px 10px;">Delete</button></td>
+                    <td><button class="btn btn-danger" onclick="deletePlayer('${p.id}')" style="padding: 5px 10px;">Delete</button></td>
                 </tr>
             `).join('');
         }
@@ -526,9 +533,10 @@
                 return;
             }
             
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('tournament_participants')
                 .insert({
+                    tournament_id: tournamentId,
                     player_name: name,
                     team: team,
                     age_group: age,
@@ -556,7 +564,7 @@
         async function deletePlayer(id) {
             if (!confirm('Are you sure you want to delete this player?')) return;
             
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('tournament_participants')
                 .delete()
                 .eq('id', id);
@@ -573,10 +581,10 @@
         async function clearAllPlayers() {
             if (!confirm('Are you sure you want to delete all players?')) return;
             
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('tournament_participants')
                 .delete()
-                .neq('id', '00000000-0000-0000-0000-000000000000');
+                .eq('tournament_id', tournamentId);
             
             if (error) {
                 console.error('Error clearing players:', error);
@@ -587,10 +595,11 @@
             await loadPlayers();
         }
 
-        function addBulkPlayers() {
-            // Add 10 sample players
+        async function addBulkPlayers() {
+            const bulkPlayers = [];
             for (let i = 1; i <= 10; i++) {
-                supabase.from('tournament_participants').insert({
+                bulkPlayers.push({
+                    tournament_id: tournamentId,
                     player_name: `Player ${i}`,
                     team: `Team ${Math.floor(i/3) + 1}`,
                     age_group: 'Adult',
@@ -600,7 +609,18 @@
                     ranking: i
                 });
             }
-            setTimeout(() => loadPlayers(), 1000);
+            
+            const { error } = await supabaseClient
+                .from('tournament_participants')
+                .insert(bulkPlayers);
+            
+            if (error) {
+                console.error('Error adding bulk players:', error);
+                alert('Error adding players');
+                return;
+            }
+            
+            await loadPlayers();
         }
 
         function proceedToMats() {
@@ -645,30 +665,40 @@
         }
 
         function generateCategoriesOverview() {
-            const categories = [
-                { name: 'Adult / Male / White Belt', count: 8 },
-                { name: 'Adult / Male / Blue Belt', count: 4 },
-                { name: 'Adult / Female / White Belt', count: 6 }
-            ];
+            // Group players by age, gender, belt
+            const categories = {};
+            players.forEach(p => {
+                const key = `${p.age_group} / ${p.gender} / ${p.belt_level}`;
+                if (!categories[key]) {
+                    categories[key] = [];
+                }
+                categories[key].push(p);
+            });
             
             const list = document.getElementById('categoriesList');
-            list.innerHTML = categories.map((cat, i) => `
-                <div class="mat-card" onclick="openBracket('${cat.name}')">
-                    <div class="mat-number">${cat.count}</div>
-                    <div>${cat.name}</div>
+            list.innerHTML = Object.entries(categories).map(([cat, players]) => `
+                <div class="mat-card" onclick="openBracket('${cat}', ${players.length})">
+                    <div class="mat-number">${players.length}</div>
+                    <div>${cat}</div>
                     <div style="margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.6);">Click to start bracket</div>
                 </div>
             `).join('');
         }
 
-        function openBracket(category) {
+        function openBracket(category, playerCount) {
             document.getElementById('overviewSection').classList.add('hidden');
             document.getElementById('bracketSection').classList.remove('hidden');
             document.getElementById('matchTitle').textContent = category + ' • ELIMINATION';
             
-            // Sample players
-            document.getElementById('redPlayerName').textContent = 'Ahmed Mohamed';
-            document.getElementById('bluePlayerName').textContent = 'Ali Hassan';
+            // Get first two players for demo
+            const categoryPlayers = players.filter(p => 
+                `${p.age_group} / ${p.gender} / ${p.belt_level}` === category
+            );
+            
+            if (categoryPlayers.length >= 2) {
+                document.getElementById('redPlayerName').textContent = categoryPlayers[0].player_name;
+                document.getElementById('bluePlayerName').textContent = categoryPlayers[1].player_name;
+            }
         }
 
         function backToPlayers() {
@@ -713,10 +743,28 @@
             clearInterval(timerInterval);
         }
 
-        function finishMatch() {
+        async function finishMatch() {
             clearInterval(timerInterval);
             const redScore = parseInt(document.getElementById('redScore').textContent);
             const blueScore = parseInt(document.getElementById('blueScore').textContent);
+            const redName = document.getElementById('redPlayerName').textContent;
+            const blueName = document.getElementById('bluePlayerName').textContent;
+            
+            // Save match result to database
+            const { error } = await supabaseClient
+                .from('match_results')
+                .insert({
+                    tournament_id: tournamentId,
+                    red_player: redName,
+                    blue_player: blueName,
+                    red_score: redScore,
+                    blue_score: blueScore,
+                    winner: redScore > blueScore ? redName : blueScore > redScore ? blueName : 'Draw'
+                });
+            
+            if (error) {
+                console.error('Error saving match result:', error);
+            }
             
             if (redScore > blueScore) {
                 alert('🔴 Red Player Wins!');
