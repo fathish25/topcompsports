@@ -117,8 +117,6 @@
             btn.textContent = 'Signing in...';
             alert.classList.remove('show');
             
-            console.log('🔄 Attempting login for:', email);
-            
             try {
                 // 1. تسجيل الدخول
                 const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
@@ -126,60 +124,31 @@
                     password: password
                 });
                 
-                if (authError) {
-                    throw new Error(authError.message || 'Invalid email or password');
-                }
+                if (authError) throw authError;
                 
                 console.log('✅ Login successful! User ID:', authData.user.id);
                 
-                // 2. البحث عن المنظم باستخدام maybeSingle() (الأكثر أماناً)
-                const { data: organizer, error: orgError } = await supabaseClient
-                    .from('organizers')
-                    .select('id, email, full_name, org_name')
-                    .eq('email', email)
-                    .maybeSingle();
+                // 2. البحث عن المنظم باستخدام RPC Function
+                const { data: organizer, error: rpcError } = await supabaseClient
+                    .rpc('get_organizer_by_email', { target_email: email });
                 
-                console.log('🏢 Organizer query result:', organizer);
-                console.log('❌ Organizer query error:', orgError);
+                if (rpcError) throw rpcError;
                 
-                if (orgError) {
-                    throw new Error('Database error: ' + orgError.message);
-                }
+                const org = organizer && organizer.length > 0 ? organizer[0] : null;
                 
-                if (organizer) {
-                    console.log('✅ Organizer found:', organizer.full_name);
-                    console.log('🔄 Redirecting to organizer dashboard...');
-                    
+                if (org) {
+                    console.log('🏢 Organizer found:', org.full_name);
                     alert.textContent = '✅ Login successful! Redirecting...';
                     alert.className = 'alert alert-success show';
-                    
                     setTimeout(() => {
                         window.location.href = 'organizer-dashboard.html';
                     }, 1000);
                 } else {
-                    console.warn('⚠️ No organizer found for email:', email);
-                    
-                    // خطوة تصحيحية: جلب جميع المنظمين للتأكد من أن RLS يعمل
-                    const { data: allOrganizers, error: allError } = await supabaseClient
-                        .from('organizers')
-                        .select('email, full_name');
-                    
-                    console.log('📋 All organizers in DB:', allOrganizers);
-                    console.log('❌ All organizers error:', allError);
-                    
-                    const debugMsg = `⚠️ No organizer profile found for this email.\n\n` +
-                        `Email: ${email}\n` +
-                        `Total organizers in DB: ${allOrganizers?.length || 0}\n\n` +
-                        `Please check Supabase RLS policies or contact support.`;
-                    
-                    alert.textContent = debugMsg;
-                    alert.className = 'alert alert-error show';
-                    btn.disabled = false;
-                    btn.textContent = 'Sign In →';
+                    throw new Error('No organizer profile found for this email');
                 }
                 
             } catch (error) {
-                console.error('❌ Login error:', error);
+                console.error('❌ Error:', error);
                 alert.textContent = '❌ ' + error.message;
                 alert.className = 'alert alert-error show';
                 btn.disabled = false;
