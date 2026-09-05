@@ -1,0 +1,117 @@
+/* ===== TopCompSports Shared Header Styles ===== */
+
+.site-header {
+    background: rgba(10, 10, 10, 0.98);
+    backdrop-filter: blur(10px);
+    padding: 15px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #0066CC;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+}
+
+.logo-text {
+    font-size: 28px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #0066CC, #003366);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.site-nav {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.site-nav a {
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    transition: all 0.3s;
+    font-weight: 600;
+}
+
+.site-nav a:hover {
+    color: #0066CC;
+    background: rgba(0, 102, 204, 0.1);
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #0066CC, #003366);
+    color: #fff !important;
+    padding: 10px 20px !important;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 102, 204, 0.4);
+}
+
+.btn-logout {
+    background: transparent;
+    color: #fff;
+    border: 2px solid #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.btn-logout:hover {
+    background: #fff;
+    color: #0A0A0A;
+}
+
+.lang-switcher {
+    display: flex;
+    gap: 5px;
+    background: #2A2A2A;
+    padding: 5px;
+    border-radius: 8px;
+}
+
+.lang-btn {
+    padding: 8px 15px;
+    border: none;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.lang-btn.active {
+    background: #0066CC;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .site-header {
+        padding: 12px 20px;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .site-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+}
