@@ -7,7 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            /* تغيير اللون الأحمر إلى الأزرق */
             --primary-blue: #0066CC;
             --dark-blue: #003366;
             --accent-yellow: #FFB800;
@@ -54,7 +53,6 @@
             cursor: pointer;
         }
 
-        /* شعار SVG جديد */
         .logo-svg {
             width: 50px;
             height: 50px;
@@ -175,7 +173,7 @@
             flex-wrap: wrap;
         }
 
-        /* صورة Hero جديدة - صورة حقيقية */
+        /* صورة Hero الجديدة - صورة اليدين */
         .hero-image {
             position: relative;
             border-radius: 20px;
@@ -204,7 +202,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(0, 102, 204, 0.3) 0%, rgba(0, 51, 102, 0.5) 100%);
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.2) 0%, rgba(0, 51, 102, 0.4) 100%);
             z-index: 1;
         }
 
@@ -596,8 +594,8 @@
                 </div>
             </div>
             <div class="hero-image">
-                <!-- صورة حقيقية بدلاً من البدلة الحمراء -->
-                <img src="https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800&q=80" alt="Jiu-Jitsu Competition">
+                <!-- الصورة الجديدة - صورة اليدين مع الشريط -->
+                <img src="https://images.unsplash.com/photo-1599058945522-28d5ecc43b1f?w=800&q=80" alt="Jiu-Jitsu Preparation">
                 <div class="hero-image-overlay"></div>
             </div>
         </div>
@@ -654,7 +652,7 @@
     <!-- Tournaments -->
     <section class="container" id="tournaments">
         <div class="section-header">
-            <h2 data-i18n="active_tournaments">🏆 Active Tournaments</h2>
+            <h2 data-i18n="active_tournaments"> Active Tournaments</h2>
             <p data-i18n="tournaments_desc">Browse upcoming tournaments and register now to participate</p>
         </div>
         <div id="tournamentsList" class="tournaments-grid">
@@ -775,7 +773,7 @@
                 loading: 'جاري تحميل البطولات...',
                 cta_title: 'جاهز لتنظيم بطولتك القادمة؟',
                 cta_desc: 'انضم إلى المنصة وابدأ في إنشاء بطولات احترافية اليوم',
-                cta_button: 'ابدأ الآن 🚀',
+                cta_button: 'ابدأ الآن ',
                 cta_secondary: 'اعرف المزيد',
                 footer_desc: 'المنصة الاحترافية الأولى لإدارة بطولات الجوجيتسو في المنطقة',
                 footer_links: 'روابط سريعة',
@@ -794,6 +792,7 @@
         // ===== Language Switcher - English is default =====
         let currentLang = localStorage.getItem('lang') || 'en';
 
+        // تعريف الدالة قبل استخدامها
         function changeLang(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
@@ -806,7 +805,7 @@
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
             document.documentElement.lang = lang;
             
-            // Update all texts - FIX: use innerHTML for all to support HTML tags
+            // Update all texts - استخدام innerHTML لدعم HTML tags
             document.querySelectorAll('[data-i18n]').forEach(element => {
                 const key = element.getAttribute('data-i18n');
                 if (translations[lang][key]) {
@@ -860,12 +859,12 @@
                     
                     return `
                         <div class="tournament-card">
-                            <div class="tournament-banner">🏆</div>
+                            <div class="tournament-banner"></div>
                             <div class="tournament-content">
                                 <h3>${t.name}</h3>
                                 <div class="tournament-meta">
                                     <div>📅 ${translations[currentLang].date}: ${formattedDate}</div>
-                                    <div> ${translations[currentLang].location}: ${t.location || 'TBD'}</div>
+                                    <div> 📍 ${translations[currentLang].location}: ${t.location || 'TBD'}</div>
                                 </div>
                                 <div class="tournament-actions">
                                     <a href="tournament-details.html?tournament_id=${t.id}" class="btn btn-primary">${translations[currentLang].details}</a>
