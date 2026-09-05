@@ -3,277 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In - TopCompSports</title>
+    <title>TopCompSports - Professional Tournament Management</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        :root {
+            --primary-blue: #0066CC;
+            --dark-blue: #003366;
+            --accent-yellow: #FFB800;
+            --black: #0A0A0A;
+            --dark-gray: #1A1A1A;
+            --medium-gray: #2A2A2A;
+            --white: #FFFFFF;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
-            background: linear-gradient(135deg, #0066CC 0%, #003366 100%);
-            color: #fff; 
-            min-height: 100vh;
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
+
+        .header {
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--primary-blue);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .logo-text { font-size: 28px; font-weight: bold; background: var(--gradient-blue); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .nav { display: flex; gap: 30px; align-items: center; }
+        .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; transition: all 0.3s; font-weight: 600; }
+        .nav a:hover { color: var(--primary-blue); background: rgba(0,102,204,0.1); }
+
+        .user-section { display: flex; align-items: center; gap: 15px; }
+        .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid var(--accent-yellow); background: var(--medium-gray); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-name { font-weight: 600; color: var(--accent-yellow); }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; text-decoration: none; display: inline-block; }
+        .btn-login { background: var(--primary-blue); color: var(--white); }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
+        .btn-logout { background: transparent; border: 2px solid var(--white); color: var(--white); }
+        .btn-logout:hover { background: var(--white); color: var(--black); }
+
+        .lang-switcher { display: flex; gap: 5px; background: var(--medium-gray); padding: 5px; border-radius: 8px; }
+        .lang-btn { padding: 8px 15px; border: none; background: transparent; color: var(--white); cursor: pointer; border-radius: 6px; font-weight: bold; }
+        .lang-btn.active { background: var(--primary-blue); }
+
+        .hero {
+            min-height: 90vh;
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            background: var(--gradient-blue);
+            padding: 100px 50px;
         }
 
-        .login-container {
-            background: #1A1A1A;
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .hero-text h1 { font-size: 4.5rem; font-weight: 900; line-height: 1.1; margin-bottom: 20px; text-transform: uppercase; }
+        .hero-text h1 span { color: var(--primary-blue); display: block; }
+        .hero-text p { font-size: 1.3rem; color: rgba(255,255,255,0.9); margin-bottom: 30px; }
+        .hero-buttons { display: flex; gap: 15px; flex-wrap: wrap; }
+
+        .hero-image {
             border-radius: 20px;
-            padding: 50px;
-            width: 100%;
-            max-width: 450px;
-            border: 2px solid #2A2A2A;
+            overflow: hidden;
+            border: 3px solid var(--accent-yellow);
+            height: 500px;
+            background: var(--medium-gray);
         }
 
-        .logo { text-align: center; margin-bottom: 30px; }
-        .logo-icon { 
-            width: 70px; 
-            height: 70px; 
-            background: #FFB800;
-            border-radius: 15px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 36px; 
-            font-weight: bold; 
-            color: #0A0A0A;
-            margin: 0 auto 15px;
-        }
-        .logo-text { font-size: 24px; font-weight: bold; color: #FFB800; }
+        .hero-image img { width: 100%; height: 100%; object-fit: cover; }
 
-        .login-header { text-align: center; margin-bottom: 30px; }
-        .login-header h1 { font-size: 2rem; margin-bottom: 10px; color: #FFB800; }
-        .login-header p { color: rgba(255,255,255,0.6); }
+        .btn-primary { background: var(--white); color: var(--primary-blue); padding: 15px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+        .btn-secondary { background: transparent; color: var(--white); border: 2px solid var(--white); padding: 15px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-secondary:hover { background: var(--white); color: var(--primary-blue); }
 
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
-        .form-input {
-            width: 100%;
-            background: #0A0A0A;
-            border: 2px solid #2A2A2A;
-            color: #fff;
-            padding: 14px 16px;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        .form-input:focus { outline: none; border-color: #0066CC; }
+        .features { padding: 80px 50px; background: #F5F5F5; color: var(--black); }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
+        .feature-card { text-align: center; padding: 40px 30px; background: var(--white); border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .feature-icon { font-size: 3.5rem; margin-bottom: 20px; }
+        .feature-card h3 { font-size: 1.4rem; margin-bottom: 15px; }
+        .feature-card p { color: rgba(0,0,0,0.7); }
 
-        .btn {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1.05rem;
-            margin-top: 10px;
-        }
-
-        .btn-primary { background: #0066CC; color: #fff; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
-        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
-        .alert.show { display: block; }
-        .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
-        .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
-        .alert-info { background: rgba(14,165,233,0.2); border: 1px solid #0ea5e9; color: #0ea5e9; }
-
-        .signup-link { text-align: center; margin-top: 20px; color: rgba(255,255,255,0.6); }
-        .signup-link a { color: #FFB800; text-decoration: none; font-weight: 600; }
-        .signup-link a:hover { text-decoration: underline; }
-
-        @media (max-width: 480px) {
-            .login-container { padding: 30px 20px; }
-            .login-header h1 { font-size: 1.5rem; }
+        @media (max-width: 768px) {
+            .header { padding: 12px 20px; flex-direction: column; gap: 15px; }
+            .nav { flex-wrap: wrap; justify-content: center; }
+            .hero { padding: 60px 20px; }
+            .hero-content { grid-template-columns: 1fr; gap: 40px; }
+            .hero-text h1 { font-size: 2.5rem; }
+            .hero-image { height: 300px; }
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo">
-            <div class="logo-icon">T</div>
+    <header class="header">
+        <div class="logo" onclick="window.location.href='index.html'">
             <div class="logo-text">TopCompSports</div>
         </div>
-
-        <div class="login-header">
-            <h1>Welcome Back</h1>
-            <p>Sign in to your TopCompSports account</p>
-        </div>
-
-        <div id="alert" class="alert"></div>
-
-        <form id="loginForm" onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label class="form-label">Email Address</label>
-                <input type="email" class="form-input" id="email" required placeholder="your.email@example.com" autocomplete="off">
+        
+        <nav class="nav">
+            <a href="#tournaments">Tournaments</a>
+            <a href="#features">Features</a>
+            <a href="organizer-dashboard.html">Organizer</a>
+            
+            <!-- User Section (مخفي افتراضياً) -->
+            <div id="userSection" class="user-section" style="display: none;">
+                <a href="my-profile.html" style="color: var(--accent-yellow); text-decoration: none; margin-right: 15px;">
+                    My Profile
+                </a>
+                <div class="user-info" onclick="window.location.href='my-profile.html'">
+                    <div class="user-avatar" id="userAvatar">
+                        <span>👤</span>
+                    </div>
+                    <span class="user-name" id="userName">User</span>
+                </div>
+                <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
             </div>
-
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <input type="password" class="form-input" id="password" required placeholder="Enter your password" autocomplete="off">
+            
+            <!-- Login Button (يظهر افتراضياً) -->
+            <a href="login.html" id="loginBtn" class="btn btn-login">Login</a>
+            
+            <div class="lang-switcher">
+                <button class="lang-btn" onclick="changeLanguage('ar')">عربي</button>
+                <button class="lang-btn active" onclick="changeLanguage('en')">English</button>
             </div>
+        </nav>
+    </header>
 
-            <button type="submit" class="btn btn-primary" id="submitBtn">Sign In →</button>
-        </form>
-
-        <div class="signup-link">
-            Don't have an account? <a href="signup.html">Create one</a>
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>DISCIPLINE.<br><span>FOCUS.</span><br>STRENGTH.</h1>
+                <p>Professional tournament management platform for Jiu-Jitsu competitions</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="window.location.href='#tournaments'">Browse Tournaments</button>
+                    <button class="btn btn-secondary" onclick="window.location.href='organizer-dashboard.html'">Create Tournament</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800" alt="Jiu-Jitsu" onerror="this.style.display='none'">
+            </div>
         </div>
-    </div>
+    </section>
+
+    <section class="features" id="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3>Easy Registration</h3>
+                <p>Smart registration system</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🥋</div>
+                <h3>Mat Management</h3>
+                <p>Organize matches efficiently</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🏆</div>
+                <h3>Bracket System</h3>
+                <p>Automatic bracket creation</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⏱️</div>
+                <h3>Live Scoreboard</h3>
+                <p>Real-time score tracking</p>
+            </div>
+        </div>
+    </section>
 
     <script>
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        function showAlert(type, message) {
-            const alert = document.getElementById('alert');
-            alert.className = 'alert alert-' + type + ' show';
-            alert.textContent = message;
-            setTimeout(function() { alert.classList.remove('show'); }, 6000);
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-
-            const email = document.getElementById('email').value.trim().toLowerCase();
-            const password = document.getElementById('password').value;
-            const submitBtn = document.getElementById('submitBtn');
-
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Signing in...';
-
-            try {
-                const result = await dbClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
-                if (result.error) {
-                    if (result.error.message.includes('Email not confirmed')) {
-                        showAlert('info', '📧 Please check your email and confirm your account.');
-                    } else if (result.error.message.includes('Invalid login credentials')) {
-                        showAlert('error', '❌ Invalid email or password.');
-                    } else {
-                        showAlert('error', '❌ ' + result.error.message);
-                    }
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Sign In →';
-                    return;
-                }
-
-                console.log('✅ Login successful! User ID:', result.data.user.id);
-
-                let userProfile = null;
-                
-                try {
-                    const profileResult = await dbClient
-                        .from('users')
-                        .select('*')
-                        .eq('id', result.data.user.id)
-                        .maybeSingle();
-
-                    if (profileResult.data) {
-                        userProfile = profileResult.data;
-                    }
-                } catch (profileErr) {
-                    console.warn('Profile lookup failed:', profileErr.message);
-                }
-
-                if (!userProfile) {
-                    console.log('⚠️ Profile not found, creating one...');
-                    
-                    try {
-                        const createResult = await dbClient
-                            .from('users')
-                            .insert([{
-                                id: result.data.user.id,
-                                email: email,
-                                full_name: result.data.user.user_metadata?.full_name || email.split('@')[0],
-                                user_type: result.data.user.user_metadata?.user_type || 'athlete',
-                                email_confirmed: result.data.user.email_confirmed_at ? true : false,
-                                created_at: new Date().toISOString()
-                            }])
-                            .select()
-                            .single();
-
-                        if (createResult.data) {
-                            userProfile = createResult.data;
-                        } else {
-                            userProfile = {
-                                id: result.data.user.id,
-                                email: email,
-                                full_name: email.split('@')[0],
-                                user_type: 'athlete'
-                            };
-                        }
-                    } catch (createErr) {
-                        console.error('Create error:', createErr);
-                        userProfile = {
-                            id: result.data.user.id,
-                            email: email,
-                            full_name: email.split('@')[0],
-                            user_type: 'athlete'
-                        };
-                    }
-                }
-
-                const userData = {
-                    id: result.data.user.id,
-                    email: result.data.user.email,
-                    full_name: userProfile.full_name,
-                    user_type: userProfile.user_type || 'athlete',
-                    profile_picture_url: userProfile.profile_picture_url
-                };
-
-                localStorage.setItem('currentUser', JSON.stringify(userData));
-
-                const isProfileComplete = userProfile.full_name && 
-                                       userProfile.date_of_birth && 
-                                       userProfile.gender;
-
-                console.log('Profile complete:', isProfileComplete);
-
-                showAlert('success', '✅ Login successful! Redirecting...');
-
-                setTimeout(function() {
-                    if (!isProfileComplete) {
-                        console.log('Redirecting to profile.html (incomplete profile)');
-                        window.location.href = 'profile.html';
-                    } else {
-                        console.log('Redirecting to index.html (home page)');
-                        window.location.href = 'index.html';
-                    }
-                }, 1500);
-
-            } catch (error) {
-                console.error('Login error:', error);
-                showAlert('error', '❌ Error: ' + error.message);
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Sign In →';
-            }
-        }
-
+        // ===== عند تحميل الصفحة - لا توجيه أبداً =====
         window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            
-            if (urlParams.get('needsConfirmation') === 'true') {
-                showAlert('info', '📧 Account created! Please check your email.');
-            }
-            
-            if (urlParams.get('confirmed') === 'true') {
-                showAlert('success', '✅ Email confirmed! You can now sign in.');
-            }
-
-            if (urlParams.get('email')) {
-                document.getElementById('email').value = urlParams.get('email');
-            }
+            console.log('Index page loaded - showing home page');
+            checkUserStatus();
         };
+
+        // ===== التحقق من المستخدم بدون توجيه =====
+        function checkUserStatus() {
+            const storedUser = localStorage.getItem('currentUser');
+            
+            if (storedUser) {
+                try {
+                    const userData = JSON.parse(storedUser);
+                    console.log('User found in localStorage:', userData);
+                    
+                    // إذا البروفايل غير مكتمل، اعرض تنبيه فقط بدون توجيه
+                    if (!userData.profile_complete) {
+                        console.log('Profile not complete - showing notification only');
+                        // لا توجيه - فقط اعرض الصفحة مع تنبيه
+                        showUserSection(userData);
+                        return;
+                    }
+                    
+                    showUserSection(userData);
+                } catch (e) {
+                    console.error('Error parsing stored user:', e);
+                    showLoginButton();
+                }
+            } else {
+                console.log('No stored user - showing login button');
+                showLoginButton();
+            }
+        }
+
+        // ===== إظهار قسم المستخدم =====
+        function showUserSection(userData) {
+            document.getElementById('userSection').style.display = 'flex';
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('userName').textContent = userData.full_name || 'User';
+
+            if (userData.profile_picture_url) {
+                document.getElementById('userAvatar').innerHTML = 
+                    `<img src="${userData.profile_picture_url}" alt="Profile">`;
+            }
+        }
+
+        // ===== إظهار زر تسجيل الدخول =====
+        function showLoginButton() {
+            document.getElementById('userSection').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'inline-block';
+        }
+
+        // ===== تسجيل الخروج =====
+        async function handleLogout() {
+            try {
+                await dbClient.auth.signOut();
+                localStorage.removeItem('currentUser');
+                console.log('User logged out');
+                showLoginButton();
+                window.location.reload();
+            } catch (err) {
+                console.error('Logout error:', err);
+            }
+        }
+
+        // ===== تغيير اللغة =====
+        function changeLanguage(lang) {
+            localStorage.setItem('lang', lang);
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((lang === 'ar' && btn.textContent === 'عربي') || 
+                    (lang === 'en' && btn.textContent === 'English')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            window.location.reload();
+        }
     </script>
 </body>
 </html>
