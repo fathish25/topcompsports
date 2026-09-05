@@ -53,10 +53,29 @@
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid var(--primary-blue); flex-wrap: wrap; gap: 20px; }
         .page-title { font-size: 2.2rem; font-weight: 900; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
-        .tournament-card { background: linear-gradient(135deg, var(--medium-gray) 0%, var(--dark-gray) 100%); border: 2px solid var(--primary-blue); border-radius: 15px; padding: 25px; margin-bottom: 20px; transition: all 0.4s; position: relative; overflow: hidden; }
+        .tournament-card { 
+            background: linear-gradient(135deg, var(--medium-gray) 0%, var(--dark-gray) 100%); 
+            border: 2px solid var(--primary-blue); 
+            border-radius: 15px; 
+            padding: 0;
+            margin-bottom: 25px; 
+            transition: all 0.4s; 
+            position: relative; 
+            overflow: hidden; 
+        }
         .tournament-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary); transform: scaleX(0); transition: transform 0.4s; }
         .tournament-card:hover::before { transform: scaleX(1); }
         .tournament-card:hover { border-color: var(--accent-yellow); transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0, 102, 204, 0.4); }
+        
+        .tournament-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-bottom: 3px solid var(--accent-yellow);
+            background: var(--dark-gray);
+        }
+
+        .tournament-content { padding: 25px; }
         
         .tournament-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 15px; }
         .tournament-name { font-size: 1.5rem; font-weight: bold; color: var(--white); }
@@ -90,7 +109,28 @@
         .form-group label { display: block; color: var(--white); font-size: 0.95rem; margin-bottom: 8px; font-weight: 600; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; background: var(--black); border: 2px solid var(--primary-blue); color: var(--white); padding: 12px 15px; border-radius: 10px; font-size: 1rem; transition: all 0.3s; }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--accent-yellow); box-shadow: 0 0 15px rgba(255, 184, 0, 0.3); }
+        .form-textarea { min-height: 80px; resize: vertical; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .image-upload {
+            border: 2px dashed var(--primary-blue);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .image-upload:hover { border-color: var(--accent-yellow); background: rgba(255,184,0,0.05); }
+        .image-upload input[type="file"] { display: none; }
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+        .image-preview.show { display: block; }
 
         .loading { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.6); font-size: 1.1rem; }
         .empty-state { text-align: center; padding: 80px 20px; color: rgba(255,255,255,0.6); }
@@ -104,6 +144,7 @@
             .stats-grid { grid-template-columns: 1fr; }
             .tournament-actions { flex-direction: column; }
             .tournament-actions .btn { width: 100%; }
+            .tournament-image { height: 180px; }
         }
     </style>
 </head>
@@ -147,14 +188,28 @@
             </div>
             <form id="tournamentForm" onsubmit="handleFormSubmit(event)">
                 <input type="hidden" id="editTournamentId">
+                
                 <div class="form-group">
                     <label data-i18n="label_name">اسم البطولة *</label>
                     <input type="text" id="tournamentName" required placeholder="مثال: بطولة الرياض المفتوحة">
                 </div>
+                
                 <div class="form-group">
                     <label data-i18n="label_desc">الوصف</label>
-                    <textarea id="tournamentDesc" rows="3" placeholder="وصف البطولة..."></textarea>
+                    <textarea id="tournamentDesc" class="form-textarea" placeholder="وصف البطولة..."></textarea>
                 </div>
+
+                <div class="form-group">
+                    <label>📷 صورة البطولة (اختياري)</label>
+                    <div class="image-upload" onclick="document.getElementById('tournamentImage').click()">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">📷</div>
+                        <div>اضغط لرفع صورة</div>
+                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 5px;">PNG, JPG حتى 5MB</div>
+                        <input type="file" id="tournamentImage" accept="image/*" onchange="handleImagePreview(event)">
+                    </div>
+                    <img id="imagePreview" class="image-preview" alt="Preview">
+                </div>
+                
                 <div class="form-row">
                     <div class="form-group">
                         <label data-i18n="label_date">📅 تاريخ البطولة *</label>
@@ -188,15 +243,14 @@
     </div>
 
     <script>
-        // ===== Supabase Setup (مرة واحدة فقط) =====
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentUser = null;
         let currentLang = localStorage.getItem('lang') || 'ar';
+        let selectedImageFile = null;
 
-        // ===== Translations =====
         const translations = {
             ar: {
                 logout: '🚪 خروج',
@@ -231,7 +285,7 @@
                 success_update: '✅ تم تحديث البطولة بنجاح!',
                 success_copy: '✅ تم نسخ رابط التسجيل!',
                 success_delete: '✅ تم حذف البطولة!',
-                error_create: '❌ خطأ في إنشاء البطولة: ',
+                error_create: ' خطأ في إنشاء البطولة: ',
                 error_update: '❌ خطأ في تحديث البطولة: ',
                 error_delete: '❌ خطأ في الحذف: ',
                 confirm_delete: 'هل أنت متأكد من حذف هذه البطولة؟ سيتم حذف جميع البيانات المرتبطة بها!',
@@ -282,7 +336,6 @@
             }
         };
 
-        // ===== Language Switcher =====
         function changeLang(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
@@ -298,7 +351,6 @@
             loadTournaments();
         }
 
-        // ===== Auth Check =====
         async function checkAuth() {
             const { data: { user }, error } = await supabase.auth.getUser();
             if (error || !user) {
@@ -308,11 +360,12 @@
             currentUser = user;
         }
 
-        // ===== Modal Functions =====
         function openCreateModal() {
             document.getElementById('tournamentForm').reset();
             document.getElementById('editTournamentId').value = '';
             document.getElementById('modalTitle').textContent = translations[currentLang].modal_title_create;
+            document.getElementById('imagePreview').classList.remove('show');
+            selectedImageFile = null;
             document.getElementById('tournamentModal').classList.add('show');
         }
 
@@ -330,6 +383,13 @@
                 document.getElementById('maxParticipants').value = data.max_participants || 200;
                 document.getElementById('registrationFee').value = data.registration_fee || 0;
                 
+                // Load existing image if exists
+                if (data.image_url) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = data.image_url;
+                    preview.classList.add('show');
+                }
+                
                 document.getElementById('modalTitle').textContent = translations[currentLang].modal_title_edit;
                 document.getElementById('tournamentModal').classList.add('show');
             } catch (error) {
@@ -339,12 +399,59 @@
 
         function closeModal() {
             document.getElementById('tournamentModal').classList.remove('show');
+            selectedImageFile = null;
+            document.getElementById('imagePreview').classList.remove('show');
         }
 
-        // ===== Form Submit (Create or Update) =====
+        function handleImagePreview(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showAlert('error', 'حجم الصورة يجب أن يكون أقل من 5MB');
+                    return;
+                }
+                selectedImageFile = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.classList.add('show');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         async function handleFormSubmit(e) {
             e.preventDefault();
             const editId = document.getElementById('editTournamentId').value;
+            
+            let imageUrl = null;
+            
+            // Upload image if selected
+            if (selectedImageFile) {
+                try {
+                    const fileExt = selectedImageFile.name.split('.').pop();
+                    const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`;
+                    
+                    const { error: uploadError } = await supabase.storage
+                        .from('tournament_images')
+                        .upload(fileName, selectedImageFile, { upsert: true });
+                    
+                    if (uploadError) {
+                        console.error('Upload error:', uploadError);
+                        showAlert('error', 'خطأ في رفع الصورة: ' + uploadError.message);
+                        return;
+                    }
+                    
+                    const { data: { publicUrl } } = supabase.storage
+                        .from('tournament_images')
+                        .getPublicUrl(fileName);
+                    
+                    imageUrl = publicUrl;
+                } catch (error) {
+                    console.error('Image upload error:', error);
+                }
+            }
             
             const tournamentData = {
                 organizer_id: currentUser.id,
@@ -355,12 +462,21 @@
                 location: document.getElementById('tournamentLocation').value,
                 max_participants: parseInt(document.getElementById('maxParticipants').value) || 200,
                 registration_fee: parseFloat(document.getElementById('registrationFee').value) || 0,
-                status: 'draft'
+                status: 'draft',
+                updated_at: new Date().toISOString()
             };
+            
+            if (imageUrl) {
+                tournamentData.image_url = imageUrl;
+            }
 
             try {
                 let error;
                 if (editId) {
+                    // If editing and no new image, keep old one
+                    if (!imageUrl) {
+                        delete tournamentData.image_url;
+                    }
                     const res = await supabase.from('tournaments').update(tournamentData).eq('id', editId);
                     error = res.error;
                     if (!error) showAlert('success', translations[currentLang].success_update);
@@ -379,7 +495,6 @@
             }
         }
 
-        // ===== Load Tournaments =====
         async function loadTournaments() {
             const container = document.getElementById('tournamentsList');
             container.innerHTML = `<div class="loading">${translations[currentLang].loading}</div>`;
@@ -412,36 +527,40 @@
                     if (date < today && date.toDateString() !== today.toDateString()) statusText = translations[currentLang].status_completed;
                     else if (date.toDateString() === today.toDateString()) statusText = translations[currentLang].status_today;
 
+                    const imageUrl = t.image_url || 'https://via.placeholder.com/800x250/1A1A1A/FFB800?text=Tournament+Image';
+
                     return `
                         <div class="tournament-card">
-                            <div class="tournament-header">
-                                <div class="tournament-name">${t.name}</div>
-                                <span class="tournament-status">${statusText}</span>
-                            </div>
-                            <div class="tournament-meta">
-                                <span>📅 ${translations[currentLang].date}: ${formattedDate}</span>
-                                <span>📍 ${translations[currentLang].location}: ${t.location || 'TBD'}</span>
-                            </div>
-                            <div class="stats-grid">
-                                <div class="stat-card">
-                                    <div class="stat-value" id="regCount_${t.id}">-</div>
-                                    <div class="stat-label">${translations[currentLang].players}</div>
+                            <img src="${imageUrl}" alt="${t.name}" class="tournament-image" onerror="this.src='https://via.placeholder.com/800x250/1A1A1A/FFB800?text=No+Image'">
+                            <div class="tournament-content">
+                                <div class="tournament-header">
+                                    <div class="tournament-name">${t.name}</div>
+                                    <span class="tournament-status">${statusText}</span>
                                 </div>
-                                <div class="stat-card">
-                                    <div class="stat-value" id="matchCount_${t.id}">-</div>
-                                    <div class="stat-label">${translations[currentLang].matches}</div>
+                                <div class="tournament-meta">
+                                    <span> ${translations[currentLang].date}: ${formattedDate}</span>
+                                    <span>📍 ${translations[currentLang].location}: ${t.location || 'TBD'}</span>
                                 </div>
-                                <div class="stat-card">
-                                    <div class="stat-value" id="matCount_${t.id}">-</div>
-                                    <div class="stat-label">${translations[currentLang].capacity}</div>
+                                <div class="stats-grid">
+                                    <div class="stat-card">
+                                        <div class="stat-value" id="regCount_${t.id}">-</div>
+                                        <div class="stat-label">${translations[currentLang].players}</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-value" id="matchCount_${t.id}">-</div>
+                                        <div class="stat-label">${translations[currentLang].matches}</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-value">${t.max_participants || 200}</div>
+                                        <div class="stat-label">${translations[currentLang].capacity}</div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="tournament-actions">
-                                <a href="tournament-manager.html?tournament_id=${t.id}" class="btn btn-primary btn-sm">${translations[currentLang].manage}</a>
-                                <a href="tournament-details.html?tournament_id=${t.id}" target="_blank" class="btn btn-secondary btn-sm">${translations[currentLang].view}</a>
-                                <button class="btn btn-secondary btn-sm" onclick="copyRegistrationLink('${t.id}')">${translations[currentLang].copy_link}</button>
-                                <button class="btn btn-sm" style="background: var(--accent-yellow); color: var(--black);" onclick="openEditModal('${t.id}')">${translations[currentLang].edit}</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteTournament('${t.id}')">${translations[currentLang].delete}</button>
+                                <div class="tournament-actions">
+                                    <a href="tournament-manager.html?tournament_id=${t.id}" class="btn btn-primary btn-sm">${translations[currentLang].manage}</a>
+                                    <a href="tournament-details.html?tournament_id=${t.id}" target="_blank" class="btn btn-secondary btn-sm">${translations[currentLang].view}</a>
+                                    <button class="btn btn-sm" style="background: var(--accent-yellow); color: var(--black);" onclick="openEditModal('${t.id}')">${translations[currentLang].edit}</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteTournament('${t.id}')">${translations[currentLang].delete}</button>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -449,6 +568,7 @@
 
                 data.forEach(t => loadTournamentStats(t.id));
             } catch (error) {
+                console.error('Load error:', error);
                 container.innerHTML = `<div class="alert alert-error show">❌ ${error.message}</div>`;
             }
         }
@@ -460,23 +580,7 @@
 
                 const { count: matchCount } = await supabase.from('matches').select('*', { count: 'exact', head: true }).eq('tournament_id', tournamentId);
                 if (document.getElementById(`matchCount_${tournamentId}`)) document.getElementById(`matchCount_${tournamentId}`).textContent = matchCount || 0;
-
-                const matsData = localStorage.getItem(`mats_${tournamentId}`);
-                const matCount = matsData ? JSON.parse(matsData).length : 0;
-                if (document.getElementById(`matCount_${tournamentId}`)) document.getElementById(`matCount_${tournamentId}`).textContent = matCount || 200;
             } catch (error) { console.error('Stats error:', error); }
-        }
-
-        async function copyRegistrationLink(tournamentId) {
-            const url = `${window.location.origin}/player-registration.html?tournament_id=${tournamentId}`;
-            try {
-                await navigator.clipboard.writeText(url);
-                showAlert('success', translations[currentLang].success_copy + '\n\n' + url);
-            } catch (err) {
-                const textArea = document.createElement('textarea');
-                textArea.value = url; document.body.appendChild(textArea); textArea.select(); document.execCommand('copy'); document.body.removeChild(textArea);
-                showAlert('success', translations[currentLang].success_copy);
-            }
         }
 
         async function deleteTournament(tournamentId) {
@@ -503,7 +607,13 @@
             setTimeout(() => alert.classList.remove('show'), 5000);
         }
 
-        // ===== Init =====
+        window.onclick = function(event) {
+            const modal = document.getElementById('tournamentModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
         window.onload = async () => {
             await checkAuth();
             changeLang(currentLang);
