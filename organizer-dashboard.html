@@ -358,6 +358,7 @@
         var currentUser = null;
         var currentLang = localStorage.getItem('lang') || 'en';
         var selectedImageFile = null;
+        var STORAGE_BUCKET_NAME = 'tournament_images';
 
         // ===== Translations =====
         var translations = {
@@ -375,7 +376,7 @@
                 capacity: 'Capacity',
                 manage: '⚙️ Manage',
                 view: '️ View',
-                edit: '✏️ Edit',
+                edit: '️ Edit',
                 delete: '🗑️ Delete',
                 date: 'Date',
                 location: 'Location',
@@ -421,13 +422,41 @@
             }
         };
 
-        // ===== Initialize Supabase =====
+        // ===== Initialize Supabase ONCE =====
         function initSupabase() {
             if (!dbClient) {
+                console.log('Initializing Supabase client...');
                 dbClient = window.supabase.createClient(
                     'https://ngiclnkmbvzjhylwhzyn.supabase.co',
                     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w'
                 );
+                console.log('✅ Supabase client initialized');
+            }
+            return dbClient;
+        }
+
+        // ===== Check Bucket Access =====
+        async function checkBucketAccess() {
+            try {
+                console.log('Checking bucket access:', STORAGE_BUCKET_NAME);
+                if (!dbClient) {
+                    throw new Error('Supabase client not initialized');
+                }
+                
+                var result = await dbClient.storage
+                    .from(STORAGE_BUCKET_NAME)
+                    .list('', { limit: 1 });
+                
+                if (result.error) {
+                    console.error('Bucket access error:', result.error);
+                    throw new Error('Cannot access bucket: ' + result.error.message);
+                }
+                
+                console.log('✅ Bucket is accessible');
+                return true;
+            } catch (error) {
+                console.error('Bucket check failed:', error);
+                throw error;
             }
         }
 
@@ -472,12 +501,21 @@
         }
 
         // ===== Modal Functions =====
-        window.openCreateModal = function() {
+        window.openCreateModal = async function() {
             console.log('Opening create modal');
             if (!currentUser) {
                 window.showAlert('error', 'Please login first');
                 return;
             }
+            
+            // Check bucket access before opening modal
+            try {
+                await checkBucketAccess();
+            } catch (error) {
+                window.showAlert('error', 'Storage error: ' + error.message + '\n\nPlease contact support.');
+                return;
+            }
+            
             document.getElementById('tournamentForm').reset();
             document.getElementById('editTournamentId').value = '';
             document.getElementById('modalTitle').textContent = translations[currentLang].modalTitleCreate;
@@ -549,14 +587,14 @@
             e.preventDefault();
             console.log('Form submitted');
             
-            // Check if user is logged in
             if (!currentUser) {
                 console.error('No user logged in');
-                window.showAlert('error', 'Please login first. Redirecting...');
-                setTimeout(function() {
-                    window.location.href = 'login.html';
-                }, 2000);
+                window.showAlert('error', 'Please login first');
                 return;
+            }
+            
+            if (!dbClient) {
+                initSupabase();
             }
             
             console.log('Current user ID:', currentUser.id);
@@ -569,22 +607,30 @@
             // Upload image if selected
             if (selectedImageFile) {
                 try {
-                    console.log('Uploading image...');
+                    console.log('Uploading image to bucket:', STORAGE_BUCKET_NAME);
+                    
+                    // Verify bucket access first
+                    await checkBucketAccess();
+                    
                     var fileExt = selectedImageFile.name.split('.').pop();
                     var fileName = currentUser.id + '-' + Date.now() + '.' + fileExt;
                     
+                    console.log('Uploading file:', fileName);
                     var uploadResult = await dbClient.storage
-                        .from('tournament_images')
-                        .upload(fileName, selectedImageFile, { upsert: true });
+                        .from(STORAGE_BUCKET_NAME)
+                        .upload(fileName, selectedImageFile, { 
+                            upsert: true,
+                            contentType: selectedImageFile.type
+                        });
                     
                     if (uploadResult.error) {
                         console.error('Upload error:', uploadResult.error);
-                        throw uploadResult.error;
+                        throw new Error(uploadResult.error.message);
                     }
                     
-                    console.log('Image uploaded successfully');
+                    console.log('✅ Image uploaded successfully');
                     var urlResult = dbClient.storage
-                        .from('tournament_images')
+                        .from(STORAGE_BUCKET_NAME)
                         .getPublicUrl(fileName);
                     
                     imageUrl = urlResult.data.publicUrl;
@@ -653,6 +699,10 @@
                     return;
                 }
 
+                if (!dbClient) {
+                    initSupabase();
+                }
+
                 console.log('User ID:', currentUser.id);
                 var result = await dbClient
                     .from('tournaments')
@@ -672,7 +722,7 @@
                     var t = translations[currentLang];
                     container.innerHTML = 
                         '<div class="empty-state">' +
-                            '<div class="icon">🏆</div>' +
+                            '<div class="icon"></div>' +
                             '<h3>' + t.noTournaments + '</h3>' +
                             '<p>' + t.noTournamentsDesc + '</p>' +
                         '</div>';
@@ -756,6 +806,8 @@
         // ===== Load Stats =====
         window.loadTournamentStats = async function(tournamentId) {
             try {
+                if (!dbClient) return;
+                
                 var regResult = await dbClient.from('tournament_participants').select('*', { count: 'exact', head: true }).eq('tournament_id', tournamentId);
                 var regCount = regResult.count || 0;
                 var regElement = document.getElementById('regCount_' + tournamentId);
@@ -774,6 +826,8 @@
         window.deleteTournament = async function(tournamentId) {
             if (!confirm(translations[currentLang].confirmDelete)) return;
             try {
+                if (!dbClient) initSupabase();
+                
                 var result = await dbClient.from('tournaments').delete().eq('id', tournamentId);
                 if (result.error) throw result.error;
                 window.showAlert('success', translations[currentLang].successDelete);
@@ -785,6 +839,7 @@
 
         // ===== Logout =====
         window.logout = async function() {
+            if (!dbClient) initSupabase();
             await dbClient.auth.signOut();
             window.location.href = 'index.html';
         };
@@ -809,7 +864,8 @@
 
         // ===== Initialize =====
         window.onload = async function() {
-            console.log('Page loaded, checking auth...');
+            console.log('Page loaded, initializing...');
+            initSupabase();
             var authOk = await checkAuth();
             if (authOk) {
                 console.log('Auth successful, loading data...');
