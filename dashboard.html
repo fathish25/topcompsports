@@ -26,7 +26,6 @@
             min-height: 100vh;
         }
 
-        /* Header */
         .header {
             background: rgba(10, 10, 10, 0.98);
             backdrop-filter: blur(10px);
@@ -48,7 +47,6 @@
         .btn-logout { background: transparent; border: 2px solid var(--white); color: var(--white); }
         .btn-logout:hover { background: var(--white); color: var(--black); }
 
-        /* Main Content */
         .dashboard-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -126,10 +124,10 @@
             flex-wrap: wrap;
         }
 
-        .btn-primary { background: var(--primary-blue); color: var(--white); }
+        .btn-primary { background: var(--primary-blue); color: var(--white); padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
         
-        .btn-secondary { background: var(--success); color: var(--white); }
+        .btn-secondary { background: var(--success); color: var(--white); padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
         .btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(16,185,129,0.4); }
 
         .loading { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.6); font-size: 1.2rem; }
@@ -143,7 +141,6 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <div class="logo" onclick="window.location.href='index.html'">
             <div class="logo-text">TopCompSports</div>
@@ -155,17 +152,15 @@
         </nav>
     </header>
 
-    <!-- Main Content -->
     <div class="dashboard-container">
         <div class="welcome-section">
-            <h1>Welcome to Your Dashboard! 🎉</h1>
+            <h1>Welcome to Your Dashboard! </h1>
             <p>Manage your profile and track your tournament journey</p>
         </div>
 
         <div id="loading" class="loading">Loading your profile...</div>
 
         <div id="profileContent" style="display: none;">
-            <!-- Profile Card -->
             <div class="profile-card">
                 <div class="profile-header">
                     <div class="profile-avatar" id="profileAvatar">
@@ -180,11 +175,11 @@
 
                 <div class="profile-details">
                     <div class="detail-item">
-                        <div class="detail-label">📅 Date of Birth</div>
+                        <div class="detail-label"> Date of Birth</div>
                         <div class="detail-value" id="profileDob">Not provided</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label"> Gender</div>
+                        <div class="detail-label">👤 Gender</div>
                         <div class="detail-value" id="profileGender">Not provided</div>
                     </div>
                     <div class="detail-item">
@@ -198,11 +193,11 @@
                 </div>
 
                 <div class="action-buttons">
-                    <button class="btn btn-primary" onclick="window.location.href='profile.html'">
+                    <button class="btn-primary" onclick="window.location.href='profile.html'">
                         ✏️ Edit Profile
                     </button>
-                    <button class="btn btn-secondary" onclick="window.location.href='index.html#tournaments'">
-                        🏆 Browse Tournaments
+                    <button class="btn-secondary" onclick="window.location.href='index.html#tournaments'">
+                         Browse Tournaments
                     </button>
                 </div>
             </div>
@@ -216,7 +211,6 @@
 
         let currentUser = null;
 
-        // ===== Check Auth on Load =====
         window.onload = async function() {
             const { data: { user }, error } = await dbClient.auth.getUser();
             
@@ -226,10 +220,24 @@
             }
 
             currentUser = user;
+            
+            // Check if profile is complete
+            const { data: profile } = await dbClient
+                .from('users')
+                .select('*')
+                .eq('id', user.id)
+                .maybeSingle();
+
+            if (!profile || !profile.full_name || !profile.date_of_birth || !profile.gender) {
+                // Profile not complete, redirect to profile page
+                console.log('Profile not complete, redirecting to profile.html');
+                window.location.href = 'profile.html';
+                return;
+            }
+
             await loadUserProfile();
         };
 
-        // ===== Load User Profile =====
         async function loadUserProfile() {
             try {
                 const { data: profile, error } = await dbClient
@@ -244,7 +252,6 @@
                 document.getElementById('profileContent').style.display = 'block';
 
                 if (profile) {
-                    // Display profile information
                     document.getElementById('profileName').textContent = profile.full_name || 'User';
                     document.getElementById('profileEmail').textContent = profile.email;
                     document.getElementById('profileType').textContent = 
@@ -255,13 +262,11 @@
                     document.getElementById('profileCountry').textContent = profile.country || 'Not provided';
                     document.getElementById('profilePhone').textContent = profile.phone || 'Not provided';
 
-                    // Load profile picture
                     if (profile.profile_picture_url) {
                         document.getElementById('profileAvatar').innerHTML = 
                             `<img src="${profile.profile_picture_url}" alt="Profile">`;
                     }
                 } else {
-                    // No profile found
                     document.getElementById('profileName').textContent = currentUser.email.split('@')[0];
                     document.getElementById('profileEmail').textContent = currentUser.email;
                 }
@@ -272,7 +277,6 @@
             }
         }
 
-        // ===== Handle Logout =====
         async function handleLogout() {
             await dbClient.auth.signOut();
             localStorage.removeItem('currentUser');
