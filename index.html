@@ -10,118 +10,132 @@
             --primary-blue: #0066CC;
             --dark-blue: #003366;
             --accent-yellow: #FFB800;
-            --accent-orange: #FF8C00;
             --black: #0A0A0A;
             --dark-gray: #1A1A1A;
             --medium-gray: #2A2A2A;
-            --light-gray: #F5F5F5;
             --white: #FFFFFF;
             --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
-            --gradient-dark: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', 'Tahoma', sans-serif; background: var(--black); color: var(--white); line-height: 1.6; overflow-x: hidden; }
-        img { max-width: 100%; height: auto; display: block; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
 
-        .header { background: rgba(10,10,10,0.98); backdrop-filter: blur(10px); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-blue); position: sticky; top: 0; z-index: 1000; }
+        .header {
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--primary-blue);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
         .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; }
-        .logo-svg { width: 50px; height: 50px; }
         .logo-text { font-size: 28px; font-weight: bold; background: var(--gradient-blue); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
         .nav { display: flex; gap: 30px; align-items: center; }
         .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; transition: all 0.3s; font-weight: 600; }
         .nav a:hover { color: var(--primary-blue); background: rgba(0,102,204,0.1); }
+
+        .user-section { display: flex; align-items: center; gap: 15px; }
+        .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid var(--accent-yellow); background: var(--medium-gray); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-name { font-weight: 600; color: var(--accent-yellow); }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; }
+        .btn-login { background: var(--primary-blue); color: var(--white); }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
+        .btn-logout { background: transparent; border: 2px solid var(--white); color: var(--white); }
+        .btn-logout:hover { background: var(--white); color: var(--black); }
+
         .lang-switcher { display: flex; gap: 5px; background: var(--medium-gray); padding: 5px; border-radius: 8px; }
         .lang-btn { padding: 8px 15px; border: none; background: transparent; color: var(--white); cursor: pointer; border-radius: 6px; font-weight: bold; }
         .lang-btn.active { background: var(--primary-blue); }
 
-        .hero { position: relative; min-height: 90vh; display: flex; align-items: center; background: var(--gradient-dark); padding: 100px 50px; }
-        .hero-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            background: var(--gradient-blue);
+            padding: 100px 50px;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
         .hero-text h1 { font-size: 4.5rem; font-weight: 900; line-height: 1.1; margin-bottom: 20px; text-transform: uppercase; }
         .hero-text h1 span { color: var(--primary-blue); display: block; }
         .hero-text p { font-size: 1.3rem; color: rgba(255,255,255,0.9); margin-bottom: 30px; }
         .hero-buttons { display: flex; gap: 15px; flex-wrap: wrap; }
-        .hero-image { position: relative; border-radius: 20px; overflow: hidden; border: 3px solid var(--primary-blue); height: 500px; }
+
+        .hero-image {
+            border-radius: 20px;
+            overflow: hidden;
+            border: 3px solid var(--accent-yellow);
+            height: 500px;
+            background: var(--medium-gray);
+        }
+
         .hero-image img { width: 100%; height: 100%; object-fit: cover; }
 
-        .btn { padding: 15px 35px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; transition: all 0.3s; }
-        .btn-primary { background: var(--gradient-blue); color: var(--white); }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,102,204,0.6); }
-        .btn-secondary { background: transparent; color: var(--white); border: 2px solid var(--white); }
-        .btn-secondary:hover { background: var(--white); color: var(--black); }
+        .btn-primary { background: var(--white); color: var(--primary-blue); padding: 15px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+        .btn-secondary { background: transparent; color: var(--white); border: 2px solid var(--white); padding: 15px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-secondary:hover { background: var(--white); color: var(--primary-blue); }
 
-        .features { padding: 80px 50px; background: var(--light-gray); color: var(--black); }
+        .features { padding: 80px 50px; background: #F5F5F5; color: var(--black); }
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
         .feature-card { text-align: center; padding: 40px 30px; background: var(--white); border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .feature-icon { font-size: 3.5rem; margin-bottom: 20px; color: var(--primary-blue); }
+        .feature-icon { font-size: 3.5rem; margin-bottom: 20px; }
         .feature-card h3 { font-size: 1.4rem; margin-bottom: 15px; }
         .feature-card p { color: rgba(0,0,0,0.7); }
 
-        .stats-section { padding: 100px 50px; background: var(--gradient-blue); text-align: center; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; max-width: 1000px; margin: 0 auto; }
-        .stat-item h3 { font-size: 3.5rem; font-weight: 900; margin-bottom: 10px; }
-        .stat-item p { font-size: 1.2rem; }
-
-        .container { max-width: 1400px; margin: 0 auto; padding: 80px 50px; }
-        .section-header { text-align: center; margin-bottom: 60px; }
-        .section-header h2 { font-size: 2.8rem; font-weight: 900; margin-bottom: 15px; }
-        .section-header p { color: rgba(255,255,255,0.8); font-size: 1.2rem; }
-
-        .tournaments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; }
-        .tournament-card { background: linear-gradient(135deg, var(--medium-gray), var(--dark-gray)); border: 2px solid var(--primary-blue); border-radius: 15px; overflow: hidden; padding: 20px; }
-        .tournament-banner { height: 200px; background: var(--gradient-blue); display: flex; align-items: center; justify-content: center; font-size: 5rem; margin-bottom: 20px; }
-        .tournament-content h3 { color: var(--white); font-size: 1.5rem; margin-bottom: 15px; }
-        .tournament-meta { color: rgba(255,255,255,0.7); margin-bottom: 20px; }
-        .tournament-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .tournament-actions .btn { flex: 1; justify-content: center; }
-
-        .cta-section { padding: 100px 50px; background: var(--gradient-dark); text-align: center; border-top: 3px solid var(--primary-blue); border-bottom: 3px solid var(--primary-blue); }
-        .cta-content { max-width: 800px; margin: 0 auto; }
-        .cta-content h2 { font-size: 3rem; margin-bottom: 20px; }
-        .cta-content h2 span { color: var(--primary-blue); }
-        .cta-content p { font-size: 1.3rem; margin-bottom: 40px; color: rgba(255,255,255,0.9); }
-
-        footer { background: var(--black); padding: 50px 50px 20px; border-top: 3px solid var(--primary-blue); }
-        .footer-content { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px; }
-        .footer-section h4 { color: var(--primary-blue); margin-bottom: 20px; }
-        .footer-section ul { list-style: none; }
-        .footer-section ul li { margin-bottom: 12px; }
-        .footer-section ul li a { color: rgba(255,255,255,0.7); text-decoration: none; }
-        .footer-section ul li a:hover { color: var(--primary-blue); }
-        .footer-bottom { text-align: center; padding-top: 30px; border-top: 2px solid var(--medium-gray); color: rgba(255,255,255,0.6); }
-
-        .loading, .empty-state { text-align: center; padding: 80px 20px; color: rgba(255,255,255,0.6); }
-        .empty-state .icon { font-size: 6rem; margin-bottom: 20px; opacity: 0.5; }
-
         @media (max-width: 768px) {
-            .header { padding: 12px 20px; flex-direction: column; }
+            .header { padding: 12px 20px; flex-direction: column; gap: 15px; }
             .nav { flex-wrap: wrap; justify-content: center; }
             .hero { padding: 60px 20px; }
             .hero-content { grid-template-columns: 1fr; gap: 40px; }
             .hero-text h1 { font-size: 2.5rem; }
             .hero-image { height: 300px; }
-            .container, .features, .stats-section, .cta-section { padding: 40px 20px; }
         }
     </style>
 </head>
 <body>
     <header class="header">
-        <div class="logo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-            <svg class="logo-svg" viewBox="0 0 100 100">
-                <defs><linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#0066CC"/><stop offset="100%" style="stop-color:#003366"/></linearGradient></defs>
-                <circle cx="50" cy="50" r="45" fill="url(#logoGrad)" stroke="#FFB800" stroke-width="3"/>
-                <text x="50" y="65" font-family="Arial Black" font-size="45" font-weight="900" fill="#FFB800" text-anchor="middle">T</text>
-            </svg>
+        <div class="logo" onclick="window.location.href='index.html'">
             <div class="logo-text">TopCompSports</div>
         </div>
+        
         <nav class="nav">
-            <a href="#tournaments" data-i18n="nav_tournaments">Tournaments</a>
-            <a href="#features" data-i18n="nav_features">Features</a>
-            <a href="organizer-dashboard.html" data-i18n="nav_organizer">Organizer</a>
-            <a href="login.html" class="btn btn-primary" data-i18n="nav_login">Login</a>
+            <a href="#tournaments">Tournaments</a>
+            <a href="#features">Features</a>
+            <a href="organizer-dashboard.html">Organizer</a>
+            
+            <div id="userSection" class="user-section" style="display: none;">
+                <div class="user-info" onclick="window.location.href='dashboard.html'">
+                    <div class="user-avatar" id="userAvatar">
+                        <span></span>
+                    </div>
+                    <span class="user-name" id="userName">User</span>
+                </div>
+                <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
+            </div>
+            
+            <a href="login.html" id="loginBtn" class="btn btn-login">Login</a>
+            
             <div class="lang-switcher">
-                <button class="lang-btn" onclick="changeLanguage('ar')" id="btn-ar">عربي</button>
-                <button class="lang-btn active" onclick="changeLanguage('en')" id="btn-en">English</button>
+                <button class="lang-btn" onclick="changeLanguage('ar')">عربي</button>
+                <button class="lang-btn active" onclick="changeLanguage('en')">English</button>
             </div>
         </nav>
     </header>
@@ -129,15 +143,15 @@
     <section class="hero">
         <div class="hero-content">
             <div class="hero-text">
-                <h1 data-i18n="hero_title">DISCIPLINE.<br><span>FOCUS.</span><br>STRENGTH.</h1>
-                <p data-i18n="hero_subtitle">Professional tournament management platform for Jiu-Jitsu competitions</p>
+                <h1>DISCIPLINE.<br><span>FOCUS.</span><br>STRENGTH.</h1>
+                <p>Professional tournament management platform for Jiu-Jitsu competitions</p>
                 <div class="hero-buttons">
-                    <a href="#tournaments" class="btn btn-primary" data-i18n="hero_cta_primary">Browse Tournaments</a>
-                    <a href="organizer-dashboard.html" class="btn btn-secondary" data-i18n="hero_cta_secondary">Create Tournament</a>
+                    <button class="btn btn-primary" onclick="window.location.href='#tournaments'">Browse Tournaments</button>
+                    <button class="btn btn-secondary" onclick="window.location.href='organizer-dashboard.html'">Create Tournament</button>
                 </div>
             </div>
             <div class="hero-image">
-                <img src="hero-image.jpg" alt="Jiu-Jitsu">
+                <img src="https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800" alt="Jiu-Jitsu" onerror="this.style.display='none'">
             </div>
         </div>
     </section>
@@ -146,239 +160,142 @@
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon">📝</div>
-                <h3 data-i18n="feature1_title">Easy Registration</h3>
-                <p data-i18n="feature1_desc">Smart registration system</p>
+                <h3>Easy Registration</h3>
+                <p>Smart registration system</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">🥋</div>
-                <h3 data-i18n="feature2_title">Mat Management</h3>
-                <p data-i18n="feature2_desc">Organize matches on multiple mats</p>
+                <h3>Mat Management</h3>
+                <p>Organize matches efficiently</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon"></div>
-                <h3 data-i18n="feature3_title">Bracket System</h3>
-                <p data-i18n="feature3_desc">Automatic bracket creation</p>
+                <div class="feature-icon">🏆</div>
+                <h3>Bracket System</h3>
+                <p>Automatic bracket creation</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">⏱️</div>
-                <h3 data-i18n="feature4_title">Scoreboard</h3>
-                <p data-i18n="feature4_desc">Professional timer</p>
+                <h3>Live Scoreboard</h3>
+                <p>Real-time score tracking</p>
             </div>
         </div>
     </section>
-
-    <section class="stats-section">
-        <div class="stats-grid">
-            <div class="stat-item"><h3 id="statTournaments">0</h3><p data-i18n="stat_tournaments">Active Tournaments</p></div>
-            <div class="stat-item"><h3 id="statPlayers">0</h3><p data-i18n="stat_players">Registered Players</p></div>
-            <div class="stat-item"><h3 id="statMatches">0</h3><p data-i18n="stat_matches">Matches</p></div>
-            <div class="stat-item"><h3>24/7</h3><p data-i18n="stat_availability">Available</p></div>
-        </div>
-    </section>
-
-    <section class="container" id="tournaments">
-        <div class="section-header">
-            <h2 data-i18n="active_tournaments">🏆 Active Tournaments</h2>
-            <p data-i18n="tournaments_desc">Browse upcoming tournaments</p>
-        </div>
-        <div id="tournamentsList" class="tournaments-grid">
-            <div class="loading" data-i18n="loading">Loading...</div>
-        </div>
-    </section>
-
-    <section class="cta-section">
-        <div class="cta-content">
-            <h2 data-i18n="cta_title">Ready to Organize Your Next <span>Tournament</span>?</h2>
-            <p data-i18n="cta_desc">Join the platform today</p>
-            <div class="hero-buttons" style="justify-content: center;">
-                <a href="login.html" class="btn btn-primary" data-i18n="cta_button">Get Started 🚀</a>
-                <a href="#features" class="btn btn-secondary" data-i18n="cta_secondary">Learn More</a>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h4>TopCompSports</h4>
-                <p data-i18n="footer_desc">Professional platform for Jiu-Jitsu tournaments</p>
-            </div>
-            <div class="footer-section">
-                <h4 data-i18n="footer_links">Quick Links</h4>
-                <ul>
-                    <li><a href="#tournaments" data-i18n="nav_tournaments">Tournaments</a></li>
-                    <li><a href="#features" data-i18n="nav_features">Features</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4 data-i18n="footer_contact">Contact</h4>
-                <ul>
-                    <li><a href="#">📧 support@topcompsports.com</a></li>
-                    <li><a href="#">📱 WhatsApp</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p data-i18n="footer_copyright">© 2026 TopCompSports - All rights reserved</p>
-        </div>
-    </footer>
 
     <script>
-        // ===== Translations =====
-        const i18n = {
-            en: {
-                nav_tournaments: 'Tournaments',
-                nav_features: 'Features',
-                nav_organizer: 'Organizer',
-                nav_login: 'Login',
-                hero_title: 'DISCIPLINE.<br><span>FOCUS.</span><br>STRENGTH.',
-                hero_subtitle: 'Professional tournament management platform for Jiu-Jitsu competitions',
-                hero_cta_primary: 'Browse Tournaments',
-                hero_cta_secondary: 'Create Tournament',
-                feature1_title: 'Easy Registration',
-                feature1_desc: 'Smart registration system',
-                feature2_title: 'Mat Management',
-                feature2_desc: 'Organize matches on multiple mats',
-                feature3_title: 'Bracket System',
-                feature3_desc: 'Automatic bracket creation',
-                feature4_title: 'Scoreboard',
-                feature4_desc: 'Professional timer',
-                stat_tournaments: 'Active Tournaments',
-                stat_players: 'Registered Players',
-                stat_matches: 'Matches',
-                stat_availability: 'Available',
-                active_tournaments: '🏆 Active Tournaments',
-                tournaments_desc: 'Browse upcoming tournaments',
-                loading: 'Loading...',
-                cta_title: 'Ready to Organize Your Next Tournament?',
-                cta_desc: 'Join the platform today',
-                cta_button: 'Get Started 🚀',
-                cta_secondary: 'Learn More',
-                footer_desc: 'Professional platform for Jiu-Jitsu tournaments',
-                footer_links: 'Quick Links',
-                footer_contact: 'Contact',
-                footer_copyright: '© 2026 TopCompSports - All rights reserved'
-            },
-            ar: {
-                nav_tournaments: 'البطولات',
-                nav_features: 'المميزات',
-                nav_organizer: 'لوحة المنظم',
-                nav_login: 'تسجيل الدخول',
-                hero_title: 'انضباط.<br><span>تركيز.</span><br>قوة.',
-                hero_subtitle: 'منصة احترافية لإدارة بطولات الجوجيتسو',
-                hero_cta_primary: 'استعرض البطولات',
-                hero_cta_secondary: 'إنشاء بطولة',
-                feature1_title: 'تسجيل سهل',
-                feature1_desc: 'نظام تسجيل ذكي',
-                feature2_title: 'إدارة البساط',
-                feature2_desc: 'نظّم المباريات على عدة بساط',
-                feature3_title: 'نظام البراكيت',
-                feature3_desc: 'إنشاء براكيت تلقائي',
-                feature4_title: 'لوحة النتائج',
-                feature4_desc: 'مؤقت احترافي',
-                stat_tournaments: 'بطولة نشطة',
-                stat_players: 'لاعب مسجل',
-                stat_matches: 'مباراة',
-                stat_availability: 'متاح دائماً',
-                active_tournaments: '🏆 البطولات النشطة',
-                tournaments_desc: 'استعرض البطولات القادمة',
-                loading: 'جاري التحميل...',
-                cta_title: 'جاهز لتنظيم بطولتك القادمة؟',
-                cta_desc: 'انضم إلى المنصة اليوم',
-                cta_button: 'ابدأ الآن ',
-                cta_secondary: 'اعرف المزيد',
-                footer_desc: 'المنصة الاحترافية لإدارة بطولات الجوجيتسو',
-                footer_links: 'روابط سريعة',
-                footer_contact: 'تواصل معنا',
-                footer_copyright: '© 2026 TopCompSports - جميع الحقوق محفوظة'
-            }
-        };
-
-        // ===== Language Function - MUST be global =====
-        function changeLanguage(lang) {
-            localStorage.setItem('lang', lang);
-            
-            // Update buttons
-            document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
-            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-            
-            // Update direction
-            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            document.documentElement.lang = lang;
-            
-            // Update all texts
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (i18n[lang][key]) {
-                    el.innerHTML = i18n[lang][key];
-                }
-            });
-            
-            // Reload tournaments
-            if (typeof loadTournaments === 'function') loadTournaments();
-        }
-
-        // ===== Initialize =====
-        let currentLang = localStorage.getItem('lang') || 'en';
-        
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', function() {
-            changeLanguage(currentLang);
-            loadTournaments();
-            loadStats();
-        });
-
-        // ===== Supabase =====
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        async function loadTournaments() {
+        window.onload = async function() {
+            console.log('Index page loaded');
+            await checkAndShowUser();
+        };
+
+        async function checkAndShowUser() {
             try {
-                const { data, error } = await supabaseClient.from('tournaments').select('*').order('date', { ascending: true });
-                if (error) throw error;
-
-                const container = document.getElementById('tournamentsList');
-                if (!data || data.length === 0) {
-                    container.innerHTML = `<div class="empty-state"><div class="icon">🏆</div><h3>${i18n[currentLang].loading}</h3></div>`;
+                const storedUser = localStorage.getItem('currentUser');
+                
+                if (storedUser) {
+                    const userData = JSON.parse(storedUser);
+                    console.log('User found in localStorage:', userData);
+                    
+                    // Check if profile is complete
+                    if (!userData.profile_complete) {
+                        console.log('Profile not complete, redirecting to profile.html');
+                        window.location.href = 'profile.html';
+                        return;
+                    }
+                    
+                    showUserSection(userData);
                     return;
                 }
 
-                container.innerHTML = data.map(t => {
-                    const date = new Date(t.date).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
-                    return `
-                        <div class="tournament-card">
-                            <div class="tournament-banner">🏆</div>
-                            <div class="tournament-content">
-                                <h3>${t.name}</h3>
-                                <div class="tournament-meta">
-                                    <div>📅 ${date}</div>
-                                    <div>📍 ${t.location || 'TBD'}</div>
-                                </div>
-                                <div class="tournament-actions">
-                                    <a href="tournament-details.html?tournament_id=${t.id}" class="btn btn-primary">Details</a>
-                                    <a href="public-bracket.html?tournament_id=${t.id}" class="btn btn-secondary">Bracket</a>
-                                    <a href="results.html?tournament_id=${t.id}" class="btn btn-secondary">Results</a>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } catch (error) {
-                console.error('Error:', error);
+                const { data: { user }, error } = await dbClient.auth.getUser();
+                
+                if (error || !user) {
+                    console.log('No authenticated user');
+                    showLoginButton();
+                    return;
+                }
+
+                console.log('User authenticated via Supabase:', user.email);
+                
+                const { data: profile } = await dbClient
+                    .from('users')
+                    .select('*')
+                    .eq('id', user.id)
+                    .maybeSingle();
+
+                const userData = {
+                    id: user.id,
+                    email: user.email,
+                    full_name: profile?.full_name || user.user_metadata?.full_name || user.email.split('@')[0],
+                    user_type: profile?.user_type || user.user_metadata?.user_type || 'athlete',
+                    profile_picture_url: profile?.profile_picture_url,
+                    profile_complete: !!(profile?.full_name && profile?.date_of_birth && profile?.gender)
+                };
+
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+                
+                if (!userData.profile_complete) {
+                    console.log('Profile not complete, redirecting to profile.html');
+                    window.location.href = 'profile.html';
+                    return;
+                }
+                
+                showUserSection(userData);
+
+            } catch (err) {
+                console.error('Error checking user:', err);
+                showLoginButton();
             }
         }
 
-        async function loadStats() {
+        function showUserSection(userData) {
+            console.log('Showing user section for:', userData.full_name);
+            
+            document.getElementById('userSection').style.display = 'flex';
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('userName').textContent = userData.full_name;
+
+            if (userData.profile_picture_url) {
+                document.getElementById('userAvatar').innerHTML = 
+                    `<img src="${userData.profile_picture_url}" alt="Profile">`;
+            }
+        }
+
+        function showLoginButton() {
+            console.log('Showing login button');
+            document.getElementById('userSection').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'inline-block';
+        }
+
+        async function handleLogout() {
             try {
-                const { count: tc } = await supabaseClient.from('tournaments').select('*', { count: 'exact', head: true });
-                const { count: pc } = await supabaseClient.from('tournament_participants').select('*', { count: 'exact', head: true });
-                const { count: mc } = await supabaseClient.from('matches').select('*', { count: 'exact', head: true });
-                
-                document.getElementById('statTournaments').textContent = tc || 0;
-                document.getElementById('statPlayers').textContent = pc || 0;
-                document.getElementById('statMatches').textContent = mc || 0;
-            } catch (e) { console.error(e); }
+                await dbClient.auth.signOut();
+                localStorage.removeItem('currentUser');
+                console.log('User logged out');
+                showLoginButton();
+                window.location.reload();
+            } catch (err) {
+                console.error('Logout error:', err);
+            }
+        }
+
+        function changeLanguage(lang) {
+            localStorage.setItem('lang', lang);
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((lang === 'ar' && btn.textContent === 'عربي') || 
+                    (lang === 'en' && btn.textContent === 'English')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            window.location.reload();
         }
     </script>
 </body>
