@@ -173,7 +173,7 @@
             flex-wrap: wrap;
         }
 
-        /* صورة Hero الجديدة - صورة اليدين */
+        /* صورة Hero */
         .hero-image {
             position: relative;
             border-radius: 20px;
@@ -594,8 +594,8 @@
                 </div>
             </div>
             <div class="hero-image">
-                <!-- الصورة الجديدة - صورة اليدين مع الشريط -->
-                <img src="https://images.unsplash.com/photo-1599058945522-28d5ecc43b1f?w=800&q=80" alt="Jiu-Jitsu Preparation">
+                <!-- استخدام الصورة المحلية hero-image.jpg -->
+                <img src="hero-image.jpg" alt="Jiu-Jitsu Preparation">
                 <div class="hero-image-overlay"></div>
             </div>
         </div>
@@ -652,7 +652,7 @@
     <!-- Tournaments -->
     <section class="container" id="tournaments">
         <div class="section-header">
-            <h2 data-i18n="active_tournaments"> Active Tournaments</h2>
+            <h2 data-i18n="active_tournaments">🏆 Active Tournaments</h2>
             <p data-i18n="tournaments_desc">Browse upcoming tournaments and register now to participate</p>
         </div>
         <div id="tournamentsList" class="tournaments-grid">
@@ -792,8 +792,8 @@
         // ===== Language Switcher - English is default =====
         let currentLang = localStorage.getItem('lang') || 'en';
 
-        // تعريف الدالة قبل استخدامها
-        function changeLang(lang) {
+        // تعريف الدالة في Global Scope
+        window.changeLang = function(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
             
@@ -817,7 +817,7 @@
             if (typeof loadTournaments === 'function') {
                 loadTournaments();
             }
-        }
+        };
 
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
@@ -859,12 +859,12 @@
                     
                     return `
                         <div class="tournament-card">
-                            <div class="tournament-banner"></div>
+                            <div class="tournament-banner">🏆</div>
                             <div class="tournament-content">
                                 <h3>${t.name}</h3>
                                 <div class="tournament-meta">
                                     <div>📅 ${translations[currentLang].date}: ${formattedDate}</div>
-                                    <div> 📍 ${translations[currentLang].location}: ${t.location || 'TBD'}</div>
+                                    <div>📍 ${translations[currentLang].location}: ${t.location || 'TBD'}</div>
                                 </div>
                                 <div class="tournament-actions">
                                     <a href="tournament-details.html?tournament_id=${t.id}" class="btn btn-primary">${translations[currentLang].details}</a>
