@@ -7,8 +7,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --primary-red: #DC2626;
-            --dark-red: #991B1B;
+            /* تغيير اللون الأحمر إلى الأزرق */
+            --primary-blue: #0066CC;
+            --dark-blue: #003366;
             --accent-yellow: #FFB800;
             --accent-orange: #FF8C00;
             --black: #0A0A0A;
@@ -16,7 +17,7 @@
             --medium-gray: #2A2A2A;
             --light-gray: #F5F5F5;
             --white: #FFFFFF;
-            --gradient-red: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
             --gradient-dark: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
         }
 
@@ -40,7 +41,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid var(--primary-red);
+            border-bottom: 3px solid var(--primary-blue);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -53,15 +54,16 @@
             cursor: pointer;
         }
 
-        .logo img {
+        /* شعار SVG جديد */
+        .logo-svg {
+            width: 50px;
             height: 50px;
-            width: auto;
         }
 
         .logo-text {
             font-size: 28px;
             font-weight: bold;
-            background: var(--gradient-red);
+            background: var(--gradient-blue);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -84,8 +86,8 @@
         }
 
         .nav a:hover {
-            color: var(--primary-red);
-            background: rgba(220, 38, 38, 0.1);
+            color: var(--primary-blue);
+            background: rgba(0, 102, 204, 0.1);
         }
 
         .lang-switcher {
@@ -108,7 +110,7 @@
         }
 
         .lang-btn.active {
-            background: var(--primary-red);
+            background: var(--primary-blue);
             color: var(--white);
         }
 
@@ -118,11 +120,20 @@
             min-height: 90vh;
             display: flex;
             align-items: center;
-            background: linear-gradient(135deg, rgba(10,10,10,0.95) 0%, rgba(26,31,46,0.85) 100%), 
-                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23111" width="1200" height="600"/><path fill="%23DC2626" opacity="0.1" d="M0,300 Q300,200 600,300 T1200,300 L1200,600 L0,600 Z"/></svg>');
-            background-size: cover;
-            background-position: center;
+            background: linear-gradient(135deg, rgba(10,10,10,0.95) 0%, rgba(26,31,46,0.85) 100%);
             padding: 100px 50px;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 70% 50%, rgba(0, 102, 204, 0.15) 0%, transparent 50%);
+            pointer-events: none;
         }
 
         .hero-content {
@@ -132,6 +143,8 @@
             grid-template-columns: 1fr 1fr;
             gap: 80px;
             align-items: center;
+            position: relative;
+            z-index: 1;
         }
 
         .hero-text h1 {
@@ -144,7 +157,7 @@
         }
 
         .hero-text h1 span {
-            color: var(--primary-red);
+            color: var(--primary-blue);
             display: block;
         }
 
@@ -162,33 +175,37 @@
             flex-wrap: wrap;
         }
 
+        /* صورة Hero جديدة - صورة حقيقية */
         .hero-image {
             position: relative;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(220, 38, 38, 0.4);
-            border: 3px solid var(--primary-red);
-        }
-
-        .hero-image-placeholder {
-            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 102, 204, 0.4);
+            border: 3px solid var(--primary-blue);
             height: 500px;
-            background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+            background: var(--gradient-blue);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 8rem;
-            position: relative;
         }
 
-        .hero-image-placeholder::before {
-            content: '';
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .hero-image-overlay {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            background: linear-gradient(135deg, rgba(0, 102, 204, 0.3) 0%, rgba(0, 51, 102, 0.5) 100%);
+            z-index: 1;
         }
 
         /* Buttons */
@@ -208,14 +225,14 @@
         }
 
         .btn-primary {
-            background: var(--gradient-red);
+            background: var(--gradient-blue);
             color: var(--white);
-            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.4);
         }
 
         .btn-primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.6);
+            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.6);
         }
 
         .btn-secondary {
@@ -261,13 +278,13 @@
 
         .feature-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 8px 30px rgba(220, 38, 38, 0.2);
+            box-shadow: 0 8px 30px rgba(0, 102, 204, 0.2);
         }
 
         .feature-icon {
             font-size: 3.5rem;
             margin-bottom: 20px;
-            color: var(--primary-red);
+            color: var(--primary-blue);
         }
 
         .feature-card h3 {
@@ -285,7 +302,7 @@
         /* Stats Section */
         .stats-section {
             padding: 100px 50px;
-            background: var(--gradient-red);
+            background: var(--gradient-blue);
             text-align: center;
         }
 
@@ -344,7 +361,7 @@
 
         .tournament-card {
             background: linear-gradient(135deg, var(--medium-gray) 0%, var(--dark-gray) 100%);
-            border: 2px solid var(--primary-red);
+            border: 2px solid var(--primary-blue);
             border-radius: 15px;
             overflow: hidden;
             transition: all 0.4s;
@@ -352,12 +369,12 @@
 
         .tournament-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(220, 38, 38, 0.4);
+            box-shadow: 0 15px 40px rgba(0, 102, 204, 0.4);
         }
 
         .tournament-banner {
             height: 200px;
-            background: var(--gradient-red);
+            background: var(--gradient-blue);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -400,8 +417,8 @@
             padding: 100px 50px;
             background: var(--gradient-dark);
             text-align: center;
-            border-top: 3px solid var(--primary-red);
-            border-bottom: 3px solid var(--primary-red);
+            border-top: 3px solid var(--primary-blue);
+            border-bottom: 3px solid var(--primary-blue);
         }
 
         .cta-content {
@@ -417,7 +434,7 @@
         }
 
         .cta-content h2 span {
-            color: var(--primary-red);
+            color: var(--primary-blue);
         }
 
         .cta-content p {
@@ -430,7 +447,7 @@
         footer {
             background: var(--black);
             padding: 50px 50px 20px;
-            border-top: 3px solid var(--primary-red);
+            border-top: 3px solid var(--primary-blue);
         }
 
         .footer-content {
@@ -443,7 +460,7 @@
         }
 
         .footer-section h4 {
-            color: var(--primary-red);
+            color: var(--primary-blue);
             font-size: 1.3rem;
             margin-bottom: 20px;
             font-weight: 700;
@@ -464,7 +481,7 @@
         }
 
         .footer-section ul li a:hover {
-            color: var(--primary-red);
+            color: var(--primary-blue);
         }
 
         .footer-bottom {
@@ -510,7 +527,7 @@
             .hero { padding: 60px 20px; min-height: auto; }
             .hero-content { gap: 30px; }
             .hero-text h1 { font-size: 2.5rem; }
-            .hero-image-placeholder { height: 300px; font-size: 5rem; }
+            .hero-image { height: 300px; }
             .container { padding: 30px 20px; }
             .section-header h2 { font-size: 2rem; }
             .features { padding: 60px 20px; }
@@ -533,15 +550,26 @@
         /* Scrollbar */
         ::-webkit-scrollbar { width: 10px; }
         ::-webkit-scrollbar-track { background: var(--black); }
-        ::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 5px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--dark-red); }
+        ::-webkit-scrollbar-thumb { background: var(--primary-blue); border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--dark-blue); }
     </style>
 </head>
 <body>
     <!-- Header -->
     <header class="header">
         <div class="logo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-            <img src="logo.png" alt="TopCompSports Logo">
+            <!-- شعار SVG جديد -->
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0066CC;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#003366;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <circle cx="50" cy="50" r="45" fill="url(#logoGrad)" stroke="#FFB800" stroke-width="3"/>
+                <text x="50" y="65" font-family="Arial Black, sans-serif" font-size="45" font-weight="900" fill="#FFB800" text-anchor="middle">T</text>
+                <path d="M 20 75 Q 50 85 80 75" stroke="#FFB800" stroke-width="2" fill="none"/>
+            </svg>
             <div class="logo-text">TopCompSports</div>
         </div>
         <nav class="nav">
@@ -568,7 +596,9 @@
                 </div>
             </div>
             <div class="hero-image">
-                <div class="hero-image-placeholder">🥋</div>
+                <!-- صورة حقيقية بدلاً من البدلة الحمراء -->
+                <img src="https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800&q=80" alt="Jiu-Jitsu Competition">
+                <div class="hero-image-overlay"></div>
             </div>
         </div>
     </section>
@@ -762,7 +792,7 @@
         };
 
         // ===== Language Switcher - English is default =====
-        let currentLang = localStorage.getItem('lang') || 'en'; // English is default
+        let currentLang = localStorage.getItem('lang') || 'en';
 
         function changeLang(lang) {
             currentLang = lang;
@@ -776,7 +806,7 @@
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
             document.documentElement.lang = lang;
             
-            // Update all texts
+            // Update all texts - FIX: use innerHTML for all to support HTML tags
             document.querySelectorAll('[data-i18n]').forEach(element => {
                 const key = element.getAttribute('data-i18n');
                 if (translations[lang][key]) {
@@ -830,12 +860,12 @@
                     
                     return `
                         <div class="tournament-card">
-                            <div class="tournament-banner"></div>
+                            <div class="tournament-banner">🏆</div>
                             <div class="tournament-content">
                                 <h3>${t.name}</h3>
                                 <div class="tournament-meta">
                                     <div>📅 ${translations[currentLang].date}: ${formattedDate}</div>
-                                    <div>📍 ${translations[currentLang].location}: ${t.location || 'TBD'}</div>
+                                    <div> ${translations[currentLang].location}: ${t.location || 'TBD'}</div>
                                 </div>
                                 <div class="tournament-actions">
                                     <a href="tournament-details.html?tournament_id=${t.id}" class="btn btn-primary">${translations[currentLang].details}</a>
