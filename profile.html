@@ -193,6 +193,7 @@
         .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
         .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
         .alert-warning { background: rgba(245,158,11,0.2); border: 1px solid #f59e0b; color: #f59e0b; }
+        .alert-info { background: rgba(14,165,233,0.2); border: 1px solid #0ea5e9; color: #0ea5e9; }
 
         .loading-overlay {
             position: fixed;
@@ -246,12 +247,11 @@
 
         <div id="alert" class="alert"></div>
 
-        <!-- Profile Picture -->
         <div class="upload-section">
             <div class="section-title">📷 Profile Picture <span class="optional-badge">Optional</span></div>
             <div class="profile-pic-section">
                 <div class="profile-pic-container" id="profilePicContainer">
-                    <div class="placeholder"></div>
+                    <div class="placeholder">👤</div>
                 </div>
                 <button type="button" class="upload-btn" onclick="document.getElementById('profilePic').click()">
                     📷 Upload Photo
@@ -261,7 +261,6 @@
             </div>
         </div>
 
-        <!-- Documents -->
         <div class="upload-section">
             <div class="section-title">📄 Identity Document <span class="optional-badge">Optional</span></div>
             <div class="document-upload" id="idCardUpload">
@@ -280,12 +279,11 @@
             ✅ Save & Continue to Dashboard
         </button>
         <button type="button" class="btn btn-skip" onclick="skipAndContinue()">
-            ⏭️ Skip - Go to Dashboard
+            ️ Skip - Go to Dashboard
         </button>
     </div>
 
     <script>
-        // ===== Supabase Setup =====
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -294,7 +292,6 @@
         let profilePictureFile = null;
         let documentFile = null;
 
-        // ===== Check Auth on Load =====
         window.onload = async function() {
             console.log('Page loaded, checking auth...');
             
@@ -313,19 +310,32 @@
                 currentUser = user;
                 console.log('✅ User authenticated:', user.email);
                 
-                // Display user info
                 document.getElementById('userEmail').textContent = user.email;
                 document.getElementById('userName').textContent = user.user_metadata?.full_name || 'Welcome!';
 
-                // Load existing profile data
                 await loadExistingProfile();
+
+                // Check if profile is already complete
+                const { data: profile } = await dbClient
+                    .from('users')
+                    .select('*')
+                    .eq('id', user.id)
+                    .maybeSingle();
+
+                if (profile && profile.full_name && profile.date_of_birth && profile.gender) {
+                    console.log('Profile already complete, redirecting to dashboard...');
+                    showAlert('info', '✅ Your profile is already complete. Redirecting to dashboard...');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 2000);
+                }
+
             } catch (err) {
                 console.error('Initialization error:', err);
                 showAlert('error', '❌ Error loading page: ' + err.message);
             }
         };
 
-        // ===== Load Existing Profile =====
         async function loadExistingProfile() {
             try {
                 console.log('Loading profile for:', currentUser.id);
@@ -343,12 +353,10 @@
                 if (profile) {
                     console.log('Profile loaded:', profile);
                     
-                    // Load profile picture if exists
                     if (profile.profile_picture_url) {
                         loadProfilePicture(profile.profile_picture_url);
                     }
 
-                    // Show if document exists
                     if (profile.id_document_url) {
                         document.getElementById('idCardFileName').textContent = 'Document already uploaded ✓';
                         document.getElementById('idCardUpload').classList.add('has-file');
@@ -359,7 +367,6 @@
             }
         }
 
-        // ===== Handle Profile Picture Upload =====
         async function handleProfilePicUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -371,7 +378,6 @@
 
             profilePictureFile = file;
             
-            // Show preview
             const reader = new FileReader();
             reader.onload = function(e) {
                 loadProfilePicture(e.target.result);
@@ -381,13 +387,11 @@
             showAlert('success', '✅ Photo selected successfully');
         }
 
-        // ===== Load Profile Picture =====
         function loadProfilePicture(url) {
             const container = document.getElementById('profilePicContainer');
             container.innerHTML = `<img src="${url}" alt="Profile Picture">`;
         }
 
-        // ===== Handle Document Upload =====
         function handleDocumentUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -403,7 +407,6 @@
             event.target.closest('.document-upload').classList.add('has-file');
         }
 
-        // ===== Save and Continue =====
         async function saveAndContinue() {
             const saveBtn = document.getElementById('saveBtn');
             const loadingOverlay = document.getElementById('loadingOverlay');
@@ -421,7 +424,6 @@
                     updated_at: new Date().toISOString()
                 };
 
-                // Upload profile picture if selected (optional - won't fail if error)
                 if (profilePictureFile) {
                     try {
                         console.log('Uploading profile picture...');
@@ -433,8 +435,8 @@
                             .upload(fileName, profilePictureFile, { upsert: true });
 
                         if (uploadError) {
-                            console.warn('️ Upload failed, continuing without picture:', uploadError.message);
-                            showAlert('warning', '️ Could not upload photo, but you can continue.');
+                            console.warn('⚠️ Upload failed, continuing without picture:', uploadError.message);
+                            showAlert('warning', '⚠️ Could not upload photo, but you can continue.');
                         } else {
                             const { data: { publicUrl } } = dbClient.storage
                                 .from('profiles')
@@ -443,11 +445,10 @@
                             console.log('✅ Profile picture uploaded');
                         }
                     } catch (picError) {
-                        console.warn('️ Profile picture upload failed, continuing:', picError.message);
+                        console.warn('⚠️ Profile picture upload failed:', picError.message);
                     }
                 }
 
-                // Upload document if selected (optional - won't fail if error)
                 if (documentFile) {
                     try {
                         console.log('Uploading document...');
@@ -459,7 +460,7 @@
                             .upload(fileName, documentFile, { upsert: true });
 
                         if (docError) {
-                            console.warn('⚠️ Document upload failed, continuing:', docError.message);
+                            console.warn('⚠️ Document upload failed:', docError.message);
                             showAlert('warning', '⚠️ Could not upload document, but you can continue.');
                         } else {
                             const { data: { publicUrl } } = dbClient.storage
@@ -469,24 +470,22 @@
                             console.log('✅ Document uploaded');
                         }
                     } catch (docError) {
-                        console.warn('⚠️ Document upload failed, continuing:', docError.message);
+                        console.warn('⚠️ Document upload failed:', docError.message);
                     }
                 }
 
-                // Update profile in database
                 console.log('Updating profile in database...');
                 const { data: upsertData, error: upsertError } = await dbClient
                     .from('users')
                     .upsert(profileData, { onConflict: 'id' });
 
                 if (upsertError) {
-                    console.error(' Database update failed:', upsertError);
-                    showAlert('warning', '⚠️ Could not save to database, but you can continue.');
+                    console.error('❌ Database update failed:', upsertError);
+                    showAlert('warning', '️ Could not save to database, but you can continue.');
                 } else {
                     console.log('✅ Profile saved successfully');
                 }
 
-                // Update localStorage with user data
                 const userData = {
                     id: currentUser.id,
                     email: currentUser.email,
@@ -501,29 +500,25 @@
 
                 showAlert('success', '✅ Ready! Redirecting to dashboard...');
                 
-                // ALWAYS redirect, even if there were errors
                 setTimeout(() => {
-                    console.log(' Redirecting to index.html...');
-                    window.location.href = 'index.html';
+                    console.log('🚀 Redirecting to dashboard.html...');
+                    window.location.href = 'dashboard.html';
                 }, 1500);
 
             } catch (error) {
                 console.error('❌ Unexpected error:', error);
-                // Still redirect even on error
-                showAlert('warning', '⚠️ Some operations failed, but you can continue.');
+                showAlert('warning', '️ Some operations failed, but you can continue.');
                 setTimeout(() => {
-                    window.location.href = 'index.html';
+                    window.location.href = 'dashboard.html';
                 }, 2000);
             } finally {
                 loadingOverlay.classList.remove('show');
             }
         }
 
-        // ===== Skip and Continue =====
         function skipAndContinue() {
             console.log('⏭️ Skipping profile completion...');
             
-            // Update localStorage
             const userData = {
                 id: currentUser.id,
                 email: currentUser.email,
@@ -535,16 +530,13 @@
             localStorage.setItem('currentUser', JSON.stringify(userData));
             console.log('✅ User data saved to localStorage');
             
-            // Show loading
             document.getElementById('loadingOverlay').classList.add('show');
             
-            // Redirect immediately
             setTimeout(() => {
-                window.location.href = 'index.html';
+                window.location.href = 'dashboard.html';
             }, 500);
         }
 
-        // ===== Show Alert =====
         function showAlert(type, message) {
             const alert = document.getElementById('alert');
             alert.className = `alert alert-${type} show`;
