@@ -39,6 +39,17 @@
         .header h1 { font-size: 2.5rem; margin-bottom: 10px; color: var(--accent-yellow); }
         .header p { color: rgba(255,255,255,0.7); }
 
+        .profile-complete-banner {
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-complete-banner h2 { font-size: 1.8rem; margin-bottom: 10px; }
+        .profile-complete-banner p { color: rgba(255,255,255,0.9); }
+
         .profile-pic-section {
             text-align: center;
             margin-bottom: 40px;
@@ -83,7 +94,6 @@
         }
 
         .upload-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.4); }
-        .upload-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .form-section {
             background: var(--black);
@@ -98,6 +108,9 @@
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid var(--medium-gray);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .form-row {
@@ -109,6 +122,7 @@
 
         .form-group { margin-bottom: 20px; }
         .form-label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; color: rgba(255,255,255,0.8); }
+        
         .form-input, .form-select {
             width: 100%;
             background: var(--dark-gray);
@@ -119,8 +133,29 @@
             font-size: 1rem;
             transition: all 0.3s;
         }
-        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary-blue); }
-        .form-input:read-only { background: var(--medium-gray); cursor: not-allowed; }
+
+        .form-input:read-only, .form-select:disabled {
+            background: var(--medium-gray);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .form-input.completed {
+            border-color: #10b981;
+            background: rgba(16,185,129,0.1);
+        }
+
+        .field-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .field-status.completed { background: rgba(16,185,129,0.2); color: #10b981; }
+        .field-status.pending { background: rgba(245,158,11,0.2); color: #f59e0b; }
 
         .document-upload {
             background: var(--dark-gray);
@@ -132,11 +167,12 @@
             transition: all 0.3s;
         }
 
-        .document-upload:hover { border-color: var(--primary-blue); }
-        .document-upload.has-file { border-color: var(--accent-yellow); background: rgba(255,184,0,0.05); }
+        .document-upload.has-file { 
+            border-color: #10b981; 
+            background: rgba(16,185,129,0.05); 
+        }
 
         .document-upload input[type="file"] { display: none; }
-
         .upload-label { cursor: pointer; display: block; }
         .upload-icon { font-size: 40px; margin-bottom: 10px; }
         .file-name { color: var(--accent-yellow); font-weight: 600; margin-top: 10px; font-size: 0.9rem; }
@@ -155,16 +191,32 @@
 
         .btn-primary { background: var(--gradient-blue); color: var(--white); }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
-        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
+        
         .btn-secondary { background: transparent; border: 2px solid var(--white); color: var(--white); margin-top: 10px; }
         .btn-secondary:hover { background: var(--white); color: var(--black); }
+
+        .btn-success { background: #10b981; color: var(--white); }
+        .btn-success:hover { background: #059669; }
 
         .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
         .alert.show { display: block; }
         .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
         .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
-        .alert-warning { background: rgba(245,158,11,0.2); border: 1px solid #f59e0b; color: #f59e0b; }
+        .alert-info { background: rgba(14,165,233,0.2); border: 1px solid #0ea5e9; color: #0ea5e9; }
+
+        .edit-section-btn {
+            background: transparent;
+            border: 1px solid var(--accent-yellow);
+            color: var(--accent-yellow);
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-left: 15px;
+            transition: all 0.3s;
+        }
+
+        .edit-section-btn:hover { background: var(--accent-yellow); color: var(--black); }
 
         @media (max-width: 768px) {
             .container { padding: 30px 20px; }
@@ -176,11 +228,17 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Complete Your Profile</h1>
-            <p>Please fill in your information and upload required documents</p>
+            <h1>Your Profile</h1>
+            <p>Manage your personal information</p>
         </div>
 
         <div id="alert" class="alert"></div>
+
+        <!-- Profile Complete Banner (يظهر إذا البروفايل مكتمل) -->
+        <div id="profileCompleteBanner" class="profile-complete-banner" style="display: none;">
+            <h2>✅ Profile Complete!</h2>
+            <p>Your profile information is up to date</p>
+        </div>
 
         <!-- Profile Picture -->
         <div class="profile-pic-section">
@@ -197,27 +255,30 @@
         <form id="profileForm" onsubmit="handleProfileSubmit(event)">
             <!-- Personal Information -->
             <div class="form-section">
-                <div class="section-title">👤 Personal Information</div>
+                <div class="section-title">
+                    👤 Personal Information
+                    <button type="button" class="edit-section-btn" id="editPersonalBtn" onclick="toggleEdit('personal')">Edit</button>
+                </div>
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Full Name *</label>
-                        <input type="text" class="form-input" id="fullName" required placeholder="Enter your full name">
+                        <label class="form-label">Full Name <span class="field-status pending" id="nameStatus">Required</span></label>
+                        <input type="text" class="form-input" id="fullName" placeholder="Enter your full name">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Email *</label>
+                        <label class="form-label">Email</label>
                         <input type="email" class="form-input" id="email" readonly>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Date of Birth *</label>
-                        <input type="date" class="form-input" id="dateOfBirth" required>
+                        <label class="form-label">Date of Birth <span class="field-status pending" id="dobStatus">Required</span></label>
+                        <input type="date" class="form-input" id="dateOfBirth">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Gender *</label>
-                        <select class="form-select" id="gender" required>
+                        <label class="form-label">Gender <span class="field-status pending" id="genderStatus">Required</span></label>
+                        <select class="form-select" id="gender">
                             <option value="">Select gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
@@ -240,8 +301,11 @@
 
             <!-- Documents -->
             <div class="form-section">
-                <div class="section-title">📄 Required Documents (Optional)</div>
-                <p style="color: rgba(255,255,255,0.6); margin-bottom: 20px;">Upload ID Card / Passport / Birth Certificate for verification</p>
+                <div class="section-title">
+                    📄 Documents
+                    <button type="button" class="edit-section-btn" id="editDocsBtn" onclick="toggleEdit('docs')">Edit</button>
+                </div>
+                <p style="color: rgba(255,255,255,0.6); margin-bottom: 20px;">Upload ID Card / Passport / Birth Certificate (Optional)</p>
 
                 <div class="document-upload" id="idCardUpload">
                     <label for="idCard" class="upload-label">
@@ -253,13 +317,12 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="submitBtn">💾 Save Profile & Continue</button>
-            <button type="button" class="btn btn-secondary" onclick="skipProfile()">️ Skip for now</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">💾 Save Changes</button>
+            <button type="button" class="btn btn-success" id="continueBtn" onclick="continueToDashboard()" style="display: none;">Continue to Dashboard →</button>
         </form>
     </div>
 
     <script>
-        // ===== Supabase Setup =====
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -267,14 +330,14 @@
         let currentUser = null;
         let uploadedDocuments = {};
         let profilePictureFile = null;
+        let isEditMode = { personal: false, docs: false };
 
         // ===== Check Auth on Load =====
         window.onload = async function() {
             const { data: { user }, error } = await dbClient.auth.getUser();
             
             if (error || !user) {
-                console.error('Auth error:', error);
-                showAlert('error', '❌ You must be logged in to access this page.');
+                showAlert('error', '❌ You must be logged in.');
                 setTimeout(() => window.location.href = 'login.html', 2000);
                 return;
             }
@@ -282,53 +345,107 @@
             currentUser = user;
             document.getElementById('email').value = user.email;
 
-            // Load existing profile
-            await loadUserProfile();
+            // Load and display profile
+            await loadAndDisplayProfile();
         };
 
-        // ===== Load User Profile =====
-        async function loadUserProfile() {
+        // ===== Load and Display Profile =====
+        async function loadAndDisplayProfile() {
             try {
-                console.log('Loading profile for user:', currentUser.id);
-                
                 const { data: profile, error } = await dbClient
                     .from('users')
                     .select('*')
                     .eq('id', currentUser.id)
                     .maybeSingle();
 
-                if (error) {
-                    console.error('Load profile error:', error);
-                    showAlert('warning', '⚠️ Could not load existing profile. Please fill in your information.');
-                    return;
-                }
+                if (error) throw error;
 
                 if (profile) {
-                    console.log('Profile loaded:', profile);
-                    
-                    // Fill in the form
+                    // Fill in all fields
                     document.getElementById('fullName').value = profile.full_name || '';
                     document.getElementById('dateOfBirth').value = profile.date_of_birth || '';
                     document.getElementById('gender').value = profile.gender || '';
                     document.getElementById('country').value = profile.country || '';
                     document.getElementById('phone').value = profile.phone || '';
 
-                    // Load profile picture if exists
+                    // Mark as completed and disable
+                    if (profile.full_name) markFieldAsCompleted('fullName', 'nameStatus');
+                    if (profile.date_of_birth) markFieldAsCompleted('dateOfBirth', 'dobStatus');
+                    if (profile.gender) markFieldAsCompleted('gender', 'genderStatus');
+
+                    // Disable fields that are completed
+                    disableCompletedFields();
+
+                    // Load profile picture
                     if (profile.profile_picture_url) {
                         loadProfilePicture(profile.profile_picture_url);
                     }
 
                     // Check if document exists
                     if (profile.id_document_url) {
-                        document.getElementById('idCardFileName').textContent = 'Document already uploaded ✓';
+                        document.getElementById('idCardFileName').textContent = 'Document uploaded ✓';
                         document.getElementById('idCardUpload').classList.add('has-file');
+                        document.getElementById('idCard').disabled = true;
                     }
-                } else {
-                    console.log('No existing profile found');
+
+                    // Check if profile is complete
+                    if (profile.full_name && profile.date_of_birth && profile.gender) {
+                        showProfileCompleteBanner();
+                    }
                 }
             } catch (error) {
-                console.error('Load profile error:', error);
-                showAlert('warning', '⚠️ Could not load existing profile.');
+                console.error('Load error:', error);
+                showAlert('warning', '⚠️ Could not load profile data.');
+            }
+        }
+
+        // ===== Mark Field as Completed =====
+        function markFieldAsCompleted(fieldId, statusId) {
+            const field = document.getElementById(fieldId);
+            const status = document.getElementById(statusId);
+            
+            field.classList.add('completed');
+            field.readOnly = true;
+            
+            if (status) {
+                status.textContent = 'Completed ✓';
+                status.className = 'field-status completed';
+            }
+        }
+
+        // ===== Disable Completed Fields =====
+        function disableCompletedFields() {
+            const fields = ['fullName', 'dateOfBirth', 'gender', 'country', 'phone'];
+            fields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field.value) {
+                    field.disabled = true;
+                }
+            });
+        }
+
+        // ===== Show Profile Complete Banner =====
+        function showProfileCompleteBanner() {
+            document.getElementById('profileCompleteBanner').style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('continueBtn').style.display = 'block';
+        }
+
+        // ===== Toggle Edit Mode =====
+        function toggleEdit(section) {
+            isEditMode[section] = !isEditMode[section];
+            
+            if (section === 'personal') {
+                const fields = ['fullName', 'dateOfBirth', 'gender', 'country', 'phone'];
+                fields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    field.disabled = isEditMode.personal;
+                });
+                
+                document.getElementById('editPersonalBtn').textContent = isEditMode.personal ? 'Save' : 'Edit';
+            } else if (section === 'docs') {
+                document.getElementById('idCard').disabled = !isEditMode.docs;
+                document.getElementById('editDocsBtn').textContent = isEditMode.docs ? 'Save' : 'Edit';
             }
         }
 
@@ -344,14 +461,13 @@
 
             profilePictureFile = file;
             
-            // Show preview
             const reader = new FileReader();
             reader.onload = function(e) {
                 loadProfilePicture(e.target.result);
             };
             reader.readAsDataURL(file);
 
-            showAlert('success', '✅ Profile picture selected. It will be saved with your profile.');
+            showAlert('success', '✅ Picture selected. Click Save to upload.');
         }
 
         // ===== Load Profile Picture =====
@@ -407,19 +523,14 @@
                             .from('profiles')
                             .upload(fileName, profilePictureFile, { upsert: true });
 
-                        if (uploadError) {
-                            console.error('Profile pic upload error:', uploadError);
-                            // Continue anyway
-                        } else {
+                        if (!uploadError) {
                             const { data: { publicUrl } } = dbClient.storage
                                 .from('profiles')
                                 .getPublicUrl(fileName);
-                            
                             profileData.profile_picture_url = publicUrl;
                         }
                     } catch (picError) {
-                        console.error('Profile picture error:', picError);
-                        // Continue without picture
+                        console.error('Profile pic error:', picError);
                     }
                 }
 
@@ -433,63 +544,47 @@
                             .from('documents')
                             .upload(fileName, uploadedDocuments.idCard, { upsert: true });
 
-                        if (docError) {
-                            console.error('Document upload error:', docError);
-                            // Continue anyway
-                        } else {
+                        if (!docError) {
                             const { data: { publicUrl } } = dbClient.storage
                                 .from('documents')
                                 .getPublicUrl(fileName);
-                            
                             profileData.id_document_url = publicUrl;
                         }
                     } catch (docError) {
                         console.error('Document error:', docError);
-                        // Continue without document
                     }
                 }
 
-                // Upsert profile (insert or update)
+                // Upsert profile
                 const { error: upsertError } = await dbClient
                     .from('users')
                     .upsert(profileData, { onConflict: 'id' });
 
                 if (upsertError) throw upsertError;
 
-                showAlert('success', '✅ Profile saved successfully! Redirecting...');
+                showAlert('success', '✅ Profile saved successfully!');
                 
-                // Update localStorage
-                localStorage.setItem('currentUser', JSON.stringify({
-                    id: currentUser.id,
-                    email: currentUser.email,
-                    full_name: profileData.full_name,
-                    user_type: 'athlete',
-                    profile_complete: true
-                }));
-
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 2000);
+                // Reload profile
+                await loadAndDisplayProfile();
+                
+                // Reset edit mode
+                isEditMode.personal = false;
+                isEditMode.docs = false;
+                document.getElementById('editPersonalBtn').textContent = 'Edit';
+                document.getElementById('editDocsBtn').textContent = 'Edit';
 
             } catch (error) {
                 console.error('Save error:', error);
-                showAlert('error', '❌ Error saving profile: ' + error.message);
-                submitBtn.disabled = false;
-                submitBtn.textContent = '💾 Save Profile & Continue';
+                showAlert('error', '❌ Error saving: ' + error.message);
             }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = '💾 Save Changes';
         }
 
-        // ===== Skip Profile =====
-        function skipProfile() {
-            if (confirm('Are you sure you want to skip? You can complete your profile later from your account settings.')) {
-                // Save minimal data
-                localStorage.setItem('currentUser', JSON.stringify({
-                    id: currentUser.id,
-                    email: currentUser.email,
-                    profile_complete: false
-                }));
-                window.location.href = 'index.html';
-            }
+        // ===== Continue to Dashboard =====
+        function continueToDashboard() {
+            window.location.href = 'index.html';
         }
 
         // ===== Show Alert =====
