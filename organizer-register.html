@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Become an Organizer - TopCompSports</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-blue: #0066CC; --dark-blue: #003366; --accent-yellow: #FFB800;
+            --black: #0A0A0A; --dark-gray: #1A1A1A; --medium-gray: #2A2A2A; --white: #FFFFFF;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--gradient-blue); color: var(--white); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .container { max-width: 600px; width: 100%; background: var(--dark-gray); border-radius: 20px; padding: 40px; border: 2px solid var(--medium-gray); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header-icon { font-size: 4rem; margin-bottom: 15px; }
+        .header h1 { font-size: 2rem; margin-bottom: 15px; color: var(--accent-yellow); }
+        .header p { color: rgba(255,255,255,0.8); font-size: 1.1rem; line-height: 1.6; }
+        .alert-box { background: rgba(255,184,0,0.1); border: 2px solid var(--accent-yellow); border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: center; }
+        .alert-box .icon { font-size: 2rem; margin-bottom: 10px; }
+        .alert-box h3 { color: var(--accent-yellow); margin-bottom: 10px; }
+        .alert-box p { color: rgba(255,255,255,0.8); font-size: 0.95rem; }
+        .user-info-box { background: var(--black); padding: 20px; border-radius: 12px; margin-bottom: 25px; text-align: center; border: 2px solid var(--primary-blue); }
+        .user-info-box h3 { color: var(--accent-yellow); margin-bottom: 5px; }
+        .user-info-box p { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
+        .form-input { width: 100%; background: var(--black); border: 2px solid var(--medium-gray); color: var(--white); padding: 14px 16px; border-radius: 10px; font-size: 1rem; }
+        .form-input:focus { outline: none; border-color: var(--accent-yellow); }
+        .form-input:read-only { background: var(--medium-gray); cursor: not-allowed; opacity: 0.7; }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1.05rem; margin-top: 15px; text-decoration: none; display: block; text-align: center; }
+        .btn-primary { background: var(--accent-yellow); color: var(--black); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,184,0,0.4); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-secondary { background: transparent; border: 2px solid var(--white); color: var(--white); }
+        .btn-secondary:hover { background: var(--white); color: var(--black); }
+        .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
+        .alert.show { display: block; }
+        .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
+        .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
+        @media (max-width: 768px) { .container { padding: 30px 20px; } .header h1 { font-size: 1.5rem; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">🏆</div>
+            <h1>Become an Organizer</h1>
+            <p>Join our community of tournament organizers and create amazing competitions</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <div class="alert-box">
+            <div class="icon">⚠️</div>
+            <h3>Organizers Only</h3>
+            <p>Only registered organizers can create and manage tournaments on TopCompSports. Please complete the form below to apply.</p>
+        </div>
+
+        <div id="userInfoBox" class="user-info-box" style="display: none;">
+            <h3 id="currentUserName">User</h3>
+            <p id="currentUserEmail">email@example.com</p>
+            <p style="margin-top: 10px; font-size: 0.85rem; color: var(--accent-yellow);">Upgrade your account to Organizer</p>
+        </div>
+
+        <form id="organizerForm" onsubmit="handleOrganizerRegister(event)">
+            <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" class="form-input" id="fullName" required placeholder="Your full name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Organization / Club Name *</label>
+                <input type="text" class="form-input" id="orgName" required placeholder="Your organization name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email *</label>
+                <input type="email" class="form-input" id="email" required placeholder="your.email@example.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Phone Number *</label>
+                <input type="tel" class="form-input" id="phone" required placeholder="+1 (234) 567-8900">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Experience in Organizing Tournaments</label>
+                <select class="form-input" id="experience">
+                    <option value="none">No experience</option>
+                    <option value="beginner">Beginner (1-2 events)</option>
+                    <option value="intermediate">Intermediate (3-10 events)</option>
+                    <option value="advanced">Advanced (10+ events)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Why do you want to be an organizer?</label>
+                <textarea class="form-input" id="reason" rows="3" placeholder="Tell us about your goals..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" id="submitBtn">🚀 Apply as Organizer</button>
+        </form>
+
+        <button class="btn btn-secondary" onclick="window.location.href='index.html'">← Back to Home</button>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let currentUser = null;
+
+        window.onload = async function() {
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                try {
+                    const userData = JSON.parse(storedUser);
+                    currentUser = userData;
+                    document.getElementById('userInfoBox').style.display = 'block';
+                    document.getElementById('currentUserName').textContent = userData.full_name || 'User';
+                    document.getElementById('currentUserEmail').textContent = userData.email;
+                    document.getElementById('fullName').value = userData.full_name || '';
+                    document.getElementById('email').value = userData.email || '';
+                    document.getElementById('fullName').readOnly = true;
+                    document.getElementById('email').readOnly = true;
+                } catch (e) { console.error('Error:', e); }
+            }
+        };
+
+        async function handleOrganizerRegister(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                const organizerData = {
+                    full_name: document.getElementById('fullName').value.trim(),
+                    org_name: document.getElementById('orgName').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    phone: document.getElementById('phone').value.trim(),
+                    experience: document.getElementById('experience').value,
+                    reason: document.getElementById('reason').value.trim(),
+                    user_type: 'organizer',
+                    status: 'pending',
+                    created_at: new Date().toISOString()
+                };
+
+                if (currentUser) {
+                    const { error } = await dbClient.from('users').update({
+                        user_type: 'organizer', org_name: organizerData.org_name, phone: organizerData.phone, experience: organizerData.experience
+                    }).eq('id', currentUser.id);
+                    if (error) throw error;
+                    currentUser.user_type = 'organizer';
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showAlert('success', '✅ Your account has been upgraded to Organizer!');
+                    setTimeout(() => { window.location.href = 'organizer-dashboard.html'; }, 2000);
+                } else {
+                    const { error } = await dbClient.from('organizer_applications').insert([organizerData]);
+                    if (error) throw error;
+                    showAlert('success', '✅ Application submitted! We will review it and contact you soon.');
+                    setTimeout(() => { window.location.href = 'signup.html?apply=organizer'; }, 2500);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('error', '❌ Error: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Apply as Organizer';
+            }
+        }
+
+        function showAlert(type, message) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+    </script>
+</body>
+</html>
