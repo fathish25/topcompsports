@@ -138,17 +138,17 @@
     </div>
 
     <script>
-        // ===== Supabase Setup =====
+        // ===== Supabase Setup - تعريف واحد فقط =====
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ===== Show Alert =====
         function showAlert(type, message) {
             const alert = document.getElementById('alert');
-            alert.className = `alert alert-${type} show`;
+            alert.className = 'alert alert-' + type + ' show';
             alert.textContent = message;
-            setTimeout(() => alert.classList.remove('show'), 6000);
+            setTimeout(function() { alert.classList.remove('show'); }, 6000);
         }
 
         // ===== Handle Login =====
@@ -164,65 +164,64 @@
 
             try {
                 // 1. Sign in with Supabase Auth
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const result = await client.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
 
-                if (error) {
-                    if (error.message.includes('Email not confirmed')) {
-                        showAlert('info', '📧 Please check your email and confirm your account before signing in.');
-                    } else if (error.message.includes('Invalid login credentials')) {
+                if (result.error) {
+                    if (result.error.message.includes('Email not confirmed')) {
+                        showAlert('info', ' Please check your email and confirm your account before signing in.');
+                    } else if (result.error.message.includes('Invalid login credentials')) {
                         showAlert('error', '❌ Invalid email or password. Please try again.');
                     } else {
-                        showAlert('error', '❌ ' + error.message);
+                        showAlert('error', '❌ ' + result.error.message);
                     }
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Sign In →';
                     return;
                 }
 
-                console.log('✅ Login successful! User ID:', data.user.id);
+                console.log('✅ Login successful! User ID:', result.data.user.id);
 
-                // 2. Get user profile from database (any type: athlete, coach, or organizer)
-                const { data: userProfile, error: profileError } = await supabase
+                // 2. Get user profile from database
+                const profileResult = await client
                     .from('users')
                     .select('*')
-                    .eq('id', data.user.id)
+                    .eq('id', result.data.user.id)
                     .maybeSingle();
 
+                let userProfile = profileResult.data;
+
                 // 3. If profile doesn't exist, create it automatically
-                if (!userProfile || profileError) {
+                if (!userProfile) {
                     console.log('⚠️ Profile not found, creating one...');
                     
-                    const { data: newProfile, error: createError } = await supabase
+                    const createResult = await client
                         .from('users')
                         .insert([{
-                            id: data.user.id,
+                            id: result.data.user.id,
                             email: email,
-                            full_name: data.user.user_metadata?.full_name || email.split('@')[0],
-                            user_type: data.user.user_metadata?.user_type || 'athlete',
-                            email_confirmed: data.user.email_confirmed_at ? true : false,
+                            full_name: result.data.user.user_metadata?.full_name || email.split('@')[0],
+                            user_type: result.data.user.user_metadata?.user_type || 'athlete',
+                            email_confirmed: result.data.user.email_confirmed_at ? true : false,
                             created_at: new Date().toISOString()
                         }])
                         .select()
                         .single();
 
-                    if (createError) {
-                        console.error('Create profile error:', createError);
+                    if (createResult.error) {
+                        console.error('Create profile error:', createResult.error);
                         showAlert('error', '❌ Could not create user profile. Please contact support.');
                         submitBtn.disabled = false;
                         submitBtn.textContent = 'Sign In →';
                         return;
                     }
 
-                    // Use the newly created profile
-                    const finalProfile = newProfile;
-                    redirectToDashboard(finalProfile);
-                    return;
+                    userProfile = createResult.data;
                 }
 
-                // 4. Profile exists, redirect based on user type
+                // 4. Redirect based on user type
                 redirectToDashboard(userProfile);
 
             } catch (error) {
@@ -233,7 +232,7 @@
             }
         }
 
-        // ===== Redirect to Dashboard Based on User Type =====
+        // ===== Redirect to Dashboard =====
         function redirectToDashboard(userProfile) {
             const userType = userProfile.user_type || 'athlete';
             
@@ -247,13 +246,10 @@
 
             showAlert('success', '✅ Login successful! Redirecting...');
 
-            setTimeout(() => {
+            setTimeout(function() {
                 if (userType === 'organizer') {
                     window.location.href = 'organizer-dashboard.html';
-                } else if (userType === 'coach') {
-                    window.location.href = 'index.html';
                 } else {
-                    // athlete or any other type
                     window.location.href = 'index.html';
                 }
             }, 1500);
@@ -265,7 +261,7 @@
             
             if (urlParams.get('needsConfirmation') === 'true') {
                 const email = urlParams.get('email') || '';
-                showAlert('info', ` Account created! Please check your email${email ? ' (' + email + ')' : ''} and click the confirmation link.`);
+                showAlert('info', '📧 Account created! Please check your email' + (email ? ' (' + email + ')' : '') + ' and click the confirmation link.');
             }
             
             if (urlParams.get('confirmed') === 'true') {
