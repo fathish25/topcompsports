@@ -50,7 +50,6 @@
         .alert-info { background: rgba(14, 165, 233, 0.2); border: 1px solid #0ea5e9; color: #0ea5e9; }
         .alert.show { display: block; }
         
-        /* Modal & Match Styles */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .modal-overlay.show { display: flex; }
         .modal { background: #151d2b; border-radius: 16px; padding: 30px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; border: 2px solid #f1c40f; }
@@ -205,25 +204,19 @@
 
         <!-- Step 2: Mats Setup -->
         <div id="matsSection" class="section hidden">
-            <h2 class="section-title">🥋 Mats Setup</h2>
+            <h2 class="section-title">🥋 Mats Setup - Configure Tournament Mats</h2>
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label">Number of Mats</label>
-                    <select class="form-select" id="numberOfMats" onchange="generateMats()">
-                        <option value="1">1 Mat</option><option value="2">2 Mats</option><option value="3">3 Mats</option>
-                        <option value="4">4 Mats</option><option value="5">5 Mats</option><option value="6">6 Mats</option>
-                        <option value="7">7 Mats</option><option value="8">8 Mats</option>
+                    <select class="form-select" id="numberOfMats" onchange="updateMatsCount()">
+                        <!-- Will be populated by JS up to 32 -->
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Matches Per Mat</label>
-                    <input type="number" class="form-input" id="matchesPerMat" value="10" min="1" max="50">
-                </div>
             </div>
-            <div id="matsContainer" style="margin-top: 20px;"></div>
+            <div id="matsGrid" class="mats-grid" style="margin-top: 20px;"></div>
             <div style="margin-top: 30px; display: flex; gap: 10px;">
                 <button class="btn btn-back" onclick="showStep('players')">← Back to Players</button>
-                <button class="btn btn-primary" onclick="showStep('overview')">🏆 View Brackets →</button>
+                <button class="btn btn-primary" onclick="openMatOverviewInNewTab()">🏆 View Mats Overview (New Tab)</button>
             </div>
         </div>
 
@@ -348,8 +341,8 @@
         let currentBlueScore = 0;
         let timerInterval = null;
         let matchTime = 300;
+        let matsConfig = JSON.parse(sessionStorage.getItem('matsConfig') || '[]');
 
-        // AJP Official Data
         const AGE_GROUPS = {
             'Kids 1 (4-5 yrs)': { age: '4-5', fightTime: 2 },
             'Kids 2 (6-7 yrs)': { age: '6-7', fightTime: 2 },
@@ -408,17 +401,44 @@
 
         window.onload = async () => {
             const urlParams = new URLSearchParams(window.location.search);
+            const view = urlParams.get('view');
+            const matId = urlParams.get('matId');
+            
             tournamentId = urlParams.get('tournament_id');
-            if (!tournamentId) {
+            if (!tournamentId && view !== 'mat-view') {
                 showAlert('error', 'No tournament selected!');
                 setTimeout(() => window.location.href = 'organizer-dashboard.html', 2000);
                 return;
             }
+            
+            if (view === 'mat-view' && matId) {
+                renderMatViewPage(parseInt(matId));
+                return;
+            }
+
             await loadTournamentInfo();
             await loadTeams();
             await loadPlayers();
             updateWeightAndBeltOptions();
+            
+            initMatsDropdown();
+            if (matsConfig.length === 0) {
+                updateMatsCount();
+            } else {
+                renderMatsGrid();
+            }
         };
+
+        function initMatsDropdown() {
+            const select = document.getElementById('numberOfMats');
+            select.innerHTML = '';
+            for (let i = 1; i <= 32; i++) {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = `${i} Mat${i > 1 ? 's' : ''}`;
+                select.appendChild(opt);
+            }
+        }
 
         function updateWeightAndBeltOptions() {
             const ageGroup = document.getElementById('playerAge').value;
@@ -426,7 +446,6 @@
             const weightSelect = document.getElementById('playerWeight');
             const beltSelect = document.getElementById('playerBelt');
             
-            // Update weights
             weightSelect.innerHTML = '<option value="">Select Weight</option>';
             if (ageGroup && gender && WEIGHT_CLASSES[gender] && WEIGHT_CLASSES[gender][ageGroup]) {
                 WEIGHT_CLASSES[gender][ageGroup].forEach(w => {
@@ -434,7 +453,6 @@
                 });
             }
             
-            // Update belts
             beltSelect.innerHTML = '<option value="">Select Belt</option>';
             if (ageGroup) {
                 let beltCategory = 'Adult';
@@ -531,25 +549,68 @@
             row.className = 'bulk-row';
             row.innerHTML = `
                 <input type="text" placeholder="Player Name *" class="b-name">
-                <select class="b-team"><option value="TCS Player">TCS Player</option><option value="Free Player">Free Player</option></select>
-                <select class="b-age"><option value="Adult (18-29 yrs)">Adult</option><option value="Kids 1 (4-5 yrs)">Kids 1</option><option value="Kids 2 (6-7 yrs)">Kids 2</option><option value="Kids 3 (8-9 yrs)">Kids 3</option><option value="Infant (10-11 yrs)">Infant</option><option value="Junior (12-13 yrs)">Junior</option><option value="Teen (14-15 yrs)">Teen</option></select>
-                <select class="b-gender"><option value="Male">Male</option><option value="Female">Female</option></select>
-                <select class="b-weight">
-                    <option value="">Weight</option>
-                    <option value="16">16 kg</option><option value="20">20 kg</option><option value="25">25 kg</option><option value="30">30 kg</option>
-                    <option value="35">35 kg</option><option value="40">40 kg</option><option value="45">45 kg</option><option value="50">50 kg</option>
-                    <option value="55">55 kg</option><option value="60">60 kg</option><option value="65">65 kg</option><option value="70">70 kg</option>
-                    <option value="75">75 kg</option><option value="80">80 kg</option><option value="85">85 kg</option><option value="90">90 kg</option>
-                    <option value="95">95 kg</option><option value="100">100 kg</option><option value="100+">100+ kg</option>
+                <select class="b-team">
+                    <option value="TCS Player">TCS Player</option>
+                    <option value="Free Player">Free Player</option>
                 </select>
-                <select class="b-belt">
-                    <option value="">Belt</option><option value="White">White</option><option value="Grey">Grey</option>
-                    <option value="Yellow">Yellow</option><option value="Orange">Orange</option><option value="Green">Green</option>
-                    <option value="Blue">Blue</option><option value="Purple">Purple</option><option value="Brown">Brown</option><option value="Black">Black</option>
+                <select class="b-age" onchange="updateBulkRowOptions(this)">
+                    <option value="">Select Age</option>
+                    <option value="Kids 1 (4-5 yrs)">Kids 1 (4-5 yrs)</option>
+                    <option value="Kids 2 (6-7 yrs)">Kids 2 (6-7 yrs)</option>
+                    <option value="Kids 3 (8-9 yrs)">Kids 3 (8-9 yrs)</option>
+                    <option value="Infant (10-11 yrs)">Infant (10-11 yrs)</option>
+                    <option value="Junior (12-13 yrs)">Junior (12-13 yrs)</option>
+                    <option value="Teen (14-15 yrs)">Teen (14-15 yrs)</option>
+                    <option value="Youth (16-17 yrs)">Youth (16-17 yrs)</option>
+                    <option value="Adult (18-29 yrs)">Adult (18-29 yrs)</option>
+                    <option value="Amateur/Pro (18-29 yrs)">Amateur/Pro (18-29 yrs)</option>
+                    <option value="Master 1 (30-35 yrs)">Master 1 (30-35 yrs)</option>
+                    <option value="Master 2 (36-40 yrs)">Master 2 (36-40 yrs)</option>
+                    <option value="Master 3 (41-45 yrs)">Master 3 (41-45 yrs)</option>
+                    <option value="Master 4 (46+ yrs)">Master 4 (46+ yrs)</option>
                 </select>
+                <select class="b-gender" onchange="updateBulkRowOptions(this)">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+                <select class="b-weight"><option value="">Select Weight</option></select>
+                <select class="b-belt"><option value="">Select Belt</option></select>
                 <button class="remove-btn" onclick="this.parentElement.remove()">✕</button>
             `;
             container.appendChild(row);
+        }
+
+        function updateBulkRowOptions(selectElement) {
+            const row = selectElement.closest('.bulk-row');
+            const ageSelect = row.querySelector('.b-age');
+            const genderSelect = row.querySelector('.b-gender');
+            const weightSelect = row.querySelector('.b-weight');
+            const beltSelect = row.querySelector('.b-belt');
+            
+            const ageGroup = ageSelect.value;
+            const gender = genderSelect.value;
+            
+            if (!ageGroup || !gender) return;
+            
+            weightSelect.innerHTML = '<option value="">Select Weight</option>';
+            if (WEIGHT_CLASSES[gender] && WEIGHT_CLASSES[gender][ageGroup]) {
+                WEIGHT_CLASSES[gender][ageGroup].forEach(w => {
+                    weightSelect.innerHTML += `<option value="${w}">${w} kg</option>`;
+                });
+            }
+            
+            beltSelect.innerHTML = '<option value="">Select Belt</option>';
+            let beltCategory = 'Adult';
+            if (ageGroup.includes('Kids') || ageGroup.includes('Infant') || ageGroup.includes('Junior') || ageGroup.includes('Teen')) {
+                beltCategory = 'Kids';
+            } else if (ageGroup.includes('Youth')) {
+                beltCategory = 'Youth';
+            } else if (ageGroup.includes('Master')) {
+                beltCategory = 'Master';
+            }
+            BELT_LEVELS[beltCategory].forEach(b => {
+                beltSelect.innerHTML += `<option value="${b}">${b}</option>`;
+            });
         }
 
         async function saveBulkPlayers() {
@@ -642,7 +703,6 @@
             showAlert('success', '✅ Excel downloaded!');
         }
 
-        // ========== NAVIGATION ==========
         function showStep(step) {
             document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
@@ -654,7 +714,7 @@
                 if (players.length === 0) { showAlert('error', 'Add players first!'); return; }
                 document.getElementById('matsSection').classList.remove('hidden');
                 document.getElementById('step2').classList.add('active');
-                generateMats();
+                renderMatsGrid();
             } else if (step === 'overview') {
                 if (players.length === 0) { showAlert('error', 'Add players first!'); return; }
                 document.getElementById('overviewSection').classList.remove('hidden');
@@ -664,28 +724,163 @@
             }
         }
 
-        // ========== MATS ==========
-        function generateMats() {
-            const numMats = parseInt(document.getElementById('numberOfMats').value);
-            const matchesPerMat = parseInt(document.getElementById('matchesPerMat').value) || 10;
-            const container = document.getElementById('matsContainer');
+        // ========== MATS MANAGEMENT ==========
+        function updateMatsCount() {
+            const count = parseInt(document.getElementById('numberOfMats').value);
+            const existing = [...matsConfig];
+            matsConfig = [];
+            for (let i = 1; i <= count; i++) {
+                matsConfig.push(existing.find(m => m.id === i) || { id: i, weights: [], ageGroups: [], genders: [], belts: [] });
+            }
+            sessionStorage.setItem('matsConfig', JSON.stringify(matsConfig));
+            renderMatsGrid();
+        }
+
+        function renderMatsGrid() {
+            const grid = document.getElementById('matsGrid');
+            grid.innerHTML = '';
+            const uniqueWeights = [...new Set(players.map(p => p.weight).filter(Boolean))];
+            const uniqueAgeGroups = [...new Set(players.map(p => p.age_group).filter(Boolean))];
+            const uniqueGenders = [...new Set(players.map(p => p.gender).filter(Boolean))];
+            const uniqueBelts = [...new Set(players.map(p => p.belt_level).filter(Boolean))];
+
+            matsConfig.forEach(mat => {
+                const card = document.createElement('div');
+                card.className = 'mat-card';
+                card.style.textAlign = 'left';
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h3 style="color:#f1c40f; font-size:18px;">🥋 Mat ${mat.id}</h3>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMat(${mat.id})">✕</button>
+                    </div>
+                    ${renderMatSection(mat.id, 'ageGroups', 'Age Groups', uniqueAgeGroups)}
+                    ${renderMatSection(mat.id, 'genders', 'Genders', uniqueGenders)}
+                    ${renderMatSection(mat.id, 'weights', 'Weights', uniqueWeights)}
+                    ${renderMatSection(mat.id, 'belts', 'Belts', uniqueBelts)}
+                    <button class="btn btn-info" style="width:100%; margin-top:15px;" onclick="openMatViewInNewTab(${mat.id})">🥋 View Mat ${mat.id} & Brackets</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderMatSection(matId, type, label, options) {
+            const mat = matsConfig.find(m => m.id === matId);
+            const items = mat[type];
+            let tagsHtml = items.length === 0 ? '<span style="color:#666; font-size:12px;">None selected</span>' : 
+                items.map((item, i) => `<span style="background:rgba(241,196,15,0.2); color:#f1c40f; padding:2px 8px; border-radius:12px; font-size:12px; margin:2px; display:inline-block;">${item} <span style="cursor:pointer; color:#ef4444; margin-left:4px;" onclick="removeMatTag(${matId}, '${type}', ${i})">×</span></span>`).join('');
             
-            let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px;">';
-            for (let i = 1; i <= numMats; i++) {
-                const matMatches = matches.filter(m => m.mat_number === i);
+            const optionsHtml = options.filter(o => !items.includes(o)).map(o => `<option value="${o}">${o}</option>`).join('');
+            const selectId = `select_${type}_${matId}`;
+            
+            return `
+                <div style="margin-bottom:10px;">
+                    <div style="font-size:12px; color:#8899aa; margin-bottom:4px; font-weight:bold;">${label}</div>
+                    <div style="margin-bottom:6px;">${tagsHtml}</div>
+                    <div style="display:flex; gap:5px;">
+                        <select id="${selectId}" style="flex:1; background:#1a1f2e; color:#fff; border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:6px; font-size:12px;">
+                            <option value="">Select ${label.slice(0,-1)}...</option>
+                            ${optionsHtml}
+                        </select>
+                        <button class="btn btn-success btn-sm" onclick="addMatTag(${matId}, '${type}')">Add</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function addMatTag(matId, type) {
+            const selectId = `select_${type}_${matId}`;
+            const select = document.getElementById(selectId);
+            if (!select || !select.value) return;
+            
+            const mat = matsConfig.find(m => m.id === matId);
+            if (!mat[type].includes(select.value)) {
+                mat[type].push(select.value);
+                sessionStorage.setItem('matsConfig', JSON.stringify(matsConfig));
+                renderMatsGrid();
+            }
+        }
+
+        function removeMatTag(matId, type, index) {
+            const mat = matsConfig.find(m => m.id === matId);
+            mat[type].splice(index, 1);
+            sessionStorage.setItem('matsConfig', JSON.stringify(matsConfig));
+            renderMatsGrid();
+        }
+
+        function deleteMat(matId) {
+            matsConfig = matsConfig.filter(m => m.id !== matId);
+            matsConfig.forEach((m, i) => m.id = i + 1);
+            document.getElementById('numberOfMats').value = matsConfig.length;
+            sessionStorage.setItem('matsConfig', JSON.stringify(matsConfig));
+            renderMatsGrid();
+        }
+
+        function openMatViewInNewTab(matId) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('view', 'mat-view');
+            url.searchParams.set('matId', matId);
+            window.open(url.toString(), '_blank');
+        }
+
+        function openMatOverviewInNewTab() {
+            const url = new URL(window.location.href);
+            url.searchParams.set('view', 'overview');
+            window.open(url.toString(), '_blank');
+        }
+
+        function renderMatViewPage(matId) {
+            document.querySelector('.container').innerHTML = `
+                <button class="btn btn-back" onclick="window.close()" style="margin-bottom:20px;">← Close Tab</button>
+                <div class="section">
+                    <h2 class="section-title">🥋 Mat ${matId} Brackets</h2>
+                    <div id="matViewCategories"></div>
+                </div>
+            `;
+            
+            const mat = matsConfig.find(m => m.id === matId);
+            if (!mat) {
+                document.getElementById('matViewCategories').innerHTML = '<p>Mat not found.</p>';
+                return;
+            }
+            
+            const matchingPlayers = players.filter(p => {
+                const matchAge = mat.ageGroups.length === 0 || mat.ageGroups.includes(p.age_group);
+                const matchGender = mat.genders.length === 0 || mat.genders.includes(p.gender);
+                const matchWeight = mat.weights.length === 0 || mat.weights.includes(p.weight);
+                const matchBelt = mat.belts.length === 0 || mat.belts.includes(p.belt_level);
+                return matchAge && matchGender && matchWeight && matchBelt;
+            });
+            
+            const categories = {};
+            matchingPlayers.forEach(p => {
+                const key = `${p.age_group || 'Unknown'} / ${p.gender || 'Unknown'} / ${p.belt_level || 'Unknown'}`;
+                if (!categories[key]) categories[key] = [];
+                categories[key].push(p);
+            });
+            
+            const container = document.getElementById('matViewCategories');
+            if (Object.keys(categories).length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#8899aa;">No players match the selected categories for this mat.</p>';
+                return;
+            }
+            
+            let html = '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px;">';
+            Object.entries(categories).forEach(([cat, catPlayers]) => {
+                const weightGroups = {};
+                catPlayers.forEach(p => {
+                    const w = p.weight || 'Unknown';
+                    if (!weightGroups[w]) weightGroups[w] = [];
+                    weightGroups[w].push(p);
+                });
+                
                 html += `
-                    <div style="background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h3 style="color: #f1c40f; font-size: 18px;">🥋 Mat ${i}</h3>
-                            <span style="color: rgba(255,255,255,0.6); font-size: 13px;">${matMatches.length} matches</span>
-                        </div>
-                        <div style="color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 15px;">Capacity: ${matchesPerMat} matches</div>
-                        <div style="background: rgba(241, 196, 15, 0.1); padding: 10px; border-radius: 6px; font-size: 13px;">
-                            ${matMatches.length > 0 ? matMatches.slice(0, 3).map(m => `• ${m.red_player_name} vs ${m.blue_player_name}`).join('<br>') + (matMatches.length > 3 ? '<br>...' : '') : 'No matches assigned yet'}
-                        </div>
+                    <div class="mat-card" onclick="openBracketModal('${cat}')">
+                        <div class="mat-number">${catPlayers.length}</div>
+                        <div style="font-weight:bold; margin-bottom:10px;">${cat}</div>
+                        <div style="font-size:12px; color:rgba(255,255,255,0.6);">${Object.keys(weightGroups).length} weight classes</div>
                     </div>
                 `;
-            }
+            });
             html += '</div>';
             container.innerHTML = html;
         }
@@ -765,7 +960,6 @@
             }
             showAlert('success', `✅ Created ${totalMatches} matches!`);
             await loadMatches();
-            generateMats();
         }
 
         async function loadMatches() {
@@ -773,7 +967,6 @@
             if (error) { console.error('Error loading matches:', error); return; }
             matches = data || [];
             displayMatches();
-            generateMats();
         }
 
         function displayMatches() {
