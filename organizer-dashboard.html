@@ -226,20 +226,6 @@
         .form-textarea { min-height: 80px; resize: vertical; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
-        .image-upload {
-            border: 2px dashed var(--primary-blue);
-            border-radius: 10px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .image-upload:hover { border-color: var(--accent-yellow); background: rgba(255,184,0,0.05); }
-        .image-upload input[type="file"] { display: none; }
-        .image-preview { max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 10px; display: none; }
-        .image-preview.show { display: block; }
-
         .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
         .alert.show { display: block; }
         .alert-success { background: rgba(16,185,129,0.2); border: 2px solid #10b981; color: #10b981; }
@@ -308,18 +294,6 @@
                     <label class="form-label">Description</label>
                     <textarea class="form-textarea" id="tournamentDesc" placeholder="Tournament description..."></textarea>
                 </div>
-
-                <div class="form-group">
-                    <label class="form-label">📷 Tournament Image (Optional)</label>
-                    <div class="image-upload" onclick="document.getElementById('tournamentImage').click()">
-                        <div style="font-size: 3rem; margin-bottom: 10px;">📷</div>
-                        <div>Click to upload image</div>
-                        <div style="font-size: 0.85rem; color: rgba(0,0,0,0.6); margin-top: 5px;">PNG, JPG up to 5MB</div>
-                        <input type="file" id="tournamentImage" accept="image/*" onchange="window.handleImagePreview(event)">
-                    </div>
-                    <img id="imagePreview" class="image-preview" alt="Preview">
-                    <p style="font-size: 0.85rem; color: rgba(0,0,0,0.5); margin-top: 5px;">⚠️ Image upload is currently disabled. Tournament will be created without image.</p>
-                </div>
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -358,7 +332,6 @@
         var dbClient = null;
         var currentUser = null;
         var currentLang = localStorage.getItem('lang') || 'en';
-        var selectedImageFile = null;
 
         // ===== Translations =====
         var translations = {
@@ -412,7 +385,7 @@
                 successCreate: '✅ تم الإنشاء بنجاح!',
                 successUpdate: '✅ تم التحديث بنجاح!',
                 successDelete: '✅ تم الحذف!',
-                errorCreate: '❌ خطأ في الإنشاء: ',
+                errorCreate: ' خطأ في الإنشاء: ',
                 errorUpdate: '❌ خطأ في التحديث: ',
                 errorDelete: ' خطأ في الحذف: ',
                 confirmDelete: 'هل أنت متأكد من الحذف؟',
@@ -484,8 +457,6 @@
             document.getElementById('tournamentForm').reset();
             document.getElementById('editTournamentId').value = '';
             document.getElementById('modalTitle').textContent = translations[currentLang].modalTitleCreate;
-            document.getElementById('imagePreview').classList.remove('show');
-            selectedImageFile = null;
             document.getElementById('tournamentModal').classList.add('show');
         };
 
@@ -503,17 +474,12 @@
                 document.getElementById('editTournamentId').value = data.id;
                 document.getElementById('tournamentName').value = data.name;
                 document.getElementById('tournamentDesc').value = data.description || '';
-                document.getElementById('tournamentDate').value = data.date;
+                // Handle different date column names
+                document.getElementById('tournamentDate').value = data.tournament_date || data.date || data.event_date || '';
                 document.getElementById('registrationDeadline').value = data.registration_deadline || '';
-                document.getElementById('tournamentLocation').value = data.location || '';
+                document.getElementById('tournamentLocation').value = data.location || data.tournament_location || '';
                 document.getElementById('maxParticipants').value = data.max_participants || 200;
                 document.getElementById('registrationFee').value = data.registration_fee || 0;
-                
-                if (data.image_url) {
-                    var preview = document.getElementById('imagePreview');
-                    preview.src = data.image_url;
-                    preview.classList.add('show');
-                }
                 
                 document.getElementById('modalTitle').textContent = translations[currentLang].modalTitleEdit;
                 document.getElementById('tournamentModal').classList.add('show');
@@ -524,30 +490,9 @@
 
         window.closeModal = function() {
             document.getElementById('tournamentModal').classList.remove('show');
-            selectedImageFile = null;
-            document.getElementById('imagePreview').classList.remove('show');
         };
 
-        // ===== Image Preview =====
-        window.handleImagePreview = function(event) {
-            var file = event.target.files[0];
-            if (file) {
-                if (file.size > 5 * 1024 * 1024) {
-                    window.showAlert('error', 'Image size must be less than 5MB');
-                    return;
-                }
-                selectedImageFile = file;
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var preview = document.getElementById('imagePreview');
-                    preview.src = e.target.result;
-                    preview.classList.add('show');
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-
-        // ===== Form Submit - WITHOUT IMAGE UPLOAD =====
+        // ===== Form Submit =====
         window.handleFormSubmit = async function(e) {
             e.preventDefault();
             console.log('Form submitted');
@@ -567,19 +512,18 @@
             var editId = document.getElementById('editTournamentId').value;
             console.log('Edit ID:', editId);
             
-            // Create tournament WITHOUT image
+            // Create tournament data with flexible column names
             var tournamentData = {
                 organizer_id: currentUser.id,
                 name: document.getElementById('tournamentName').value,
                 description: document.getElementById('tournamentDesc').value,
-                date: document.getElementById('tournamentDate').value,
+                tournament_date: document.getElementById('tournamentDate').value,
                 registration_deadline: document.getElementById('registrationDeadline').value || null,
                 location: document.getElementById('tournamentLocation').value,
                 max_participants: parseInt(document.getElementById('maxParticipants').value) || 200,
                 registration_fee: parseFloat(document.getElementById('registrationFee').value) || 0,
                 status: 'draft',
-                updated_at: new Date().toISOString(),
-                image_url: null // No image for now
+                updated_at: new Date().toISOString()
             };
 
             console.log('Tournament data:', tournamentData);
@@ -656,7 +600,9 @@
                 
                 for (var i = 0; i < data.length; i++) {
                     var t = data[i];
-                    var date = new Date(t.date);
+                    // Handle different date column names
+                    var dateValue = t.tournament_date || t.date || t.event_date;
+                    var date = new Date(dateValue);
                     var formattedDate = date.toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
                     
                     var statusText = translations[currentLang].statusUpcoming;
@@ -666,12 +612,14 @@
                         statusText = translations[currentLang].statusToday;
                     }
 
-                    // Use placeholder image if no image_url
-                    var imageUrl = t.image_url || 'https://via.placeholder.com/800x200/0066CC/FFFFFF?text=' + encodeURIComponent(t.name);
+                    // Handle different location column names
+                    var locationValue = t.location || t.tournament_location || 'TBD';
 
                     html += 
                         '<div class="tournament-card">' +
-                            '<img src="' + imageUrl + '" alt="' + t.name + '" class="tournament-image" onerror="this.src=\'https://via.placeholder.com/800x200/0066CC/FFFFFF?text=No+Image\'">' +
+                            '<div class="tournament-image" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0066CC 0%, #003366 100%);">' +
+                                '<span style="font-size: 4rem; opacity: 0.3;">🏆</span>' +
+                            '</div>' +
                             '<div class="tournament-content">' +
                                 '<div class="tournament-header">' +
                                     '<div>' +
@@ -686,7 +634,7 @@
                                     '</div>' +
                                     '<div class="tournament-meta-item">' +
                                         '<span>📍</span>' +
-                                        '<span>' + translations[currentLang].location + ': ' + (t.location || 'TBD') + '</span>' +
+                                        '<span>' + translations[currentLang].location + ': ' + locationValue + '</span>' +
                                     '</div>' +
                                 '</div>' +
                                 '<div class="stats-row">' +
@@ -695,7 +643,7 @@
                                         '<div class="stat-label">' + translations[currentLang].players + '</div>' +
                                     '</div>' +
                                     '<div class="stat-item">' +
-                                        '<div class="stat-value" id="matchCount_' + t.id + '">-</div>' +
+                                        <div class="stat-value" id="matchCount_' + t.id + '">-</div>' +
                                         '<div class="stat-label">' + translations[currentLang].matches + '</div>' +
                                     '</div>' +
                                     '<div class="stat-item">' +
