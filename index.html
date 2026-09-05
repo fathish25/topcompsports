@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TopCompSports - Professional Tournament Management</title>
+    <title data-i18n="page_title">TopCompSports - Professional Tournament Management</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --primary-blue: #0066CC;
-            --dark-blue: #003366;
+            --primary-red: #DC2626;
+            --dark-red: #991B1B;
             --accent-yellow: #FFB800;
             --accent-orange: #FF8C00;
             --black: #0A0A0A;
             --dark-gray: #1A1A1A;
             --medium-gray: #2A2A2A;
-            --light-gray: #4A4A4A;
+            --light-gray: #F5F5F5;
             --white: #FFFFFF;
-            --gradient-hero: linear-gradient(135deg, var(--dark-blue) 0%, var(--black) 100%);
-            --gradient-primary: linear-gradient(135deg, var(--accent-yellow) 0%, var(--accent-orange) 100%);
-            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            --gradient-red: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+            --gradient-dark: linear-gradient(135deg, var(--black) 0%, var(--dark-gray) 100%);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -31,6 +30,8 @@
             overflow-x: hidden;
         }
 
+        img { max-width: 100%; height: auto; display: block; }
+
         /* Header */
         .header {
             background: rgba(10, 10, 10, 0.98);
@@ -39,11 +40,10 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid var(--accent-yellow);
+            border-bottom: 3px solid var(--primary-red);
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0, 102, 204, 0.3);
         }
 
         .logo {
@@ -61,7 +61,7 @@
         .logo-text {
             font-size: 28px;
             font-weight: bold;
-            background: var(--gradient-primary);
+            background: var(--gradient-red);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -69,24 +69,23 @@
 
         .nav {
             display: flex;
-            gap: 20px;
+            gap: 30px;
             align-items: center;
         }
 
         .nav a {
             color: var(--white);
             text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 8px 15px;
+            border-radius: 6px;
             transition: all 0.3s;
             font-weight: 600;
-            border: 2px solid transparent;
+            font-size: 0.95rem;
         }
 
         .nav a:hover {
-            border-color: var(--accent-yellow);
-            background: rgba(255, 184, 0, 0.1);
-            transform: translateY(-2px);
+            color: var(--primary-red);
+            background: rgba(220, 38, 38, 0.1);
         }
 
         .lang-switcher {
@@ -95,7 +94,6 @@
             background: var(--medium-gray);
             padding: 5px;
             border-radius: 8px;
-            border: 2px solid var(--primary-blue);
         }
 
         .lang-btn {
@@ -110,51 +108,44 @@
         }
 
         .lang-btn.active {
-            background: var(--gradient-primary);
-            color: var(--black);
+            background: var(--primary-red);
+            color: var(--white);
         }
 
         /* Hero Section */
         .hero {
-            padding: 120px 50px 100px;
-            background: var(--gradient-hero);
             position: relative;
-            overflow: hidden;
-            border-bottom: 3px solid var(--accent-yellow);
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,184,0,0.1)" stroke-width="0.5"/></svg>');
-            background-size: 200px 200px;
-            opacity: 0.3;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(10,10,10,0.95) 0%, rgba(26,31,46,0.85) 100%), 
+                        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23111" width="1200" height="600"/><path fill="%23DC2626" opacity="0.1" d="M0,300 Q300,200 600,300 T1200,300 L1200,600 L0,600 Z"/></svg>');
+            background-size: cover;
+            background-position: center;
+            padding: 100px 50px;
         }
 
         .hero-content {
-            position: relative;
-            z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 60px;
+            gap: 80px;
             align-items: center;
         }
 
         .hero-text h1 {
-            font-size: 3.5rem;
+            font-size: 4.5rem;
             font-weight: 900;
+            line-height: 1.1;
             margin-bottom: 20px;
-            line-height: 1.2;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .hero-text h1 span {
-            color: var(--accent-yellow);
+            color: var(--primary-red);
+            display: block;
         }
 
         .hero-text p {
@@ -162,6 +153,7 @@
             color: rgba(255, 255, 255, 0.9);
             margin-bottom: 30px;
             line-height: 1.8;
+            max-width: 600px;
         }
 
         .hero-buttons {
@@ -170,10 +162,40 @@
             flex-wrap: wrap;
         }
 
+        .hero-image {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(220, 38, 38, 0.4);
+            border: 3px solid var(--primary-red);
+        }
+
+        .hero-image-placeholder {
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8rem;
+            position: relative;
+        }
+
+        .hero-image-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        }
+
+        /* Buttons */
         .btn {
             padding: 15px 35px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             text-decoration: none;
@@ -186,106 +208,106 @@
         }
 
         .btn-primary {
-            background: var(--gradient-primary);
-            color: var(--black);
-            border: 2px solid var(--accent-yellow);
+            background: var(--gradient-red);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
         }
 
         .btn-primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 184, 0, 0.4);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.6);
         }
 
         .btn-secondary {
             background: transparent;
             color: var(--white);
-            border: 2px solid var(--primary-blue);
+            border: 2px solid var(--white);
         }
 
         .btn-secondary:hover {
-            background: var(--primary-blue);
+            background: var(--white);
+            color: var(--black);
             transform: translateY(-3px);
         }
 
-        .hero-image {
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 102, 204, 0.4);
-            border: 3px solid var(--accent-yellow);
+        .btn-sm {
+            padding: 10px 20px;
+            font-size: 0.9rem;
         }
 
-        .hero-image img {
-            width: 100%;
-            height: auto;
-            display: block;
+        /* Features Section */
+        .features {
+            padding: 80px 50px;
+            background: var(--light-gray);
+            color: var(--black);
         }
 
-        /* Stats Section */
-        .stats-section {
-            padding: 60px 50px;
-            background: var(--dark-gray);
-            border-bottom: 2px solid var(--primary-blue);
-        }
-
-        .stats-grid {
+        .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 30px;
             max-width: 1200px;
             margin: 0 auto;
         }
 
-        .stat-card {
-            background: linear-gradient(135deg, var(--medium-gray) 0%, var(--dark-gray) 100%);
-            border: 2px solid var(--primary-blue);
-            border-radius: 15px;
-            padding: 30px 20px;
+        .feature-card {
             text-align: center;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: var(--gradient-primary);
-            opacity: 0;
+            padding: 40px 30px;
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             transition: all 0.3s;
         }
 
-        .stat-card:hover::before {
-            left: 0;
-            opacity: 0.1;
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 30px rgba(220, 38, 38, 0.2);
         }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-yellow);
-            box-shadow: 0 10px 30px rgba(255, 184, 0, 0.3);
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-red);
         }
 
-        .stat-icon {
-            font-size: 3rem;
+        .feature-card h3 {
+            font-size: 1.4rem;
             margin-bottom: 15px;
+            font-weight: 700;
+            color: var(--black);
         }
 
-        .stat-value {
-            font-size: 2.5rem;
+        .feature-card p {
+            color: rgba(0, 0, 0, 0.7);
+            line-height: 1.7;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: 100px 50px;
+            background: var(--gradient-red);
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .stat-item h3 {
+            font-size: 3.5rem;
             font-weight: 900;
-            color: var(--accent-yellow);
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            color: var(--white);
         }
 
-        .stat-label {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1rem;
+        .stat-item p {
+            font-size: 1.2rem;
             font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
         }
 
         /* Container */
@@ -298,92 +320,48 @@
         .section-header {
             text-align: center;
             margin-bottom: 60px;
-            position: relative;
         }
 
         .section-header h2 {
             font-size: 2.8rem;
             font-weight: 900;
             margin-bottom: 15px;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--white);
+            text-transform: uppercase;
         }
 
         .section-header p {
             color: rgba(255, 255, 255, 0.8);
             font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto;
         }
 
         /* Tournaments Grid */
         .tournaments-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 30px;
         }
 
         .tournament-card {
             background: linear-gradient(135deg, var(--medium-gray) 0%, var(--dark-gray) 100%);
-            border: 2px solid var(--primary-blue);
-            border-radius: 20px;
+            border: 2px solid var(--primary-red);
+            border-radius: 15px;
             overflow: hidden;
             transition: all 0.4s;
-            position: relative;
-        }
-
-        .tournament-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-primary);
-            transform: scaleX(0);
-            transition: transform 0.4s;
-        }
-
-        .tournament-card:hover::before {
-            transform: scaleX(1);
         }
 
         .tournament-card:hover {
-            border-color: var(--accent-yellow);
             transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(0, 102, 204, 0.4);
+            box-shadow: 0 15px 40px rgba(220, 38, 38, 0.4);
         }
 
         .tournament-banner {
             height: 200px;
-            background: var(--gradient-blue);
+            background: var(--gradient-red);
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tournament-banner::after {
-            content: '🥋';
-            font-size: 6rem;
-            opacity: 0.3;
-        }
-
-        .tournament-status {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: var(--gradient-primary);
-            color: var(--black);
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            z-index: 2;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            font-size: 5rem;
         }
 
         .tournament-content {
@@ -399,43 +377,8 @@
 
         .tournament-meta {
             color: rgba(255, 255, 255, 0.7);
-            font-size: 0.95rem;
             margin-bottom: 20px;
             line-height: 1.8;
-        }
-
-        .tournament-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .tournament-stats {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(0, 102, 204, 0.1);
-            border-radius: 10px;
-            border: 1px solid rgba(0, 102, 204, 0.3);
-        }
-
-        .tournament-stat {
-            flex: 1;
-            text-align: center;
-        }
-
-        .tournament-stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--accent-yellow);
-        }
-
-        .tournament-stat-label {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 3px;
         }
 
         .tournament-actions {
@@ -452,133 +395,13 @@
             font-size: 0.9rem;
         }
 
-        /* Features */
-        .features-section {
-            background: var(--dark-gray);
-            border-top: 3px solid var(--primary-blue);
-            border-bottom: 3px solid var(--primary-blue);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .feature-card {
-            background: linear-gradient(135deg, var(--medium-gray) 0%, var(--dark-gray) 100%);
-            border: 2px solid var(--primary-blue);
-            border-radius: 15px;
-            padding: 40px 30px;
-            text-align: center;
-            transition: all 0.4s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--gradient-primary);
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-
-        .feature-card:hover::before {
-            opacity: 0.05;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--accent-yellow);
-            box-shadow: 0 15px 40px rgba(255, 184, 0, 0.3);
-        }
-
-        .feature-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            display: block;
-            position: relative;
-            z-index: 1;
-        }
-
-        .feature-card h3 {
-            color: var(--accent-yellow);
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-            position: relative;
-            z-index: 1;
-        }
-
-        .feature-card p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1rem;
-            line-height: 1.8;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* How It Works */
-        .how-it-works {
-            padding: 100px 50px;
-            background: var(--black);
-        }
-
-        .steps-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .step-card {
-            text-align: center;
-            position: relative;
-            padding: 40px 20px;
-        }
-
-        .step-number {
-            width: 80px;
-            height: 80px;
-            background: var(--gradient-primary);
-            color: var(--black);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin: 0 auto 25px;
-            box-shadow: 0 10px 30px rgba(255, 184, 0, 0.4);
-            border: 3px solid var(--accent-yellow);
-        }
-
-        .step-card h3 {
-            color: var(--white);
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
-        .step-card p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1rem;
-            line-height: 1.8;
-        }
-
         /* CTA Section */
         .cta-section {
             padding: 100px 50px;
-            background: var(--gradient-blue);
+            background: var(--gradient-dark);
             text-align: center;
-            border-top: 3px solid var(--accent-yellow);
-            border-bottom: 3px solid var(--accent-yellow);
+            border-top: 3px solid var(--primary-red);
+            border-bottom: 3px solid var(--primary-red);
         }
 
         .cta-content {
@@ -594,7 +417,7 @@
         }
 
         .cta-content h2 span {
-            color: var(--accent-yellow);
+            color: var(--primary-red);
         }
 
         .cta-content p {
@@ -607,7 +430,7 @@
         footer {
             background: var(--black);
             padding: 50px 50px 20px;
-            border-top: 3px solid var(--primary-blue);
+            border-top: 3px solid var(--primary-red);
         }
 
         .footer-content {
@@ -620,7 +443,7 @@
         }
 
         .footer-section h4 {
-            color: var(--accent-yellow);
+            color: var(--primary-red);
             font-size: 1.3rem;
             margin-bottom: 20px;
             font-weight: 700;
@@ -638,11 +461,10 @@
             color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             transition: color 0.3s;
-            font-size: 1rem;
         }
 
         .footer-section ul li a:hover {
-            color: var(--accent-yellow);
+            color: var(--primary-red);
         }
 
         .footer-bottom {
@@ -650,7 +472,6 @@
             padding-top: 30px;
             border-top: 2px solid var(--medium-gray);
             color: rgba(255, 255, 255, 0.6);
-            font-size: 0.95rem;
         }
 
         /* Loading & Empty States */
@@ -665,7 +486,6 @@
             text-align: center;
             padding: 100px 20px;
             color: rgba(255, 255, 255, 0.6);
-            grid-column: 1 / -1;
         }
 
         .empty-state .icon {
@@ -674,86 +494,47 @@
             opacity: 0.5;
         }
 
-        .empty-state h3 {
-            font-size: 1.8rem;
-            color: var(--white);
-            margin-bottom: 15px;
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .header { padding: 15px 30px; }
+            .hero { padding: 80px 30px; }
+            .hero-content { grid-template-columns: 1fr; gap: 40px; }
+            .hero-text h1 { font-size: 3.5rem; }
+            .container { padding: 40px 30px; }
+            .section-header h2 { font-size: 2.2rem; }
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
-            .header {
-                padding: 15px 20px;
-                flex-direction: column;
-                gap: 15px;
-            }
+            .header { padding: 12px 20px; flex-direction: column; gap: 15px; }
+            .nav { flex-wrap: wrap; justify-content: center; gap: 15px; }
+            .hero { padding: 60px 20px; min-height: auto; }
+            .hero-content { gap: 30px; }
+            .hero-text h1 { font-size: 2.5rem; }
+            .hero-image-placeholder { height: 300px; font-size: 5rem; }
+            .container { padding: 30px 20px; }
+            .section-header h2 { font-size: 2rem; }
+            .features { padding: 60px 20px; }
+            .stats-section { padding: 60px 20px; }
+            .cta-section { padding: 60px 20px; }
+            .cta-content h2 { font-size: 2rem; }
+            footer { padding: 30px 20px 15px; }
+        }
 
-            .nav {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .hero {
-                padding: 60px 20px 50px;
-            }
-
-            .hero-content {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-
-            .hero-text h1 {
-                font-size: 2.2rem;
-            }
-
-            .container {
-                padding: 40px 20px;
-            }
-
-            .section-header h2 {
-                font-size: 2rem;
-            }
-
-            .tournaments-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .tournament-actions {
-                flex-direction: column;
-            }
-
-            .tournament-actions .btn {
-                width: 100%;
-            }
-
-            .stats-section,
-            .how-it-works,
-            .cta-section {
-                padding: 60px 20px;
-            }
-
-            .cta-content h2 {
-                font-size: 2rem;
-            }
+        @media (max-width: 480px) {
+            .hero-text h1 { font-size: 2rem; }
+            .hero-buttons { flex-direction: column; }
+            .hero-buttons .btn { width: 100%; justify-content: center; }
+            .section-header h2 { font-size: 1.8rem; }
+            .tournaments-grid { grid-template-columns: 1fr; }
+            .tournament-actions { flex-direction: column; }
+            .tournament-actions .btn { width: 100%; }
         }
 
         /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--black);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-blue);
-            border-radius: 6px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-yellow);
-        }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--black); }
+        ::-webkit-scrollbar-thumb { background: var(--primary-red); border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--dark-red); }
     </style>
 </head>
 <body>
@@ -764,14 +545,13 @@
             <div class="logo-text">TopCompSports</div>
         </div>
         <nav class="nav">
-            <a href="#tournaments" data-i18n="nav_tournaments">البطولات</a>
-            <a href="#features" data-i18n="nav_features">المميزات</a>
-            <a href="#how-it-works" data-i18n="nav_how">كيف يعمل</a>
-            <a href="organizer-dashboard.html" data-i18n="nav_organizer">لوحة المنظم</a>
-            <a href="login.html" class="btn btn-primary btn-sm" data-i18n="nav_login">تسجيل الدخول</a>
+            <a href="#tournaments" data-i18n="nav_tournaments">Tournaments</a>
+            <a href="#features" data-i18n="nav_features">Features</a>
+            <a href="organizer-dashboard.html" data-i18n="nav_organizer">Organizer</a>
+            <a href="login.html" class="btn btn-primary btn-sm" data-i18n="nav_login">Login</a>
             <div class="lang-switcher">
-                <button class="lang-btn active" onclick="changeLang('ar')" id="btn-ar">عربي</button>
-                <button class="lang-btn" onclick="changeLang('en')" id="btn-en">English</button>
+                <button class="lang-btn" onclick="changeLang('ar')" id="btn-ar">عربي</button>
+                <button class="lang-btn active" onclick="changeLang('en')" id="btn-en">English</button>
             </div>
         </nav>
     </header>
@@ -780,15 +560,41 @@
     <section class="hero">
         <div class="hero-content">
             <div class="hero-text">
-                <h1 data-i18n="hero_title">احترافية <span>إدارة البطولات</span> الرياضية</h1>
-                <p data-i18n="hero_subtitle">منصة متكاملة لإدارة بطولات الجوجيتسو - من التسجيل وحتى النتائج، بتصميم احترافي ومعايير عالمية</p>
+                <h1 data-i18n="hero_title">DISCIPLINE.<br><span>FOCUS.</span><br>STRENGTH.</h1>
+                <p data-i18n="hero_subtitle">Professional tournament management platform for Jiu-Jitsu competitions - From registration to results, with world-class standards</p>
                 <div class="hero-buttons">
-                    <a href="#tournaments" class="btn btn-primary" data-i18n="hero_cta_primary">استعرض البطولات</a>
-                    <a href="organizer-dashboard.html" class="btn btn-secondary" data-i18n="hero_cta_secondary">إنشاء بطولة</a>
+                    <a href="#tournaments" class="btn btn-primary" data-i18n="hero_cta_primary">Browse Tournaments</a>
+                    <a href="organizer-dashboard.html" class="btn btn-secondary" data-i18n="hero_cta_secondary">Create Tournament</a>
                 </div>
             </div>
             <div class="hero-image">
-                <img src="hero-image.jpg" alt="Tournament Action" data-i18n-alt="hero_image_alt">
+                <div class="hero-image-placeholder">🥋</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3 data-i18n="feature1_title">Easy Registration</h3>
+                <p data-i18n="feature1_desc">Smart registration system that auto-fills player data and allows easy tournament updates</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🥋</div>
+                <h3 data-i18n="feature2_title">Mat Management</h3>
+                <p data-i18n="feature2_desc">Organize matches on multiple mats with smart filtering by age, weight, and belt</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🏆</div>
+                <h3 data-i18n="feature3_title">Bracket System</h3>
+                <p data-i18n="feature3_desc">Automatic professional bracket creation with BYE support and winner advancement</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⏱️</div>
+                <h3 data-i18n="feature4_title">Scoreboard</h3>
+                <p data-i18n="feature4_desc">Professional timer with complete scoring system per global rules</p>
             </div>
         </div>
     </section>
@@ -796,25 +602,21 @@
     <!-- Stats Section -->
     <section class="stats-section">
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">🏆</div>
-                <div class="stat-value" id="statTournaments">0</div>
-                <div class="stat-label" data-i18n="stat_tournaments">بطولة نشطة</div>
+            <div class="stat-item">
+                <h3 id="statTournaments">0</h3>
+                <p data-i18n="stat_tournaments">Active Tournaments</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">👥</div>
-                <div class="stat-value" id="statPlayers">0</div>
-                <div class="stat-label" data-i18n="stat_players">لاعب مسجل</div>
+            <div class="stat-item">
+                <h3 id="statPlayers">0</h3>
+                <p data-i18n="stat_players">Registered Players</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">⚔️</div>
-                <div class="stat-value" id="statMatches">0</div>
-                <div class="stat-label" data-i18n="stat_matches">مباراة</div>
+            <div class="stat-item">
+                <h3 id="statMatches">0</h3>
+                <p data-i18n="stat_matches">Matches</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">🌍</div>
-                <div class="stat-value">24/7</div>
-                <div class="stat-label" data-i18n="stat_availability">متاح دائماً</div>
+            <div class="stat-item">
+                <h3>24/7</h3>
+                <p data-i18n="stat_availability">Available</p>
             </div>
         </div>
     </section>
@@ -822,94 +624,22 @@
     <!-- Tournaments -->
     <section class="container" id="tournaments">
         <div class="section-header">
-            <h2 data-i18n="active_tournaments">🏆 البطولات النشطة</h2>
-            <p data-i18n="tournaments_desc">استعرض البطولات القادمة وسجّل الآن للمشاركة</p>
+            <h2 data-i18n="active_tournaments">🏆 Active Tournaments</h2>
+            <p data-i18n="tournaments_desc">Browse upcoming tournaments and register now to participate</p>
         </div>
         <div id="tournamentsList" class="tournaments-grid">
-            <div class="loading" data-i18n="loading">جاري تحميل البطولات...</div>
+            <div class="loading" data-i18n="loading">Loading tournaments...</div>
         </div>
     </section>
 
-    <!-- Features -->
-    <section class="features-section" id="features">
-        <div class="container">
-            <div class="section-header">
-                <h2 data-i18n="features_title">✨ مميزات المنصة</h2>
-                <p data-i18n="features_desc">كل ما تحتاجه لإدارة بطولة احترافية في مكان واحد</p>
-            </div>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <span class="feature-icon">📝</span>
-                    <h3 data-i18n="feature1_title">تسجيل سهل وسريع</h3>
-                    <p data-i18n="feature1_desc">نظام تسجيل ذكي يجلب بيانات اللاعب تلقائياً ويتيح تحديث بيانات البطولة بسهولة</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">🥋</span>
-                    <h3 data-i18n="feature2_title">إدارة البساط</h3>
-                    <p data-i18n="feature2_desc">نظّم المباريات على عدة بساط مع فلترة ذكية حسب الفئة العمرية والوزن والحزام</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">🏆</span>
-                    <h3 data-i18n="feature3_title">نظام البراكيت</h3>
-                    <p data-i18n="feature3_desc">إنشاء براكيت تلقائي احترافي مع دعم BYE وترقية الفائزين بين الجولات</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">⏱️</span>
-                    <h3 data-i18n="feature4_title">لوحة النتائج</h3>
-                    <p data-i18n="feature4_desc">مؤقت احترافي مع نظام نقاط كامل (Advantage, Penalty) حسب القواعد العالمية</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">📊</span>
-                    <h3 data-i18n="feature5_title">النتائج والترتيب</h3>
-                    <p data-i18n="feature5_desc">عرض النتائج والبوديوم للجمهور مع إمكانية تصدير البيانات بصيغ متعددة</p>
-                </div>
-                <div class="feature-card">
-                    <span class="feature-icon">📱</span>
-                    <h3 data-i18n="feature6_title">تصميم متجاوب</h3>
-                    <p data-i18n="feature6_desc">واجهة احترافية تعمل بسلاسة على جميع الأجهزة - من الجوال إلى الشاشات الكبيرة</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="how-it-works" id="how-it-works">
-        <div class="section-header">
-            <h2 data-i18n="how_title">🎯 كيف يعمل النظام؟</h2>
-            <p data-i18n="how_desc">أربع خطوات بسيطة لإدارة بطولة ناجحة</p>
-        </div>
-        <div class="steps-grid">
-            <div class="step-card">
-                <div class="step-number">1</div>
-                <h3 data-i18n="step1_title">إنشاء البطولة</h3>
-                <p data-i18n="step1_desc">أنشئ بطولة جديدة وحدد التاريخ والموقع والفئات المتاحة</p>
-            </div>
-            <div class="step-card">
-                <div class="step-number">2</div>
-                <h3 data-i18n="step2_title">تسجيل اللاعبين</h3>
-                <p data-i18n="step2_desc">شارك رابط التسجيل مع اللاعبين أو أضفهم يدوياً من لوحة التحكم</p>
-            </div>
-            <div class="step-card">
-                <div class="step-number">3</div>
-                <h3 data-i18n="step3_title">إدارة المباريات</h3>
-                <p data-i18n="step3_desc">نظّم البساط، أنشئ البراكيت، وابدأ المباريات مع لوحة النتائج</p>
-            </div>
-            <div class="step-card">
-                <div class="step-number">4</div>
-                <h3 data-i18n="step4_title">النتائج والفائزون</h3>
-                <p data-i18n="step4_desc">تابع النتائج لحظياً واعرض البوديوم النهائي للجمهور</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA -->
+    <!-- CTA Section -->
     <section class="cta-section">
         <div class="cta-content">
-            <h2 data-i18n="cta_title">جاهز لتنظيم <span>بطولتك</span> القادمة؟</h2>
-            <p data-i18n="cta_desc">انضم إلى المنصة وابدأ في إنشاء بطولات احترافية اليوم</p>
+            <h2 data-i18n="cta_title">Ready to Organize Your Next <span>Tournament</span>?</h2>
+            <p data-i18n="cta_desc">Join the platform and start creating professional tournaments today</p>
             <div class="hero-buttons" style="justify-content: center;">
-                <a href="login.html" class="btn btn-primary" data-i18n="cta_button">ابدأ الآن 🚀</a>
-                <a href="#features" class="btn btn-secondary" data-i18n="cta_secondary">اعرف المزيد</a>
+                <a href="login.html" class="btn btn-primary" data-i18n="cta_button">Get Started 🚀</a>
+                <a href="#features" class="btn btn-secondary" data-i18n="cta_secondary">Learn More</a>
             </div>
         </div>
     </section>
@@ -920,114 +650,51 @@
             <div class="footer-section">
                 <h4>TopCompSports</h4>
                 <p style="color: rgba(255,255,255,0.7); line-height: 1.8;" data-i18n="footer_desc">
-                    المنصة الاحترافية الأولى لإدارة بطولات الجوجيتسو في المنطقة
+                    The first professional platform for managing Jiu-Jitsu tournaments in the region
                 </p>
             </div>
             <div class="footer-section">
-                <h4 data-i18n="footer_links">روابط سريعة</h4>
+                <h4 data-i18n="footer_links">Quick Links</h4>
                 <ul>
-                    <li><a href="#tournaments" data-i18n="nav_tournaments">البطولات</a></li>
-                    <li><a href="#features" data-i18n="nav_features">المميزات</a></li>
-                    <li><a href="#how-it-works" data-i18n="nav_how">كيف يعمل</a></li>
+                    <li><a href="#tournaments" data-i18n="nav_tournaments">Tournaments</a></li>
+                    <li><a href="#features" data-i18n="nav_features">Features</a></li>
+                    <li><a href="organizer-dashboard.html" data-i18n="nav_organizer">Organizer Dashboard</a></li>
                 </ul>
             </div>
             <div class="footer-section">
-                <h4 data-i18n="footer_organizers">للمنظمين</h4>
-                <ul>
-                    <li><a href="organizer-dashboard.html" data-i18n="nav_organizer">لوحة التحكم</a></li>
-                    <li><a href="login.html" data-i18n="nav_login">تسجيل الدخول</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4 data-i18n="footer_contact">تواصل معنا</h4>
+                <h4 data-i18n="footer_contact">Contact Us</h4>
                 <ul>
                     <li><a href="#">📧 support@topcompsports.com</a></li>
-                    <li><a href="#">📱 واتساب</a></li>
+                    <li><a href="#">📱 WhatsApp</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <p data-i18n="footer_copyright">© 2026 TopCompSports - جميع الحقوق محفوظة | صُمم بشغف لعالم الجوجيتسو 🥋</p>
+            <p data-i18n="footer_copyright">© 2026 TopCompSports - All rights reserved | Designed with passion for the Jiu-Jitsu world 🥋</p>
         </div>
     </footer>
 
     <script>
-        // Translations
+        // ===== Translations =====
         const translations = {
-            ar: {
-                nav_tournaments: 'البطولات',
-                nav_features: 'المميزات',
-                nav_how: 'كيف يعمل',
-                nav_organizer: 'لوحة المنظم',
-                nav_login: 'تسجيل الدخول',
-                hero_title: 'احترافية إدارة البطولات الرياضية',
-                hero_subtitle: 'منصة متكاملة لإدارة بطولات الجوجيتسو - من التسجيل وحتى النتائج، بتصميم احترافي ومعايير عالمية',
-                hero_cta_primary: 'استعرض البطولات',
-                hero_cta_secondary: 'إنشاء بطولة',
-                hero_image_alt: 'صورة البطولة',
-                stat_tournaments: 'بطولة نشطة',
-                stat_players: 'لاعب مسجل',
-                stat_matches: 'مباراة',
-                stat_availability: 'متاح دائماً',
-                active_tournaments: ' البطولات النشطة',
-                tournaments_desc: 'استعرض البطولات القادمة وسجّل الآن للمشاركة',
-                loading: 'جاري تحميل البطولات...',
-                features_title: '✨ مميزات المنصة',
-                features_desc: 'كل ما تحتاجه لإدارة بطولة احترافية في مكان واحد',
-                feature1_title: 'تسجيل سهل وسريع',
-                feature1_desc: 'نظام تسجيل ذكي يجلب بيانات اللاعب تلقائياً ويتيح تحديث بيانات البطولة بسهولة',
-                feature2_title: 'إدارة البساط',
-                feature2_desc: 'نظّم المباريات على عدة بساط مع فلترة ذكية حسب الفئة العمرية والوزن والحزام',
-                feature3_title: 'نظام البراكيت',
-                feature3_desc: 'إنشاء براكيت تلقائي احترافي مع دعم BYE وترقية الفائزين بين الجولات',
-                feature4_title: 'لوحة النتائج',
-                feature4_desc: 'مؤقت احترافي مع نظام نقاط كامل (Advantage, Penalty) حسب القواعد العالمية',
-                feature5_title: 'النتائج والترتيب',
-                feature5_desc: 'عرض النتائج والبوديوم للجمهور مع إمكانية تصدير البيانات بصيغ متعددة',
-                feature6_title: 'تصميم متجاوب',
-                feature6_desc: 'واجهة احترافية تعمل بسلاسة على جميع الأجهزة - من الجوال إلى الشاشات الكبيرة',
-                how_title: '🎯 كيف يعمل النظام؟',
-                how_desc: 'أربع خطوات بسيطة لإدارة بطولة ناجحة',
-                step1_title: 'إنشاء البطولة',
-                step1_desc: 'أنشئ بطولة جديدة وحدد التاريخ والموقع والفئات المتاحة',
-                step2_title: 'تسجيل اللاعبين',
-                step2_desc: 'شارك رابط التسجيل مع اللاعبين أو أضفهم يدوياً من لوحة التحكم',
-                step3_title: 'إدارة المباريات',
-                step3_desc: 'نظّم البساط، أنشئ البراكيت، وابدأ المباريات مع لوحة النتائج',
-                step4_title: 'النتائج والفائزون',
-                step4_desc: 'تابع النتائج لحظياً واعرض البوديوم النهائي للجمهور',
-                cta_title: 'جاهز لتنظيم بطولتك القادمة؟',
-                cta_desc: 'انضم إلى المنصة وابدأ في إنشاء بطولات احترافية اليوم',
-                cta_button: 'ابدأ الآن ',
-                cta_secondary: 'اعرف المزيد',
-                footer_desc: 'المنصة الاحترافية الأولى لإدارة بطولات الجوجيتسو في المنطقة',
-                footer_links: 'روابط سريعة',
-                footer_organizers: 'للمنظمين',
-                footer_contact: 'تواصل معنا',
-                footer_copyright: '© 2026 TopCompSports - جميع الحقوق محفوظة | صُمم بشغف لعالم الجوجيتسو 🥋',
-                no_tournaments: 'لا توجد بطولات نشطة حالياً',
-                no_tournaments_desc: 'تابعنا لمعرفة مواعيد البطولات القادمة أو أنشئ بطولتك الخاصة',
-                players: 'لاعب',
-                matches: 'مباراة',
-                capacity: 'السعة',
-                details: 'التفاصيل',
-                bracket: 'البراكيت',
-                results: 'النتائج',
-                location: 'الموقع',
-                date: 'التاريخ',
-                tbd: 'سيتم الإعلان عنه'
-            },
             en: {
+                page_title: 'TopCompSports - Professional Tournament Management',
                 nav_tournaments: 'Tournaments',
                 nav_features: 'Features',
-                nav_how: 'How It Works',
                 nav_organizer: 'Organizer',
                 nav_login: 'Login',
-                hero_title: 'Professional Tournament Management',
-                hero_subtitle: 'Complete platform for managing Jiu-Jitsu tournaments - from registration to results, with professional design and global standards',
+                hero_title: 'DISCIPLINE.<br><span>FOCUS.</span><br>STRENGTH.',
+                hero_subtitle: 'Professional tournament management platform for Jiu-Jitsu competitions - From registration to results, with world-class standards',
                 hero_cta_primary: 'Browse Tournaments',
                 hero_cta_secondary: 'Create Tournament',
-                hero_image_alt: 'Tournament Action',
+                feature1_title: 'Easy Registration',
+                feature1_desc: 'Smart registration system that auto-fills player data and allows easy tournament updates',
+                feature2_title: 'Mat Management',
+                feature2_desc: 'Organize matches on multiple mats with smart filtering by age, weight, and belt',
+                feature3_title: 'Bracket System',
+                feature3_desc: 'Automatic professional bracket creation with BYE support and winner advancement',
+                feature4_title: 'Scoreboard',
+                feature4_desc: 'Professional timer with complete scoring system per global rules',
                 stat_tournaments: 'Active Tournaments',
                 stat_players: 'Registered Players',
                 stat_matches: 'Matches',
@@ -1035,80 +702,92 @@
                 active_tournaments: '🏆 Active Tournaments',
                 tournaments_desc: 'Browse upcoming tournaments and register now to participate',
                 loading: 'Loading tournaments...',
-                features_title: '✨ Platform Features',
-                features_desc: 'Everything you need to manage a professional tournament in one place',
-                feature1_title: 'Easy Registration',
-                feature1_desc: 'Smart registration system that auto-fills player data and allows easy tournament data updates',
-                feature2_title: 'Mat Management',
-                feature2_desc: 'Organize matches on multiple mats with smart filtering by age group, weight, and belt',
-                feature3_title: 'Bracket System',
-                feature3_desc: 'Automatic professional bracket creation with BYE support and winner advancement between rounds',
-                feature4_title: 'Scoreboard',
-                feature4_desc: 'Professional timer with complete scoring system (Advantage, Penalty) per global rules',
-                feature5_title: 'Results & Standings',
-                feature5_desc: 'Display results and podium for the public with multi-format data export capability',
-                feature6_title: 'Responsive Design',
-                feature6_desc: 'Professional interface that works smoothly on all devices - from mobile to large screens',
-                how_title: '🎯 How It Works?',
-                how_desc: 'Four simple steps to manage a successful tournament',
-                step1_title: 'Create Tournament',
-                step1_desc: 'Create a new tournament and set the date, location, and available categories',
-                step2_title: 'Register Players',
-                step2_desc: 'Share the registration link with players or add them manually from the control panel',
-                step3_title: 'Manage Matches',
-                step3_desc: 'Organize mats, create brackets, and start matches with the scoreboard',
-                step4_title: 'Results & Winners',
-                step4_desc: 'Follow results in real-time and display the final podium to the public',
                 cta_title: 'Ready to Organize Your Next Tournament?',
                 cta_desc: 'Join the platform and start creating professional tournaments today',
                 cta_button: 'Get Started 🚀',
                 cta_secondary: 'Learn More',
                 footer_desc: 'The first professional platform for managing Jiu-Jitsu tournaments in the region',
                 footer_links: 'Quick Links',
-                footer_organizers: 'For Organizers',
                 footer_contact: 'Contact Us',
                 footer_copyright: '© 2026 TopCompSports - All rights reserved | Designed with passion for the Jiu-Jitsu world 🥋',
                 no_tournaments: 'No active tournaments',
                 no_tournaments_desc: 'Follow us to know upcoming tournament dates or create your own',
-                players: 'Players',
-                matches: 'Matches',
-                capacity: 'Capacity',
                 details: 'Details',
                 bracket: 'Bracket',
                 results: 'Results',
                 location: 'Location',
-                date: 'Date',
-                tbd: 'TBD'
+                date: 'Date'
+            },
+            ar: {
+                page_title: 'TopCompSports - نظام إدارة البطولات الاحترافي',
+                nav_tournaments: 'البطولات',
+                nav_features: 'المميزات',
+                nav_organizer: 'لوحة المنظم',
+                nav_login: 'تسجيل الدخول',
+                hero_title: 'انضباط.<br><span>تركيز.</span><br>قوة.',
+                hero_subtitle: 'منصة احترافية لإدارة بطولات الجوجيتسو - من التسجيل وحتى النتائج، بمعايير عالمية',
+                hero_cta_primary: 'استعرض البطولات',
+                hero_cta_secondary: 'إنشاء بطولة',
+                feature1_title: 'تسجيل سهل',
+                feature1_desc: 'نظام تسجيل ذكي يجلب بيانات اللاعب تلقائياً ويتيح تحديث البطولة بسهولة',
+                feature2_title: 'إدارة البساط',
+                feature2_desc: 'نظّم المباريات على عدة بساط مع فلترة ذكية حسب العمر والوزن والحزام',
+                feature3_title: 'نظام البراكيت',
+                feature3_desc: 'إنشاء براكيت تلقائي احترافي مع دعم BYE وترقية الفائزين',
+                feature4_title: 'لوحة النتائج',
+                feature4_desc: 'مؤقت احترافي مع نظام نقاط كامل حسب القواعد العالمية',
+                stat_tournaments: 'بطولة نشطة',
+                stat_players: 'لاعب مسجل',
+                stat_matches: 'مباراة',
+                stat_availability: 'متاح دائماً',
+                active_tournaments: '🏆 البطولات النشطة',
+                tournaments_desc: 'استعرض البطولات القادمة وسجّل الآن للمشاركة',
+                loading: 'جاري تحميل البطولات...',
+                cta_title: 'جاهز لتنظيم بطولتك القادمة؟',
+                cta_desc: 'انضم إلى المنصة وابدأ في إنشاء بطولات احترافية اليوم',
+                cta_button: 'ابدأ الآن 🚀',
+                cta_secondary: 'اعرف المزيد',
+                footer_desc: 'المنصة الاحترافية الأولى لإدارة بطولات الجوجيتسو في المنطقة',
+                footer_links: 'روابط سريعة',
+                footer_contact: 'تواصل معنا',
+                footer_copyright: '© 2026 TopCompSports - جميع الحقوق محفوظة | صُمم بشغف لعالم الجوجيتسو 🥋',
+                no_tournaments: 'لا توجد بطولات نشطة حالياً',
+                no_tournaments_desc: 'تابعنا لمعرفة مواعيد البطولات القادمة أو أنشئ بطولتك الخاصة',
+                details: 'التفاصيل',
+                bracket: 'البراكيت',
+                results: 'النتائج',
+                location: 'الموقع',
+                date: 'التاريخ'
             }
         };
 
-        let currentLang = localStorage.getItem('lang') || 'ar';
+        // ===== Language Switcher - English is default =====
+        let currentLang = localStorage.getItem('lang') || 'en'; // English is default
 
         function changeLang(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
             
+            // Update active button
             document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
             document.getElementById('btn-en').classList.toggle('active', lang === 'en');
             
+            // Update direction and language
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
             document.documentElement.lang = lang;
             
+            // Update all texts
             document.querySelectorAll('[data-i18n]').forEach(element => {
                 const key = element.getAttribute('data-i18n');
                 if (translations[lang][key]) {
-                    element.textContent = translations[lang][key];
-                }
-            });
-
-            document.querySelectorAll('[data-i18n-alt]').forEach(element => {
-                const key = element.getAttribute('data-i18n-alt');
-                if (translations[lang][key]) {
-                    element.alt = translations[lang][key];
+                    element.innerHTML = translations[lang][key];
                 }
             });
             
-            loadTournaments();
+            // Reload tournaments if on page
+            if (typeof loadTournaments === 'function') {
+                loadTournaments();
+            }
         }
 
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
@@ -1116,6 +795,7 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         window.onload = async () => {
+            // Initialize with current language (English by default)
             changeLang(currentLang);
             await Promise.all([loadTournaments(), loadStats()]);
         };
@@ -1137,80 +817,25 @@
                             <div class="icon">🏆</div>
                             <h3>${translations[currentLang].no_tournaments}</h3>
                             <p>${translations[currentLang].no_tournaments_desc}</p>
-                            <a href="organizer-dashboard.html" class="btn btn-primary" style="margin-top: 20px;">${translations[currentLang].hero_cta_secondary}</a>
                         </div>
                     `;
                     return;
                 }
 
-                const tournamentsWithStats = await Promise.all(
-                    data.map(async (t) => {
-                        try {
-                            const { count: playerCount } = await supabase
-                                .from('tournament_participants')
-                                .select('*', { count: 'exact', head: true })
-                                .eq('tournament_id', t.id);
-                            
-                            const { count: matchCount } = await supabase
-                                .from('matches')
-                                .select('*', { count: 'exact', head: true })
-                                .eq('tournament_id', t.id);
-
-                            return { ...t, playerCount: playerCount || 0, matchCount: matchCount || 0 };
-                        } catch (e) {
-                            return { ...t, playerCount: 0, matchCount: 0 };
-                        }
-                    })
-                );
-
-                container.innerHTML = tournamentsWithStats.map(t => {
+                container.innerHTML = data.map(t => {
                     const date = new Date(t.date);
                     const formattedDate = date.toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', { 
                         year: 'numeric', month: 'long', day: 'numeric' 
                     });
                     
-                    const today = new Date();
-                    const tournamentDate = new Date(t.date);
-                    let statusClass = '';
-                    let statusText = currentLang === 'ar' ? 'قادمة' : 'Upcoming';
-                    
-                    if (tournamentDate < today) {
-                        statusClass = 'completed';
-                        statusText = currentLang === 'ar' ? 'منتهية' : 'Completed';
-                    } else if (tournamentDate.toDateString() === today.toDateString()) {
-                        statusText = currentLang === 'ar' ? 'اليوم' : 'Today';
-                    }
-
                     return `
                         <div class="tournament-card">
-                            <div class="tournament-banner">
-                                <span class="tournament-status">${statusText}</span>
-                            </div>
+                            <div class="tournament-banner"></div>
                             <div class="tournament-content">
                                 <h3>${t.name}</h3>
                                 <div class="tournament-meta">
-                                    <div class="tournament-meta-item">
-                                        <span>📅</span>
-                                        <span>${translations[currentLang].date}: ${formattedDate}</span>
-                                    </div>
-                                    <div class="tournament-meta-item">
-                                        <span>📍</span>
-                                        <span>${translations[currentLang].location}: ${t.location || translations[currentLang].tbd}</span>
-                                    </div>
-                                </div>
-                                <div class="tournament-stats">
-                                    <div class="tournament-stat">
-                                        <div class="tournament-stat-value">${t.playerCount}</div>
-                                        <div class="tournament-stat-label">${translations[currentLang].players}</div>
-                                    </div>
-                                    <div class="tournament-stat">
-                                        <div class="tournament-stat-value">${t.matchCount}</div>
-                                        <div class="tournament-stat-label">${translations[currentLang].matches}</div>
-                                    </div>
-                                    <div class="tournament-stat">
-                                        <div class="tournament-stat-value">${t.max_participants || 200}</div>
-                                        <div class="tournament-stat-label">${translations[currentLang].capacity}</div>
-                                    </div>
+                                    <div>📅 ${translations[currentLang].date}: ${formattedDate}</div>
+                                    <div>📍 ${translations[currentLang].location}: ${t.location || 'TBD'}</div>
                                 </div>
                                 <div class="tournament-actions">
                                     <a href="tournament-details.html?tournament_id=${t.id}" class="btn btn-primary">${translations[currentLang].details}</a>
