@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التسجيل في البطولة - TopCompSports</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { background: rgba(21, 29, 43, 0.95); padding: 30px; border-radius: 16px; margin-bottom: 30px; text-align: center; border: 2px solid #f1c40f; }
+        .header h1 { color: #f1c40f; font-size: 2rem; margin-bottom: 10px; }
+        .section { background: #151d2b; border-radius: 12px; padding: 25px; margin-bottom: 20px; border: 1px solid #2a3548; }
+        .section-title { font-size: 1.3rem; font-weight: bold; color: #f1c40f; margin-bottom: 20px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 8px; font-weight: 600; }
+        .form-group input, .form-group select { width: 100%; background: #1a1f2e; border: 2px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; font-size: 1rem; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #f1c40f; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn { padding: 14px 28px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: all 0.3s; width: 100%; }
+        .btn-primary { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241,196,15,0.3); }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; margin-top: 10px; }
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; text-align: center; }
+        .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
+        .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
+        .alert.show { display: block; }
+        .player-info { background: rgba(241,196,15,0.1); padding: 20px; border-radius: 8px; border: 1px solid rgba(241,196,15,0.3); margin-bottom: 20px; }
+        .info-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .info-label { color: rgba(255,255,255,0.6); }
+        .info-value { color: #fff; font-weight: bold; }
+        .readonly-field { background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.7) !important; cursor: not-allowed; }
+        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 التسجيل في البطولة</h1>
+            <p style="color: rgba(255,255,255,0.7);">قم بتحديث بياناتك الخاصة بالبطولة أدناه</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <div class="section">
+            <div class="section-title">👤 بياناتك الشخصية (من الحساب)</div>
+            <div id="playerInfo" class="player-info">
+                <p style="text-align: center; color: rgba(255,255,255,0.6);">جاري تحميل البيانات...</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">📝 بيانات المشاركة في البطولة (قابل للتعديل)</div>
+            <form id="tournamentForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>الفئة العمرية *</label>
+                        <select id="ageGroup" required onchange="updateWeightOptions()">
+                            <option value="">اختر الفئة...</option>
+                            <option value="Kids 1 (4-5 yrs)">Kids 1 (4-5 yrs)</option>
+                            <option value="Kids 2 (6-7 yrs)">Kids 2 (6-7 yrs)</option>
+                            <option value="Kids 3 (8-9 yrs)">Kids 3 (8-9 yrs)</option>
+                            <option value="Infant (10-11 yrs)">Infant (10-11 yrs)</option>
+                            <option value="Junior (12-13 yrs)">Junior (12-13 yrs)</option>
+                            <option value="Teen (14-15 yrs)">Teen (14-15 yrs)</option>
+                            <option value="Youth (16-17 yrs)">Youth (16-17 yrs)</option>
+                            <option value="Amateur/Professional (18-29 yrs)">Amateur/Professional (18-29 yrs)</option>
+                            <option value="Master 1 (30-35 yrs)">Master 1 (30-35 yrs)</option>
+                            <option value="Master 2 (36-40 yrs)">Master 2 (36-40 yrs)</option>
+                            <option value="Master 3 (41-45 yrs)">Master 3 (41-45 yrs)</option>
+                            <option value="Master 4 (46+ yrs)">Master 4 (46+ yrs)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الوزن (كجم) *</label>
+                        <select id="weight" required><option value="">اختر الوزن أولاً...</option></select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>الحزام *</label>
+                        <select id="belt" required>
+                            <option value="">اختر الحزام...</option>
+                            <option value="White">أبيض</option><option value="Grey">رمادي</option>
+                            <option value="Yellow">أصفر</option><option value="Orange">برتقالي</option>
+                            <option value="Green">أخضر</option><option value="Blue">أزرق</option>
+                            <option value="Purple">بنفسجي</option><option value="Brown">بني</option>
+                            <option value="Black">أسود</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>نوع المشاركة *</label>
+                        <select id="giType" required>
+                            <option value="">اختر...</option>
+                            <option value="Gi">بدلة (Gi)</option>
+                            <option value="No-Gi">بدون بدلة (No-Gi)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>اسم الفريق / الأكاديمية *</label>
+                    <input type="text" id="teamName" placeholder="أدخل اسم فريقك" required>
+                </div>
+
+                <div class="form-group">
+                    <label>التصنيف (Ranking) - اختياري</label>
+                    <input type="number" id="ranking" placeholder="0 = غير مصنف | 1-10 = محلي | 1-100 = دولي" min="0" value="0">
+                </div>
+
+                <button type="submit" class="btn btn-primary">✅ تأكيد التسجيل في البطولة</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">← العودة للصفحة الرئيسية</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let currentPlayer = null;
+        let tournamentId = null;
+
+        const WEIGHTS = {
+            'Male': {
+                'Amateur/Professional (18-29 yrs)': ['56', '62', '69', '77', '85', '94', '100', '120'],
+                'Master 1 (30-35 yrs)': ['56', '62', '69', '77', '85', '94', '100', '120'],
+                'Master 2 (36-40 yrs)': ['56', '62', '69', '77', '85', '94', '100', '120'],
+                'Master 3 (41-45 yrs)': ['56', '62', '69', '77', '85', '94', '100', '120'],
+                'Master 4 (46+ yrs)': ['56', '62', '69', '77', '85', '94', '100', '120']
+            },
+            'Female': {
+                'Amateur/Professional (18-29 yrs)': ['49', '55', '62', '70', '80', '90', '95'],
+                'Master 1 (30-35 yrs)': ['49', '55', '62', '70', '80', '90', '95'],
+                'Master 2 (36-40 yrs)': ['49', '55', '62', '70', '80', '90', '95'],
+                'Master 3 (41-45 yrs)': ['49', '55', '62', '70', '80', '90', '95'],
+                'Master 4 (46+ yrs)': ['49', '55', '62', '70', '80', '90', '95']
+            }
+        };
+
+        window.onload = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            tournamentId = urlParams.get('tournament_id');
+            
+            // التحقق من تسجيل الدخول
+            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            if (authError || !user) {
+                showAlert('error', '❌ يرجى تسجيل الدخول أولاً!');
+                setTimeout(() => window.location.href = 'login.html?redirect=player-registration.html?tournament_id=' + tournamentId, 2000);
+                return;
+            }
+
+            if (!tournamentId) {
+                showAlert('error', '❌ بيانات غير صحيحة!');
+                return;
+            }
+
+            await loadPlayerData(user.id);
+        };
+
+        async function loadPlayerData(userId) {
+            try {
+                // محاولة جلب بيانات اللاعب من جدول players
+                const { data, error } = await supabase.rpc('get_player_profile', { p_user_id: userId });
+                
+                if (error || !data) {
+                    // إذا لم يكن موجوداً، نستخدم بيانات الـ Auth كحد أدنى
+                    const { data: { user } } = await supabase.auth.getUser();
+                    currentPlayer = { full_name: user.email.split('@')[0], email: user.email, gender: 'Male' };
+                } else {
+                    currentPlayer = data;
+                }
+                
+                displayPlayerInfo();
+                
+                // ملء البيانات القابلة للتعديل إذا كانت موجودة مسبقاً في التسجيل
+                const { data: existingReg } = await supabase
+                    .from('tournament_participants')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .eq('tournament_id', tournamentId)
+                    .single();
+
+                if (existingReg) {
+                    document.getElementById('ageGroup').value = existingReg.age_group || '';
+                    updateWeightOptions();
+                    setTimeout(() => {
+                        document.getElementById('weight').value = existingReg.weight || '';
+                        document.getElementById('belt').value = existingReg.belt_level || '';
+                        document.getElementById('giType').value = existingReg.gi_type || '';
+                        document.getElementById('teamName').value = existingReg.team || '';
+                        document.getElementById('ranking').value = existingReg.ranking || 0;
+                    }, 100);
+                }
+            } catch (error) {
+                console.error('Error loading player:', error);
+                showAlert('error', '❌ خطأ في تحميل البيانات: ' + error.message);
+            }
+        }
+
+        function displayPlayerInfo() {
+            const infoDiv = document.getElementById('playerInfo');
+            infoDiv.innerHTML = `
+                <h3>👤 ${currentPlayer.full_name}</h3>
+                <div class="info-row"><span class="info-label">البريد الإلكتروني:</span><span class="info-value">${currentPlayer.email}</span></div>
+                <div class="info-row"><span class="info-label">الجنس:</span><span class="info-value">${currentPlayer.gender === 'Male' ? 'ذكر' : 'أنثى'}</span></div>
+                <div class="info-row"><span class="info-label">الدولة:</span><span class="info-value">${currentPlayer.country || 'غير محدد'}</span></div>
+            `;
+        }
+
+        function updateWeightOptions() {
+            const ageGroup = document.getElementById('ageGroup').value;
+            const gender = currentPlayer.gender || 'Male';
+            const weightSelect = document.getElementById('weight');
+            
+            weightSelect.innerHTML = '<option value="">اختر الوزن...</option>';
+            
+            if (WEIGHTS[gender] && WEIGHTS[gender][ageGroup]) {
+                WEIGHTS[gender][ageGroup].forEach(weight => {
+                    const option = document.createElement('option');
+                    option.value = weight;
+                    option.textContent = weight + ' كجم';
+                    weightSelect.appendChild(option);
+                });
+            }
+        }
+
+        document.getElementById('tournamentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            const formData = {
+                tournament_id: tournamentId,
+                user_id: user.id,
+                player_name: currentPlayer.full_name,
+                age_group: document.getElementById('ageGroup').value,
+                gender: currentPlayer.gender,
+                weight: parseFloat(document.getElementById('weight').value),
+                belt_level: document.getElementById('belt').value,
+                gi_type: document.getElementById('giType').value,
+                team: document.getElementById('teamName').value,
+                ranking: parseInt(document.getElementById('ranking').value) || 0
+            };
+
+            try {
+                // التحقق من التسجيل المسبق لتحديثه بدلاً من تكراره
+                const { data: existing } = await supabase
+                    .from('tournament_participants')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .eq('tournament_id', tournamentId)
+                    .single();
+
+                let error;
+                if (existing) {
+                    const res = await supabase.from('tournament_participants').update(formData).eq('id', existing.id);
+                    error = res.error;
+                } else {
+                    const res = await supabase.from('tournament_participants').insert([formData]);
+                    error = res.error;
+                }
+                
+                if (error) throw error;
+                showAlert('success', '✅ تم التسجيل في البطولة بنجاح! سيتم توجيهك...');
+                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+
+            } catch (error) {
+                console.error('Registration error:', error);
+                showAlert('error', '❌ خطأ في التسجيل: ' + error.message);
+            }
+        });
+
+        function showAlert(type, message) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+        }
+    </script>
+</body>
+</html>
