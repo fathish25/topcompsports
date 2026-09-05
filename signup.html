@@ -1,23 +1,31 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TopCompSports - Create Account</title>
+    <title>Create Your Account - TopCompSports</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
+        :root {
+            --primary-blue: #0066CC;
+            --dark-blue: #003366;
+            --accent-yellow: #FFB800;
+            --black: #0A0A0A;
+            --dark-gray: #1A1A1A;
+            --medium-gray: #2A2A2A;
+            --light-gray: #F5F5F5;
+            --white: #FFFFFF;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
+
+        .signup-container { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
         
-        .left-panel {
-            flex: 1;
-            background: linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
+        /* Left Side - Blue */
+        .signup-left {
+            background: var(--gradient-blue);
             padding: 60px;
             display: flex;
             flex-direction: column;
@@ -25,398 +33,366 @@
             position: relative;
             overflow: hidden;
         }
-        .left-panel::before {
+
+        .signup-left::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 500px;
-            height: 500px;
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 50%;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 15s ease-in-out infinite;
         }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 80px;
-            position: relative;
-            z-index: 1;
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: #fff;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            font-weight: bold;
-            color: #2563EB;
-        }
-        .logo-text { color: #fff; font-size: 24px; font-weight: bold; }
-        .left-content { position: relative; z-index: 1; }
-        .left-tagline { color: rgba(255,255,255,0.8); font-size: 14px; letter-spacing: 3px; margin-bottom: 20px; }
-        .left-title { color: #fff; font-size: 64px; font-weight: bold; line-height: 1.1; margin-bottom: 30px; }
-        .left-description { color: rgba(255,255,255,0.9); font-size: 18px; line-height: 1.6; margin-bottom: 40px; }
+
+        .signup-left-content { position: relative; z-index: 1; }
+        .logo { display: flex; align-items: center; gap: 15px; margin-bottom: 40px; }
+        .logo-icon { width: 50px; height: 50px; background: var(--white); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: var(--primary-blue); }
+        .logo-text { font-size: 28px; font-weight: bold; color: var(--white); }
         
-        .right-panel {
-            flex: 1;
-            background: #0f172a;
+        .signup-left h1 { font-size: 3.5rem; font-weight: 900; line-height: 1.2; margin-bottom: 20px; color: var(--white); }
+        .signup-left p { font-size: 1.2rem; color: rgba(255,255,255,0.9); line-height: 1.8; max-width: 500px; }
+
+        /* Right Side - Dark */
+        .signup-right {
+            background: var(--dark-gray);
             padding: 60px;
             overflow-y: auto;
-            max-height: 100vh;
         }
-        .lang-switcher { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; }
-        .lang-btn {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        .lang-btn.active { background: #2563EB; border-color: #2563EB; }
-        .right-header { margin-bottom: 40px; }
-        .right-tagline { color: #2563EB; font-size: 12px; letter-spacing: 3px; margin-bottom: 15px; }
-        .right-title { color: #fff; font-size: 48px; font-weight: bold; margin-bottom: 20px; }
+
+        .signup-header { margin-bottom: 40px; }
+        .signup-header h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; }
+        .signup-header p { color: rgba(255,255,255,0.6); }
+
+        /* User Type Selection */
+        .user-type-section { margin-bottom: 30px; }
+        .user-type-label { font-size: 0.9rem; font-weight: 600; margin-bottom: 15px; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; }
         
-        .role-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
-        .role-card {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.1);
+        .user-type-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
+        
+        .user-type-option {
+            background: var(--medium-gray);
+            border: 2px solid transparent;
             border-radius: 12px;
-            padding: 20px;
+            padding: 25px 15px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
         }
-        .role-card:hover { border-color: rgba(37, 99, 235, 0.5); background: rgba(37, 99, 235, 0.1); }
-        .role-card.selected { border-color: #2563EB; background: rgba(37, 99, 235, 0.2); }
-        .role-icon { font-size: 32px; margin-bottom: 10px; }
-        .role-name { color: #fff; font-weight: bold; font-size: 14px; }
+
+        .user-type-option:hover { border-color: var(--primary-blue); transform: translateY(-2px); }
+        .user-type-option.active { border-color: var(--primary-blue); background: rgba(0,102,204,0.1); }
         
+        .user-type-icon { font-size: 2.5rem; margin-bottom: 10px; }
+        .user-type-name { font-weight: 600; font-size: 0.95rem; }
+
+        /* Form */
         .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; color: rgba(255,255,255,0.8); }
+        .form-input, .form-select {
+            width: 100%;
+            background: var(--black);
+            border: 2px solid var(--medium-gray);
+            color: var(--white);
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary-blue); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-label { display: block; color: rgba(255,255,255,0.9); font-size: 12px; letter-spacing: 2px; margin-bottom: 10px; font-weight: bold; }
-        
-        /* ✅ تنسيق الحقول النصية */
-        .form-input {
+
+        .btn {
             width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.1);
-            color: #fff;
-            padding: 14px 18px;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.3s;
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: #2563EB;
-            background: rgba(37, 99, 235, 0.1);
-        }
-        
-        /* ✅ تنسيق القوائم المنسدلة - محسّن */
-        .form-select {
-            width: 100%;
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            color: #fff !important;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            padding: 14px 40px 14px 18px;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.3s;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            cursor: pointer;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23ffffff' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-        }
-        .form-select:focus {
-            outline: none;
-            border-color: #2563EB;
-            background-color: rgba(37, 99, 235, 0.2) !important;
-        }
-        
-        /* ✅ تنسيق خيارات القائمة المنسدلة */
-        .form-select option {
-            background-color: #1a1f2e !important;
-            color: #fff !important;
-            padding: 10px;
-        }
-        .form-select optgroup {
-            background-color: #0f172a !important;
-            color: #fff !important;
-            font-weight: bold;
-        }
-        
-        .btn-primary {
-            width: 100%;
-            background: linear-gradient(135deg, #2563EB, #1d4ed8);
-            color: #fff;
-            border: none;
             padding: 16px;
-            border-radius: 8px;
-            font-size: 16px;
+            border: none;
+            border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 20px;
+            font-size: 1.05rem;
+            margin-top: 10px;
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5); }
-        
-        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; white-space: pre-line; }
-        .alert-success { background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; }
-        .alert-error { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; color: #ef4444; }
+
+        .btn-primary { background: var(--gradient-blue); color: var(--white); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
+        .btn-secondary { background: transparent; color: var(--white); border: 2px solid var(--white); margin-top: 15px; }
+        .btn-secondary:hover { background: var(--white); color: var(--black); }
+
+        .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; }
         .alert.show { display: block; }
-        
-        .form-footer { text-align: center; margin-top: 30px; color: rgba(255,255,255,0.6); font-size: 14px; }
-        .form-footer a { color: #2563EB; text-decoration: none; font-weight: bold; }
-        
-        @media (max-width: 1024px) { .left-panel { display: none; } }
+        .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
+        .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
+        .alert-info { background: rgba(14,165,233,0.2); border: 1px solid #0ea5e9; color: #0ea5e9; }
+
+        .login-link { text-align: center; margin-top: 20px; color: rgba(255,255,255,0.6); }
+        .login-link a { color: var(--primary-blue); text-decoration: none; font-weight: 600; }
+        .login-link a:hover { text-decoration: underline; }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .signup-container { grid-template-columns: 1fr; }
+            .signup-left { display: none; }
+            .signup-right { padding: 40px 20px; }
+            .user-type-options { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .signup-left h1 { font-size: 2.5rem; }
+            .signup-header h2 { font-size: 2rem; }
+        }
+
+        @media (max-width: 480px) {
+            .signup-right { padding: 30px 15px; }
+            .signup-header h2 { font-size: 1.8rem; }
+            .btn { padding: 14px; font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
-
-    <div class="lang-switcher">
-        <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
-        <button class="lang-btn" onclick="setLanguage('ar')">AR</button>
-    </div>
-
-    <div class="left-panel">
-        <div class="logo">
-            <div class="logo-icon">T</div>
-            <div class="logo-text">TopCompSports</div>
-        </div>
-        <div class="left-content">
-            <div class="left-tagline" data-en="JOIN THE COMMUNITY" data-ar="انضم للمجتمع">JOIN THE COMMUNITY</div>
-            <h1 class="left-title" data-en="Start your journey today." data-ar="ابدأ رحلتك اليوم.">Start your journey today.</h1>
-            <p class="left-description" data-en="Join thousands of athletes, coaches, and organizers building the future of competition." data-ar="انضم إلى الآلاف من اللاعبين والمدربين والمنظمين الذين يبنون مستقبل المنافسات.">Join thousands of athletes, coaches, and organizers building the future of competition.</p>
-        </div>
-    </div>
-
-    <div class="right-panel">
-        <div class="right-header">
-            <div class="right-tagline" data-en="CREATE YOUR ACCOUNT" data-ar="إنشاء حسابك">CREATE YOUR ACCOUNT</div>
-            <h1 class="right-title" data-en="Make your mark." data-ar="اترك بصمتك.">Make your mark.</h1>
+    <div class="signup-container">
+        <!-- Left Side -->
+        <div class="signup-left">
+            <div class="signup-left-content">
+                <div class="logo">
+                    <div class="logo-icon">T</div>
+                    <div class="logo-text">TopCompSports</div>
+                </div>
+                <h1>Start your journey today.</h1>
+                <p>Join thousands of athletes, coaches, and organizers building the future of competition.</p>
+            </div>
         </div>
 
-        <div class="alert" id="alert"></div>
+        <!-- Right Side -->
+        <div class="signup-right">
+            <div class="signup-header">
+                <h2>Make your mark.</h2>
+                <p>Create your account to get started</p>
+            </div>
 
-        <form id="signupForm" onsubmit="handleSignup(event)">
-            <div class="form-group">
-                <label class="form-label" data-en="I AM JOINING AS" data-ar="أنا أنضم كـ">I AM JOINING AS</label>
-                <div class="role-selector">
-                    <div class="role-card selected" onclick="selectRole('athlete', this)">
-                        <div class="role-icon">🥋</div>
-                        <div class="role-name" data-en="Athlete" data-ar="لاعب">Athlete</div>
+            <div id="alert" class="alert"></div>
+
+            <form id="signupForm" onsubmit="handleSignup(event)">
+                <!-- User Type Selection -->
+                <div class="user-type-section">
+                    <div class="user-type-label">I am joining as</div>
+                    <div class="user-type-options">
+                        <div class="user-type-option" onclick="selectUserType('athlete')" id="type-athlete">
+                            <div class="user-type-icon">🥋</div>
+                            <div class="user-type-name">Athlete</div>
+                        </div>
+                        <div class="user-type-option" onclick="selectUserType('coach')" id="type-coach">
+                            <div class="user-type-icon">👨🏫</div>
+                            <div class="user-type-name">Coach</div>
+                        </div>
+                        <div class="user-type-option" onclick="selectUserType('organizer')" id="type-organizer">
+                            <div class="user-type-name">Organizer</div>
+                        </div>
                     </div>
-                    <div class="role-card" onclick="selectRole('coach', this)">
-                        <div class="role-icon">👨‍🏫</div>
-                        <div class="role-name" data-en="Coach" data-ar="مدرب">Coach</div>
+                    <input type="hidden" id="userType" required>
+                </div>
+
+                <!-- Personal Info -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Full Name *</label>
+                        <input type="text" class="form-input" id="fullName" required placeholder="Enter your full name">
                     </div>
-                    <div class="role-card" onclick="selectRole('organizer', this)">
-                        <div class="role-icon"></div>
-                        <div class="role-name" data-en="Organizer" data-ar="منظم">Organizer</div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address *</label>
+                        <input type="email" class="form-input" id="email" required placeholder="your.email@example.com" autocomplete="off">
                     </div>
                 </div>
-                <input type="hidden" id="role" value="athlete">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Password *</label>
+                        <input type="password" class="form-input" id="password" required placeholder="Create a password" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password *</label>
+                        <input type="password" class="form-input" id="confirmPassword" required placeholder="Confirm your password">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Date of Birth</label>
+                        <input type="date" class="form-input" id="dateOfBirth">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Gender</label>
+                        <select class="form-select" id="gender">
+                            <option value="">Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Country</label>
+                        <input type="text" class="form-input" id="country" placeholder="Your country">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-input" id="phone" placeholder="+1 (234) 567-8900">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Create Account →</button>
+            </form>
+
+            <div class="login-link">
+                Already have an account? <a href="login.html">Sign in</a>
             </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" data-en="FULL NAME" data-ar="الاسم الكامل">FULL NAME</label>
-                    <input type="text" class="form-input" id="fullName" required data-placeholder-en="Your full name" data-placeholder-ar="اسمك الكامل">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" data-en="EMAIL ADDRESS" data-ar="البريد الإلكتروني">EMAIL ADDRESS</label>
-                    <input type="email" class="form-input" id="email" required placeholder="you@example.com">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" data-en="PASSWORD" data-ar="كلمة المرور">PASSWORD</label>
-                    <input type="password" class="form-input" id="password" required minlength="8" data-placeholder-en="At least 8 characters" data-placeholder-ar="8 أحرف على الأقل">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" data-en="CONFIRM PASSWORD" data-ar="تأكيد كلمة المرور">CONFIRM PASSWORD</label>
-                    <input type="password" class="form-input" id="confirmPassword" required data-placeholder-en="Repeat your password" data-placeholder-ar="أعد كتابة كلمة المرور">
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" data-en="DATE OF BIRTH" data-ar="تاريخ الميلاد">DATE OF BIRTH</label>
-                    <input type="date" class="form-input" id="dob" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" data-en="GENDER" data-ar="النوع">GENDER</label>
-                    <select class="form-select" id="gender" required>
-                        <option value="" data-en="Select gender" data-ar="اختر النوع">Select gender</option>
-                        <option value="male" data-en="Male" data-ar="ذكر">Male</option>
-                        <option value="female" data-en="Female" data-ar="أنثى">Female</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label" data-en="COUNTRY" data-ar="الدولة">COUNTRY</label>
-                    <select class="form-select" id="country" required>
-                        <option value="">Select country</option>
-                        <option value="Egypt">Egypt / مصر</option>
-                        <option value="UAE">UAE / الإمارات</option>
-                        <option value="Saudi Arabia">Saudi Arabia / السعودية</option>
-                        <option value="Jordan">Jordan / الأردن</option>
-                        <option value="Lebanon">Lebanon / لبنان</option>
-                        <option value="Morocco">Morocco / المغرب</option>
-                        <option value="Other">Other / أخرى</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" data-en="PHONE NUMBER" data-ar="رقم الهاتف">PHONE NUMBER</label>
-                    <input type="tel" class="form-input" id="phone" required data-placeholder-en="+20 1XX XXX XXXX" data-placeholder-ar="+20 1XX XXX XXXX">
-                </div>
-            </div>
-
-            <button type="submit" class="btn-primary" id="signupBtn" data-en="CREATE ACCOUNT →" data-ar="← إنشاء حساب">CREATE ACCOUNT →</button>
-        </form>
-
-        <div class="form-footer">
-            <span data-en="Already have an account?" data-ar="لديك حساب بالفعل؟">Already have an account?</span>
-            <a href="login.html" data-en="Sign in" data-ar="تسجيل الدخول">Sign in</a>
         </div>
     </div>
 
     <script>
+        // ===== Supabase Setup =====
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
-        
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        let currentLang = 'en';
 
-        function setLanguage(lang) {
-            currentLang = lang;
-            document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-            document.documentElement.lang = lang;
+        // ===== User Type Selection =====
+        function selectUserType(type) {
+            // Remove active class from all options
+            document.querySelectorAll('.user-type-option').forEach(opt => opt.classList.remove('active'));
             
-            document.querySelectorAll('[data-en]').forEach(el => {
-                if (el.tagName === 'INPUT' && el.getAttribute(`data-placeholder-${lang}`)) {
-                    el.placeholder = el.getAttribute(`data-placeholder-${lang}`);
-                } else {
-                    const text = el.getAttribute(`data-${lang}`);
-                    if (text) el.textContent = text;
-                }
-            });
+            // Add active class to selected option
+            document.getElementById(`type-${type}`).classList.add('active');
             
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            // Set hidden input value
+            document.getElementById('userType').value = type;
         }
 
-        function selectRole(role, element) {
-            document.getElementById('role').value = role;
-            document.querySelectorAll('.role-card').forEach(card => card.classList.remove('selected'));
-            element.classList.add('selected');
-        }
-
-        async function handleSignup(event) {
-            event.preventDefault();
-            
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if (password !== confirmPassword) {
-                showAlert('error', currentLang === 'ar' ? ' كلمتا المرور غير متطابقتين' : '❌ Passwords do not match');
-                return;
-            }
-
-            if (password.length < 8) {
-                showAlert('error', currentLang === 'ar' ? '❌ كلمة المرور يجب أن تكون 8 أحرف على الأقل' : '❌ Password must be at least 8 characters');
-                return;
-            }
-
-            const btn = document.getElementById('signupBtn');
-            btn.disabled = true;
-            const originalText = btn.textContent;
-            btn.textContent = currentLang === 'ar' ? '⏳ جاري الإنشاء...' : '⏳ Creating...';
-
-            try {
-                const { data, error } = await supabase.auth.signUp({
-                    email: document.getElementById('email').value,
-                    password: password,
-                    options: {
-                        data: {
-                            full_name: document.getElementById('fullName').value,
-                            role: document.getElementById('role').value,
-                            date_of_birth: document.getElementById('dob').value,
-                            gender: document.getElementById('gender').value,
-                            country: document.getElementById('country').value,
-                            phone: document.getElementById('phone').value,
-                            registration_step: 1
-                        },
-                        emailRedirectTo: window.location.origin + '/email-confirmed.html'
-                    }
-                });
-
-                if (error) throw error;
-
-                const email = document.getElementById('email').value;
-                const role = document.getElementById('role').value;
-                const roleName = role === 'athlete' ? (currentLang === 'ar' ? 'لاعب' : 'Athlete') :
-                                role === 'coach' ? (currentLang === 'ar' ? 'مدرب' : 'Coach') :
-                                (currentLang === 'ar' ? 'منظم' : 'Organizer');
-
-                const successMsg = currentLang === 'ar' 
-                    ? `✅ تم إنشاء حساب ${roleName} بنجاح!\n\n📧 يرجى فحص بريدك الإلكتروني:\n${email}\n\nاضغط على رابط التأكيد في البريد لتفعيل حسابك وإكمال بياناتك.`
-                    : `✅ ${roleName} account created successfully!\n\n📧 Please check your email:\n${email}\n\nClick the confirmation link in the email to activate your account and complete your profile.`;
-
-                showAlert('success', successMsg);
-
-                document.getElementById('signupForm').querySelectorAll('input, select, button').forEach(el => {
-                    el.disabled = true;
-                });
-
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 6000);
-
-            } catch (err) {
-                console.error('Signup error:', err);
-                let errorMsg = err.message;
-                
-                const isDuplicate = errorMsg.toLowerCase().includes('user already registered') || 
-                                    errorMsg.toLowerCase().includes('email already registered') || 
-                                    errorMsg.toLowerCase().includes('duplicate key');
-
-                if (isDuplicate) {
-                    errorMsg = currentLang === 'ar' 
-                        ? '❌ هذا البريد الإلكتروني مسجل بالفعل في النظام.\nلا يمكن استخدام نفس البريد أكثر من مرة.\nيرجى تسجيل الدخول أو استخدام بريد إلكتروني آخر.'
-                        : '❌ This email is already registered in the system.\nAn email cannot be used more than once.\nPlease sign in or use a different email address.';
-                } else if (currentLang === 'ar') {
-                    if (errorMsg.includes('Invalid email')) {
-                        errorMsg = '❌ صيغة البريد الإلكتروني غير صحيحة.';
-                    }
-                }
-                
-                showAlert('error', errorMsg);
-                btn.disabled = false;
-                btn.textContent = originalText;
-            }
-        }
-
+        // ===== Show Alert =====
         function showAlert(type, message) {
             const alert = document.getElementById('alert');
             alert.className = `alert alert-${type} show`;
             alert.textContent = message;
-            setTimeout(() => alert.classList.remove('show'), 6000);
+            setTimeout(() => alert.classList.remove('show'), 5000);
         }
+
+        // ===== Check if Email Exists =====
+        async function checkEmailExists(email) {
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('email')
+                    .eq('email', email)
+                    .single();
+                
+                if (error && error.code !== 'PGRST116') throw error;
+                return data !== null;
+            } catch (error) {
+                console.error('Error checking email:', error);
+                return false;
+            }
+        }
+
+        // ===== Handle Signup =====
+        async function handleSignup(e) {
+            e.preventDefault();
+
+            const userType = document.getElementById('userType').value;
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const dateOfBirth = document.getElementById('dateOfBirth').value;
+            const gender = document.getElementById('gender').value;
+            const country = document.getElementById('country').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            // Validation
+            if (!userType) {
+                showAlert('error', 'Please select your user type (Athlete, Coach, or Organizer)');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showAlert('error', 'Passwords do not match');
+                return;
+            }
+
+            if (password.length < 6) {
+                showAlert('error', 'Password must be at least 6 characters');
+                return;
+            }
+
+            // Check if email already exists
+            const emailExists = await checkEmailExists(email);
+            if (emailExists) {
+                showAlert('error', 'This email address is already registered. Please use a different email or sign in.');
+                return;
+            }
+
+            try {
+                // Sign up with Supabase Auth
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            full_name: fullName,
+                            user_type: userType
+                        }
+                    }
+                });
+
+                if (authError) throw authError;
+
+                // Create user profile in database
+                const { error: profileError } = await supabase
+                    .from('users')
+                    .insert([{
+                        id: authData.user.id,
+                        email: email,
+                        full_name: fullName,
+                        user_type: userType,
+                        date_of_birth: dateOfBirth || null,
+                        gender: gender || null,
+                        country: country || null,
+                        phone: phone || null,
+                        email_confirmed: false,
+                        created_at: new Date().toISOString()
+                    }]);
+
+                if (profileError) throw profileError;
+
+                // Success message
+                showAlert('success', '✅ Account created successfully! Please check your email to confirm your account.');
+                
+                // Clear form
+                document.getElementById('signupForm').reset();
+                document.querySelectorAll('.user-type-option').forEach(opt => opt.classList.remove('active'));
+                document.getElementById('userType').value = '';
+
+                // Redirect after 3 seconds
+                setTimeout(() => {
+                    window.location.href = 'login.html?emailConfirmed=please_check_email';
+                }, 3000);
+
+            } catch (error) {
+                console.error('Signup error:', error);
+                showAlert('error', 'Error: ' + error.message);
+            }
+        }
+
+        // ===== Check URL Parameters on Load =====
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('email')) {
+                document.getElementById('email').value = urlParams.get('email');
+            }
+        };
     </script>
 </body>
 </html>
