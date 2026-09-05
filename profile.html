@@ -15,6 +15,7 @@
             --medium-gray: #2A2A2A;
             --white: #FFFFFF;
             --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            --success: #10b981;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,7 +35,7 @@
             width: 100%;
             background: var(--dark-gray);
             border-radius: 20px;
-            padding: 50px;
+            padding: 40px;
             border: 2px solid var(--medium-gray);
         }
 
@@ -55,35 +56,43 @@
 
         .upload-section {
             background: var(--black);
-            padding: 30px;
+            padding: 25px;
             border-radius: 15px;
             margin-bottom: 20px;
         }
 
         .section-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--accent-yellow);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
+        .optional-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+        }
+
         .profile-pic-section {
             text-align: center;
-            padding: 30px;
+            padding: 25px;
             background: var(--dark-gray);
             border-radius: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .profile-pic-container {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 20px;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px;
             border-radius: 50%;
             overflow: hidden;
-            border: 4px solid var(--accent-yellow);
+            border: 3px solid var(--accent-yellow);
             background: var(--medium-gray);
             display: flex;
             align-items: center;
@@ -97,18 +106,19 @@
         }
 
         .profile-pic-container .placeholder {
-            font-size: 60px;
+            font-size: 50px;
             color: rgba(255,255,255,0.3);
         }
 
         .upload-btn {
             background: var(--primary-blue);
             color: var(--white);
-            padding: 10px 25px;
+            padding: 8px 20px;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 0.9rem;
             transition: all 0.3s;
         }
 
@@ -118,60 +128,111 @@
             background: var(--dark-gray);
             border: 2px dashed var(--medium-gray);
             border-radius: 10px;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
             transition: all 0.3s;
         }
 
         .document-upload:hover { border-color: var(--primary-blue); }
-        .document-upload.has-file { border-color: #10b981; background: rgba(16,185,129,0.05); }
+        .document-upload.has-file { border-color: var(--success); background: rgba(16,185,129,0.05); }
 
         .document-upload input[type="file"] { display: none; }
         .upload-label { cursor: pointer; display: block; }
-        .upload-icon { font-size: 50px; margin-bottom: 15px; }
-        .file-name { color: var(--accent-yellow); font-weight: 600; margin-top: 10px; }
+        .upload-icon { font-size: 40px; margin-bottom: 10px; }
+        .file-name { color: var(--accent-yellow); font-weight: 600; margin-top: 10px; font-size: 0.9rem; }
 
         .btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             border: none;
             border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 1.05rem;
-            margin-top: 20px;
+            font-size: 1rem;
+            margin-top: 15px;
         }
 
-        .btn-primary { background: var(--gradient-blue); color: var(--white); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
+        .btn-primary { 
+            background: var(--success); 
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(16,185,129,0.4); }
         .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .btn-skip { background: transparent; border: 2px solid var(--white); color: var(--white); }
+        .btn-skip { 
+            background: transparent; 
+            border: 2px solid var(--white); 
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
         .btn-skip:hover { background: var(--white); color: var(--black); }
 
-        .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
-        .alert.show { display: block; }
+        .alert { 
+            padding: 12px 15px; 
+            border-radius: 8px; 
+            margin-bottom: 15px; 
+            display: none; 
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .alert.show { display: block; animation: slideIn 0.3s ease; }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
         .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
+        .alert-info { background: rgba(14,165,233,0.2); border: 1px solid #0ea5e9; color: #0ea5e9; }
 
-        .optional-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px;
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.6);
-            margin-left: 10px;
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loading-overlay.show { display: flex; }
+        .loading-spinner {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid var(--accent-yellow);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
-            .container { padding: 30px 20px; }
+            .container { padding: 25px 15px; }
             .header h1 { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>Complete Your Profile</h1>
@@ -190,29 +251,29 @@
             <div class="section-title">📷 Profile Picture <span class="optional-badge">Optional</span></div>
             <div class="profile-pic-section">
                 <div class="profile-pic-container" id="profilePicContainer">
-                    <div class="placeholder">👤</div>
+                    <div class="placeholder"></div>
                 </div>
                 <button type="button" class="upload-btn" onclick="document.getElementById('profilePic').click()">
                      Upload Photo
                 </button>
                 <input type="file" id="profilePic" accept="image/*" onchange="handleProfilePicUpload(event)" style="display: none;">
-                <p style="margin-top: 10px; font-size: 0.85rem; color: rgba(255,255,255,0.5);">Max 5MB (JPG, PNG)</p>
+                <p style="margin-top: 10px; font-size: 0.8rem; color: rgba(255,255,255,0.5);">Max 5MB (JPG, PNG)</p>
             </div>
         </div>
 
         <!-- Documents -->
         <div class="upload-section">
-            <div class="section-title">📄 Identity Document <span class="optional-badge">Optional</span></div>
+            <div class="section-title"> Identity Document <span class="optional-badge">Optional</span></div>
             <div class="document-upload" id="idCardUpload">
                 <label for="idCard" class="upload-label">
                     <div class="upload-icon"></div>
                     <div style="font-weight: 600; margin-bottom: 5px;">Upload ID Card / Passport / Birth Certificate</div>
-                    <div style="font-size: 0.9rem; color: rgba(255,255,255,0.6);">For verification purposes</div>
+                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">For verification purposes</div>
                     <div class="file-name" id="idCardFileName">No file chosen</div>
                 </label>
                 <input type="file" id="idCard" accept="image/*,.pdf" onchange="handleDocumentUpload(event)">
             </div>
-            <p style="margin-top: 15px; font-size: 0.85rem; color: rgba(255,255,255,0.5);">Max 10MB (JPG, PNG, PDF)</p>
+            <p style="margin-top: 10px; font-size: 0.8rem; color: rgba(255,255,255,0.5);">Max 10MB (JPG, PNG, PDF)</p>
         </div>
 
         <button type="button" class="btn btn-primary" id="saveBtn" onclick="saveAndContinue()">
@@ -234,33 +295,53 @@
 
         // ===== Check Auth on Load =====
         window.onload = async function() {
-            const { data: { user }, error } = await dbClient.auth.getUser();
+            console.log('Page loaded, checking auth...');
             
-            if (error || !user) {
-                window.location.href = 'login.html';
-                return;
+            try {
+                const { data: { user }, error } = await dbClient.auth.getUser();
+                
+                if (error || !user) {
+                    console.error('Auth error:', error);
+                    showAlert('error', '❌ You must be logged in. Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                    return;
+                }
+
+                currentUser = user;
+                console.log('User authenticated:', user.email);
+                
+                // Display user info
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userName').textContent = user.user_metadata?.full_name || 'Welcome!';
+
+                // Load existing profile data
+                await loadExistingProfile();
+            } catch (err) {
+                console.error('Initialization error:', err);
+                showAlert('error', '❌ Error loading page: ' + err.message);
             }
-
-            currentUser = user;
-            
-            // Display user info
-            document.getElementById('userEmail').textContent = user.email;
-            document.getElementById('userName').textContent = user.user_metadata?.full_name || 'Welcome!';
-
-            // Load existing profile data
-            await loadExistingProfile();
         };
 
         // ===== Load Existing Profile =====
         async function loadExistingProfile() {
             try {
-                const { data: profile } = await dbClient
+                console.log('Loading profile for:', currentUser.id);
+                const { data: profile, error } = await dbClient
                     .from('users')
                     .select('*')
                     .eq('id', currentUser.id)
                     .maybeSingle();
 
+                if (error) {
+                    console.error('Load profile error:', error);
+                    return;
+                }
+
                 if (profile) {
+                    console.log('Profile loaded:', profile);
+                    
                     // Load profile picture if exists
                     if (profile.profile_picture_url) {
                         loadProfilePicture(profile.profile_picture_url);
@@ -272,8 +353,8 @@
                         document.getElementById('idCardUpload').classList.add('has-file');
                     }
                 }
-            } catch (error) {
-                console.error('Load error:', error);
+            } catch (err) {
+                console.error('Load error:', err);
             }
         }
 
@@ -324,10 +405,15 @@
         // ===== Save and Continue =====
         async function saveAndContinue() {
             const saveBtn = document.getElementById('saveBtn');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
             saveBtn.disabled = true;
             saveBtn.textContent = 'Saving...';
+            loadingOverlay.classList.add('show');
 
             try {
+                console.log('Starting save process...');
+                
                 const profileData = {
                     id: currentUser.id,
                     email: currentUser.email,
@@ -337,27 +423,34 @@
                 // Upload profile picture if selected
                 if (profilePictureFile) {
                     try {
+                        console.log('Uploading profile picture...');
                         const fileExt = profilePictureFile.name.split('.').pop();
                         const fileName = `${currentUser.id}-profile.${fileExt}`;
                         
-                        const { error: uploadError } = await dbClient.storage
+                        const { data: uploadData, error: uploadError } = await dbClient.storage
                             .from('profiles')
                             .upload(fileName, profilePictureFile, { upsert: true });
 
-                        if (!uploadError) {
+                        if (uploadError) {
+                            console.error('Upload error:', uploadError);
+                            showAlert('error', '⚠️ Could not upload photo. Continuing anyway...');
+                        } else {
                             const { data: { publicUrl } } = dbClient.storage
                                 .from('profiles')
                                 .getPublicUrl(fileName);
                             profileData.profile_picture_url = publicUrl;
+                            console.log('Profile picture uploaded:', publicUrl);
                         }
                     } catch (picError) {
                         console.error('Profile pic error:', picError);
+                        // Continue without picture
                     }
                 }
 
                 // Upload document if selected
                 if (documentFile) {
                     try {
+                        console.log('Uploading document...');
                         const fileExt = documentFile.name.split('.').pop();
                         const fileName = `${currentUser.id}-id-doc.${fileExt}`;
                         
@@ -365,50 +458,83 @@
                             .from('documents')
                             .upload(fileName, documentFile, { upsert: true });
 
-                        if (!docError) {
+                        if (docError) {
+                            console.error('Document upload error:', docError);
+                            showAlert('error', '⚠️ Could not upload document. Continuing anyway...');
+                        } else {
                             const { data: { publicUrl } } = dbClient.storage
                                 .from('documents')
                                 .getPublicUrl(fileName);
                             profileData.id_document_url = publicUrl;
+                            console.log('Document uploaded:', publicUrl);
                         }
                     } catch (docError) {
                         console.error('Document error:', docError);
+                        // Continue without document
                     }
                 }
 
-                // Update profile
-                const { error: upsertError } = await dbClient
+                // Update profile in database
+                console.log('Updating profile in database...', profileData);
+                const { data: upsertData, error: upsertError } = await dbClient
                     .from('users')
                     .upsert(profileData, { onConflict: 'id' });
 
-                if (upsertError) throw upsertError;
+                if (upsertError) {
+                    console.error('Upsert error:', upsertError);
+                    throw new Error('Failed to save profile: ' + upsertError.message);
+                }
 
-                showAlert('success', '✅ Profile saved! Redirecting...');
+                console.log('Profile saved successfully:', upsertData);
+
+                // Update localStorage with complete user data
+                const userData = {
+                    id: currentUser.id,
+                    email: currentUser.email,
+                    full_name: currentUser.user_metadata?.full_name || 'User',
+                    user_type: currentUser.user_metadata?.user_type || 'athlete',
+                    profile_complete: true,
+                    profile_picture_url: profileData.profile_picture_url || null
+                };
+
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+                console.log('User data saved to localStorage:', userData);
+
+                showAlert('success', '✅ Profile saved! Redirecting to dashboard...');
                 
-                // Update localStorage
-                const currentUserData = JSON.parse(localStorage.getItem('currentUser') || '{}');
-                currentUserData.profile_complete = true;
-                localStorage.setItem('currentUser', JSON.stringify(currentUserData));
-
+                // Wait a moment then redirect
                 setTimeout(() => {
+                    console.log('Redirecting to index.html...');
                     window.location.href = 'index.html';
                 }, 1500);
 
             } catch (error) {
                 console.error('Save error:', error);
-                showAlert('error', '❌ Error: ' + error.message);
+                showAlert('error', '❌ Error saving profile: ' + error.message);
                 saveBtn.disabled = false;
                 saveBtn.textContent = '✅ Save & Continue to Dashboard';
+            } finally {
+                loadingOverlay.classList.remove('show');
             }
         }
 
         // ===== Skip and Continue =====
         function skipAndContinue() {
-            // Update localStorage
-            const currentUserData = JSON.parse(localStorage.getItem('currentUser') || '{}');
-            currentUserData.profile_complete = true;
-            localStorage.setItem('currentUser', JSON.stringify(currentUserData));
+            console.log('Skipping profile completion...');
             
+            // Update localStorage
+            const userData = {
+                id: currentUser.id,
+                email: currentUser.email,
+                full_name: currentUser.user_metadata?.full_name || 'User',
+                user_type: currentUser.user_metadata?.user_type || 'athlete',
+                profile_complete: true
+            };
+
+            localStorage.setItem('currentUser', JSON.stringify(userData));
+            console.log('User data saved to localStorage:', userData);
+            
+            // Redirect
             window.location.href = 'index.html';
         }
 
