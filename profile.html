@@ -14,8 +14,8 @@
             --dark-gray: #1A1A1A;
             --medium-gray: #2A2A2A;
             --white: #FFFFFF;
-            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
             --success: #10b981;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -52,7 +52,7 @@
         }
 
         .user-info h3 { color: var(--accent-yellow); margin-bottom: 5px; }
-        .user-info p { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+        .user-info p { color: rgba(255,255,255,0.6); font-size: 0.9rem; word-break: break-all; }
 
         .upload-section {
             background: var(--black);
@@ -192,7 +192,7 @@
         
         .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
         .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
-        .alert-info { background: rgba(14,165,233,0.2); border: 1px solid #0ea5e9; color: #0ea5e9; }
+        .alert-warning { background: rgba(245,158,11,0.2); border: 1px solid #f59e0b; color: #f59e0b; }
 
         .loading-overlay {
             position: fixed;
@@ -254,7 +254,7 @@
                     <div class="placeholder"></div>
                 </div>
                 <button type="button" class="upload-btn" onclick="document.getElementById('profilePic').click()">
-                     Upload Photo
+                    📷 Upload Photo
                 </button>
                 <input type="file" id="profilePic" accept="image/*" onchange="handleProfilePicUpload(event)" style="display: none;">
                 <p style="margin-top: 10px; font-size: 0.8rem; color: rgba(255,255,255,0.5);">Max 5MB (JPG, PNG)</p>
@@ -263,7 +263,7 @@
 
         <!-- Documents -->
         <div class="upload-section">
-            <div class="section-title"> Identity Document <span class="optional-badge">Optional</span></div>
+            <div class="section-title">📄 Identity Document <span class="optional-badge">Optional</span></div>
             <div class="document-upload" id="idCardUpload">
                 <label for="idCard" class="upload-label">
                     <div class="upload-icon"></div>
@@ -285,6 +285,7 @@
     </div>
 
     <script>
+        // ===== Supabase Setup =====
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -310,7 +311,7 @@
                 }
 
                 currentUser = user;
-                console.log('User authenticated:', user.email);
+                console.log('✅ User authenticated:', user.email);
                 
                 // Display user info
                 document.getElementById('userEmail').textContent = user.email;
@@ -420,7 +421,7 @@
                     updated_at: new Date().toISOString()
                 };
 
-                // Upload profile picture if selected
+                // Upload profile picture if selected (optional - won't fail if error)
                 if (profilePictureFile) {
                     try {
                         console.log('Uploading profile picture...');
@@ -432,22 +433,21 @@
                             .upload(fileName, profilePictureFile, { upsert: true });
 
                         if (uploadError) {
-                            console.error('Upload error:', uploadError);
-                            showAlert('error', '⚠️ Could not upload photo. Continuing anyway...');
+                            console.warn('️ Upload failed, continuing without picture:', uploadError.message);
+                            showAlert('warning', '️ Could not upload photo, but you can continue.');
                         } else {
                             const { data: { publicUrl } } = dbClient.storage
                                 .from('profiles')
                                 .getPublicUrl(fileName);
                             profileData.profile_picture_url = publicUrl;
-                            console.log('Profile picture uploaded:', publicUrl);
+                            console.log('✅ Profile picture uploaded');
                         }
                     } catch (picError) {
-                        console.error('Profile pic error:', picError);
-                        // Continue without picture
+                        console.warn('️ Profile picture upload failed, continuing:', picError.message);
                     }
                 }
 
-                // Upload document if selected
+                // Upload document if selected (optional - won't fail if error)
                 if (documentFile) {
                     try {
                         console.log('Uploading document...');
@@ -459,35 +459,34 @@
                             .upload(fileName, documentFile, { upsert: true });
 
                         if (docError) {
-                            console.error('Document upload error:', docError);
-                            showAlert('error', '⚠️ Could not upload document. Continuing anyway...');
+                            console.warn('⚠️ Document upload failed, continuing:', docError.message);
+                            showAlert('warning', '⚠️ Could not upload document, but you can continue.');
                         } else {
                             const { data: { publicUrl } } = dbClient.storage
                                 .from('documents')
                                 .getPublicUrl(fileName);
                             profileData.id_document_url = publicUrl;
-                            console.log('Document uploaded:', publicUrl);
+                            console.log('✅ Document uploaded');
                         }
                     } catch (docError) {
-                        console.error('Document error:', docError);
-                        // Continue without document
+                        console.warn('⚠️ Document upload failed, continuing:', docError.message);
                     }
                 }
 
                 // Update profile in database
-                console.log('Updating profile in database...', profileData);
+                console.log('Updating profile in database...');
                 const { data: upsertData, error: upsertError } = await dbClient
                     .from('users')
                     .upsert(profileData, { onConflict: 'id' });
 
                 if (upsertError) {
-                    console.error('Upsert error:', upsertError);
-                    throw new Error('Failed to save profile: ' + upsertError.message);
+                    console.error(' Database update failed:', upsertError);
+                    showAlert('warning', '⚠️ Could not save to database, but you can continue.');
+                } else {
+                    console.log('✅ Profile saved successfully');
                 }
 
-                console.log('Profile saved successfully:', upsertData);
-
-                // Update localStorage with complete user data
+                // Update localStorage with user data
                 const userData = {
                     id: currentUser.id,
                     email: currentUser.email,
@@ -498,21 +497,23 @@
                 };
 
                 localStorage.setItem('currentUser', JSON.stringify(userData));
-                console.log('User data saved to localStorage:', userData);
+                console.log('✅ User data saved to localStorage');
 
-                showAlert('success', '✅ Profile saved! Redirecting to dashboard...');
+                showAlert('success', '✅ Ready! Redirecting to dashboard...');
                 
-                // Wait a moment then redirect
+                // ALWAYS redirect, even if there were errors
                 setTimeout(() => {
-                    console.log('Redirecting to index.html...');
+                    console.log(' Redirecting to index.html...');
                     window.location.href = 'index.html';
                 }, 1500);
 
             } catch (error) {
-                console.error('Save error:', error);
-                showAlert('error', '❌ Error saving profile: ' + error.message);
-                saveBtn.disabled = false;
-                saveBtn.textContent = '✅ Save & Continue to Dashboard';
+                console.error('❌ Unexpected error:', error);
+                // Still redirect even on error
+                showAlert('warning', '⚠️ Some operations failed, but you can continue.');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
             } finally {
                 loadingOverlay.classList.remove('show');
             }
@@ -520,7 +521,7 @@
 
         // ===== Skip and Continue =====
         function skipAndContinue() {
-            console.log('Skipping profile completion...');
+            console.log('⏭️ Skipping profile completion...');
             
             // Update localStorage
             const userData = {
@@ -532,10 +533,15 @@
             };
 
             localStorage.setItem('currentUser', JSON.stringify(userData));
-            console.log('User data saved to localStorage:', userData);
+            console.log('✅ User data saved to localStorage');
             
-            // Redirect
-            window.location.href = 'index.html';
+            // Show loading
+            document.getElementById('loadingOverlay').classList.add('show');
+            
+            // Redirect immediately
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 500);
         }
 
         // ===== Show Alert =====
