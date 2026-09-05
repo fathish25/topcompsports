@@ -267,10 +267,10 @@
             <a href="index.html">Home</a>
             <a href="my-profile.html">My Profile</a>
             <div class="lang-switcher">
-                <button class="lang-btn" onclick="changeLang('ar')" id="btn-ar">عربي</button>
-                <button class="lang-btn active" onclick="changeLang('en')" id="btn-en">English</button>
+                <button class="lang-btn" onclick="window.changeLang('ar')" id="btn-ar">عربي</button>
+                <button class="lang-btn active" onclick="window.changeLang('en')" id="btn-en">English</button>
             </div>
-            <button class="btn btn-logout" onclick="logout()">Logout</button>
+            <button class="btn btn-logout" onclick="window.logout()">Logout</button>
         </div>
     </header>
 
@@ -280,8 +280,8 @@
         <div class="page-header">
             <h1 class="page-title" id="pageTitle">🏆 Organizer Dashboard</h1>
             <div class="page-actions">
-                <button class="btn btn-primary" onclick="openCreateModal()" id="btnCreate">➕ Create Tournament</button>
-                <button class="btn btn-secondary" onclick="loadTournaments()" id="btnRefresh">🔄 Refresh</button>
+                <button class="btn btn-primary" onclick="window.openCreateModal()" id="btnCreate">➕ Create Tournament</button>
+                <button class="btn btn-secondary" onclick="window.loadTournaments()" id="btnRefresh"> Refresh</button>
             </div>
         </div>
 
@@ -294,9 +294,9 @@
         <div class="modal">
             <div class="modal-header">
                 <h2 class="modal-title" id="modalTitle">Create New Tournament</h2>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <button class="modal-close" onclick="window.closeModal()">&times;</button>
             </div>
-            <form id="tournamentForm" onsubmit="handleFormSubmit(event)">
+            <form id="tournamentForm" onsubmit="window.handleFormSubmit(event)">
                 <input type="hidden" id="editTournamentId">
                 
                 <div class="form-group">
@@ -310,12 +310,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label"> Tournament Image (Optional)</label>
+                    <label class="form-label">Tournament Image (Optional)</label>
                     <div class="image-upload" onclick="document.getElementById('tournamentImage').click()">
                         <div style="font-size: 3rem; margin-bottom: 10px;">📷</div>
                         <div>Click to upload image</div>
                         <div style="font-size: 0.85rem; color: rgba(0,0,0,0.6); margin-top: 5px;">PNG, JPG up to 5MB</div>
-                        <input type="file" id="tournamentImage" accept="image/*" onchange="handleImagePreview(event)">
+                        <input type="file" id="tournamentImage" accept="image/*" onchange="window.handleImagePreview(event)">
                     </div>
                     <img id="imagePreview" class="image-preview" alt="Preview">
                 </div>
@@ -346,7 +346,7 @@
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 25px;">
                     <button type="submit" class="btn btn-primary" style="flex: 1;">💾 Save</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.closeModal()">Cancel</button>
                 </div>
             </form>
         </div>
@@ -354,7 +354,7 @@
 
     <script>
         // ===== Global Variables =====
-        var supabase = null;
+        var dbClient = null;
         var currentUser = null;
         var currentLang = localStorage.getItem('lang') || 'en';
         var selectedImageFile = null;
@@ -362,8 +362,8 @@
         // ===== Translations =====
         var translations = {
             en: {
-                pageTitle: '🏆 Organizer Dashboard',
-                btnCreate: '➕ Create Tournament',
+                pageTitle: ' Organizer Dashboard',
+                btnCreate: ' Create Tournament',
                 btnRefresh: '🔄 Refresh',
                 loading: 'Loading tournaments...',
                 modalTitleCreate: 'Create New Tournament',
@@ -374,7 +374,7 @@
                 matches: 'Matches',
                 capacity: 'Capacity',
                 manage: '⚙️ Manage',
-                view: '👁️ View',
+                view: '️ View',
                 edit: '✏️ Edit',
                 delete: '🗑️ Delete',
                 date: 'Date',
@@ -382,16 +382,16 @@
                 successCreate: '✅ Tournament created successfully!',
                 successUpdate: '✅ Tournament updated successfully!',
                 successDelete: '✅ Tournament deleted!',
-                errorCreate: ' Error creating: ',
-                errorUpdate: ' Error updating: ',
-                errorDelete: ' Error deleting: ',
+                errorCreate: '❌ Error creating: ',
+                errorUpdate: '❌ Error updating: ',
+                errorDelete: '❌ Error deleting: ',
                 confirmDelete: 'Are you sure you want to delete this tournament?',
                 statusUpcoming: 'Upcoming',
                 statusToday: 'Today',
                 statusCompleted: 'Completed'
             },
             ar: {
-                pageTitle: '🏆 لوحة تحكم المنظم',
+                pageTitle: ' لوحة تحكم المنظم',
                 btnCreate: '➕ إنشاء بطولة',
                 btnRefresh: '🔄 تحديث',
                 loading: 'جاري التحميل...',
@@ -413,7 +413,7 @@
                 successDelete: '✅ تم الحذف!',
                 errorCreate: '❌ خطأ في الإنشاء: ',
                 errorUpdate: '❌ خطأ في التحديث: ',
-                errorDelete: ' خطأ في الحذف: ',
+                errorDelete: '❌ خطأ في الحذف: ',
                 confirmDelete: 'هل أنت متأكد من الحذف؟',
                 statusUpcoming: 'قادمة',
                 statusToday: 'اليوم',
@@ -423,8 +423,8 @@
 
         // ===== Initialize Supabase =====
         function initSupabase() {
-            if (!supabase) {
-                supabase = window.supabase.createClient(
+            if (!dbClient) {
+                dbClient = window.supabase.createClient(
                     'https://ngiclnkmbvzjhylwhzyn.supabase.co',
                     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w'
                 );
@@ -432,7 +432,7 @@
         }
 
         // ===== Language Switcher =====
-        function changeLang(lang) {
+        window.changeLang = function(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
             document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
@@ -445,40 +445,55 @@
             document.getElementById('btnCreate').textContent = t.btnCreate;
             document.getElementById('btnRefresh').textContent = t.btnRefresh;
             
-            loadTournaments();
-        }
+            window.loadTournaments();
+        };
 
         // ===== Auth Check =====
         async function checkAuth() {
             try {
                 initSupabase();
-                var result = await supabase.auth.getUser();
+                var result = await dbClient.auth.getUser();
                 if (result.error || !result.data.user) {
-                    window.location.href = 'login.html?redirect=organizer-dashboard.html';
+                    console.error('Auth failed:', result.error);
+                    window.showAlert('error', 'Please login to access this page');
+                    setTimeout(function() {
+                        window.location.href = 'login.html?redirect=organizer-dashboard.html';
+                    }, 2000);
                     return false;
                 }
                 currentUser = result.data.user;
+                console.log('✅ User authenticated:', currentUser.id);
                 return true;
             } catch (error) {
                 console.error('Auth error:', error);
-                showAlert('error', 'Authentication error');
+                window.showAlert('error', 'Authentication error: ' + error.message);
                 return false;
             }
         }
 
         // ===== Modal Functions =====
-        function openCreateModal() {
+        window.openCreateModal = function() {
+            console.log('Opening create modal');
+            if (!currentUser) {
+                window.showAlert('error', 'Please login first');
+                return;
+            }
             document.getElementById('tournamentForm').reset();
             document.getElementById('editTournamentId').value = '';
             document.getElementById('modalTitle').textContent = translations[currentLang].modalTitleCreate;
             document.getElementById('imagePreview').classList.remove('show');
             selectedImageFile = null;
             document.getElementById('tournamentModal').classList.add('show');
-        }
+        };
 
-        async function openEditModal(id) {
+        window.openEditModal = async function(id) {
+            console.log('Opening edit modal for:', id);
+            if (!currentUser) {
+                window.showAlert('error', 'Please login first');
+                return;
+            }
             try {
-                var result = await supabase.from('tournaments').select('*').eq('id', id).single();
+                var result = await dbClient.from('tournaments').select('*').eq('id', id).single();
                 if (result.error) throw result.error;
                 var data = result.data;
 
@@ -500,22 +515,22 @@
                 document.getElementById('modalTitle').textContent = translations[currentLang].modalTitleEdit;
                 document.getElementById('tournamentModal').classList.add('show');
             } catch (error) {
-                showAlert('error', 'Error loading tournament: ' + error.message);
+                window.showAlert('error', 'Error loading tournament: ' + error.message);
             }
-        }
+        };
 
-        function closeModal() {
+        window.closeModal = function() {
             document.getElementById('tournamentModal').classList.remove('show');
             selectedImageFile = null;
             document.getElementById('imagePreview').classList.remove('show');
-        }
+        };
 
         // ===== Image Preview =====
-        function handleImagePreview(event) {
+        window.handleImagePreview = function(event) {
             var file = event.target.files[0];
             if (file) {
                 if (file.size > 5 * 1024 * 1024) {
-                    showAlert('error', 'Image size must be less than 5MB');
+                    window.showAlert('error', 'Image size must be less than 5MB');
                     return;
                 }
                 selectedImageFile = file;
@@ -527,33 +542,57 @@
                 };
                 reader.readAsDataURL(file);
             }
-        }
+        };
 
         // ===== Form Submit =====
-        async function handleFormSubmit(e) {
+        window.handleFormSubmit = async function(e) {
             e.preventDefault();
+            console.log('Form submitted');
+            
+            // Check if user is logged in
+            if (!currentUser) {
+                console.error('No user logged in');
+                window.showAlert('error', 'Please login first. Redirecting...');
+                setTimeout(function() {
+                    window.location.href = 'login.html';
+                }, 2000);
+                return;
+            }
+            
+            console.log('Current user ID:', currentUser.id);
+            
             var editId = document.getElementById('editTournamentId').value;
+            console.log('Edit ID:', editId);
             
             var imageUrl = null;
             
+            // Upload image if selected
             if (selectedImageFile) {
                 try {
+                    console.log('Uploading image...');
                     var fileExt = selectedImageFile.name.split('.').pop();
                     var fileName = currentUser.id + '-' + Date.now() + '.' + fileExt;
                     
-                    var uploadResult = await supabase.storage
+                    var uploadResult = await dbClient.storage
                         .from('tournament_images')
                         .upload(fileName, selectedImageFile, { upsert: true });
                     
-                    if (uploadResult.error) throw uploadResult.error;
+                    if (uploadResult.error) {
+                        console.error('Upload error:', uploadResult.error);
+                        throw uploadResult.error;
+                    }
                     
-                    var urlResult = supabase.storage
+                    console.log('Image uploaded successfully');
+                    var urlResult = dbClient.storage
                         .from('tournament_images')
                         .getPublicUrl(fileName);
                     
                     imageUrl = urlResult.data.publicUrl;
+                    console.log('Image URL:', imageUrl);
                 } catch (error) {
                     console.error('Image upload error:', error);
+                    window.showAlert('error', 'Failed to upload image: ' + error.message);
+                    return;
                 }
             }
             
@@ -570,44 +609,64 @@
                 updated_at: new Date().toISOString()
             };
             
-            if (imageUrl) tournamentData.image_url = imageUrl;
+            if (imageUrl) {
+                tournamentData.image_url = imageUrl;
+            }
+
+            console.log('Tournament data:', tournamentData);
 
             try {
-                var error;
+                var result;
                 if (editId) {
+                    console.log('Updating tournament:', editId);
                     if (!imageUrl) delete tournamentData.image_url;
-                    var res = await supabase.from('tournaments').update(tournamentData).eq('id', editId);
-                    error = res.error;
-                    if (!error) showAlert('success', translations[currentLang].successUpdate);
+                    result = await dbClient.from('tournaments').update(tournamentData).eq('id', editId);
+                    if (result.error) throw result.error;
+                    window.showAlert('success', translations[currentLang].successUpdate);
                 } else {
+                    console.log('Creating new tournament');
                     tournamentData.created_at = new Date().toISOString();
-                    var res = await supabase.from('tournaments').insert([tournamentData]);
-                    error = res.error;
-                    if (!error) showAlert('success', translations[currentLang].successCreate);
+                    result = await dbClient.from('tournaments').insert([tournamentData]);
+                    if (result.error) throw result.error;
+                    window.showAlert('success', translations[currentLang].successCreate);
                 }
 
-                if (error) throw error;
-                closeModal();
-                await loadTournaments();
+                console.log('Success:', result);
+                window.closeModal();
+                await window.loadTournaments();
             } catch (error) {
-                showAlert('error', (editId ? translations[currentLang].errorUpdate : translations[currentLang].errorCreate) + error.message);
+                console.error('Error:', error);
+                window.showAlert('error', (editId ? translations[currentLang].errorUpdate : translations[currentLang].errorCreate) + error.message);
             }
-        }
+        };
 
         // ===== Load Tournaments =====
-        async function loadTournaments() {
+        window.loadTournaments = async function() {
+            console.log('Loading tournaments...');
             var container = document.getElementById('tournamentsList');
             container.innerHTML = '<div class="loading">' + translations[currentLang].loading + '</div>';
 
             try {
-                var result = await supabase
+                if (!currentUser) {
+                    console.error('No user logged in');
+                    window.showAlert('error', 'Please login first');
+                    return;
+                }
+
+                console.log('User ID:', currentUser.id);
+                var result = await dbClient
                     .from('tournaments')
                     .select('*')
                     .eq('organizer_id', currentUser.id)
                     .order('created_at', { ascending: false });
 
-                if (result.error) throw result.error;
+                if (result.error) {
+                    console.error('Load error:', result.error);
+                    throw result.error;
+                }
+                
                 var data = result.data;
+                console.log('Tournaments loaded:', data);
 
                 if (!data || data.length === 0) {
                     var t = translations[currentLang];
@@ -653,7 +712,7 @@
                                         '<span>' + translations[currentLang].date + ': ' + formattedDate + '</span>' +
                                     '</div>' +
                                     '<div class="tournament-meta-item">' +
-                                        '<span></span>' +
+                                        '<span>📍</span>' +
                                         '<span>' + translations[currentLang].location + ': ' + (t.location || 'TBD') + '</span>' +
                                     '</div>' +
                                 '</div>' +
@@ -674,8 +733,8 @@
                                 '<div class="tournament-actions">' +
                                     '<a href="tournament-manager.html?tournament_id=' + t.id + '" class="btn btn-primary">' + translations[currentLang].manage + '</a>' +
                                     '<a href="tournament-details.html?tournament_id=' + t.id + '" target="_blank" class="btn btn-secondary">' + translations[currentLang].view + '</a>' +
-                                    '<button class="btn btn-secondary" onclick="openEditModal(\'' + t.id + '\')">' + translations[currentLang].edit + '</button>' +
-                                    '<button class="btn" style="background: #ef4444; color: white;" onclick="deleteTournament(\'' + t.id + '\')">' + translations[currentLang].delete + '</button>' +
+                                    '<button class="btn btn-secondary" onclick="window.openEditModal(\'' + t.id + '\')">' + translations[currentLang].edit + '</button>' +
+                                    '<button class="btn" style="background: #ef4444; color: white;" onclick="window.deleteTournament(\'' + t.id + '\')">' + translations[currentLang].delete + '</button>' +
                                 '</div>' +
                             '</div>' +
                         '</div>';
@@ -686,74 +745,76 @@
 
                 // Load stats for each tournament
                 for (var j = 0; j < data.length; j++) {
-                    loadTournamentStats(data[j].id);
+                    window.loadTournamentStats(data[j].id);
                 }
             } catch (error) {
                 console.error('Load error:', error);
                 container.innerHTML = '<div class="alert alert-error show">❌ ' + error.message + '</div>';
             }
-        }
+        };
 
         // ===== Load Stats =====
-        async function loadTournamentStats(tournamentId) {
+        window.loadTournamentStats = async function(tournamentId) {
             try {
-                var regResult = await supabase.from('tournament_participants').select('*', { count: 'exact', head: true }).eq('tournament_id', tournamentId);
+                var regResult = await dbClient.from('tournament_participants').select('*', { count: 'exact', head: true }).eq('tournament_id', tournamentId);
                 var regCount = regResult.count || 0;
                 var regElement = document.getElementById('regCount_' + tournamentId);
                 if (regElement) regElement.textContent = regCount;
 
-                var matchResult = await supabase.from('matches').select('*', { count: 'exact', head: true }).eq('tournament_id', tournamentId);
+                var matchResult = await dbClient.from('matches').select('*', { count: 'exact', head: true }).eq('tournament_id', tournamentId);
                 var matchCount = matchResult.count || 0;
                 var matchElement = document.getElementById('matchCount_' + tournamentId);
                 if (matchElement) matchElement.textContent = matchCount;
             } catch (error) { 
                 console.error('Stats error:', error); 
             }
-        }
+        };
 
         // ===== Delete Tournament =====
-        async function deleteTournament(tournamentId) {
+        window.deleteTournament = async function(tournamentId) {
             if (!confirm(translations[currentLang].confirmDelete)) return;
             try {
-                var result = await supabase.from('tournaments').delete().eq('id', tournamentId);
+                var result = await dbClient.from('tournaments').delete().eq('id', tournamentId);
                 if (result.error) throw result.error;
-                showAlert('success', translations[currentLang].successDelete);
-                await loadTournaments();
+                window.showAlert('success', translations[currentLang].successDelete);
+                await window.loadTournaments();
             } catch (error) {
-                showAlert('error', translations[currentLang].errorDelete + error.message);
+                window.showAlert('error', translations[currentLang].errorDelete + error.message);
             }
-        }
+        };
 
         // ===== Logout =====
-        async function logout() {
-            await supabase.auth.signOut();
+        window.logout = async function() {
+            await dbClient.auth.signOut();
             window.location.href = 'index.html';
-        }
+        };
 
         // ===== Show Alert =====
-        function showAlert(type, message) {
+        window.showAlert = function(type, message) {
             var alert = document.getElementById('alert');
             alert.className = 'alert alert-' + type + ' show';
             alert.textContent = message;
             setTimeout(function() { 
                 alert.classList.remove('show'); 
             }, 5000);
-        }
+        };
 
         // ===== Close Modal on Outside Click =====
         window.onclick = function(event) {
             var modal = document.getElementById('tournamentModal');
             if (event.target === modal) {
-                closeModal();
+                window.closeModal();
             }
         };
 
         // ===== Initialize =====
         window.onload = async function() {
+            console.log('Page loaded, checking auth...');
             var authOk = await checkAuth();
             if (authOk) {
-                changeLang(currentLang);
-                await loadTournaments();
+                console.log('Auth successful, loading data...');
+                window.changeLang(currentLang);
+                await window.loadTournaments();
             }
         };
     </script>
