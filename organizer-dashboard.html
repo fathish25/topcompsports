@@ -310,7 +310,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Tournament Image (Optional)</label>
+                    <label class="form-label">📷 Tournament Image (Optional)</label>
                     <div class="image-upload" onclick="document.getElementById('tournamentImage').click()">
                         <div style="font-size: 3rem; margin-bottom: 10px;">📷</div>
                         <div>Click to upload image</div>
@@ -318,6 +318,7 @@
                         <input type="file" id="tournamentImage" accept="image/*" onchange="window.handleImagePreview(event)">
                     </div>
                     <img id="imagePreview" class="image-preview" alt="Preview">
+                    <p style="font-size: 0.85rem; color: rgba(0,0,0,0.5); margin-top: 5px;">⚠️ Image upload is currently disabled. Tournament will be created without image.</p>
                 </div>
                 
                 <div class="form-row">
@@ -358,7 +359,6 @@
         var currentUser = null;
         var currentLang = localStorage.getItem('lang') || 'en';
         var selectedImageFile = null;
-        var STORAGE_BUCKET_NAME = 'tournament_images';
 
         // ===== Translations =====
         var translations = {
@@ -414,7 +414,7 @@
                 successDelete: '✅ تم الحذف!',
                 errorCreate: '❌ خطأ في الإنشاء: ',
                 errorUpdate: '❌ خطأ في التحديث: ',
-                errorDelete: '❌ خطأ في الحذف: ',
+                errorDelete: ' خطأ في الحذف: ',
                 confirmDelete: 'هل أنت متأكد من الحذف؟',
                 statusUpcoming: 'قادمة',
                 statusToday: 'اليوم',
@@ -422,42 +422,16 @@
             }
         };
 
-        // ===== Initialize Supabase ONCE =====
+        // ===== Initialize Supabase =====
         function initSupabase() {
             if (!dbClient) {
-                console.log('Initializing Supabase client...');
+                console.log('Initializing Supabase...');
                 dbClient = window.supabase.createClient(
                     'https://ngiclnkmbvzjhylwhzyn.supabase.co',
                     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w'
                 );
-                console.log('✅ Supabase client initialized');
             }
             return dbClient;
-        }
-
-        // ===== Check Bucket Access =====
-        async function checkBucketAccess() {
-            try {
-                console.log('Checking bucket access:', STORAGE_BUCKET_NAME);
-                if (!dbClient) {
-                    throw new Error('Supabase client not initialized');
-                }
-                
-                var result = await dbClient.storage
-                    .from(STORAGE_BUCKET_NAME)
-                    .list('', { limit: 1 });
-                
-                if (result.error) {
-                    console.error('Bucket access error:', result.error);
-                    throw new Error('Cannot access bucket: ' + result.error.message);
-                }
-                
-                console.log('✅ Bucket is accessible');
-                return true;
-            } catch (error) {
-                console.error('Bucket check failed:', error);
-                throw error;
-            }
         }
 
         // ===== Language Switcher =====
@@ -501,21 +475,12 @@
         }
 
         // ===== Modal Functions =====
-        window.openCreateModal = async function() {
+        window.openCreateModal = function() {
             console.log('Opening create modal');
             if (!currentUser) {
                 window.showAlert('error', 'Please login first');
                 return;
             }
-            
-            // Check bucket access before opening modal
-            try {
-                await checkBucketAccess();
-            } catch (error) {
-                window.showAlert('error', 'Storage error: ' + error.message + '\n\nPlease contact support.');
-                return;
-            }
-            
             document.getElementById('tournamentForm').reset();
             document.getElementById('editTournamentId').value = '';
             document.getElementById('modalTitle').textContent = translations[currentLang].modalTitleCreate;
@@ -582,7 +547,7 @@
             }
         };
 
-        // ===== Form Submit =====
+        // ===== Form Submit - WITHOUT IMAGE UPLOAD =====
         window.handleFormSubmit = async function(e) {
             e.preventDefault();
             console.log('Form submitted');
@@ -602,46 +567,7 @@
             var editId = document.getElementById('editTournamentId').value;
             console.log('Edit ID:', editId);
             
-            var imageUrl = null;
-            
-            // Upload image if selected
-            if (selectedImageFile) {
-                try {
-                    console.log('Uploading image to bucket:', STORAGE_BUCKET_NAME);
-                    
-                    // Verify bucket access first
-                    await checkBucketAccess();
-                    
-                    var fileExt = selectedImageFile.name.split('.').pop();
-                    var fileName = currentUser.id + '-' + Date.now() + '.' + fileExt;
-                    
-                    console.log('Uploading file:', fileName);
-                    var uploadResult = await dbClient.storage
-                        .from(STORAGE_BUCKET_NAME)
-                        .upload(fileName, selectedImageFile, { 
-                            upsert: true,
-                            contentType: selectedImageFile.type
-                        });
-                    
-                    if (uploadResult.error) {
-                        console.error('Upload error:', uploadResult.error);
-                        throw new Error(uploadResult.error.message);
-                    }
-                    
-                    console.log('✅ Image uploaded successfully');
-                    var urlResult = dbClient.storage
-                        .from(STORAGE_BUCKET_NAME)
-                        .getPublicUrl(fileName);
-                    
-                    imageUrl = urlResult.data.publicUrl;
-                    console.log('Image URL:', imageUrl);
-                } catch (error) {
-                    console.error('Image upload error:', error);
-                    window.showAlert('error', 'Failed to upload image: ' + error.message);
-                    return;
-                }
-            }
-            
+            // Create tournament WITHOUT image
             var tournamentData = {
                 organizer_id: currentUser.id,
                 name: document.getElementById('tournamentName').value,
@@ -652,12 +578,9 @@
                 max_participants: parseInt(document.getElementById('maxParticipants').value) || 200,
                 registration_fee: parseFloat(document.getElementById('registrationFee').value) || 0,
                 status: 'draft',
-                updated_at: new Date().toISOString()
+                updated_at: new Date().toISOString(),
+                image_url: null // No image for now
             };
-            
-            if (imageUrl) {
-                tournamentData.image_url = imageUrl;
-            }
 
             console.log('Tournament data:', tournamentData);
 
@@ -665,7 +588,6 @@
                 var result;
                 if (editId) {
                     console.log('Updating tournament:', editId);
-                    if (!imageUrl) delete tournamentData.image_url;
                     result = await dbClient.from('tournaments').update(tournamentData).eq('id', editId);
                     if (result.error) throw result.error;
                     window.showAlert('success', translations[currentLang].successUpdate);
@@ -744,7 +666,8 @@
                         statusText = translations[currentLang].statusToday;
                     }
 
-                    var imageUrl = t.image_url || 'https://via.placeholder.com/800x200/0066CC/FFFFFF?text=Tournament';
+                    // Use placeholder image if no image_url
+                    var imageUrl = t.image_url || 'https://via.placeholder.com/800x200/0066CC/FFFFFF?text=' + encodeURIComponent(t.name);
 
                     html += 
                         '<div class="tournament-card">' +
