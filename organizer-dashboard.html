@@ -21,7 +21,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); color: var(--black); min-height: 100vh; }
 
-        /* Header - مطابق للصفحة الرئيسية */
         .header {
             background: var(--black);
             padding: 15px 50px;
@@ -31,8 +30,15 @@
             border-bottom: 3px solid var(--primary-blue);
         }
 
-        .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; }
-        .logo-text { font-size: 28px; font-weight: bold; color: var(--primary-blue); }
+        .logo { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            cursor: pointer;
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
         
         .nav { display: flex; gap: 20px; align-items: center; }
         .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; transition: all 0.3s; }
@@ -49,7 +55,6 @@
         .lang-btn { padding: 8px 15px; border: none; background: transparent; color: var(--white); cursor: pointer; border-radius: 6px; font-weight: bold; }
         .lang-btn.active { background: var(--primary-blue); }
 
-        /* Container */
         .container { max-width: 1200px; margin: 0 auto; padding: 40px 50px; }
         
         .page-header {
@@ -73,7 +78,6 @@
 
         .page-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-        /* Tournament Cards */
         .tournaments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
         
         .tournament-card {
@@ -159,7 +163,6 @@
 
         .tournament-actions .btn { flex: 1; min-width: 100px; }
 
-        /* Modal */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -256,10 +259,9 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <div class="logo" onclick="window.location.href='index.html'">
-            <div class="logo-text">TopCompSports</div>
+            TopCompSports
         </div>
         <div class="nav">
             <a href="index.html">Home</a>
@@ -272,7 +274,6 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <div class="container">
         <div id="alert" class="alert"></div>
 
@@ -289,7 +290,6 @@
         </div>
     </div>
 
-    <!-- Create/Edit Modal -->
     <div class="modal-overlay" id="tournamentModal">
         <div class="modal">
             <div class="modal-header">
@@ -310,7 +310,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">📷 Tournament Image (Optional)</label>
+                    <label class="form-label"> Tournament Image (Optional)</label>
                     <div class="image-upload" onclick="document.getElementById('tournamentImage').click()">
                         <div style="font-size: 3rem; margin-bottom: 10px;">📷</div>
                         <div>Click to upload image</div>
@@ -326,7 +326,7 @@
                         <input type="date" class="form-input" id="tournamentDate" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label"> Registration Deadline</label>
+                        <label class="form-label">Registration Deadline</label>
                         <input type="date" class="form-input" id="registrationDeadline">
                     </div>
                 </div>
@@ -354,15 +354,15 @@
 
     <script>
         // ===== Global Variables =====
-        let supabase = null;
-        let currentUser = null;
-        let currentLang = localStorage.getItem('lang') || 'en';
-        let selectedImageFile = null;
+        var supabase = null;
+        var currentUser = null;
+        var currentLang = localStorage.getItem('lang') || 'en';
+        var selectedImageFile = null;
 
         // ===== Translations =====
-        const translations = {
+        var translations = {
             en: {
-                pageTitle: ' Organizer Dashboard',
+                pageTitle: '🏆 Organizer Dashboard',
                 btnCreate: '➕ Create Tournament',
                 btnRefresh: '🔄 Refresh',
                 loading: 'Loading tournaments...',
@@ -412,8 +412,8 @@
                 successUpdate: '✅ تم التحديث بنجاح!',
                 successDelete: '✅ تم الحذف!',
                 errorCreate: '❌ خطأ في الإنشاء: ',
-                errorUpdate: ' خطأ في التحديث: ',
-                errorDelete: '❌ خطأ في الحذف: ',
+                errorUpdate: '❌ خطأ في التحديث: ',
+                errorDelete: ' خطأ في الحذف: ',
                 confirmDelete: 'هل أنت متأكد من الحذف؟',
                 statusUpcoming: 'قادمة',
                 statusToday: 'اليوم',
@@ -432,7 +432,7 @@
         }
 
         // ===== Language Switcher =====
-        window.changeLang = function(lang) {
+        function changeLang(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
             document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
@@ -440,24 +440,24 @@
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
             document.documentElement.lang = lang;
             
-            const t = translations[lang];
+            var t = translations[lang];
             document.getElementById('pageTitle').textContent = t.pageTitle;
             document.getElementById('btnCreate').textContent = t.btnCreate;
             document.getElementById('btnRefresh').textContent = t.btnRefresh;
             
             loadTournaments();
-        };
+        }
 
         // ===== Auth Check =====
         async function checkAuth() {
             try {
                 initSupabase();
-                const { data: { user }, error } = await supabase.auth.getUser();
-                if (error || !user) {
+                var result = await supabase.auth.getUser();
+                if (result.error || !result.data.user) {
                     window.location.href = 'login.html?redirect=organizer-dashboard.html';
                     return false;
                 }
-                currentUser = user;
+                currentUser = result.data.user;
                 return true;
             } catch (error) {
                 console.error('Auth error:', error);
@@ -467,19 +467,20 @@
         }
 
         // ===== Modal Functions =====
-        window.openCreateModal = function() {
+        function openCreateModal() {
             document.getElementById('tournamentForm').reset();
             document.getElementById('editTournamentId').value = '';
             document.getElementById('modalTitle').textContent = translations[currentLang].modalTitleCreate;
             document.getElementById('imagePreview').classList.remove('show');
             selectedImageFile = null;
             document.getElementById('tournamentModal').classList.add('show');
-        };
+        }
 
-        window.openEditModal = async function(id) {
+        async function openEditModal(id) {
             try {
-                const { data, error } = await supabase.from('tournaments').select('*').eq('id', id).single();
-                if (error) throw error;
+                var result = await supabase.from('tournaments').select('*').eq('id', id).single();
+                if (result.error) throw result.error;
+                var data = result.data;
 
                 document.getElementById('editTournamentId').value = data.id;
                 document.getElementById('tournamentName').value = data.name;
@@ -491,7 +492,7 @@
                 document.getElementById('registrationFee').value = data.registration_fee || 0;
                 
                 if (data.image_url) {
-                    const preview = document.getElementById('imagePreview');
+                    var preview = document.getElementById('imagePreview');
                     preview.src = data.image_url;
                     preview.classList.add('show');
                 }
@@ -501,62 +502,62 @@
             } catch (error) {
                 showAlert('error', 'Error loading tournament: ' + error.message);
             }
-        };
+        }
 
-        window.closeModal = function() {
+        function closeModal() {
             document.getElementById('tournamentModal').classList.remove('show');
             selectedImageFile = null;
             document.getElementById('imagePreview').classList.remove('show');
-        };
+        }
 
         // ===== Image Preview =====
-        window.handleImagePreview = function(event) {
-            const file = event.target.files[0];
+        function handleImagePreview(event) {
+            var file = event.target.files[0];
             if (file) {
                 if (file.size > 5 * 1024 * 1024) {
                     showAlert('error', 'Image size must be less than 5MB');
                     return;
                 }
                 selectedImageFile = file;
-                const reader = new FileReader();
+                var reader = new FileReader();
                 reader.onload = function(e) {
-                    const preview = document.getElementById('imagePreview');
+                    var preview = document.getElementById('imagePreview');
                     preview.src = e.target.result;
                     preview.classList.add('show');
                 };
                 reader.readAsDataURL(file);
             }
-        };
+        }
 
         // ===== Form Submit =====
-        window.handleFormSubmit = async function(e) {
+        async function handleFormSubmit(e) {
             e.preventDefault();
-            const editId = document.getElementById('editTournamentId').value;
+            var editId = document.getElementById('editTournamentId').value;
             
-            let imageUrl = null;
+            var imageUrl = null;
             
             if (selectedImageFile) {
                 try {
-                    const fileExt = selectedImageFile.name.split('.').pop();
-                    const fileName = `${currentUser.id}-${Date.now()}.${fileExt}`;
+                    var fileExt = selectedImageFile.name.split('.').pop();
+                    var fileName = currentUser.id + '-' + Date.now() + '.' + fileExt;
                     
-                    const { error: uploadError } = await supabase.storage
+                    var uploadResult = await supabase.storage
                         .from('tournament_images')
                         .upload(fileName, selectedImageFile, { upsert: true });
                     
-                    if (uploadError) throw uploadError;
+                    if (uploadResult.error) throw uploadResult.error;
                     
-                    const { data: { publicUrl } } = supabase.storage
+                    var urlResult = supabase.storage
                         .from('tournament_images')
                         .getPublicUrl(fileName);
                     
-                    imageUrl = publicUrl;
+                    imageUrl = urlResult.data.publicUrl;
                 } catch (error) {
                     console.error('Image upload error:', error);
                 }
             }
             
-            const tournamentData = {
+            var tournamentData = {
                 organizer_id: currentUser.id,
                 name: document.getElementById('tournamentName').value,
                 description: document.getElementById('tournamentDesc').value,
@@ -572,15 +573,15 @@
             if (imageUrl) tournamentData.image_url = imageUrl;
 
             try {
-                let error;
+                var error;
                 if (editId) {
                     if (!imageUrl) delete tournamentData.image_url;
-                    const res = await supabase.from('tournaments').update(tournamentData).eq('id', editId);
+                    var res = await supabase.from('tournaments').update(tournamentData).eq('id', editId);
                     error = res.error;
                     if (!error) showAlert('success', translations[currentLang].successUpdate);
                 } else {
                     tournamentData.created_at = new Date().toISOString();
-                    const res = await supabase.from('tournaments').insert([tournamentData]);
+                    var res = await supabase.from('tournaments').insert([tournamentData]);
                     error = res.error;
                     if (!error) showAlert('success', translations[currentLang].successCreate);
                 }
@@ -591,141 +592,157 @@
             } catch (error) {
                 showAlert('error', (editId ? translations[currentLang].errorUpdate : translations[currentLang].errorCreate) + error.message);
             }
-        };
+        }
 
         // ===== Load Tournaments =====
-        window.loadTournaments = async function() {
-            const container = document.getElementById('tournamentsList');
-            container.innerHTML = `<div class="loading">${translations[currentLang].loading}</div>`;
+        async function loadTournaments() {
+            var container = document.getElementById('tournamentsList');
+            container.innerHTML = '<div class="loading">' + translations[currentLang].loading + '</div>';
 
             try {
-                const { data, error } = await supabase
+                var result = await supabase
                     .from('tournaments')
                     .select('*')
                     .eq('organizer_id', currentUser.id)
                     .order('created_at', { ascending: false });
 
-                if (error) throw error;
+                if (result.error) throw result.error;
+                var data = result.data;
 
                 if (!data || data.length === 0) {
-                    const t = translations[currentLang];
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon">🏆</div>
-                            <h3>${t.noTournaments}</h3>
-                            <p>${t.noTournamentsDesc}</p>
-                        </div>`;
+                    var t = translations[currentLang];
+                    container.innerHTML = 
+                        '<div class="empty-state">' +
+                            '<div class="icon">🏆</div>' +
+                            '<h3>' + t.noTournaments + '</h3>' +
+                            '<p>' + t.noTournamentsDesc + '</p>' +
+                        '</div>';
                     return;
                 }
 
-                const today = new Date();
-                container.innerHTML = '<div class="tournaments-grid">' + data.map(t => {
-                    const date = new Date(t.date);
-                    const formattedDate = date.toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                var today = new Date();
+                var html = '<div class="tournaments-grid">';
+                
+                for (var i = 0; i < data.length; i++) {
+                    var t = data[i];
+                    var date = new Date(t.date);
+                    var formattedDate = date.toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
                     
-                    let statusText = translations[currentLang].statusUpcoming;
-                    if (date < today && date.toDateString() !== today.toDateString()) statusText = translations[currentLang].statusCompleted;
-                    else if (date.toDateString() === today.toDateString()) statusText = translations[currentLang].statusToday;
+                    var statusText = translations[currentLang].statusUpcoming;
+                    if (date < today && date.toDateString() !== today.toDateString()) {
+                        statusText = translations[currentLang].statusCompleted;
+                    } else if (date.toDateString() === today.toDateString()) {
+                        statusText = translations[currentLang].statusToday;
+                    }
 
-                    const imageUrl = t.image_url || 'https://via.placeholder.com/800x200/0066CC/FFFFFF?text=Tournament';
+                    var imageUrl = t.image_url || 'https://via.placeholder.com/800x200/0066CC/FFFFFF?text=Tournament';
 
-                    return `
-                        <div class="tournament-card">
-                            <img src="${imageUrl}" alt="${t.name}" class="tournament-image" onerror="this.src='https://via.placeholder.com/800x200/0066CC/FFFFFF?text=No+Image'">
-                            <div class="tournament-content">
-                                <div class="tournament-header">
-                                    <div>
-                                        <div class="tournament-name">${t.name}</div>
-                                    </div>
-                                    <span class="tournament-status">${statusText}</span>
-                                </div>
-                                <div class="tournament-meta">
-                                    <div class="tournament-meta-item">
-                                        <span>📅</span>
-                                        <span>${translations[currentLang].date}: ${formattedDate}</span>
-                                    </div>
-                                    <div class="tournament-meta-item">
-                                        <span>📍</span>
-                                        <span>${translations[currentLang].location}: ${t.location || 'TBD'}</span>
-                                    </div>
-                                </div>
-                                <div class="stats-row">
-                                    <div class="stat-item">
-                                        <div class="stat-value" id="regCount_${t.id}">-</div>
-                                        <div class="stat-label">${translations[currentLang].players}</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-value" id="matchCount_${t.id}">-</div>
-                                        <div class="stat-label">${translations[currentLang].matches}</div>
-                                    </div>
-                                    <div class="stat-item">
-                                        <div class="stat-value">${t.max_participants || 200}</div>
-                                        <div class="stat-label">${translations[currentLang].capacity}</div>
-                                    </div>
-                                </div>
-                                <div class="tournament-actions">
-                                    <a href="tournament-manager.html?tournament_id=${t.id}" class="btn btn-primary">${translations[currentLang].manage}</a>
-                                    <a href="tournament-details.html?tournament_id=${t.id}" target="_blank" class="btn btn-secondary">${translations[currentLang].view}</a>
-                                    <button class="btn btn-secondary" onclick="openEditModal('${t.id}')">${translations[currentLang].edit}</button>
-                                    <button class="btn" style="background: #ef4444; color: white;" onclick="deleteTournament('${t.id}')">${translations[currentLang].delete}</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('') + '</div>';
+                    html += 
+                        '<div class="tournament-card">' +
+                            '<img src="' + imageUrl + '" alt="' + t.name + '" class="tournament-image" onerror="this.src=\'https://via.placeholder.com/800x200/0066CC/FFFFFF?text=No+Image\'">' +
+                            '<div class="tournament-content">' +
+                                '<div class="tournament-header">' +
+                                    '<div>' +
+                                        '<div class="tournament-name">' + t.name + '</div>' +
+                                    '</div>' +
+                                    '<span class="tournament-status">' + statusText + '</span>' +
+                                '</div>' +
+                                '<div class="tournament-meta">' +
+                                    '<div class="tournament-meta-item">' +
+                                        '<span>📅</span>' +
+                                        '<span>' + translations[currentLang].date + ': ' + formattedDate + '</span>' +
+                                    '</div>' +
+                                    '<div class="tournament-meta-item">' +
+                                        '<span></span>' +
+                                        '<span>' + translations[currentLang].location + ': ' + (t.location || 'TBD') + '</span>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div class="stats-row">' +
+                                    '<div class="stat-item">' +
+                                        '<div class="stat-value" id="regCount_' + t.id + '">-</div>' +
+                                        '<div class="stat-label">' + translations[currentLang].players + '</div>' +
+                                    '</div>' +
+                                    '<div class="stat-item">' +
+                                        '<div class="stat-value" id="matchCount_' + t.id + '">-</div>' +
+                                        '<div class="stat-label">' + translations[currentLang].matches + '</div>' +
+                                    '</div>' +
+                                    '<div class="stat-item">' +
+                                        '<div class="stat-value">' + (t.max_participants || 200) + '</div>' +
+                                        '<div class="stat-label">' + translations[currentLang].capacity + '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div class="tournament-actions">' +
+                                    '<a href="tournament-manager.html?tournament_id=' + t.id + '" class="btn btn-primary">' + translations[currentLang].manage + '</a>' +
+                                    '<a href="tournament-details.html?tournament_id=' + t.id + '" target="_blank" class="btn btn-secondary">' + translations[currentLang].view + '</a>' +
+                                    '<button class="btn btn-secondary" onclick="openEditModal(\'' + t.id + '\')">' + translations[currentLang].edit + '</button>' +
+                                    '<button class="btn" style="background: #ef4444; color: white;" onclick="deleteTournament(\'' + t.id + '\')">' + translations[currentLang].delete + '</button>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+                }
+                
+                html += '</div>';
+                container.innerHTML = html;
 
-                data.forEach(t => loadTournamentStats(t.id));
+                // Load stats for each tournament
+                for (var j = 0; j < data.length; j++) {
+                    loadTournamentStats(data[j].id);
+                }
             } catch (error) {
                 console.error('Load error:', error);
-                container.innerHTML = `<div class="alert alert-error show">❌ ${error.message}</div>`;
+                container.innerHTML = '<div class="alert alert-error show">❌ ' + error.message + '</div>';
             }
-        };
+        }
 
         // ===== Load Stats =====
         async function loadTournamentStats(tournamentId) {
             try {
-                const { count: regCount } = await supabase.from('tournament_participants').select('*', { count: 'exact', head: true }).eq('tournament_id', tournamentId);
-                if (document.getElementById(`regCount_${tournamentId}`)) {
-                    document.getElementById(`regCount_${tournamentId}`).textContent = regCount || 0;
-                }
+                var regResult = await supabase.from('tournament_participants').select('*', { count: 'exact', head: true }).eq('tournament_id', tournamentId);
+                var regCount = regResult.count || 0;
+                var regElement = document.getElementById('regCount_' + tournamentId);
+                if (regElement) regElement.textContent = regCount;
 
-                const { count: matchCount } = await supabase.from('matches').select('*', { count: 'exact', head: true }).eq('tournament_id', tournamentId);
-                if (document.getElementById(`matchCount_${tournamentId}`)) {
-                    document.getElementById(`matchCount_${tournamentId}`).textContent = matchCount || 0;
-                }
-            } catch (error) { console.error('Stats error:', error); }
+                var matchResult = await supabase.from('matches').select('*', { count: 'exact', head: true }).eq('tournament_id', tournamentId);
+                var matchCount = matchResult.count || 0;
+                var matchElement = document.getElementById('matchCount_' + tournamentId);
+                if (matchElement) matchElement.textContent = matchCount;
+            } catch (error) { 
+                console.error('Stats error:', error); 
+            }
         }
 
         // ===== Delete Tournament =====
-        window.deleteTournament = async function(tournamentId) {
+        async function deleteTournament(tournamentId) {
             if (!confirm(translations[currentLang].confirmDelete)) return;
             try {
-                const { error } = await supabase.from('tournaments').delete().eq('id', tournamentId);
-                if (error) throw error;
+                var result = await supabase.from('tournaments').delete().eq('id', tournamentId);
+                if (result.error) throw result.error;
                 showAlert('success', translations[currentLang].successDelete);
                 await loadTournaments();
             } catch (error) {
                 showAlert('error', translations[currentLang].errorDelete + error.message);
             }
-        };
+        }
 
         // ===== Logout =====
-        window.logout = async function() {
+        async function logout() {
             await supabase.auth.signOut();
             window.location.href = 'index.html';
-        };
+        }
 
         // ===== Show Alert =====
         function showAlert(type, message) {
-            const alert = document.getElementById('alert');
-            alert.className = `alert alert-${type} show`;
+            var alert = document.getElementById('alert');
+            alert.className = 'alert alert-' + type + ' show';
             alert.textContent = message;
-            setTimeout(() => alert.classList.remove('show'), 5000);
+            setTimeout(function() { 
+                alert.classList.remove('show'); 
+            }, 5000);
         }
 
         // ===== Close Modal on Outside Click =====
         window.onclick = function(event) {
-            const modal = document.getElementById('tournamentModal');
+            var modal = document.getElementById('tournamentModal');
             if (event.target === modal) {
                 closeModal();
             }
@@ -733,7 +750,7 @@
 
         // ===== Initialize =====
         window.onload = async function() {
-            const authOk = await checkAuth();
+            var authOk = await checkAuth();
             if (authOk) {
                 changeLang(currentLang);
                 await loadTournaments();
