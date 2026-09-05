@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - TopCompSports</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-blue: #0066CC;
+            --dark-blue: #003366;
+            --accent-yellow: #FFB800;
+            --black: #0A0A0A;
+            --dark-gray: #1A1A1A;
+            --medium-gray: #2A2A2A;
+            --white: #FFFFFF;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
+
+        .header {
+            background: rgba(10, 10, 10, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--primary-blue);
+        }
+
+        .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .logo-text { font-size: 24px; font-weight: bold; color: var(--accent-yellow); }
+        .nav { display: flex; gap: 20px; align-items: center; }
+        .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; }
+        .nav a:hover { color: var(--primary-blue); }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        .page-title { font-size: 2rem; color: var(--accent-yellow); margin-bottom: 30px; text-align: center; }
+
+        .profile-card {
+            background: var(--dark-gray);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 2px solid var(--medium-gray);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid var(--medium-gray);
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid var(--accent-yellow);
+            background: var(--medium-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 60px;
+        }
+
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        .upload-btn {
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .upload-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.4); }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; color: rgba(255,255,255,0.8); }
+        .form-input, .form-select {
+            width: 100%;
+            background: var(--black);
+            border: 2px solid var(--medium-gray);
+            color: var(--white);
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary-blue); }
+        .form-input:read-only { background: var(--medium-gray); cursor: not-allowed; }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .btn-primary { background: var(--primary-blue); color: var(--white); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
+        
+        .btn-secondary { background: transparent; border: 2px solid var(--white); color: var(--white); }
+        .btn-secondary:hover { background: var(--white); color: var(--black); }
+
+        .alert { padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; display: none; }
+        .alert.show { display: block; }
+        .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
+        .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
+
+        @media (max-width: 768px) {
+            .header { padding: 15px 20px; flex-direction: column; gap: 15px; }
+            .profile-card { padding: 25px 15px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo" onclick="window.location.href='index.html'">
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <nav class="nav">
+            <a href="index.html">Home</a>
+            <a href="index.html#tournaments">Tournaments</a>
+            <a href="index.html" onclick="handleLogout(); return false;">Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 class="page-title">My Profile</h1>
+
+        <div id="alert" class="alert"></div>
+
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">
+                    <span>👤</span>
+                </div>
+                <h2 id="profileName">User Name</h2>
+                <p id="profileEmail" style="color: var(--primary-blue);">user@email.com</p>
+                <button class="upload-btn" onclick="document.getElementById('profilePic').click()">
+                    📷 Change Photo
+                </button>
+                <input type="file" id="profilePic" accept="image/*" onchange="handleProfilePicUpload(event)" style="display: none;">
+            </div>
+
+            <form onsubmit="handleProfileUpdate(event)">
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" class="form-input" id="fullName" required readonly>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-input" id="email" required readonly>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label class="form-label">Date of Birth</label>
+                        <input type="date" class="form-input" id="dateOfBirth">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Gender</label>
+                        <select class="form-select" id="gender">
+                            <option value="">Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label class="form-label">Country</label>
+                        <input type="text" class="form-input" id="country" placeholder="Your country">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-input" id="phone" placeholder="+1 (234) 567-8900">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">← Back to Home</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+        let profilePictureFile = null;
+
+        window.onload = async function() {
+            const { data: { user }, error } = await dbClient.auth.getUser();
+            
+            if (error || !user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = user;
+            await loadProfile();
+        };
+
+        async function loadProfile() {
+            const { data: profile } = await dbClient
+                .from('users')
+                .select('*')
+                .eq('id', currentUser.id)
+                .maybeSingle();
+
+            if (profile) {
+                document.getElementById('profileName').textContent = profile.full_name || 'User';
+                document.getElementById('profileEmail').textContent = profile.email;
+                document.getElementById('fullName').value = profile.full_name || '';
+                document.getElementById('email').value = profile.email;
+                document.getElementById('dateOfBirth').value = profile.date_of_birth || '';
+                document.getElementById('gender').value = profile.gender || '';
+                document.getElementById('country').value = profile.country || '';
+                document.getElementById('phone').value = profile.phone || '';
+
+                if (profile.profile_picture_url) {
+                    document.getElementById('profileAvatar').innerHTML = 
+                        `<img src="${profile.profile_picture_url}" alt="Profile">`;
+                }
+            }
+        }
+
+        async function handleProfilePicUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('error', '❌ File size must be less than 5MB');
+                return;
+            }
+
+            profilePictureFile = file;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('profileAvatar').innerHTML = 
+                    `<img src="${e.target.result}" alt="Profile">`;
+            };
+            reader.readAsDataURL(file);
+
+            showAlert('success', '✅ Photo selected. Click Save to upload.');
+        }
+
+        async function handleProfileUpdate(e) {
+            e.preventDefault();
+
+            try {
+                const profileData = {
+                    id: currentUser.id,
+                    email: currentUser.email,
+                    full_name: document.getElementById('fullName').value.trim(),
+                    date_of_birth: document.getElementById('dateOfBirth').value || null,
+                    gender: document.getElementById('gender').value || null,
+                    country: document.getElementById('country').value.trim() || null,
+                    phone: document.getElementById('phone').value.trim() || null,
+                    updated_at: new Date().toISOString()
+                };
+
+                // Upload profile picture if selected
+                if (profilePictureFile) {
+                    const fileExt = profilePictureFile.name.split('.').pop();
+                    const fileName = `${currentUser.id}-profile.${fileExt}`;
+                    
+                    const { error: uploadError } = await dbClient.storage
+                        .from('profiles')
+                        .upload(fileName, profilePictureFile, { upsert: true });
+
+                    if (!uploadError) {
+                        const { data: { publicUrl } } = dbClient.storage
+                            .from('profiles')
+                            .getPublicUrl(fileName);
+                        profileData.profile_picture_url = publicUrl;
+                    }
+                }
+
+                const { error: upsertError } = await dbClient
+                    .from('users')
+                    .upsert(profileData, { onConflict: 'id' });
+
+                if (upsertError) throw upsertError;
+
+                showAlert('success', '✅ Profile updated successfully!');
+                
+                // Update localStorage
+                const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                userData.full_name = profileData.full_name;
+                userData.profile_picture_url = profileData.profile_picture_url;
+                localStorage.setItem('currentUser', JSON.stringify(userData));
+
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+
+            } catch (error) {
+                showAlert('error', '❌ Error: ' + error.message);
+            }
+        }
+
+        async function handleLogout() {
+            await dbClient.auth.signOut();
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        function showAlert(type, message) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+    </script>
+</body>
+</html>
