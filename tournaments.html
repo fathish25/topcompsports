@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournaments - TopCompSports</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-blue: #0066CC; --dark-blue: #003366; --accent-yellow: #FFB800;
+            --black: #0A0A0A; --dark-gray: #1A1A1A; --medium-gray: #2A2A2A; --white: #FFFFFF;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--white); color: var(--black); min-height: 100vh; }
+        
+        .header { background: var(--black); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-blue); }
+        .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .logo-text { font-size: 24px; font-weight: bold; color: var(--accent-yellow); }
+        .nav { display: flex; gap: 20px; align-items: center; }
+        .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; }
+        .nav a:hover { color: var(--accent-yellow); }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-login { background: var(--primary-blue); color: var(--white); }
+        
+        .hero { background: var(--gradient-blue); padding: 60px 50px; text-align: center; color: var(--white); }
+        .hero h1 { font-size: 3rem; margin-bottom: 15px; }
+        .hero p { font-size: 1.2rem; opacity: 0.9; }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 60px 50px; }
+        .tournaments-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .tournament-card { background: var(--white); border-radius: 15px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); transition: all 0.3s; cursor: pointer; border: 2px solid transparent; }
+        .tournament-card:hover { transform: translateY(-5px); box-shadow: 0 12px 35px rgba(0,102,204,0.25); border-color: var(--primary-blue); }
+        .tournament-banner { height: 200px; background: var(--gradient-blue); display: flex; align-items: center; justify-content: center; position: relative; }
+        .tournament-banner::before { content: '🏆'; font-size: 6rem; opacity: 0.3; }
+        .tournament-content { padding: 25px; }
+        .tournament-content h3 { font-size: 1.4rem; margin-bottom: 15px; color: var(--black); }
+        .tournament-meta { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        .tournament-meta-item { display: flex; align-items: center; gap: 10px; color: rgba(0,0,0,0.7); }
+        .btn-register { width: 100%; padding: 12px; background: var(--primary-blue); color: var(--white); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-register:hover { background: var(--dark-blue); }
+        
+        .loading, .empty { text-align: center; padding: 60px 20px; color: rgba(0,0,0,0.5); }
+        .empty .icon { font-size: 4rem; margin-bottom: 20px; opacity: 0.5; }
+        
+        @media (max-width: 768px) {
+            .header { padding: 15px 20px; flex-direction: column; gap: 15px; }
+            .hero { padding: 40px 20px; }
+            .hero h1 { font-size: 2rem; }
+            .container { padding: 40px 20px; }
+            .tournaments-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo" onclick="window.location.href='index.html'">
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <nav class="nav">
+            <a href="index.html">Home</a>
+            <a href="tournaments.html">Tournaments</a>
+            <a href="login.html" class="btn btn-login">Login</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>🏆 All Tournaments</h1>
+        <p>Browse and register for upcoming competitions</p>
+    </section>
+
+    <div class="container">
+        <div id="tournamentsGrid" class="tournaments-grid">
+            <div class="loading">Loading tournaments...</div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        window.onload = async function() {
+            await loadTournaments();
+        };
+
+        async function loadTournaments() {
+            const grid = document.getElementById('tournamentsGrid');
+            try {
+                const { data: tournaments, error } = await dbClient.from('tournaments').select('*').order('date', { ascending: true });
+                
+                if (error || !tournaments || tournaments.length === 0) {
+                    grid.innerHTML = '<div class="empty"><div class="icon">🏆</div><p>No tournaments available yet</p></div>';
+                    return;
+                }
+
+                grid.innerHTML = tournaments.map(t => {
+                    const date = new Date(t.date);
+                    const formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                    const location = t.location || 'To be announced';
+                    
+                    return `
+                        <div class="tournament-card" onclick="window.location.href='tournament-details.html?tournament_id=${t.id}'">
+                            <div class="tournament-banner"></div>
+                            <div class="tournament-content">
+                                <h3>${t.name}</h3>
+                                <div class="tournament-meta">
+                                    <div class="tournament-meta-item"><span>📅</span><span>${formattedDate}</span></div>
+                                    <div class="tournament-meta-item"><span></span><span>${location}</span></div>
+                                </div>
+                                <button class="btn-register">Register Now →</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error:', error);
+                grid.innerHTML = '<div class="empty"><div class="icon">❌</div><p>Error loading tournaments</p></div>';
+            }
+        }
+    </script>
+</body>
+</html>
