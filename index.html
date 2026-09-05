@@ -1,794 +1,1136 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TopCompSports - The Competition Platform</title>
+    <title>TopCompSports - منصة إدارة بطولات الجوجيتسو الاحترافية</title>
+    <meta name="description" content="منصة احترافية لإدارة بطولات الجوجيتسو - التسجيل، البراكيت، النتائج، والجدول الزمني">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ===== المتغيرات الأساسية ===== */
+        :root {
+            --primary: #f1c40f;
+            --primary-dark: #d4a017;
+            --secondary: #0ea5e9;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-dark: #0a0e17;
+            --bg-card: #151d2b;
+            --bg-card-hover: #1a2332;
+            --border: #2a3548;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --gradient-primary: linear-gradient(135deg, #f1c40f 0%, #d4a017 100%);
+            --gradient-hero: linear-gradient(135deg, rgba(241, 196, 15, 0.1) 0%, rgba(26, 31, 46, 0.8) 100%);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --shadow-gold: 0 4px 20px rgba(241, 196, 15, 0.3);
+        }
+
+        /* ===== إعادة الضبط الأساسية ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: #0a0e17;
-            color: #fff;
+            font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
             overflow-x: hidden;
         }
-        
-        /* Header */
+
+        /* ===== الهيدر ===== */
         .header {
             background: rgba(21, 29, 43, 0.95);
             backdrop-filter: blur(10px);
-            padding: 20px 50px;
+            padding: 15px 50px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #2a3548;
+            border-bottom: 2px solid var(--border);
             position: sticky;
             top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
         }
-        .logo-container {
+
+        .logo {
             display: flex;
             align-items: center;
             gap: 15px;
-        }
-        .logo-img {
-            height: 50px;
-            width: auto;
-            transition: transform 0.3s;
-        }
-        .logo-img:hover { transform: scale(1.1); }
-        .logo-text {
-            font-size: 24px;
-            font-weight: bold;
-            color: #fff;
-            letter-spacing: 1px;
-        }
-        .nav-links {
-            display: flex;
-            gap: 30px;
-            align-items: center;
-        }
-        .nav-links a {
-            color: rgba(255,255,255,0.8);
-            text-decoration: none;
-            font-size: 15px;
-            transition: all 0.3s;
-            position: relative;
-        }
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: #f1c40f;
-            transition: width 0.3s;
-        }
-        .nav-links a:hover {
-            color: #f1c40f;
-        }
-        .nav-links a:hover::after { width: 100%; }
-        
-        .btn-login {
-            background: linear-gradient(135deg, #2563EB, #1d4ed8);
-            color: #fff;
-            padding: 12px 28px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-        }
-        .btn-login:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
-        }
-        .btn-signup {
-            background: transparent;
-            color: #fff;
-            padding: 12px 28px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: bold;
-            border: 2px solid #2563EB;
-            transition: all 0.3s;
-        }
-        .btn-signup:hover {
-            background: #2563EB;
-            transform: translateY(-3px);
-        }
-        .lang-switcher { display: flex; gap: 10px; }
-        .lang-btn {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: #fff;
-            padding: 8px 14px;
-            border-radius: 8px;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-            transition: all 0.3s;
         }
-        .lang-btn.active { background: #2563EB; border-color: #2563EB; }
-        .lang-btn:hover { border-color: #f1c40f; }
-        
-        /* Hero Section */
-        .hero {
-            min-height: 90vh;
-            display: flex;
-            align-items: center;
-            padding: 80px 50px;
-            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 50%, #0a0e17 100%);
-            position: relative;
-            overflow: hidden;
-        }
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(241, 196, 15, 0.1) 0%, transparent 50%);
-            animation: pulse 8s ease-in-out infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-        .hero-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-        }
-        .hero-text h1 {
-            font-size: 80px;
-            font-weight: 900;
-            line-height: 1.05;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            letter-spacing: -2px;
-            animation: slideInLeft 1s ease-out;
-        }
-        @keyframes slideInLeft {
-            from { opacity: 0; transform: translateX(-50px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        .hero-text h1 .highlight {
-            color: #f1c40f;
-            text-shadow: 0 0 30px rgba(241, 196, 15, 0.5);
-            display: inline-block;
-            animation: glow 2s ease-in-out infinite;
-        }
-        @keyframes glow {
-            0%, 100% { text-shadow: 0 0 30px rgba(241, 196, 15, 0.5); }
-            50% { text-shadow: 0 0 50px rgba(241, 196, 15, 0.8); }
-        }
-        .hero-text p {
-            font-size: 20px;
-            color: rgba(255,255,255,0.85);
-            line-height: 1.8;
-            margin-bottom: 45px;
-            animation: slideInLeft 1s ease-out 0.2s both;
-        }
-        .hero-buttons {
-            display: flex;
-            gap: 20px;
-            animation: slideInLeft 1s ease-out 0.4s both;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #2563EB, #1d4ed8);
-            color: #fff;
-            padding: 18px 40px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 17px;
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.3s;
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
-        }
-        .btn-primary:hover::before { left: 100%; }
-        .btn-primary:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 35px rgba(37, 99, 235, 0.6);
-        }
-        .btn-secondary {
-            background: transparent;
-            color: #fff;
-            padding: 18px 40px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 17px;
-            border: 2px solid rgba(255,255,255,0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-secondary::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 0; height: 100%;
-            background: rgba(241, 196, 15, 0.1);
-            transition: width 0.3s;
-            z-index: -1;
-        }
-        .btn-secondary:hover::before { width: 100%; }
-        .btn-secondary:hover {
-            border-color: #f1c40f;
-            color: #f1c40f;
-            transform: translateY(-4px);
-        }
-        .hero-image {
-            position: relative;
-            animation: slideInRight 1s ease-out;
-        }
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(50px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        .hero-image img {
-            width: 100%;
-            border-radius: 24px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
-            transition: transform 0.5s;
-            filter: contrast(1.1) brightness(0.95);
-        }
-        .hero-image:hover img { transform: scale(1.02); }
-        .hero-image::before {
-            content: '';
-            position: absolute;
-            top: -20px; left: -20px;
-            right: 20px; bottom: 20px;
-            border: 3px solid #f1c40f;
-            border-radius: 24px;
-            z-index: -1;
-            opacity: 0.3;
-        }
-        .hero-badge {
-            position: absolute;
-            top: 30px; left: 30px;
-            background: rgba(0,0,0,0.9);
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: bold;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            animation: float 3s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        .hero-badge .live-dot {
-            display: inline-block;
-            width: 10px; height: 10px;
-            background: #10b981;
-            border-radius: 50%;
-            margin-right: 10px;
-            animation: pulse-dot 2s infinite;
-            box-shadow: 0 0 10px #10b981;
-        }
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
-        }
-        
-        /* Stats Section */
-        .stats {
-            background: linear-gradient(135deg, #151d2b 0%, #1a2332 100%);
-            padding: 80px 50px;
-            border-top: 2px solid #2a3548;
-            border-bottom: 2px solid #2a3548;
-            position: relative;
-            overflow: hidden;
-        }
-        .stats::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #2563EB, #f1c40f, #2563EB);
-        }
-        .stats-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 50px;
-        }
-        .stat-item {
-            text-align: center;
-            padding: 30px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.3s;
-        }
-        .stat-item:hover {
-            transform: translateY(-10px);
-            border-color: #f1c40f;
-            box-shadow: 0 10px 40px rgba(241, 196, 15, 0.2);
-        }
-        .stat-number {
-            font-size: 56px;
-            font-weight: 900;
-            color: #f1c40f;
-            margin-bottom: 12px;
-            text-shadow: 0 0 30px rgba(241, 196, 15, 0.3);
-        }
-        .stat-label {
-            color: rgba(255,255,255,0.8);
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-weight: 600;
-        }
-        
-        /* Features Section */
-        .features {
-            padding: 120px 50px;
-            background: #0a0e17;
-            position: relative;
-        }
-        .features::before {
-            content: '';
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
-            pointer-events: none;
-        }
-        .features-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-        .section-title {
-            text-align: center;
-            margin-bottom: 80px;
-        }
-        .section-title h2 {
-            font-size: 56px;
-            font-weight: 900;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: -1px;
-        }
-        .section-title h2 .highlight {
-            color: #2563EB;
-            text-shadow: 0 0 40px rgba(37, 99, 235, 0.5);
-        }
-        .section-title p {
-            color: rgba(255,255,255,0.8);
-            font-size: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-        }
-        .feature-card {
-            background: linear-gradient(135deg, #151d2b 0%, #1a2332 100%);
-            border: 2px solid #2a3548;
-            border-radius: 20px;
-            padding: 50px 40px;
-            transition: all 0.4s;
-            position: relative;
-            overflow: hidden;
-        }
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 4px;
-            background: linear-gradient(90deg, #2563EB, #f1c40f);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.4s;
-        }
-        .feature-card:hover::before { transform: scaleX(1); }
-        .feature-card:hover {
-            border-color: #2563EB;
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(37, 99, 235, 0.3);
-        }
-        .feature-icon {
-            font-size: 64px;
-            margin-bottom: 25px;
-            display: inline-block;
-            animation: bounce 2s infinite;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        .feature-card h3 {
-            font-size: 28px;
-            margin-bottom: 20px;
-            color: #fff;
-            font-weight: 700;
-        }
-        .feature-card p {
-            color: rgba(255,255,255,0.75);
-            line-height: 1.8;
-            font-size: 16px;
-        }
-        
-        /* Events Section */
-        .events {
-            padding: 120px 50px;
-            background: linear-gradient(135deg, #151d2b 0%, #0a0e17 100%);
-        }
-        .events-container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        .events-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-            margin-top: 80px;
-        }
-        .event-card {
-            background: #0a0e17;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 2px solid #2a3548;
-            transition: all 0.4s;
-            position: relative;
-        }
-        .event-card::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(241, 196, 15, 0.1));
-            opacity: 0;
-            transition: opacity 0.4s;
-            pointer-events: none;
-        }
-        .event-card:hover::after { opacity: 1; }
-        .event-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: #f1c40f;
-            box-shadow: 0 20px 60px rgba(241, 196, 15, 0.2);
-        }
-        .event-image {
-            height: 220px;
-            background: linear-gradient(135deg, #2563EB, #1e40af);
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 64px;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--bg-dark);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .logo-text {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .nav {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .nav a.active {
+            background: rgba(241, 196, 15, 0.15);
+            color: var(--primary);
+        }
+
+        .btn-nav-primary {
+            background: var(--gradient-primary) !important;
+            color: var(--bg-dark) !important;
+            font-weight: bold !important;
+            padding: 10px 20px !important;
+        }
+
+        .btn-nav-primary:hover {
+            box-shadow: var(--shadow-gold);
+            transform: translateY(-2px) !important;
+        }
+
+        /* ===== Hero Section ===== */
+        .hero {
+            padding: 100px 50px 80px;
+            text-align: center;
+            background: var(--gradient-hero);
+            border-bottom: 2px solid var(--border);
             position: relative;
             overflow: hidden;
         }
-        .event-image::before {
+
+        .hero::before {
             content: '';
             position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            animation: shine 3s infinite;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(241, 196, 15, 0.05) 0%, transparent 70%);
+            animation: pulse 8s ease-in-out infinite;
         }
-        @keyframes shine {
-            0% { transform: translateX(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) rotate(45deg); }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
         }
-        .event-content {
-            padding: 30px;
+
+        .hero-content {
             position: relative;
             z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
         }
-        .event-date {
-            color: #f1c40f;
-            font-size: 14px;
-            font-weight: bold;
-            margin-bottom: 12px;
-            letter-spacing: 1px;
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(241, 196, 15, 0.15);
+            border: 1px solid rgba(241, 196, 15, 0.3);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            animation: fadeInDown 0.8s ease;
         }
-        .event-content h3 {
-            font-size: 24px;
-            margin-bottom: 18px;
-            font-weight: 700;
-        }
-        .event-location {
-            color: rgba(255,255,255,0.7);
-            font-size: 15px;
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
             margin-bottom: 20px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease;
+            line-height: 1.2;
         }
-        .event-link {
-            color: #2563EB;
-            text-decoration: none;
+
+        .hero p {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 35px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1.2s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== الأزرار ===== */
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
             font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-size: 15px;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            font-size: 1rem;
         }
-        .event-link:hover {
-            color: #f1c40f;
-            gap: 15px;
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--bg-dark);
+            box-shadow: var(--shadow-gold);
         }
-        
-        /* Footer */
-        .footer {
-            background: #0a0e17;
-            padding: 80px 50px 30px;
-            border-top: 2px solid #2a3548;
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(241, 196, 15, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+
+        /* ===== الإحصائيات ===== */
+        .stats-section {
+            padding: 60px 50px;
+            background: var(--bg-card);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: rgba(241, 196, 15, 0.05);
+            border: 1px solid rgba(241, 196, 15, 0.2);
+            border-radius: 16px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-gold);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* ===== الأقسام العامة ===== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 50px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ===== بطاقات البطولات ===== */
+        .tournaments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .tournament-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s ease;
             position: relative;
         }
-        .footer::before {
+
+        .tournament-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .tournament-banner {
+            height: 180px;
+            background: linear-gradient(135deg, #f1c40f 0%, #d4a017 50%, #f39c12 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tournament-banner::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #2563EB, #f1c40f, #2563EB);
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
         }
-        .footer-container {
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .tournament-banner-icon {
+            font-size: 5rem;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .tournament-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .tournament-status.upcoming {
+            background: rgba(14, 165, 233, 0.9);
+        }
+
+        .tournament-status.completed {
+            background: rgba(107, 114, 128, 0.9);
+        }
+
+        .tournament-content {
+            padding: 25px;
+        }
+
+        .tournament-content h3 {
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .tournament-meta {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .tournament-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .tournament-meta-item .icon {
+            font-size: 1.1rem;
+        }
+
+        .tournament-stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(241, 196, 15, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(241, 196, 15, 0.1);
+        }
+
+        .tournament-stat {
+            flex: 1;
+            text-align: center;
+        }
+
+        .tournament-stat-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .tournament-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .tournament-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tournament-actions .btn {
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        /* ===== المميزات ===== */
+        .features-section {
+            background: var(--bg-card);
+            border-top: 2px solid var(--border);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 35px 25px;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* ===== كيف يعمل النظام ===== */
+        .how-it-works {
+            padding: 80px 50px;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .step-card {
+            text-align: center;
+            position: relative;
+            padding: 30px 20px;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            color: var(--bg-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+            box-shadow: var(--shadow-gold);
+        }
+
+        .step-card h3 {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .step-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* ===== CTA Section ===== */
+        .cta-section {
+            padding: 80px 50px;
+            background: linear-gradient(135deg, rgba(241, 196, 15, 0.1) 0%, rgba(14, 165, 233, 0.05) 100%);
+            border-top: 2px solid var(--border);
+            text-align: center;
+        }
+
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-content h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        .cta-content p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        /* ===== Footer ===== */
+        footer {
+            background: #050810;
+            padding: 40px 50px 20px;
+            border-top: 2px solid var(--border);
+        }
+
+        .footer-content {
             max-width: 1400px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 60px;
-            margin-bottom: 50px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 30px;
         }
-        .footer-brand img {
-            height: 50px;
-            margin-bottom: 20px;
-            transition: transform 0.3s;
-        }
-        .footer-brand img:hover { transform: scale(1.1); }
-        .footer-brand p {
-            color: rgba(255,255,255,0.7);
-            line-height: 1.8;
-            font-size: 15px;
-        }
-        .footer-links h4 {
-            color: #fff;
-            margin-bottom: 25px;
-            font-size: 18px;
+
+        .footer-section h4 {
+            color: var(--primary);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
             font-weight: 700;
         }
-        .footer-links a {
-            display: block;
-            color: rgba(255,255,255,0.7);
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section ul li a {
+            color: var(--text-secondary);
             text-decoration: none;
-            margin-bottom: 15px;
-            transition: all 0.3s;
-            font-size: 15px;
+            transition: color 0.3s;
+            font-size: 0.95rem;
         }
-        .footer-links a:hover {
-            color: #f1c40f;
-            padding-left: 10px;
+
+        .footer-section ul li a:hover {
+            color: var(--primary);
         }
+
         .footer-bottom {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding-top: 40px;
-            border-top: 1px solid #2a3548;
-            display: flex;
-            justify-content: space-between;
-            color: rgba(255,255,255,0.5);
-            font-size: 14px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
-        
-        @media (max-width: 1024px) {
-            .hero-content { grid-template-columns: 1fr; }
-            .hero-text h1 { font-size: 56px; }
-            .features-grid, .events-grid { grid-template-columns: 1fr; }
-            .stats-container { grid-template-columns: repeat(2, 1fr); }
-            .footer-container { grid-template-columns: 1fr 1fr; }
+
+        /* ===== Loading & Empty States ===== */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state .icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .nav {
+                display: none;
+            }
+
+            .hero {
+                padding: 60px 20px 50px;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .container {
+                padding: 40px 20px;
+            }
+
+            .section-header h2 {
+                font-size: 1.8rem;
+            }
+
+            .stats-section,
+            .how-it-works,
+            .cta-section {
+                padding: 40px 20px;
+            }
+
+            .tournaments-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tournament-actions {
+                flex-direction: column;
+            }
+
+            .tournament-actions .btn {
+                width: 100%;
+            }
+        }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
         }
     </style>
 </head>
 <body>
-
-    <!-- Header -->
+    <!-- الهيدر -->
     <header class="header">
-        <div class="logo-container">
-            <img src="logo.png" alt="TopCompSports" class="logo-img">
-            <span class="logo-text">TopCompSports</span>
+        <div class="logo" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
         </div>
-        <nav class="nav-links">
-            <a href="#" data-en="Find Events" data-ar="ابحث عن الأحداث">Find Events</a>
-            <a href="#" data-en="For Athletes" data-ar="لللاعبين">For Athletes</a>
-            <a href="#" data-en="For Organizers" data-ar="للمنظمين">For Organizers</a>
-            <a href="#" data-en="About" data-ar="عن المنصة">About</a>
-            <div class="lang-switcher">
-                <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
-                <button class="lang-btn" onclick="setLanguage('ar')">AR</button>
-            </div>
-            <a href="login.html" class="btn-login" data-en="Sign In" data-ar="تسجيل الدخول">Sign In</a>
-            <a href="signup.html" class="btn-signup" data-en="Sign Up" data-ar="إنشاء حساب">Sign Up</a>
+        <nav class="nav">
+            <a href="#tournaments">البطولات</a>
+            <a href="#features">المميزات</a>
+            <a href="#how-it-works">كيف يعمل</a>
+            <a href="organizer-dashboard.html">لوحة المنظم</a>
+            <a href="login.html" class="btn-nav-primary">تسجيل الدخول</a>
         </nav>
     </header>
 
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <div class="hero-text">
-                <h1 data-en='EARN YOUR <span class="highlight">PLACE.</span>' data-ar='اكسب <span class="highlight">مكانك.</span>'>EARN YOUR <span class="highlight">PLACE.</span></h1>
-                <p data-en="Find real published tournaments, build your private competition profile, and manage every event through a secure workspace." data-ar="اكتشف البطولات المنشورة الحقيقية، وابنِ ملفك التنافسي الخاص، وأدر كل حدث من خلال مساحة عمل آمنة.">Find real published tournaments, build your private competition profile, and manage every event through a secure workspace.</p>
-                <div class="hero-buttons">
-                    <a href="#events" class="btn-primary" data-en="Find Your Event →" data-ar="ابحث عن حدثك ←">Find Your Event →</a>
-                    <a href="complete-athlete.html" class="btn-secondary" data-en="Run an Event →" data-ar="أدر حدثاً ←">Run an Event →</a>
-                </div>
-            </div>
-            <div class="hero-image">
-                <div class="hero-badge">
-                    <span class="live-dot"></span>
-                    <span data-en="Live data only" data-ar="بيانات مباشرة فقط">Live data only</span>
-                </div>
-                <img src="hero-image.jpg" alt="BJJ Competition" style="width:100%; border-radius:24px;">
+            <div class="hero-badge">🏆 المنصة الأولى لإدارة بطولات الجوجيتسو</div>
+            <h1>نظّم بطولاتك باحترافية عالمية</h1>
+            <p>منصة متكاملة لإدارة بطولات الجوجيتسو - من التسجيل وحتى النتائج، مستوحاة من معايير AJP العالمية</p>
+            <div class="hero-buttons">
+                <a href="#tournaments" class="btn btn-primary">استعرض البطولات </a>
+                <a href="organizer-dashboard.html" class="btn btn-secondary">إنشاء بطولة جديدة</a>
             </div>
         </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="stats">
-        <div class="stats-container">
-            <div class="stat-item">
-                <div class="stat-number">81</div>
-                <div class="stat-label" data-en="Published Events" data-ar="بطولة منشورة">Published Events</div>
+    <!-- الإحصائيات -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-value" id="statTournaments">0</div>
+                <div class="stat-label">بطولة نشطة</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-number">32</div>
-                <div class="stat-label" data-en="Sports Represented" data-ar="رياضة ممثلة">Sports Represented</div>
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-value" id="statPlayers">0</div>
+                <div class="stat-label">لاعب مسجل</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-number">64</div>
-                <div class="stat-label" data-en="Locations" data-ar="موقع">Locations</div>
+            <div class="stat-card">
+                <div class="stat-icon">⚔️</div>
+                <div class="stat-value" id="statMatches">0</div>
+                <div class="stat-label">مباراة</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-number">2.5K+</div>
-                <div class="stat-label" data-en="Athletes" data-ar="لاعب">Athletes</div>
+            <div class="stat-card">
+                <div class="stat-icon"></div>
+                <div class="stat-value">24/7</div>
+                <div class="stat-label">متاح دائماً</div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features">
-        <div class="features-container">
-            <div class="section-title">
-                <h2 data-en='Built for the <span class="highlight">next round</span>' data-ar='مبني <span class="highlight">للمستقبل</span>'>Built for the <span class="highlight">next round</span></h2>
-                <p data-en="Everything you need to compete, organize, and rise." data-ar="كل ما تحتاجه للمنافسة والتنظيم والتفوق.">Everything you need to compete, organize, and rise.</p>
+    <!-- البطولات -->
+    <section class="container" id="tournaments">
+        <div class="section-header">
+            <h2> البطولات النشطة</h2>
+            <p>استعرض البطولات القادمة وسجّل الآن للمشاركة</p>
+        </div>
+        <div id="tournamentsList" class="tournaments-grid">
+            <div class="loading">جاري تحميل البطولات</div>
+        </div>
+    </section>
+
+    <!-- المميزات -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>✨ مميزات المنصة</h2>
+                <p>كل ما تحتاجه لإدارة بطولة احترافية في مكان واحد</p>
             </div>
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">🛡️</div>
-                    <h3 data-en="Secure by Default" data-ar="أمان افتراضي">Secure by Default</h3>
-                    <p data-en="Access is governed by Supabase authentication and row-level security." data-ar="الوصول محكوم بمصادقة Supabase وأمان مستوى الصفوف.">Access is governed by Supabase authentication and row-level security.</p>
+                    <span class="feature-icon">📝</span>
+                    <h3>تسجيل سهل وسريع</h3>
+                    <p>نظام تسجيل ذكي يجلب بيانات اللاعب تلقائياً ويتيح تحديث بيانات البطولة بسهولة</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">👤</div>
-                    <h3 data-en="Private Profiles" data-ar="ملفات خاصة">Private Profiles</h3>
-                    <p data-en="Athletes see their own profile; personal information is not published as a directory." data-ar="اللاعبون يرون ملفاتهم فقط؛ المعلومات الشخصية لا تنشر كدليل.">Athletes see their own profile; personal information is not published as a directory.</p>
+                    <span class="feature-icon"></span>
+                    <h3>إدارة البساط</h3>
+                    <p>نظّم المباريات على عدة بساط مع فلترة ذكية حسب الفئة العمرية والوزن والحزام</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon"></div>
-                    <h3 data-en="Real Events" data-ar="أحداث حقيقية">Real Events</h3>
-                    <p data-en="The public event directory only displays tournament records that organizers publish." data-ar="دليل الأحداث العام يعرض فقط سجلات البطولات التي ينشرها المنظمون.">The public event directory only displays tournament records that organizers publish.</p>
+                    <span class="feature-icon">🏆</span>
+                    <h3>نظام البراكيت</h3>
+                    <p>إنشاء براكيت تلقائي احترافي مع دعم BYE وترقية الفائزين بين الجولات</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">⏱️</span>
+                    <h3>لوحة النتائج</h3>
+                    <p>مؤقت احترافي مع نظام نقاط كامل (Advantage, Penalty) حسب قواعد AJP</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📊</span>
+                    <h3>النتائج والترتيب</h3>
+                    <p>عرض النتائج والبوديوم للجمهور مع إمكانية تصدير البيانات بصيغ متعددة</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">📱</span>
+                    <h3>تصميم متجاوب</h3>
+                    <p>واجهة احترافية تعمل بسلاسة على جميع الأجهزة - من الجوال إلى الشاشات الكبيرة</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Events Section -->
-    <section class="events" id="events">
-        <div class="events-container">
-            <div class="section-title">
-                <h2 data-en='Find the <span class="highlight">Right Fight</span>' data-ar='ابحث عن <span class="highlight">النزال المناسب</span>'>Find the <span class="highlight">Right Fight</span></h2>
-                <p data-en="Every card below is a real published tournament record from Supabase." data-ar="كل بطاقة أدناه هي سجل بطولة حقيقي منشور من Supabase.">Every card below is a real published tournament record from Supabase.</p>
+    <!-- كيف يعمل -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-header">
+            <h2>🎯 كيف يعمل النظام؟</h2>
+            <p>أربع خطوات بسيطة لإدارة بطولة ناجحة</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>إنشاء البطولة</h3>
+                <p>أنشئ بطولة جديدة وحدد التاريخ والموقع والفئات المتاحة</p>
             </div>
-            <div class="events-grid">
-                <div class="event-card">
-                    <div class="event-image">🥋</div>
-                    <div class="event-content">
-                        <div class="event-date">AUG 26, 2026</div>
-                        <h3 data-en="Cairo BJJ Open 2026" data-ar="كايرو BJJ Open 2026">Cairo BJJ Open 2026</h3>
-                        <div class="event-location">📍 Cairo Sample Arena · Cairo · Egypt</div>
-                        <a href="#" class="event-link" data-en="View event →" data-ar="عرض الحدث ←">View event →</a>
-                    </div>
-                </div>
-                <div class="event-card">
-                    <div class="event-image">🥋</div>
-                    <div class="event-content">
-                        <div class="event-date">SEP 1, 2026</div>
-                        <h3>Test Tournament 2026</h3>
-                        <div class="event-location"> Cairo · Cairo · Egypt</div>
-                        <a href="#" class="event-link" data-en="View event →" data-ar="عرض الحدث ←">View event →</a>
-                    </div>
-                </div>
-                <div class="event-card">
-                    <div class="event-image">🥋</div>
-                    <div class="event-content">
-                        <div class="event-date">SEP 15, 2026</div>
-                        <h3 data-en="بطولة 1" data-ar="بطولة 1">بطولة 1</h3>
-                        <div class="event-location" data-en="📍 Al-Qahira · Mansoura · Egypt" data-ar="📍 القاهرة · المنصورة · مصر">📍 Al-Qahira · Mansoura · Egypt</div>
-                        <a href="#" class="event-link" data-en="View event →" data-ar="عرض الحدث ←">View event →</a>
-                    </div>
-                </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>تسجيل اللاعبين</h3>
+                <p>شارك رابط التسجيل مع اللاعبين أو أضفهم يدوياً من لوحة التحكم</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>إدارة المباريات</h3>
+                <p>نظّم البساط، أنشئ البراكيت، وابدأ المباريات مع لوحة النتائج</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h3>النتائج والفائزون</h3>
+                <p>تابع النتائج لحظياً واعرض البوديوم النهائي للجمهور</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>جاهز لتنظيم بطولتك القادمة؟</h2>
+            <p>انضم إلى المنصة وابدأ في إنشاء بطولات احترافية اليوم</p>
+            <div class="hero-buttons">
+                <a href="login.html" class="btn btn-primary">ابدأ الآن 🚀</a>
+                <a href="#features" class="btn btn-secondary">اعرف المزيد</a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-brand">
-                <img src="logo.png" alt="TopCompSports">
-                <p data-en="The home of modern martial arts competition." data-ar="موطن المنافسات الحديثة في الرياضات القتالية.">The home of modern martial arts competition.</p>
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>TopCompSports</h4>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7;">
+                    المنصة الاحترافية الأولى لإدارة بطولات الجوجيتسو في المنطقة
+                </p>
             </div>
-            <div class="footer-links">
-                <h4 data-en="Platform" data-ar="المنصة">Platform</h4>
-                <a href="#" data-en="Find Events" data-ar="ابحث عن الأحداث">Find Events</a>
-                <a href="#" data-en="For Athletes" data-ar="لللاعبين">For Athletes</a>
-                <a href="#" data-en="For Organizers" data-ar="للمنظمين">For Organizers</a>
+            <div class="footer-section">
+                <h4>روابط سريعة</h4>
+                <ul>
+                    <li><a href="#tournaments">البطولات</a></li>
+                    <li><a href="#features">المميزات</a></li>
+                    <li><a href="#how-it-works">كيف يعمل</a></li>
+                </ul>
             </div>
-            <div class="footer-links">
-                <h4 data-en="Company" data-ar="الشركة">Company</h4>
-                <a href="#" data-en="About" data-ar="عن المنصة">About</a>
-                <a href="#" data-en="Contact" data-ar="تواصل">Contact</a>
-                <a href="#" data-en="Careers" data-ar="وظائف">Careers</a>
+            <div class="footer-section">
+                <h4>للمنظمين</h4>
+                <ul>
+                    <li><a href="organizer-dashboard.html">لوحة التحكم</a></li>
+                    <li><a href="login.html">تسجيل الدخول</a></li>
+                </ul>
             </div>
-            <div class="footer-links">
-                <h4 data-en="Legal" data-ar="قانوني">Legal</h4>
-                <a href="#" data-en="Privacy" data-ar="الخصوصية">Privacy</a>
-                <a href="#" data-en="Terms" data-ar="الشروط">Terms</a>
-                <a href="#" data-en="Security" data-ar="الأمان">Security</a>
+            <div class="footer-section">
+                <h4>تواصل معنا</h4>
+                <ul>
+                    <li><a href="#">📧 support@topcompsports.com</a></li>
+                    <li><a href="#">📱 واتساب</a></li>
+                </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>© 2026 TopCompSports</span>
-            <span data-en="The home of modern martial arts competition." data-ar="موطن المنافسات الحديثة في الرياضات القتالية.">The home of modern martial arts competition.</span>
+            <p>© 2026 TopCompSports - جميع الحقوق محفوظة | صُمم بشغف لعالم الجوجيتسو 🥋</p>
         </div>
     </footer>
 
     <script>
-        let currentLang = 'en';
-        
-        function setLanguage(lang) {
-            currentLang = lang;
-            document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-            document.documentElement.lang = lang;
-            
-            document.querySelectorAll('[data-en]').forEach(el => {
-                const text = el.getAttribute(`data-${lang}`);
-                if (text) el.innerHTML = text;
-            });
-            
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        window.onload = async () => {
+            await Promise.all([
+                loadTournaments(),
+                loadStats()
+            ]);
+        };
+
+        // تحميل البطولات
+        async function loadTournaments() {
+            try {
+                const { data, error } = await supabase
+                    .from('tournaments')
+                    .select('*')
+                    .order('date', { ascending: true });
+
+                if (error) throw error;
+
+                const container = document.getElementById('tournamentsList');
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon"></div>
+                            <h3>لا توجد بطولات نشطة حالياً</h3>
+                            <p>تابعنا لمعرفة مواعيد البطولات القادمة أو أنشئ بطولتك الخاصة</p>
+                            <a href="organizer-dashboard.html" class="btn btn-primary" style="margin-top: 20px;">إنشاء بطولة جديدة</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // جلب إحصائيات كل بطولة
+                const tournamentsWithStats = await Promise.all(
+                    data.map(async (t) => {
+                        try {
+                            const { count: playerCount } = await supabase
+                                .from('tournament_participants')
+                                .select('*', { count: 'exact', head: true })
+                                .eq('tournament_id', t.id);
+                            
+                            const { count: matchCount } = await supabase
+                                .from('matches')
+                                .select('*', { count: 'exact', head: true })
+                                .eq('tournament_id', t.id);
+
+                            return { ...t, playerCount: playerCount || 0, matchCount: matchCount || 0 };
+                        } catch (e) {
+                            return { ...t, playerCount: 0, matchCount: 0 };
+                        }
+                    })
+                );
+
+                container.innerHTML = tournamentsWithStats.map(t => {
+                    const date = new Date(t.date);
+                    const formattedDate = date.toLocaleDateString('ar-SA', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    });
+                    
+                    const today = new Date();
+                    const tournamentDate = new Date(t.date);
+                    let statusClass = 'upcoming';
+                    let statusText = 'قادمة';
+                    
+                    if (tournamentDate < today) {
+                        statusClass = 'completed';
+                        statusText = 'منتهية';
+                    } else if (tournamentDate.toDateString() === today.toDateString()) {
+                        statusClass = '';
+                        statusText = 'اليوم';
+                    }
+
+                    return `
+                        <div class="tournament-card">
+                            <div class="tournament-banner">
+                                <span class="tournament-status ${statusClass}">${statusText}</span>
+                                <div class="tournament-banner-icon"></div>
+                            </div>
+                            <div class="tournament-content">
+                                <h3>${t.name}</h3>
+                                <div class="tournament-meta">
+                                    <div class="tournament-meta-item">
+                                        <span class="icon">📅</span>
+                                        <span>${formattedDate}</span>
+                                    </div>
+                                    <div class="tournament-meta-item">
+                                        <span class="icon"></span>
+                                        <span>${t.location || 'سيتم الإعلان عنه'}</span>
+                                    </div>
+                                </div>
+                                <div class="tournament-stats">
+                                    <div class="tournament-stat">
+                                        <div class="tournament-stat-value">${t.playerCount}</div>
+                                        <div class="tournament-stat-label">لاعب</div>
+                                    </div>
+                                    <div class="tournament-stat">
+                                        <div class="tournament-stat-value">${t.matchCount}</div>
+                                        <div class="tournament-stat-label">مباراة</div>
+                                    </div>
+                                    <div class="tournament-stat">
+                                        <div class="tournament-stat-value">${t.max_participants || 200}</div>
+                                        <div class="tournament-stat-label">السعة</div>
+                                    </div>
+                                </div>
+                                <div class="tournament-actions">
+                                    <a href="tournament-details.html?tournament_id=${t.id}" class="btn btn-primary btn-sm">التفاصيل</a>
+                                    <a href="public-bracket.html?tournament_id=${t.id}" class="btn btn-secondary btn-sm">البراكيت</a>
+                                    <a href="results.html?tournament_id=${t.id}" class="btn btn-secondary btn-sm">النتائج</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading tournaments:', error);
+                document.getElementById('tournamentsList').innerHTML = 
+                    `<div class="empty-state"><div class="icon">❌</div><h3>خطأ في تحميل البطولات</h3><p>${error.message}</p></div>`;
+            }
+        }
+
+        // تحميل الإحصائيات
+        async function loadStats() {
+            try {
+                const { count: tournamentCount } = await supabase
+                    .from('tournaments')
+                    .select('*', { count: 'exact', head: true });
+
+                const { count: playerCount } = await supabase
+                    .from('tournament_participants')
+                    .select('*', { count: 'exact', head: true });
+
+                const { count: matchCount } = await supabase
+                    .from('matches')
+                    .select('*', { count: 'exact', head: true });
+
+                // تأثير العد التصاعدي
+                animateCounter('statTournaments', tournamentCount || 0);
+                animateCounter('statPlayers', playerCount || 0);
+                animateCounter('statMatches', matchCount || 0);
+
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // تأثير العد التصاعدي
+        function animateCounter(elementId, target) {
+            const element = document.getElementById(elementId);
+            const duration = 2000;
+            const steps = 60;
+            const increment = target / steps;
+            let current = 0;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current);
+            }, duration / steps);
         }
     </script>
 </body>
