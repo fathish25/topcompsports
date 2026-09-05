@@ -83,6 +83,7 @@
         }
 
         .upload-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.4); }
+        .upload-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .form-section {
             background: var(--black);
@@ -119,6 +120,7 @@
             transition: all 0.3s;
         }
         .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary-blue); }
+        .form-input:read-only { background: var(--medium-gray); cursor: not-allowed; }
 
         .document-upload {
             background: var(--dark-gray);
@@ -133,26 +135,11 @@
         .document-upload:hover { border-color: var(--primary-blue); }
         .document-upload.has-file { border-color: var(--accent-yellow); background: rgba(255,184,0,0.05); }
 
-        .document-upload input[type="file"] {
-            display: none;
-        }
+        .document-upload input[type="file"] { display: none; }
 
-        .upload-label {
-            cursor: pointer;
-            display: block;
-        }
-
-        .upload-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .file-name {
-            color: var(--accent-yellow);
-            font-weight: 600;
-            margin-top: 10px;
-            font-size: 0.9rem;
-        }
+        .upload-label { cursor: pointer; display: block; }
+        .upload-icon { font-size: 40px; margin-bottom: 10px; }
+        .file-name { color: var(--accent-yellow); font-weight: 600; margin-top: 10px; font-size: 0.9rem; }
 
         .btn {
             width: 100%;
@@ -200,16 +187,17 @@
             <div class="profile-pic-container" id="profilePicContainer">
                 <div class="placeholder">👤</div>
             </div>
-            <label for="profilePic" class="upload-label">
-                <button type="button" class="upload-btn">📷 Upload Profile Picture</button>
-            </label>
-            <input type="file" id="profilePic" accept="image/*" onchange="handleProfilePicUpload(event)">
+            <button type="button" class="upload-btn" id="uploadPicBtn" onclick="document.getElementById('profilePic').click()">
+                 Upload Profile Picture
+            </button>
+            <input type="file" id="profilePic" accept="image/*" onchange="handleProfilePicUpload(event)" style="display: none;">
+            <p style="margin-top: 10px; font-size: 0.85rem; color: rgba(255,255,255,0.5);">Optional - Max 5MB</p>
         </div>
 
         <form id="profileForm" onsubmit="handleProfileSubmit(event)">
             <!-- Personal Information -->
             <div class="form-section">
-                <div class="section-title"> Personal Information</div>
+                <div class="section-title">👤 Personal Information</div>
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -218,18 +206,18 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Email *</label>
-                        <input type="email" class="form-input" id="email" required readonly>
+                        <input type="email" class="form-input" id="email" readonly>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Date of Birth</label>
-                        <input type="date" class="form-input" id="dateOfBirth">
+                        <label class="form-label">Date of Birth *</label>
+                        <input type="date" class="form-input" id="dateOfBirth" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Gender</label>
-                        <select class="form-select" id="gender">
+                        <label class="form-label">Gender *</label>
+                        <select class="form-select" id="gender" required>
                             <option value="">Select gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
@@ -252,13 +240,13 @@
 
             <!-- Documents -->
             <div class="form-section">
-                <div class="section-title">📄 Required Documents</div>
-                <p style="color: rgba(255,255,255,0.6); margin-bottom: 20px;">Please upload at least one of the following documents for verification</p>
+                <div class="section-title">📄 Required Documents (Optional)</div>
+                <p style="color: rgba(255,255,255,0.6); margin-bottom: 20px;">Upload ID Card / Passport / Birth Certificate for verification</p>
 
                 <div class="document-upload" id="idCardUpload">
                     <label for="idCard" class="upload-label">
                         <div class="upload-icon"></div>
-                        <div>Click to upload ID Card / Passport / Birth Certificate</div>
+                        <div>Click to upload document</div>
                         <div class="file-name" id="idCardFileName">No file chosen</div>
                     </label>
                     <input type="file" id="idCard" accept="image/*,.pdf" onchange="handleDocumentUpload(event, 'idCard')">
@@ -266,7 +254,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary" id="submitBtn">💾 Save Profile & Continue</button>
-            <button type="button" class="btn btn-secondary" onclick="skipProfile()">⏭️ Skip for now</button>
+            <button type="button" class="btn btn-secondary" onclick="skipProfile()">️ Skip for now</button>
         </form>
     </div>
 
@@ -278,13 +266,16 @@
 
         let currentUser = null;
         let uploadedDocuments = {};
+        let profilePictureFile = null;
 
         // ===== Check Auth on Load =====
         window.onload = async function() {
-            const { data: { user } } = await dbClient.auth.getUser();
+            const { data: { user }, error } = await dbClient.auth.getUser();
             
-            if (!user) {
-                window.location.href = 'login.html';
+            if (error || !user) {
+                console.error('Auth error:', error);
+                showAlert('error', '❌ You must be logged in to access this page.');
+                setTimeout(() => window.location.href = 'login.html', 2000);
                 return;
             }
 
@@ -298,13 +289,24 @@
         // ===== Load User Profile =====
         async function loadUserProfile() {
             try {
-                const { data: profile } = await dbClient
+                console.log('Loading profile for user:', currentUser.id);
+                
+                const { data: profile, error } = await dbClient
                     .from('users')
                     .select('*')
                     .eq('id', currentUser.id)
                     .maybeSingle();
 
+                if (error) {
+                    console.error('Load profile error:', error);
+                    showAlert('warning', '⚠️ Could not load existing profile. Please fill in your information.');
+                    return;
+                }
+
                 if (profile) {
+                    console.log('Profile loaded:', profile);
+                    
+                    // Fill in the form
                     document.getElementById('fullName').value = profile.full_name || '';
                     document.getElementById('dateOfBirth').value = profile.date_of_birth || '';
                     document.getElementById('gender').value = profile.gender || '';
@@ -316,14 +318,17 @@
                         loadProfilePicture(profile.profile_picture_url);
                     }
 
-                    // Load documents if exist
+                    // Check if document exists
                     if (profile.id_document_url) {
-                        document.getElementById('idCardFileName').textContent = 'Document uploaded ✓';
+                        document.getElementById('idCardFileName').textContent = 'Document already uploaded ✓';
                         document.getElementById('idCardUpload').classList.add('has-file');
                     }
+                } else {
+                    console.log('No existing profile found');
                 }
             } catch (error) {
                 console.error('Load profile error:', error);
+                showAlert('warning', '⚠️ Could not load existing profile.');
             }
         }
 
@@ -333,31 +338,20 @@
             if (!file) return;
 
             if (file.size > 5 * 1024 * 1024) {
-                showAlert('error', 'File size must be less than 5MB');
+                showAlert('error', '❌ File size must be less than 5MB');
                 return;
             }
 
-            try {
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${currentUser.id}-profile.${fileExt}`;
-                const filePath = `${fileName}`;
+            profilePictureFile = file;
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                loadProfilePicture(e.target.result);
+            };
+            reader.readAsDataURL(file);
 
-                const { error: uploadError } = await dbClient.storage
-                    .from('profiles')
-                    .upload(filePath, file, { upsert: true });
-
-                if (uploadError) throw uploadError;
-
-                const { data: { publicUrl } } = dbClient.storage
-                    .from('profiles')
-                    .getPublicUrl(filePath);
-
-                loadProfilePicture(publicUrl);
-                showAlert('success', 'Profile picture uploaded successfully!');
-            } catch (error) {
-                console.error('Upload error:', error);
-                showAlert('error', 'Failed to upload profile picture: ' + error.message);
-            }
+            showAlert('success', '✅ Profile picture selected. It will be saved with your profile.');
         }
 
         // ===== Load Profile Picture =====
@@ -372,7 +366,7 @@
             if (!file) return;
 
             if (file.size > 10 * 1024 * 1024) {
-                showAlert('error', 'File size must be less than 10MB');
+                showAlert('error', '❌ File size must be less than 10MB');
                 return;
             }
 
@@ -403,33 +397,76 @@
                     updated_at: new Date().toISOString()
                 };
 
-                // Upload documents if any
-                if (uploadedDocuments.idCard) {
-                    const fileExt = uploadedDocuments.idCard.name.split('.').pop();
-                    const fileName = `${currentUser.id}-id-doc.${fileExt}`;
-                    
-                    const { error: docError } = await dbClient.storage
-                        .from('documents')
-                        .upload(fileName, uploadedDocuments.idCard, { upsert: true });
+                // Upload profile picture if selected
+                if (profilePictureFile) {
+                    try {
+                        const fileExt = profilePictureFile.name.split('.').pop();
+                        const fileName = `${currentUser.id}-profile.${fileExt}`;
+                        
+                        const { error: uploadError } = await dbClient.storage
+                            .from('profiles')
+                            .upload(fileName, profilePictureFile, { upsert: true });
 
-                    if (docError) throw docError;
-
-                    const { data: { publicUrl } } = dbClient.storage
-                        .from('documents')
-                        .getPublicUrl(fileName);
-
-                    profileData.id_document_url = publicUrl;
+                        if (uploadError) {
+                            console.error('Profile pic upload error:', uploadError);
+                            // Continue anyway
+                        } else {
+                            const { data: { publicUrl } } = dbClient.storage
+                                .from('profiles')
+                                .getPublicUrl(fileName);
+                            
+                            profileData.profile_picture_url = publicUrl;
+                        }
+                    } catch (picError) {
+                        console.error('Profile picture error:', picError);
+                        // Continue without picture
+                    }
                 }
 
-                // Upsert profile
+                // Upload documents if any
+                if (uploadedDocuments.idCard) {
+                    try {
+                        const fileExt = uploadedDocuments.idCard.name.split('.').pop();
+                        const fileName = `${currentUser.id}-id-doc.${fileExt}`;
+                        
+                        const { error: docError } = await dbClient.storage
+                            .from('documents')
+                            .upload(fileName, uploadedDocuments.idCard, { upsert: true });
+
+                        if (docError) {
+                            console.error('Document upload error:', docError);
+                            // Continue anyway
+                        } else {
+                            const { data: { publicUrl } } = dbClient.storage
+                                .from('documents')
+                                .getPublicUrl(fileName);
+                            
+                            profileData.id_document_url = publicUrl;
+                        }
+                    } catch (docError) {
+                        console.error('Document error:', docError);
+                        // Continue without document
+                    }
+                }
+
+                // Upsert profile (insert or update)
                 const { error: upsertError } = await dbClient
                     .from('users')
-                    .upsert(profileData);
+                    .upsert(profileData, { onConflict: 'id' });
 
                 if (upsertError) throw upsertError;
 
                 showAlert('success', '✅ Profile saved successfully! Redirecting...');
                 
+                // Update localStorage
+                localStorage.setItem('currentUser', JSON.stringify({
+                    id: currentUser.id,
+                    email: currentUser.email,
+                    full_name: profileData.full_name,
+                    user_type: 'athlete',
+                    profile_complete: true
+                }));
+
                 setTimeout(() => {
                     window.location.href = 'index.html';
                 }, 2000);
@@ -444,7 +481,13 @@
 
         // ===== Skip Profile =====
         function skipProfile() {
-            if (confirm('Are you sure you want to skip? You can complete your profile later.')) {
+            if (confirm('Are you sure you want to skip? You can complete your profile later from your account settings.')) {
+                // Save minimal data
+                localStorage.setItem('currentUser', JSON.stringify({
+                    id: currentUser.id,
+                    email: currentUser.email,
+                    profile_complete: false
+                }));
                 window.location.href = 'index.html';
             }
         }
