@@ -46,7 +46,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="header-icon">🏆</div>
+            <div class="header-icon"></div>
             <h1>Become an Organizer</h1>
             <p>Join our community of tournament organizers and create amazing competitions</p>
         </div>
@@ -134,29 +134,34 @@
                 const organizerData = {
                     full_name: document.getElementById('fullName').value.trim(),
                     org_name: document.getElementById('orgName').value.trim(),
-                    email: document.getElementById('email').value.trim(),
                     phone: document.getElementById('phone').value.trim(),
-                    experience: document.getElementById('experience').value,
-                    reason: document.getElementById('reason').value.trim(),
-                    user_type: 'organizer',
-                    status: 'pending',
-                    created_at: new Date().toISOString()
+                    user_type: 'organizer'
                 };
 
                 if (currentUser) {
+                    // تحديث بسيط بدون الأعمدة المسببة للمشكلة
                     const { error } = await dbClient.from('users').update({
-                        user_type: 'organizer', org_name: organizerData.org_name, phone: organizerData.phone, experience: organizerData.experience
+                        user_type: 'organizer',
+                        phone: organizerData.phone
                     }).eq('id', currentUser.id);
+                    
                     if (error) throw error;
+                    
                     currentUser.user_type = 'organizer';
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
                     showAlert('success', '✅ Your account has been upgraded to Organizer!');
-                    setTimeout(() => { window.location.href = 'organizer-dashboard.html'; }, 2000);
+                    setTimeout(() => { 
+                        window.location.href = 'organizer-dashboard.html'; 
+                    }, 2000);
                 } else {
                     const { error } = await dbClient.from('organizer_applications').insert([organizerData]);
                     if (error) throw error;
+                    
                     showAlert('success', '✅ Application submitted! We will review it and contact you soon.');
-                    setTimeout(() => { window.location.href = 'signup.html?apply=organizer'; }, 2500);
+                    setTimeout(() => { 
+                        window.location.href = 'signup.html?apply=organizer'; 
+                    }, 2500);
                 }
             } catch (error) {
                 console.error('Error:', error);
