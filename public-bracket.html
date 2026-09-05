@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>البراكيت والنتائج - TopCompSports</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; min-height: 100vh; }
+        .header { background: rgba(21, 29, 43, 0.95); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2a3548; }
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #f1c40f, #d4a017); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #0a0e17; }
+        .logo-text { font-size: 22px; font-weight: bold; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 50px; }
+        .section { background: #151d2b; border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid #2a3548; }
+        .section-title { font-size: 1.8rem; font-weight: bold; color: #f1c40f; margin-bottom: 25px; border-bottom: 2px solid #2a3548; padding-bottom: 15px; }
+        .category-filter { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
+        .filter-btn { padding: 10px 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.3s; }
+        .filter-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .filter-btn.active { background: #f1c40f; color: #0a0e17; border-color: #f1c40f; }
+        .bracket-container { overflow-x: auto; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 12px; margin-bottom: 30px; }
+        .bracket-tree { display: flex; gap: 40px; min-width: max-content; }
+        .bracket-round { display: flex; flex-direction: column; justify-content: space-around; min-width: 200px; gap: 20px; }
+        .round-title { text-align: center; font-weight: bold; color: #f1c40f; margin-bottom: 15px; padding: 10px; background: rgba(241,196,15,0.1); border-radius: 8px; border: 2px solid rgba(241,196,15,0.3); }
+        .bracket-match { background: #1a1f2e; border: 2px solid #2a3548; border-radius: 8px; padding: 12px; min-width: 180px; transition: all 0.3s; }
+        .bracket-match:hover { border-color: #f1c40f; }
+        .bracket-match.completed { border-color: #27ae60; }
+        .match-id { font-size: 0.75rem; color: #8899aa; text-align: center; margin-bottom: 8px; font-weight: bold; }
+        .bracket-player { padding: 8px 10px; margin: 4px 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+        .bracket-player.red { background: rgba(192, 57, 43, 0.3); border-right: 4px solid #c0392b; }
+        .bracket-player.blue { background: rgba(41, 128, 185, 0.3); border-right: 4px solid #2980b9; }
+        .bracket-player.winner { background: rgba(39, 174, 96, 0.4); font-weight: bold; }
+        .bracket-player.empty { color: #556; font-style: italic; background: rgba(127,140,141,0.1); }
+        .player-name { flex: 1; }
+        .player-score { margin-right: 10px; font-weight: bold; }
+        .loading { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.6); font-size: 1.2rem; }
+        .category-section { margin-bottom: 40px; }
+        .category-header { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .category-header h3 { font-size: 1.3rem; margin-bottom: 5px; }
+        .category-meta { font-size: 0.9rem; opacity: 0.9; }
+        @media (max-width: 768px) { .container { padding: 20px; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <a href="index.html" class="btn btn-secondary">العودة للرئيسية</a>
+    </header>
+
+    <div class="container">
+        <div class="section">
+            <div class="section-title">🏆 البراكيت والنتائج</div>
+            
+            <div class="category-filter">
+                <button class="filter-btn active" onclick="filterBrackets('all')">الكل</button>
+                <button class="filter-btn" onclick="filterBrackets('kids')">الأطفال</button>
+                <button class="filter-btn" onclick="filterBrackets('youth')">الشباب</button>
+                <button class="filter-btn" onclick="filterBrackets('adult')">الكبار</button>
+                <button class="filter-btn" onclick="filterBrackets('master')">الماسترز</button>
+            </div>
+
+            <div id="bracketsContent">
+                <div class="loading">جاري تحميل البراكيت...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let tournamentId = null;
+        let allMatches = [];
+        let currentFilter = 'all';
+
+        const AGE_CATEGORIES = {
+            'kids': ['Kids 1', 'Kids 2', 'Kids 3', 'Infant', 'Junior', 'Teen'],
+            'youth': ['Youth'],
+            'adult': ['Amateur/Professional'],
+            'master': ['Master 1', 'Master 2', 'Master 3', 'Master 4']
+        };
+
+        window.onload = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            tournamentId = urlParams.get('tournament_id');
+            
+            if (!tournamentId) {
+                document.getElementById('bracketsContent').innerHTML = 
+                    '<div class="loading">❌ معرف البطولة غير موجود!</div>';
+                return;
+            }
+
+            await loadBrackets();
+        };
+
+        async function loadBrackets() {
+            try {
+                const { data, error } = await supabase
+                    .from('matches')
+                    .select('*')
+                    .eq('tournament_id', tournamentId)
+                    .order('division', { ascending: true })
+                    .order('round_number', { ascending: true });
+
+                if (error) throw error;
+                
+                allMatches = data || [];
+                renderBrackets();
+
+            } catch (error) {
+                console.error('Error loading brackets:', error);
+                document.getElementById('bracketsContent').innerHTML = 
+                    `<div class="loading">❌ خطأ في تحميل البراكيت: ${error.message}</div>`;
+            }
+        }
+
+        function filterBrackets(category) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(getCategoryName(category))) {
+                    btn.classList.add('active');
+                }
+            });
+            if (category === 'all') {
+                document.querySelector('.filter-btn').classList.add('active');
+            }
+            renderBrackets();
+        }
+
+        function getCategoryName(filter) {
+            const names = {
+                'all': 'الكل',
+                'kids': 'الأطفال',
+                'youth': 'الشباب',
+                'adult': 'الكبار',
+                'master': 'الماسترز'
+            };
+            return names[filter] || 'الكل';
+        }
+
+        function renderBrackets() {
+            const container = document.getElementById('bracketsContent');
+            
+            if (allMatches.length === 0) {
+                container.innerHTML = '<div class="loading">لا يوجد مباريات بعد. سيتم نشر البراكيت قريباً.</div>';
+                return;
+            }
+
+            // تجميع المباريات حسب الفئة
+            const grouped = {};
+            allMatches.forEach(match => {
+                if (!grouped[match.division]) {
+                    grouped[match.division] = [];
+                }
+                grouped[match.division].push(match);
+            });
+
+            let html = '';
+            let visibleCount = 0;
+
+            Object.entries(grouped).forEach(([division, matches]) => {
+                // التحقق من الفلتر
+                const category = getCategoryFromDivision(division);
+                if (currentFilter !== 'all' && !AGE_CATEGORIES[currentFilter].some(c => division.includes(c))) {
+                    return;
+                }
+
+                visibleCount++;
+                
+                // تجميع المباريات حسب الجولة
+                const rounds = {};
+                matches.forEach(m => {
+                    if (!rounds[m.round_number]) {
+                        rounds[m.round_number] = [];
+                    }
+                    rounds[m.round_number].push(m);
+                });
+
+                const roundNames = ['Round of 32', 'Round of 16', 'Quarterfinals', 'Semifinals', 'Finals', 'Bronze Medal'];
+                const arabicRoundNames = ['دور 32', 'دور 16', 'ربع النهائي', 'نصف النهائي', 'النهائي', 'الميدالية البرونزية'];
+
+                html += `
+                    <div class="category-section">
+                        <div class="category-header">
+                            <h3>${division}</h3>
+                            <div class="category-meta">${matches.length} مباراة</div>
+                        </div>
+                        <div class="bracket-container">
+                            <div class="bracket-tree">
+                `;
+
+                // عرض كل جولة
+                Object.keys(rounds).sort().forEach((roundNum, idx) => {
+                    const roundMatches = rounds[roundNum];
+                    const roundName = arabicRoundNames[idx] || `الجولة ${roundNum}`;
+                    
+                    html += `
+                        <div class="bracket-round">
+                            <div class="round-title">${roundName}</div>
+                    `;
+
+                    roundMatches.forEach(match => {
+                        const isCompleted = match.status === 'completed';
+                        const redWinner = isCompleted && match.winner_name === match.red_player_name;
+                        const blueWinner = isCompleted && match.winner_name === match.blue_player_name;
+                        const isBye = match.blue_player_name === 'BYE';
+
+                        html += `
+                            <div class="bracket-match ${isCompleted ? 'completed' : ''}">
+                                <div class="match-id">مباراة ${match.match_number}</div>
+                                <div class="bracket-player red ${redWinner ? 'winner' : ''}">
+                                    <span class="player-name">${match.red_player_name}</span>
+                                    <span class="player-score">${match.red_score || 0}</span>
+                                </div>
+                                <div class="bracket-player blue ${blueWinner ? 'winner' : ''} ${isBye ? 'empty' : ''}">
+                                    <span class="player-name">${match.blue_player_name}</span>
+                                    <span class="player-score">${match.blue_score || 0}</span>
+                                </div>
+                                ${isBye ? '<div style="text-align: center; font-size: 0.75rem; color: #27ae60; margin-top: 5px; font-weight: bold;">BYE</div>' : ''}
+                            </div>
+                        `;
+                    });
+
+                    html += '</div>';
+                });
+
+                html += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (visibleCount === 0) {
+                container.innerHTML = '<div class="loading">لا توجد مباريات في هذه الفئة.</div>';
+            } else {
+                container.innerHTML = html;
+            }
+        }
+
+        function getCategoryFromDivision(division) {
+            if (AGE_CATEGORIES.kids.some(c => division.includes(c))) return 'kids';
+            if (AGE_CATEGORIES.youth.some(c => division.includes(c))) return 'youth';
+            if (AGE_CATEGORIES.adult.some(c => division.includes(c))) return 'adult';
+            if (AGE_CATEGORIES.master.some(c => division.includes(c))) return 'master';
+            return 'all';
+        }
+    </script>
+</body>
+</html>
