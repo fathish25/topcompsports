@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In - TopCompSports</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="header.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body { 
             font-family: 'Segoe UI', Tahoma, sans-serif; 
             background: linear-gradient(135deg, #0066CC 0%, #003366 100%);
@@ -26,7 +26,24 @@
             width: 100%;
             max-width: 450px;
             border: 2px solid #2A2A2A;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
+
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo-icon { 
+            width: 70px; 
+            height: 70px; 
+            background: #FFB800;
+            border-radius: 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 36px; 
+            font-weight: bold; 
+            color: #0A0A0A;
+            margin: 0 auto 15px;
+        }
+        .logo-text { font-size: 24px; font-weight: bold; color: #FFB800; }
 
         .login-header { text-align: center; margin-bottom: 30px; }
         .login-header h1 { font-size: 2rem; margin-bottom: 10px; color: #FFB800; }
@@ -42,6 +59,7 @@
             padding: 14px 16px;
             border-radius: 10px;
             font-size: 1rem;
+            transition: all 0.3s;
         }
         .form-input:focus { outline: none; border-color: #0066CC; }
 
@@ -52,13 +70,14 @@
             border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
+            transition: all 0.3s;
             font-size: 1.05rem;
             margin-top: 10px;
         }
 
         .btn-primary { background: #0066CC; color: #fff; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
-        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
         .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
         .alert.show { display: block; }
@@ -68,6 +87,7 @@
 
         .signup-link { text-align: center; margin-top: 20px; color: rgba(255,255,255,0.6); }
         .signup-link a { color: #FFB800; text-decoration: none; font-weight: 600; }
+        .signup-link a:hover { text-decoration: underline; }
 
         @media (max-width: 480px) {
             .login-container { padding: 30px 20px; }
@@ -77,6 +97,11 @@
 </head>
 <body>
     <div class="login-container">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+
         <div class="login-header">
             <h1>Welcome Back</h1>
             <p>Sign in to your TopCompSports account</p>
@@ -87,12 +112,12 @@
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label class="form-label">Email Address</label>
-                <input type="email" class="form-input" id="email" required placeholder="your.email@example.com">
+                <input type="email" class="form-input" id="email" required placeholder="your.email@example.com" autocomplete="off">
             </div>
 
             <div class="form-group">
                 <label class="form-label">Password</label>
-                <input type="password" class="form-input" id="password" required placeholder="Enter your password">
+                <input type="password" class="form-input" id="password" required placeholder="Enter your password" autocomplete="off">
             </div>
 
             <button type="submit" class="btn btn-primary" id="submitBtn">Sign In →</button>
@@ -103,8 +128,21 @@
         </div>
     </div>
 
-    <script src="auth.js"></script>
     <script>
+        // ===== Supabase Setup =====
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ===== Show Alert =====
+        function showAlert(type, message) {
+            const alert = document.getElementById('alert');
+            alert.className = 'alert alert-' + type + ' show';
+            alert.textContent = message;
+            setTimeout(function() { alert.classList.remove('show'); }, 6000);
+        }
+
+        // ===== Handle Login =====
         async function handleLogin(e) {
             e.preventDefault();
 
@@ -116,16 +154,17 @@
             submitBtn.textContent = 'Signing in...';
 
             try {
-                const result = await window.supabaseClient.auth.signInWithPassword({
+                // 1. Sign in with Supabase Auth
+                const result = await dbClient.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
 
                 if (result.error) {
                     if (result.error.message.includes('Email not confirmed')) {
-                        showAlert('info', ' Please check your email and confirm your account.');
+                        showAlert('info', '📧 Please check your email and confirm your account before signing in.');
                     } else if (result.error.message.includes('Invalid login credentials')) {
-                        showAlert('error', '❌ Invalid email or password.');
+                        showAlert('error', '❌ Invalid email or password. Please try again.');
                     } else {
                         showAlert('error', '❌ ' + result.error.message);
                     }
@@ -136,28 +175,57 @@
 
                 console.log('✅ Login successful! User ID:', result.data.user.id);
 
-                // Get or create profile
-                let userProfile = await window.userAuth.getUserProfile(result.data.user.id);
-
-                if (!userProfile) {
-                    console.log('⚠️ Profile not found, creating one...');
-                    
-                    const createResult = await window.supabaseClient
+                // 2. Get user profile from database
+                let userProfile = null;
+                
+                try {
+                    const profileResult = await dbClient
                         .from('users')
-                        .insert([{
-                            id: result.data.user.id,
-                            email: email,
-                            full_name: result.data.user.user_metadata?.full_name || email.split('@')[0],
-                            user_type: result.data.user.user_metadata?.user_type || 'athlete',
-                            email_confirmed: result.data.user.email_confirmed_at ? true : false,
-                            created_at: new Date().toISOString()
-                        }])
-                        .select()
-                        .single();
+                        .select('*')
+                        .eq('id', result.data.user.id)
+                        .maybeSingle();
 
-                    if (createResult.data) {
-                        userProfile = createResult.data;
-                    } else {
+                    if (profileResult.data) {
+                        userProfile = profileResult.data;
+                    }
+                } catch (profileErr) {
+                    console.warn('Profile lookup failed:', profileErr.message);
+                }
+
+                // 3. If profile doesn't exist, create it
+                if (!userProfile) {
+                    console.log('️ Profile not found, creating one...');
+                    
+                    try {
+                        const createResult = await dbClient
+                            .from('users')
+                            .insert([{
+                                id: result.data.user.id,
+                                email: email,
+                                full_name: result.data.user.user_metadata?.full_name || email.split('@')[0],
+                                user_type: result.data.user.user_metadata?.user_type || 'athlete',
+                                email_confirmed: result.data.user.email_confirmed_at ? true : false,
+                                created_at: new Date().toISOString()
+                            }])
+                            .select()
+                            .single();
+
+                        if (createResult.data) {
+                            userProfile = createResult.data;
+                            console.log('✅ Profile created successfully');
+                        } else {
+                            console.error('Create failed:', createResult.error);
+                            // Fallback: use basic profile
+                            userProfile = {
+                                id: result.data.user.id,
+                                email: email,
+                                full_name: email.split('@')[0],
+                                user_type: 'athlete'
+                            };
+                        }
+                    } catch (createErr) {
+                        console.error('Create error:', createErr);
+                        // Fallback profile
                         userProfile = {
                             id: result.data.user.id,
                             email: email,
@@ -167,14 +235,25 @@
                     }
                 }
 
-                window.userAuth.userProfile = userProfile;
-                window.userAuth.saveToLocalStorage();
+                // 4. Save to localStorage
+                localStorage.setItem('currentUser', JSON.stringify({
+                    id: userProfile.id,
+                    email: userProfile.email,
+                    full_name: userProfile.full_name,
+                    user_type: userProfile.user_type || 'athlete'
+                }));
 
+                // 5. Redirect based on profile completion and user type
                 showAlert('success', '✅ Login successful! Redirecting...');
 
                 setTimeout(function() {
                     // Check if profile is complete
-                    if (!window.userAuth.isProfileComplete()) {
+                    const isProfileComplete = userProfile.full_name && 
+                                           userProfile.date_of_birth && 
+                                           userProfile.gender;
+
+                    if (!isProfileComplete) {
+                        // Redirect to profile page to complete data
                         window.location.href = 'profile.html';
                     } else if (userProfile.user_type === 'organizer') {
                         window.location.href = 'organizer-dashboard.html';
@@ -191,25 +270,20 @@
             }
         }
 
-        function showAlert(type, message) {
-            const alert = document.getElementById('alert');
-            alert.className = 'alert alert-' + type + ' show';
-            alert.textContent = message;
-            setTimeout(function() { alert.classList.remove('show'); }, 6000);
-        }
-
-        // Check URL parameters
+        // ===== Check URL Parameters on Load =====
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             
             if (urlParams.get('needsConfirmation') === 'true') {
-                showAlert('info', '📧 Account created! Please check your email.');
+                const email = urlParams.get('email') || '';
+                showAlert('info', '📧 Account created! Please check your email' + (email ? ' (' + email + ')' : '') + ' and click the confirmation link.');
             }
             
             if (urlParams.get('confirmed') === 'true') {
                 showAlert('success', '✅ Email confirmed! You can now sign in.');
             }
 
+            // Auto-fill email if passed in URL
             if (urlParams.get('email')) {
                 document.getElementById('email').value = urlParams.get('email');
             }
