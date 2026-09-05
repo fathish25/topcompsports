@@ -1,160 +1,282 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In - TopCompSports</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        :root {
+            --primary-blue: #0066CC;
+            --dark-blue: #003366;
+            --accent-yellow: #FFB800;
+            --black: #0A0A0A;
+            --dark-gray: #1A1A1A;
+            --medium-gray: #2A2A2A;
+            --white: #FFFFFF;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: 'Segoe UI', Tahoma, sans-serif; 
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
-            color: #fff; 
-            min-height: 100vh; 
+            background: var(--gradient-blue);
+            color: var(--white); 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: var(--dark-gray);
+            border-radius: 20px;
+            padding: 50px;
+            width: 100%;
+            max-width: 450px;
+            border: 2px solid var(--medium-gray);
+        }
+
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo-icon { 
+            width: 70px; 
+            height: 70px; 
+            background: var(--accent-yellow);
+            border-radius: 15px; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            padding: 20px; 
-        }
-        .container { 
-            max-width: 500px; 
-            width: 100%; 
-            background: rgba(21, 29, 43, 0.95); 
-            border-radius: 16px; 
-            padding: 40px; 
-        }
-        .logo { text-align: center; margin-bottom: 30px; }
-        .logo-icon { 
-            width: 60px; height: 60px; 
-            background: linear-gradient(135deg, #f1c40f, #d4a017); 
-            border-radius: 12px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 32px; font-weight: bold; color: #0a0e17; 
-            margin: 0 auto 15px; 
-        }
-        .title { font-size: 28px; font-weight: bold; color: #f1c40f; margin-bottom: 10px; text-align: center; }
-        .subtitle { color: rgba(255,255,255,0.7); text-align: center; margin-bottom: 30px; }
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 600; margin-bottom: 8px; }
-        .form-input { 
-            width: 100%; 
-            background: rgba(255,255,255,0.05); 
-            border: 2px solid rgba(255,255,255,0.1); 
-            color: #fff; 
-            padding: 14px; 
-            border-radius: 8px; 
-            font-size: 15px; 
-        }
-        .form-input:focus { outline: none; border-color: #f1c40f; }
-        .btn-primary { 
-            width: 100%; 
-            background: linear-gradient(135deg, #2563EB, #1d4ed8); 
-            color: #fff; 
-            border: none; 
-            padding: 16px; 
-            border-radius: 10px; 
-            font-size: 16px; 
+            font-size: 36px; 
             font-weight: bold; 
-            cursor: pointer; 
+            color: var(--black);
+            margin: 0 auto 15px;
+        }
+        .logo-text { font-size: 24px; font-weight: bold; color: var(--accent-yellow); }
+
+        .login-header { text-align: center; margin-bottom: 30px; }
+        .login-header h1 { font-size: 2rem; margin-bottom: 10px; color: var(--accent-yellow); }
+        .login-header p { color: rgba(255,255,255,0.6); }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
+        .form-input {
+            width: 100%;
+            background: var(--black);
+            border: 2px solid var(--medium-gray);
+            color: var(--white);
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .form-input:focus { outline: none; border-color: var(--primary-blue); }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.05rem;
             margin-top: 10px;
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3); }
-        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; white-space: pre-line; }
-        .alert-error { background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #ef4444; }
-        .alert-success { background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #10b981; }
+
+        .btn-primary { background: var(--primary-blue); color: var(--white); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
         .alert.show { display: block; }
-        .links { text-align: center; margin-top: 20px; }
-        .links a { color: #f1c40f; text-decoration: none; }
+        .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
+        .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
+        .alert-info { background: rgba(14,165,233,0.2); border: 1px solid #0ea5e9; color: #0ea5e9; }
+
+        .signup-link { text-align: center; margin-top: 20px; color: rgba(255,255,255,0.6); }
+        .signup-link a { color: var(--accent-yellow); text-decoration: none; font-weight: 600; }
+        .signup-link a:hover { text-decoration: underline; }
+
+        @media (max-width: 480px) {
+            .login-container { padding: 30px 20px; }
+            .login-header h1 { font-size: 1.5rem; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="login-container">
         <div class="logo">
             <div class="logo-icon">T</div>
-            <h1 class="title">Welcome Back</h1>
-            <p class="subtitle">Sign in to your TopCompSports account</p>
+            <div class="logo-text">TopCompSports</div>
         </div>
-        
-        <div class="alert" id="alert"></div>
-        
-        <form id="loginForm">
+
+        <div class="login-header">
+            <h1>Welcome Back</h1>
+            <p>Sign in to your TopCompSports account</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label class="form-label">Email Address</label>
-                <input type="email" class="form-input" id="email" required placeholder="your@email.com" value="shark.mma.egypt2@gmail.com">
+                <input type="email" class="form-input" id="email" required placeholder="your.email@example.com" autocomplete="off">
             </div>
+
             <div class="form-group">
                 <label class="form-label">Password</label>
-                <input type="password" class="form-input" id="password" required placeholder="••••••••">
+                <input type="password" class="form-input" id="password" required placeholder="Enter your password" autocomplete="off">
             </div>
-            <button type="submit" class="btn-primary" id="submitBtn">Sign In →</button>
+
+            <button type="submit" class="btn btn-primary" id="submitBtn">Sign In →</button>
         </form>
-        
-        <div class="links">
-            <p style="color: rgba(255,255,255,0.7); margin-top: 20px;">
-                Don't have an account? <a href="signup.html">Create one</a>
-            </p>
-            <a href="index.html">← Back to Home</a>
+
+        <div class="signup-link">
+            Don't have an account? <a href="signup.html">Create one</a>
         </div>
     </div>
 
     <script>
+        // ===== Supabase Setup =====
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
-        
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const btn = document.getElementById('submitBtn');
+        // ===== Show Alert =====
+        function showAlert(type, message) {
             const alert = document.getElementById('alert');
-            const email = document.getElementById('email').value;
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 6000);
+        }
+
+        // ===== Handle Login =====
+        async function handleLogin(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim().toLowerCase();
             const password = document.getElementById('password').value;
-            
-            btn.disabled = true;
-            btn.textContent = 'Signing in...';
-            alert.classList.remove('show');
-            
+            const submitBtn = document.getElementById('submitBtn');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in...';
+
             try {
-                // 1. تسجيل الدخول
-                const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+                // 1. Sign in with Supabase Auth
+                const { data, error } = await supabase.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
-                
-                if (authError) throw authError;
-                
-                console.log('✅ Login successful! User ID:', authData.user.id);
-                
-                // 2. البحث عن المنظم باستخدام RPC Function
-                const { data: organizer, error: rpcError } = await supabaseClient
-                    .rpc('get_organizer_by_email', { target_email: email });
-                
-                if (rpcError) throw rpcError;
-                
-                const org = organizer && organizer.length > 0 ? organizer[0] : null;
-                
-                if (org) {
-                    console.log('🏢 Organizer found:', org.full_name);
-                    alert.textContent = '✅ Login successful! Redirecting...';
-                    alert.className = 'alert alert-success show';
-                    setTimeout(() => {
-                        window.location.href = 'organizer-dashboard.html';
-                    }, 1000);
-                } else {
-                    throw new Error('No organizer profile found for this email');
+
+                if (error) {
+                    if (error.message.includes('Email not confirmed')) {
+                        showAlert('info', '📧 Please check your email and confirm your account before signing in.');
+                    } else if (error.message.includes('Invalid login credentials')) {
+                        showAlert('error', '❌ Invalid email or password. Please try again.');
+                    } else {
+                        showAlert('error', '❌ ' + error.message);
+                    }
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Sign In →';
+                    return;
                 }
-                
+
+                console.log('✅ Login successful! User ID:', data.user.id);
+
+                // 2. Get user profile from database (any type: athlete, coach, or organizer)
+                const { data: userProfile, error: profileError } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', data.user.id)
+                    .maybeSingle();
+
+                // 3. If profile doesn't exist, create it automatically
+                if (!userProfile || profileError) {
+                    console.log('⚠️ Profile not found, creating one...');
+                    
+                    const { data: newProfile, error: createError } = await supabase
+                        .from('users')
+                        .insert([{
+                            id: data.user.id,
+                            email: email,
+                            full_name: data.user.user_metadata?.full_name || email.split('@')[0],
+                            user_type: data.user.user_metadata?.user_type || 'athlete',
+                            email_confirmed: data.user.email_confirmed_at ? true : false,
+                            created_at: new Date().toISOString()
+                        }])
+                        .select()
+                        .single();
+
+                    if (createError) {
+                        console.error('Create profile error:', createError);
+                        showAlert('error', '❌ Could not create user profile. Please contact support.');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Sign In →';
+                        return;
+                    }
+
+                    // Use the newly created profile
+                    const finalProfile = newProfile;
+                    redirectToDashboard(finalProfile);
+                    return;
+                }
+
+                // 4. Profile exists, redirect based on user type
+                redirectToDashboard(userProfile);
+
             } catch (error) {
-                console.error('❌ Error:', error);
-                alert.textContent = '❌ ' + error.message;
-                alert.className = 'alert alert-error show';
-                btn.disabled = false;
-                btn.textContent = 'Sign In →';
+                console.error('Login error:', error);
+                showAlert('error', '❌ Error: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign In →';
             }
-        });
+        }
+
+        // ===== Redirect to Dashboard Based on User Type =====
+        function redirectToDashboard(userProfile) {
+            const userType = userProfile.user_type || 'athlete';
+            
+            // Store user info in localStorage
+            localStorage.setItem('currentUser', JSON.stringify({
+                id: userProfile.id,
+                email: userProfile.email,
+                full_name: userProfile.full_name,
+                user_type: userType
+            }));
+
+            showAlert('success', '✅ Login successful! Redirecting...');
+
+            setTimeout(() => {
+                if (userType === 'organizer') {
+                    window.location.href = 'organizer-dashboard.html';
+                } else if (userType === 'coach') {
+                    window.location.href = 'index.html';
+                } else {
+                    // athlete or any other type
+                    window.location.href = 'index.html';
+                }
+            }, 1500);
+        }
+
+        // ===== Check URL Parameters on Load =====
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.get('needsConfirmation') === 'true') {
+                const email = urlParams.get('email') || '';
+                showAlert('info', ` Account created! Please check your email${email ? ' (' + email + ')' : ''} and click the confirmation link.`);
+            }
+            
+            if (urlParams.get('confirmed') === 'true') {
+                showAlert('success', '✅ Email confirmed! You can now sign in.');
+            }
+
+            // Auto-fill email if passed in URL
+            if (urlParams.get('email')) {
+                document.getElementById('email').value = urlParams.get('email');
+            }
+        };
     </script>
 </body>
 </html>
