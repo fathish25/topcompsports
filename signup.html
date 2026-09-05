@@ -13,7 +13,6 @@
             --black: #0A0A0A;
             --dark-gray: #1A1A1A;
             --medium-gray: #2A2A2A;
-            --light-gray: #F5F5F5;
             --white: #FFFFFF;
             --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
         }
@@ -23,7 +22,6 @@
 
         .signup-container { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
         
-        /* Left Side - Blue */
         .signup-left {
             background: var(--gradient-blue);
             padding: 60px;
@@ -37,10 +35,8 @@
         .signup-left::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
             background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
             animation: pulse 15s ease-in-out infinite;
         }
@@ -58,7 +54,6 @@
         .signup-left h1 { font-size: 3.5rem; font-weight: 900; line-height: 1.2; margin-bottom: 20px; color: var(--white); }
         .signup-left p { font-size: 1.2rem; color: rgba(255,255,255,0.9); line-height: 1.8; max-width: 500px; }
 
-        /* Right Side - Dark */
         .signup-right {
             background: var(--dark-gray);
             padding: 60px;
@@ -69,7 +64,6 @@
         .signup-header h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; }
         .signup-header p { color: rgba(255,255,255,0.6); }
 
-        /* User Type Selection */
         .user-type-section { margin-bottom: 30px; }
         .user-type-label { font-size: 0.9rem; font-weight: 600; margin-bottom: 15px; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; }
         
@@ -91,7 +85,6 @@
         .user-type-icon { font-size: 2.5rem; margin-bottom: 10px; }
         .user-type-name { font-weight: 600; font-size: 0.95rem; }
 
-        /* Form */
         .form-group { margin-bottom: 20px; }
         .form-label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; color: rgba(255,255,255,0.8); }
         .form-input, .form-select {
@@ -121,10 +114,9 @@
 
         .btn-primary { background: var(--gradient-blue); color: var(--white); }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
-        .btn-secondary { background: transparent; color: var(--white); border: 2px solid var(--white); margin-top: 15px; }
-        .btn-secondary:hover { background: var(--white); color: var(--black); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; }
+        .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
         .alert.show { display: block; }
         .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
         .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
@@ -134,27 +126,22 @@
         .login-link a { color: var(--primary-blue); text-decoration: none; font-weight: 600; }
         .login-link a:hover { text-decoration: underline; }
 
-        /* Responsive */
         @media (max-width: 968px) {
             .signup-container { grid-template-columns: 1fr; }
             .signup-left { display: none; }
             .signup-right { padding: 40px 20px; }
             .user-type-options { grid-template-columns: 1fr; }
             .form-row { grid-template-columns: 1fr; }
-            .signup-left h1 { font-size: 2.5rem; }
-            .signup-header h2 { font-size: 2rem; }
         }
 
         @media (max-width: 480px) {
             .signup-right { padding: 30px 15px; }
             .signup-header h2 { font-size: 1.8rem; }
-            .btn { padding: 14px; font-size: 1rem; }
         }
     </style>
 </head>
 <body>
     <div class="signup-container">
-        <!-- Left Side -->
         <div class="signup-left">
             <div class="signup-left-content">
                 <div class="logo">
@@ -166,7 +153,6 @@
             </div>
         </div>
 
-        <!-- Right Side -->
         <div class="signup-right">
             <div class="signup-header">
                 <h2>Make your mark.</h2>
@@ -176,7 +162,6 @@
             <div id="alert" class="alert"></div>
 
             <form id="signupForm" onsubmit="handleSignup(event)">
-                <!-- User Type Selection -->
                 <div class="user-type-section">
                     <div class="user-type-label">I am joining as</div>
                     <div class="user-type-options">
@@ -189,17 +174,17 @@
                             <div class="user-type-name">Coach</div>
                         </div>
                         <div class="user-type-option" onclick="selectUserType('organizer')" id="type-organizer">
+                            <div class="user-type-icon">📋</div>
                             <div class="user-type-name">Organizer</div>
                         </div>
                     </div>
                     <input type="hidden" id="userType" required>
                 </div>
 
-                <!-- Personal Info -->
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Full Name *</label>
-                        <input type="text" class="form-input" id="fullName" required placeholder="Enter your full name">
+                        <input type="text" class="form-input" id="fullName" required placeholder="Enter your full name" autocomplete="off">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Email Address *</label>
@@ -210,11 +195,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Password *</label>
-                        <input type="password" class="form-input" id="password" required placeholder="Create a password" minlength="6">
+                        <input type="password" class="form-input" id="password" required placeholder="Minimum 6 characters" minlength="6" autocomplete="new-password">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Confirm Password *</label>
-                        <input type="password" class="form-input" id="confirmPassword" required placeholder="Confirm your password">
+                        <input type="password" class="form-input" id="confirmPassword" required placeholder="Re-enter password" autocomplete="new-password">
                     </div>
                 </div>
 
@@ -229,7 +214,6 @@
                             <option value="">Select gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
-                            <option value="Other">Other</option>
                         </select>
                     </div>
                 </div>
@@ -245,7 +229,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Create Account →</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">Create Account →</button>
             </form>
 
             <div class="login-link">
@@ -255,20 +239,15 @@
     </div>
 
     <script>
-        // ===== Supabase Setup =====
+        // ===== Supabase Setup - مرة واحدة فقط =====
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ===== User Type Selection =====
         function selectUserType(type) {
-            // Remove active class from all options
             document.querySelectorAll('.user-type-option').forEach(opt => opt.classList.remove('active'));
-            
-            // Add active class to selected option
             document.getElementById(`type-${type}`).classList.add('active');
-            
-            // Set hidden input value
             document.getElementById('userType').value = type;
         }
 
@@ -277,22 +256,26 @@
             const alert = document.getElementById('alert');
             alert.className = `alert alert-${type} show`;
             alert.textContent = message;
-            setTimeout(() => alert.classList.remove('show'), 5000);
+            alert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => alert.classList.remove('show'), 8000);
         }
 
-        // ===== Check if Email Exists =====
+        // ===== Check if Email Exists in Database =====
         async function checkEmailExists(email) {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('users')
                     .select('email')
-                    .eq('email', email)
-                    .single();
+                    .eq('email', email.toLowerCase())
+                    .maybeSingle();
                 
-                if (error && error.code !== 'PGRST116') throw error;
+                if (error) {
+                    console.error('Check email error:', error);
+                    return false;
+                }
                 return data !== null;
             } catch (error) {
-                console.error('Error checking email:', error);
+                console.error('Error:', error);
                 return false;
             }
         }
@@ -301,6 +284,7 @@
         async function handleSignup(e) {
             e.preventDefault();
 
+            const submitBtn = document.getElementById('submitBtn');
             const userType = document.getElementById('userType').value;
             const fullName = document.getElementById('fullName').value.trim();
             const email = document.getElementById('email').value.trim().toLowerCase();
@@ -311,32 +295,40 @@
             const country = document.getElementById('country').value.trim();
             const phone = document.getElementById('phone').value.trim();
 
-            // Validation
+            // 1. Validate User Type
             if (!userType) {
-                showAlert('error', 'Please select your user type (Athlete, Coach, or Organizer)');
+                showAlert('error', '⚠️ Please select your user type (Athlete, Coach, or Organizer)');
                 return;
             }
 
+            // 2. Validate Password Match
             if (password !== confirmPassword) {
-                showAlert('error', 'Passwords do not match');
+                showAlert('error', '⚠️ Passwords do not match');
                 return;
             }
 
+            // 3. Validate Password Length
             if (password.length < 6) {
-                showAlert('error', 'Password must be at least 6 characters');
+                showAlert('error', '⚠️ Password must be at least 6 characters');
                 return;
             }
 
-            // Check if email already exists
+            // 4. Check if email already exists
+            showAlert('info', '🔍 Checking if email is available...');
             const emailExists = await checkEmailExists(email);
+            
             if (emailExists) {
-                showAlert('error', 'This email address is already registered. Please use a different email or sign in.');
+                showAlert('error', '⚠️ This email is already registered. Please use a different email or sign in.');
                 return;
             }
+
+            // 5. Disable button during signup
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating account...';
 
             try {
-                // Sign up with Supabase Auth
-                const { data: authData, error: authError } = await supabase.auth.signUp({
+                // 6. Sign up with Supabase Auth
+                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
                     options: {
@@ -347,10 +339,20 @@
                     }
                 });
 
-                if (authError) throw authError;
+                if (authError) {
+                    // Handle specific Supabase errors
+                    if (authError.message.includes('already registered')) {
+                        showAlert('error', '⚠️ This email is already registered. Please use a different email or sign in.');
+                    } else {
+                        showAlert('error', '⚠️ ' + authError.message);
+                    }
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Create Account →';
+                    return;
+                }
 
-                // Create user profile in database
-                const { error: profileError } = await supabase
+                // 7. Create user profile in database
+                const { error: profileError } = await supabaseClient
                     .from('users')
                     .insert([{
                         id: authData.user.id,
@@ -365,34 +367,31 @@
                         created_at: new Date().toISOString()
                     }]);
 
-                if (profileError) throw profileError;
+                if (profileError) {
+                    console.error('Profile error:', profileError);
+                    // Even if profile fails, auth succeeded
+                }
 
-                // Success message
-                showAlert('success', '✅ Account created successfully! Please check your email to confirm your account.');
+                // 8. Success!
+                showAlert('success', '✅ Account created successfully! Please check your email to confirm your account. You will be redirected to login page.');
                 
-                // Clear form
+                // 9. Clear form
                 document.getElementById('signupForm').reset();
                 document.querySelectorAll('.user-type-option').forEach(opt => opt.classList.remove('active'));
                 document.getElementById('userType').value = '';
 
-                // Redirect after 3 seconds
+                // 10. Redirect to login after 4 seconds
                 setTimeout(() => {
-                    window.location.href = 'login.html?emailConfirmed=please_check_email';
-                }, 3000);
+                    window.location.href = 'login.html?email=' + encodeURIComponent(email);
+                }, 4000);
 
             } catch (error) {
                 console.error('Signup error:', error);
-                showAlert('error', 'Error: ' + error.message);
+                showAlert('error', '⚠️ Error: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account →';
             }
         }
-
-        // ===== Check URL Parameters on Load =====
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('email')) {
-                document.getElementById('email').value = urlParams.get('email');
-            }
-        };
     </script>
 </body>
 </html>
