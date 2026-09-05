@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل البطولة - TopCompSports</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; min-height: 100vh; }
+        .header { background: rgba(21, 29, 43, 0.95); padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2a3548; }
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #f1c40f, #d4a017); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #0a0e17; }
+        .logo-text { font-size: 22px; font-weight: bold; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; text-decoration: none; display: inline-block; }
+        .btn-primary { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241,196,15,0.3); }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 50px; }
+        .tournament-banner { background: linear-gradient(135deg, #1a1f2e, #2a3548); border-radius: 16px; padding: 40px; margin-bottom: 30px; border: 2px solid #f1c40f; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        .tournament-info h1 { color: #f1c40f; font-size: 2.5rem; margin-bottom: 15px; }
+        .tournament-info p { color: rgba(255,255,255,0.8); margin-bottom: 10px; font-size: 1.1rem; }
+        .tournament-dates { background: rgba(241,196,15,0.1); padding: 20px; border-radius: 12px; border: 1px solid rgba(241,196,15,0.3); }
+        .date-item { margin-bottom: 15px; }
+        .date-label { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 5px; }
+        .date-value { color: #f1c40f; font-size: 1.2rem; font-weight: bold; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 30px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 12px; flex-wrap: wrap; }
+        .tab { padding: 12px 24px; border: none; background: transparent; color: rgba(255,255,255,0.6); cursor: pointer; font-weight: bold; border-radius: 8px; transition: all 0.3s; text-decoration: none; }
+        .tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .tab.active { background: #f1c40f; color: #0a0e17; }
+        .section { background: #151d2b; border-radius: 16px; padding: 30px; margin-bottom: 30px; border: 1px solid #2a3548; }
+        .section-title { font-size: 1.8rem; font-weight: bold; color: #f1c40f; margin-bottom: 20px; border-bottom: 2px solid #2a3548; padding-bottom: 15px; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .info-card { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        .info-card h3 { color: #f1c40f; margin-bottom: 15px; font-size: 1.2rem; }
+        .info-card ul { list-style: none; padding: 0; }
+        .info-card li { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); }
+        .info-card li:last-child { border-bottom: none; }
+        .divisions-list { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; margin-top: 20px; }
+        .division-category { margin-bottom: 25px; }
+        .division-category h4 { color: #f1c40f; margin-bottom: 15px; font-size: 1.3rem; border-bottom: 1px solid rgba(241,196,15,0.3); padding-bottom: 10px; }
+        .division-item { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.95rem; color: rgba(255,255,255,0.8); }
+        .division-item:last-child { border-bottom: none; }
+        .sidebar { background: #151d2b; border-radius: 12px; padding: 25px; border: 1px solid #2a3548; }
+        .sidebar-section { margin-bottom: 25px; }
+        .sidebar-title { color: #f1c40f; font-size: 1.1rem; margin-bottom: 15px; font-weight: bold; }
+        .sidebar-item { padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); }
+        .sidebar-label { color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 5px; }
+        .sidebar-value { color: #fff; font-weight: 600; }
+        .entries-list { background: rgba(0,0,0,0.2); border-radius: 8px; overflow: hidden; }
+        .entry-item { display: flex; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .entry-item:last-child { border-bottom: none; }
+        .entry-name { color: rgba(255,255,255,0.8); }
+        .entry-price { color: #f1c40f; font-weight: bold; }
+        .loading { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.6); font-size: 1.2rem; }
+        .error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; padding: 20px; border-radius: 12px; text-align: center; }
+        @media (max-width: 968px) { .tournament-banner { grid-template-columns: 1fr; } .container { padding: 20px; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <a href="index.html" class="btn btn-secondary">العودة للرئيسية</a>
+    </header>
+
+    <div class="container">
+        <div id="loading" class="loading">جاري تحميل بيانات البطولة...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        
+        <div id="tournamentContent" style="display: none;">
+            <div class="tournament-banner">
+                <div class="tournament-info">
+                    <h1 id="tournamentName">اسم البطولة</h1>
+                    <p id="tournamentDesc">وصف البطولة</p>
+                    <p>📍 <span id="tournamentLocation">الموقع</span></p>
+                </div>
+                <div class="tournament-dates">
+                    <div class="date-item">
+                        <div class="date-label"> تاريخ البطولة</div>
+                        <div class="date-value" id="tournamentDate">-</div>
+                    </div>
+                    <div class="date-item">
+                        <div class="date-label">⏰ التسجيل ينتهي</div>
+                        <div class="date-value" id="registrationDeadline">-</div>
+                    </div>
+                    <a id="registerBtn" href="#" class="btn btn-primary" style="display: inline-block; margin-top: 15px; width: 100%; text-align: center;">📝 سجل الآن في البطولة</a>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <a href="#" class="tab active" onclick="switchTab('info'); return false;">📋 المعلومات</a>
+                <a href="#" class="tab" onclick="switchTab('athletes'); return false;">👥 اللاعبين (<span id="athleteCount">0</span>)</a>
+                <a href="#" class="tab" onclick="switchTab('brackets'); return false;">🏆 البراكيت</a>
+                <a href="#" class="tab" onclick="switchTab('schedule'); return false;">📅 الجدول</a>
+                <a href="#" class="tab" onclick="switchTab('results'); return false;"> النتائج</a>
+            </div>
+
+            <div id="tab-info">
+                <div class="section">
+                    <div class="section-title">معلومات البطولة</div>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h3>📋 عن البطولة</h3>
+                            <p id="tournamentFullDesc" style="color: rgba(255,255,255,0.8); line-height: 1.8;"></p>
+                        </div>
+                        <div class="info-card">
+                            <h3>🏆 الفئات المتاحة</h3>
+                            <div id="divisionsList" class="divisions-list">
+                                <!-- سيتم ملؤها ديناميكياً -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">📍 الموقع والتوقيت</div>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h3>الموقع</h3>
+                            <p id="locationDetails" style="color: rgba(255,255,255,0.8);"></p>
+                        </div>
+                        <div class="info-card">
+                            <h3>مواعيد weigh-in</h3>
+                            <ul id="weighInSchedule">
+                                <li>سيتم الإعلان عنها لاحقاً</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-athletes" style="display: none;">
+                <div class="section">
+                    <div class="section-title"> قائمة اللاعبين المسجلين</div>
+                    <div id="athletesList">
+                        <div class="loading">جاري تحميل قائمة اللاعبين...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-brackets" style="display: none;">
+                <div class="section">
+                    <div class="section-title"> البراكيت والنتائج</div>
+                    <p style="text-align: center; color: rgba(255,255,255,0.6); padding: 40px;">
+                        سيتم نشر البراكيت بعد انتهاء التسجيل
+                    </p>
+                </div>
+            </div>
+
+            <div id="tab-schedule" style="display: none;">
+                <div class="section">
+                    <div class="section-title">📅 جدول المباريات</div>
+                    <p style="text-align: center; color: rgba(255,255,255,0.6); padding: 40px;">
+                        سيتم نشر الجدول قبل البطولة
+                    </p>
+                </div>
+            </div>
+
+            <div id="tab-results" style="display: none;">
+                <div class="section">
+                    <div class="section-title">🏅 النتائج</div>
+                    <p style="text-align: center; color: rgba(255,255,255,0.6); padding: 40px;">
+                        ستظهر النتائج بعد انتهاء المباريات
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let tournamentId = null;
+        let currentTab = 'info';
+
+        const AGE_GROUPS = {
+            'Kids 1 (4-5 yrs)': { category: 'kids' },
+            'Kids 2 (6-7 yrs)': { category: 'kids' },
+            'Kids 3 (8-9 yrs)': { category: 'kids' },
+            'Infant (10-11 yrs)': { category: 'kids' },
+            'Junior (12-13 yrs)': { category: 'kids' },
+            'Teen (14-15 yrs)': { category: 'kids' },
+            'Youth (16-17 yrs)': { category: 'youth' },
+            'Amateur/Professional (18-29 yrs)': { category: 'adult' },
+            'Master 1 (30-35 yrs)': { category: 'master' },
+            'Master 2 (36-40 yrs)': { category: 'master' },
+            'Master 3 (41-45 yrs)': { category: 'master' },
+            'Master 4 (46+ yrs)': { category: 'master' }
+        };
+
+        window.onload = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            tournamentId = urlParams.get('tournament_id');
+            
+            if (!tournamentId) {
+                showError(' معرف البطولة غير موجود!');
+                return;
+            }
+
+            await loadTournamentDetails();
+        };
+
+        async function loadTournamentDetails() {
+            try {
+                const { data: tournament, error } = await supabase
+                    .from('tournaments')
+                    .select('*')
+                    .eq('id', tournamentId)
+                    .single();
+
+                if (error || !tournament) {
+                    showError('❌ لم يتم العثور على البطولة!');
+                    return;
+                }
+
+                displayTournamentInfo(tournament);
+                await loadAthletes();
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('tournamentContent').style.display = 'block';
+                
+                // تحديث رابط التسجيل
+                const registerBtn = document.getElementById('registerBtn');
+                registerBtn.href = `player-registration.html?tournament_id=${tournamentId}`;
+                
+            } catch (error) {
+                showError('❌ خطأ في تحميل البيانات: ' + error.message);
+            }
+        }
+
+        function displayTournamentInfo(tournament) {
+            document.getElementById('tournamentName').textContent = tournament.name;
+            document.getElementById('tournamentDesc').textContent = tournament.description || 'بطولة الجوجيتسو';
+            document.getElementById('tournamentFullDesc').textContent = tournament.description || 'بطولة احترافية للجوجيتسو brasileña';
+            document.getElementById('tournamentLocation').textContent = tournament.location || 'سيتم الإعلان عنه';
+            document.getElementById('locationDetails').textContent = tournament.location || 'سيتم الإعلان عن الموقع قريباً';
+            
+            const date = new Date(tournament.date);
+            document.getElementById('tournamentDate').textContent = date.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            if (tournament.registration_deadline) {
+                const deadline = new Date(tournament.registration_deadline);
+                document.getElementById('registrationDeadline').textContent = deadline.toLocaleDateString('ar-SA');
+            } else {
+                document.getElementById('registrationDeadline').textContent = 'لم يتم تحديده';
+            }
+
+            // عرض الفئات
+            displayDivisions();
+        }
+
+        function displayDivisions() {
+            const divisionsList = document.getElementById('divisionsList');
+            const categories = {
+                'kids': 'الأطفال',
+                'youth': 'الشباب',
+                'adult': 'الكبار',
+                'master': 'الماسترز'
+            };
+
+            let html = '';
+            Object.entries(categories).forEach(([key, label]) => {
+                const ageGroups = Object.entries(AGE_GROUPS)
+                    .filter(([_, data]) => data.category === key)
+                    .map(([name, _]) => name);
+
+                if (ageGroups.length > 0) {
+                    html += `
+                        <div class="division-category">
+                            <h4>${label}</h4>
+                            ${ageGroups.map(age => `
+                                <div class="division-item">${age}</div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+            });
+
+            divisionsList.innerHTML = html;
+        }
+
+        async function loadAthletes() {
+            try {
+                const { data, error } = await supabase
+                    .from('tournament_participants')
+                    .select('*')
+                    .eq('tournament_id', tournamentId)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                document.getElementById('athleteCount').textContent = data ? data.length : 0;
+
+                if (!data || data.length === 0) {
+                    document.getElementById('athletesList').innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">
+                            لا يوجد لاعبين مسجلين بعد. كن أول من يسجل!
+                        </div>
+                    `;
+                    return;
+                }
+
+                // تجميع اللاعبين حسب الفئة
+                const grouped = {};
+                data.forEach(player => {
+                    const key = `${player.age_group} / ${player.gender === 'Male' ? 'رجال' : 'نساء'} / ${player.belt_level} / ${player.weight}كجم`;
+                    if (!grouped[key]) grouped[key] = [];
+                    grouped[key].push(player);
+                });
+
+                let html = '';
+                Object.entries(grouped).forEach(([category, players]) => {
+                    html += `
+                        <div style="margin-bottom: 30px; background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                            <h3 style="color: #f1c40f; margin-bottom: 15px; font-size: 1.2rem;">${category} (${players.length} لاعب)</h3>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid rgba(241,196,15,0.3);">
+                                        <th style="padding: 10px; text-align: right; color: rgba(255,255,255,0.6);">#</th>
+                                        <th style="padding: 10px; text-align: right; color: rgba(255,255,255,0.6);">اللاعب</th>
+                                        <th style="padding: 10px; text-align: right; color: rgba(255,255,255,0.6);">الفريق</th>
+                                        <th style="padding: 10px; text-align: right; color: rgba(255,255,255,0.6);">التصنيف</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${players.map((p, i) => `
+                                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                            <td style="padding: 12px;">${i + 1}</td>
+                                            <td style="padding: 12px; font-weight: bold;">${p.player_name}</td>
+                                            <td style="padding: 12px; color: rgba(255,255,255,0.8);">${p.team || '-'}</td>
+                                            <td style="padding: 12px;">${p.ranking || 0}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('athletesList').innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading athletes:', error);
+                document.getElementById('athletesList').innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #ef4444;">
+                        خطأ في تحميل قائمة اللاعبين
+                    </div>
+                `;
+            }
+        }
+
+        function switchTab(tabName) {
+            // إخفاء جميع التبويبات
+            document.querySelectorAll('[id^="tab-"]').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // إزالة النشاط من جميع التبويبات
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // إظهار التبويب المطلوب
+            document.getElementById(`tab-${tabName}`).style.display = 'block';
+            event.target.classList.add('active');
+            currentTab = tabName;
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = message;
+        }
+    </script>
+</body>
+</html>
