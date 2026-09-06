@@ -40,7 +40,7 @@
             color: var(--primary-blue);
         }
         
-        .nav { display: flex; gap: 20px; align-items: center; }
+        .nav { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
         .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; transition: all 0.3s; }
         .nav a:hover { color: var(--accent-yellow); }
         
@@ -241,6 +241,7 @@
             .tournaments-grid { grid-template-columns: 1fr; }
             .form-row { grid-template-columns: 1fr; }
             .stats-row { grid-template-columns: 1fr; }
+            .page-title { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -297,7 +298,7 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">📅 Date *</label>
+                        <label class="form-label">📅 Event Date *</label>
                         <input type="date" class="form-input" id="tournamentDate" required>
                     </div>
                     <div class="form-group">
@@ -306,7 +307,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">📍 Location</label>
+                    <label class="form-label"> Location</label>
                     <input type="text" class="form-input" id="tournamentLocation" placeholder="Enter location">
                 </div>
                 <div class="form-row">
@@ -337,7 +338,7 @@
         var translations = {
             en: {
                 pageTitle: ' Organizer Dashboard',
-                btnCreate: ' Create Tournament',
+                btnCreate: '➕ Create Tournament',
                 btnRefresh: '🔄 Refresh',
                 loading: 'Loading tournaments...',
                 modalTitleCreate: 'Create New Tournament',
@@ -348,7 +349,7 @@
                 matches: 'Matches',
                 capacity: 'Capacity',
                 manage: '⚙️ Manage',
-                view: '️ View',
+                view: '👁️ View',
                 edit: '️ Edit',
                 delete: '🗑️ Delete',
                 date: 'Date',
@@ -365,8 +366,8 @@
                 statusCompleted: 'Completed'
             },
             ar: {
-                pageTitle: ' لوحة تحكم المنظم',
-                btnCreate: '➕ إنشاء بطولة',
+                pageTitle: '🏆 لوحة تحكم المنظم',
+                btnCreate: ' إنشاء بطولة',
                 btnRefresh: '🔄 تحديث',
                 loading: 'جاري التحميل...',
                 modalTitleCreate: 'إنشاء بطولة جديدة',
@@ -385,9 +386,9 @@
                 successCreate: '✅ تم الإنشاء بنجاح!',
                 successUpdate: '✅ تم التحديث بنجاح!',
                 successDelete: '✅ تم الحذف!',
-                errorCreate: ' خطأ في الإنشاء: ',
+                errorCreate: '❌ خطأ في الإنشاء: ',
                 errorUpdate: '❌ خطأ في التحديث: ',
-                errorDelete: ' خطأ في الحذف: ',
+                errorDelete: '❌ خطأ في الحذف: ',
                 confirmDelete: 'هل أنت متأكد من الحذف؟',
                 statusUpcoming: 'قادمة',
                 statusToday: 'اليوم',
@@ -403,12 +404,14 @@
                     'https://ngiclnkmbvzjhylwhzyn.supabase.co',
                     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w'
                 );
+                console.log('✅ Supabase initialized');
             }
             return dbClient;
         }
 
         // ===== Language Switcher =====
         window.changeLang = function(lang) {
+            console.log('Changing language to:', lang);
             currentLang = lang;
             localStorage.setItem('lang', lang);
             document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
@@ -421,7 +424,9 @@
             document.getElementById('btnCreate').textContent = t.btnCreate;
             document.getElementById('btnRefresh').textContent = t.btnRefresh;
             
-            window.loadTournaments();
+            if (currentUser) {
+                window.loadTournaments();
+            }
         };
 
         // ===== Auth Check =====
@@ -474,10 +479,9 @@
                 document.getElementById('editTournamentId').value = data.id;
                 document.getElementById('tournamentName').value = data.name;
                 document.getElementById('tournamentDesc').value = data.description || '';
-                // Handle different date column names
-                document.getElementById('tournamentDate').value = data.tournament_date || data.date || data.event_date || '';
+                document.getElementById('tournamentDate').value = data.event_date || data.tournament_date || '';
                 document.getElementById('registrationDeadline').value = data.registration_deadline || '';
-                document.getElementById('tournamentLocation').value = data.location || data.tournament_location || '';
+                document.getElementById('tournamentLocation').value = data.location || '';
                 document.getElementById('maxParticipants').value = data.max_participants || 200;
                 document.getElementById('registrationFee').value = data.registration_fee || 0;
                 
@@ -512,12 +516,11 @@
             var editId = document.getElementById('editTournamentId').value;
             console.log('Edit ID:', editId);
             
-            // Create tournament data with flexible column names
             var tournamentData = {
                 organizer_id: currentUser.id,
                 name: document.getElementById('tournamentName').value,
                 description: document.getElementById('tournamentDesc').value,
-                tournament_date: document.getElementById('tournamentDate').value,
+                event_date: document.getElementById('tournamentDate').value,
                 registration_deadline: document.getElementById('registrationDeadline').value || null,
                 location: document.getElementById('tournamentLocation').value,
                 max_participants: parseInt(document.getElementById('maxParticipants').value) || 200,
@@ -588,7 +591,7 @@
                     var t = translations[currentLang];
                     container.innerHTML = 
                         '<div class="empty-state">' +
-                            '<div class="icon"></div>' +
+                            '<div class="icon">🏆</div>' +
                             '<h3>' + t.noTournaments + '</h3>' +
                             '<p>' + t.noTournamentsDesc + '</p>' +
                         '</div>';
@@ -600,8 +603,7 @@
                 
                 for (var i = 0; i < data.length; i++) {
                     var t = data[i];
-                    // Handle different date column names
-                    var dateValue = t.tournament_date || t.date || t.event_date;
+                    var dateValue = t.event_date || t.tournament_date;
                     var date = new Date(dateValue);
                     var formattedDate = date.toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
                     
@@ -612,8 +614,7 @@
                         statusText = translations[currentLang].statusToday;
                     }
 
-                    // Handle different location column names
-                    var locationValue = t.location || t.tournament_location || 'TBD';
+                    var locationValue = t.location || 'TBD';
 
                     html += 
                         '<div class="tournament-card">' +
@@ -633,7 +634,7 @@
                                         '<span>' + translations[currentLang].date + ': ' + formattedDate + '</span>' +
                                     '</div>' +
                                     '<div class="tournament-meta-item">' +
-                                        '<span>📍</span>' +
+                                        '<span></span>' +
                                         '<span>' + translations[currentLang].location + ': ' + locationValue + '</span>' +
                                     '</div>' +
                                 '</div>' +
@@ -643,7 +644,7 @@
                                         '<div class="stat-label">' + translations[currentLang].players + '</div>' +
                                     '</div>' +
                                     '<div class="stat-item">' +
-                                        <div class="stat-value" id="matchCount_' + t.id + '">-</div>' +
+                                        '<div class="stat-value" id="matchCount_' + t.id + '">-</div>' +
                                         '<div class="stat-label">' + translations[currentLang].matches + '</div>' +
                                     '</div>' +
                                     '<div class="stat-item">' +
@@ -664,13 +665,12 @@
                 html += '</div>';
                 container.innerHTML = html;
 
-                // Load stats for each tournament
                 for (var j = 0; j < data.length; j++) {
                     window.loadTournamentStats(data[j].id);
                 }
             } catch (error) {
                 console.error('Load error:', error);
-                container.innerHTML = '<div class="alert alert-error show">❌ ' + error.message + '</div>';
+                container.innerHTML = '<div class="alert alert-error show"> ' + error.message + '</div>';
             }
         };
 
