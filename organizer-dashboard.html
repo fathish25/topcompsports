@@ -296,7 +296,7 @@
                     <textarea class="form-textarea" id="tournamentDesc" placeholder="Tournament description..."></textarea>
                 </div>
                 
-                <!-- ✅ تاريخ البداية والنهاية -->
+                <!-- تواريخ الحدث -->
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label"> Event Start Date *</label>
@@ -305,6 +305,30 @@
                     <div class="form-group">
                         <label class="form-label">📅 Event End Date *</label>
                         <input type="date" class="form-input" id="eventEndDate" required>
+                    </div>
+                </div>
+                
+                <!-- مواعيد التسجيل العادي -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">📝 Regular Reg. Start</label>
+                        <input type="date" class="form-input" id="regRegularStart">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">📝 Regular Reg. End</label>
+                        <input type="date" class="form-input" id="regRegularEnd">
+                    </div>
+                </div>
+                
+                <!-- مواعيد التسجيل المتأخر -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label"> Late Reg. Start</label>
+                        <input type="date" class="form-input" id="regLateStart">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">⏰ Late Reg. End</label>
+                        <input type="date" class="form-input" id="regLateEnd">
                     </div>
                 </div>
                 
@@ -350,19 +374,23 @@
                 players: 'Players',
                 matches: 'Matches',
                 capacity: 'Capacity',
-                manage: '️ Manage',
+                manage: '⚙️ Manage',
                 view: '👁️ View',
                 edit: '✏️ Edit',
                 delete: '🗑️ Delete',
                 startDate: 'Start Date',
                 endDate: 'End Date',
                 location: 'Location',
+                regRegularStart: 'Regular Reg. Start',
+                regRegularEnd: 'Regular Reg. End',
+                regLateStart: 'Late Reg. Start',
+                regLateEnd: 'Late Reg. End',
                 successCreate: '✅ Tournament created successfully!',
                 successUpdate: '✅ Tournament updated successfully!',
                 successDelete: '✅ Tournament deleted!',
-                errorCreate: '❌ Error creating: ',
-                errorUpdate: '❌ Error updating: ',
-                errorDelete: '❌ Error deleting: ',
+                errorCreate: ' Error creating: ',
+                errorUpdate: ' Error updating: ',
+                errorDelete: ' Error deleting: ',
                 confirmDelete: 'Are you sure you want to delete this tournament?',
                 statusUpcoming: 'Upcoming',
                 statusToday: 'Today',
@@ -383,10 +411,14 @@
                 manage: '⚙️ إدارة',
                 view: '👁️ عرض',
                 edit: '✏️ تعديل',
-                delete: '🗑️ حذف',
+                delete: '️ حذف',
                 startDate: 'تاريخ البداية',
                 endDate: 'تاريخ النهاية',
                 location: 'الموقع',
+                regRegularStart: 'بداية التسجيل العادي',
+                regRegularEnd: 'نهاية التسجيل العادي',
+                regLateStart: 'بداية التسجيل المتأخر',
+                regLateEnd: 'نهاية التسجيل المتأخر',
                 successCreate: '✅ تم الإنشاء بنجاح!',
                 successUpdate: '✅ تم التحديث بنجاح!',
                 successDelete: '✅ تم الحذف!',
@@ -485,6 +517,10 @@
                 document.getElementById('tournamentDesc').value = data.description || '';
                 document.getElementById('eventStartDate').value = data.event_start_date || data.event_date || '';
                 document.getElementById('eventEndDate').value = data.event_end_date || data.event_date || '';
+                document.getElementById('regRegularStart').value = data.reg_regular_start || '';
+                document.getElementById('regRegularEnd').value = data.reg_regular_end || '';
+                document.getElementById('regLateStart').value = data.reg_late_start || '';
+                document.getElementById('regLateEnd').value = data.reg_late_end || '';
                 document.getElementById('tournamentLocation').value = data.location || '';
                 document.getElementById('maxParticipants').value = data.max_participants || 200;
                 document.getElementById('registrationFee').value = data.registration_fee || 0;
@@ -536,6 +572,10 @@
                 event_start_date: startDate,
                 event_end_date: endDate,
                 event_date: startDate, // للتوافق مع البيانات القديمة
+                reg_regular_start: document.getElementById('regRegularStart').value || null,
+                reg_regular_end: document.getElementById('regRegularEnd').value || null,
+                reg_late_start: document.getElementById('regLateStart').value || null,
+                reg_late_end: document.getElementById('regLateEnd').value || null,
                 location: document.getElementById('tournamentLocation').value,
                 max_participants: parseInt(document.getElementById('maxParticipants').value) || 200,
                 registration_fee: parseFloat(document.getElementById('registrationFee').value) || 0,
@@ -651,7 +691,7 @@
                     html += 
                         '<div class="tournament-card">' +
                             '<div class="tournament-image" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0066CC 0%, #003366 100%);">' +
-                                '<span style="font-size: 4rem; opacity: 0.3;">🏆</span>' +
+                                '<span style="font-size: 4rem; opacity: 0.3;"></span>' +
                             '</div>' +
                             '<div class="tournament-content">' +
                                 '<div class="tournament-header">' +
