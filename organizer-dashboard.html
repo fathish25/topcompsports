@@ -301,10 +301,6 @@
                         <label class="form-label">📅 Event Date *</label>
                         <input type="date" class="form-input" id="tournamentDate" required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Registration Deadline</label>
-                        <input type="date" class="form-input" id="registrationDeadline">
-                    </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label"> Location</label>
@@ -480,7 +476,6 @@
                 document.getElementById('tournamentName').value = data.name;
                 document.getElementById('tournamentDesc').value = data.description || '';
                 document.getElementById('tournamentDate').value = data.event_date || data.tournament_date || '';
-                document.getElementById('registrationDeadline').value = data.registration_deadline || '';
                 document.getElementById('tournamentLocation').value = data.location || '';
                 document.getElementById('maxParticipants').value = data.max_participants || 200;
                 document.getElementById('registrationFee').value = data.registration_fee || 0;
@@ -521,7 +516,6 @@
                 name: document.getElementById('tournamentName').value,
                 description: document.getElementById('tournamentDesc').value,
                 event_date: document.getElementById('tournamentDate').value,
-                registration_deadline: document.getElementById('registrationDeadline').value || null,
                 location: document.getElementById('tournamentLocation').value,
                 max_participants: parseInt(document.getElementById('maxParticipants').value) || 200,
                 registration_fee: parseFloat(document.getElementById('registrationFee').value) || 0,
