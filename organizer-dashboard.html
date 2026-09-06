@@ -268,7 +268,7 @@
             <h1 class="page-title" id="pageTitle">🏆 Organizer Dashboard</h1>
             <div class="page-actions">
                 <button class="btn btn-primary" onclick="window.openCreateModal()" id="btnCreate">➕ Create Tournament</button>
-                <button class="btn btn-secondary" onclick="window.loadTournaments()" id="btnRefresh"> Refresh</button>
+                <button class="btn btn-secondary" onclick="window.loadTournaments()" id="btnRefresh">🔄 Refresh</button>
             </div>
         </div>
 
@@ -296,7 +296,6 @@
                     <textarea class="form-textarea" id="tournamentDesc" placeholder="Tournament description..."></textarea>
                 </div>
                 
-                <!-- تواريخ الحدث -->
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">📅 Event Start Date *</label>
@@ -308,14 +307,13 @@
                     </div>
                 </div>
                 
-                <!-- مواعيد التسجيل -->
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">📝 Regular Reg. Start</label>
                         <input type="date" class="form-input" id="regRegularStart">
                     </div>
                     <div class="form-group">
-                        <label class="form-label"> Regular Reg. End</label>
+                        <label class="form-label">📝 Regular Reg. End</label>
                         <input type="date" class="form-input" id="regRegularEnd">
                     </div>
                 </div>
@@ -332,7 +330,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label"> Location</label>
+                    <label class="form-label">📍 Location</label>
                     <input type="text" class="form-input" id="tournamentLocation" placeholder="Enter location">
                 </div>
                 <div class="form-row">
@@ -346,7 +344,7 @@
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 25px;">
-                    <button type="submit" class="btn btn-primary" style="flex: 1;">💾 Save</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;"> Save</button>
                     <button type="button" class="btn btn-secondary" onclick="window.closeModal()">Cancel</button>
                 </div>
             </form>
@@ -354,15 +352,13 @@
     </div>
 
     <script>
-        // ===== Global Variables =====
         var dbClient = null;
         var currentUser = null;
         var currentLang = localStorage.getItem('lang') || 'en';
 
-        // ===== Translations =====
         var translations = {
             en: {
-                pageTitle: ' Organizer Dashboard',
+                pageTitle: '🏆 Organizer Dashboard',
                 btnCreate: '➕ Create Tournament',
                 btnRefresh: '🔄 Refresh',
                 loading: 'Loading tournaments...',
@@ -374,23 +370,23 @@
                 matches: 'Matches',
                 capacity: 'Capacity',
                 manage: '⚙️ Manage',
-                view: '️ View',
+                view: '👁️ View',
                 edit: '✏️ Edit',
                 delete: '🗑️ Delete',
                 location: 'Location',
                 successCreate: '✅ Tournament created successfully!',
                 successUpdate: '✅ Tournament updated successfully!',
                 successDelete: '✅ Tournament deleted!',
-                errorCreate: ' Error creating: ',
-                errorUpdate: ' Error updating: ',
-                errorDelete: ' Error deleting: ',
+                errorCreate: '❌ Error creating: ',
+                errorUpdate: '❌ Error updating: ',
+                errorDelete: '❌ Error deleting: ',
                 confirmDelete: 'Are you sure you want to delete this tournament?',
                 statusUpcoming: 'Upcoming',
                 statusToday: 'Today',
                 statusCompleted: 'Completed'
             },
             ar: {
-                pageTitle: '🏆 لوحة تحكم المنظم',
+                pageTitle: ' لوحة تحكم المنظم',
                 btnCreate: '➕ إنشاء بطولة',
                 btnRefresh: '🔄 تحديث',
                 loading: 'جاري التحميل...',
@@ -401,8 +397,8 @@
                 players: 'لاعبين',
                 matches: 'مباريات',
                 capacity: 'السعة',
-                manage: '️ إدارة',
-                view: '️ عرض',
+                manage: '⚙️ إدارة',
+                view: '👁️ عرض',
                 edit: '✏️ تعديل',
                 delete: '🗑️ حذف',
                 location: 'الموقع',
@@ -410,8 +406,8 @@
                 successUpdate: '✅ تم التحديث بنجاح!',
                 successDelete: '✅ تم الحذف!',
                 errorCreate: '❌ خطأ في الإنشاء: ',
-                errorUpdate: '❌ خطأ في التحديث: ',
-                errorDelete: ' خطأ في الحذف: ',
+                errorUpdate: ' خطأ في التحديث: ',
+                errorDelete: '❌ خطأ في الحذف: ',
                 confirmDelete: 'هل أنت متأكد من الحذف؟',
                 statusUpcoming: 'قادمة',
                 statusToday: 'اليوم',
@@ -419,7 +415,6 @@
             }
         };
 
-        // ===== Initialize Supabase =====
         function initSupabase() {
             if (!dbClient) {
                 dbClient = window.supabase.createClient(
@@ -430,7 +425,6 @@
             return dbClient;
         }
 
-        // ===== Language Switcher =====
         window.changeLang = function(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
@@ -447,7 +441,6 @@
             if (currentUser) window.loadTournaments();
         };
 
-        // ===== Auth Check =====
         async function checkAuth() {
             try {
                 initSupabase();
@@ -465,7 +458,6 @@
             }
         }
 
-        // ===== Modal Functions =====
         window.openCreateModal = function() {
             if (!currentUser) { window.showAlert('error', 'Please login first'); return; }
             document.getElementById('tournamentForm').reset();
@@ -505,7 +497,6 @@
             document.getElementById('tournamentModal').classList.remove('show');
         };
 
-        // ===== Form Submit =====
         window.handleFormSubmit = async function(e) {
             e.preventDefault();
             if (!currentUser) { window.showAlert('error', 'Please login'); return; }
@@ -557,7 +548,6 @@
             }
         };
 
-        // ===== Load Tournaments =====
         window.loadTournaments = async function() {
             var container = document.getElementById('tournamentsList');
             container.innerHTML = '<div class="loading">' + translations[currentLang].loading + '</div>';
