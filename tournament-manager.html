@@ -106,7 +106,7 @@
                     <select class="form-select" id="playerTeam">
                         <option value="">Select team...</option>
                         <option value="TCS Player">️ TCS Player</option>
-                        <option value="Free Player">🆓 Free Player</option>
+                        <option value="Free Player"> Free Player</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -325,7 +325,18 @@
                     const editAgeSelect = document.getElementById('editPlayerAge');
                     ageSelect.innerHTML = '<option value="">Select Age Group</option>';
                     editAgeSelect.innerHTML = '<option value="">Select Age Group</option>';
+                    
+                    // إزالة التكرار من الفئات العمرية
+                    const uniqueAges = [];
+                    const seenAges = new Set();
                     ageData.forEach(ag => {
+                        if (!seenAges.has(ag.name.toLowerCase())) {
+                            seenAges.add(ag.name.toLowerCase());
+                            uniqueAges.push(ag);
+                        }
+                    });
+                    
+                    uniqueAges.forEach(ag => {
                         const label = `${ag.name} (${ag.min_age}-${ag.max_age} yrs)`;
                         ageSelect.innerHTML += `<option value="${ag.name}" data-max-age="${ag.max_age}">${label}</option>`;
                         editAgeSelect.innerHTML += `<option value="${ag.name}" data-max-age="${ag.max_age}">${label}</option>`;
