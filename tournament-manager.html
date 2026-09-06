@@ -78,7 +78,7 @@
 
         <div class="step-indicator">
             <div class="step active" id="step1" onclick="showStep('players')">👥 Players</div>
-            <div class="step" id="step2" onclick="showStep('mats')">🥋 Mats</div>
+            <div class="step" id="step2" onclick="showStep('mats')"> Mats</div>
             <div class="step" id="step3" onclick="showStep('overview')">🏆 Brackets</div>
             <div class="step" id="step4" onclick="showStep('registrations')">📋 Registrations</div>
         </div>
@@ -88,8 +88,8 @@
             <div class="section-title">👥 Players Registration</div>
             <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="btn btn-success" onclick="openBulkModal()">➕ Add 10 Players</button>
-                <button class="btn btn-secondary" onclick="exportToExcel()">📊 Export</button>
-                <button class="btn btn-danger" onclick="clearAllPlayers()">🗑️ Clear All</button>
+                <button class="btn btn-secondary" onclick="exportToExcel()"> Export</button>
+                <button class="btn btn-danger" onclick="clearAllPlayers()">️ Clear All</button>
             </div>
             
             <div class="form-row">
@@ -250,7 +250,7 @@
     <div class="modal-overlay" id="editModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">✏️ Edit Player</div>
+                <div class="modal-title">️ Edit Player</div>
                 <button class="modal-close" onclick="closeEditModal()">✕</button>
             </div>
             <input type="hidden" id="editPlayerId">
@@ -305,7 +305,7 @@
     <div class="modal-overlay" id="matchModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title" id="matchModalTitle">🥋 Match Control</div>
+                <div class="modal-title" id="matchModalTitle"> Match Control</div>
                 <button class="modal-close" onclick="closeMatchModal()">✕</button>
             </div>
             <div id="matchModalContent"></div>
@@ -412,7 +412,7 @@
             }
 
             await loadDropdownData();
-            await loadPlayers(); // تم تعديل هذه الدالة لتقرأ مباشرة من الجدول
+            await loadPlayers();
             
             initMatsDropdown();
             if (matsConfig.length === 0) {
@@ -434,7 +434,7 @@
             }
         }
 
-        // ===== 4. دالة جلب اللاعبين (مصححة: قراءة مباشرة من الجدول) =====
+        // ===== 4. دالة جلب اللاعبين =====
         async function loadPlayers() {
             try {
                 const { data, error } = await supabaseClient
@@ -475,7 +475,7 @@
             `).join('');
         }
 
-        // ===== 5. دالة إضافة لاعب (مصححة: إدراج مباشر في الجدول) =====
+        // ===== 5. دالة إضافة لاعب =====
         async function addPlayer() {
             const name = document.getElementById('playerName').value.trim();
             const team = document.getElementById('playerTeam').value;
@@ -611,7 +611,7 @@
             }
         }
 
-        // ===== 7. دوال التعديل والحذف (مصححة: تحديث وحذف مباشر) =====
+        // ===== 7. دوال التعديل والحذف =====
         function openEditModal(id) {
             const p = players.find(x => x.id === id);
             if (!p) return;
@@ -671,7 +671,7 @@
                 showAlert('success', 'All players cleared');
                 await loadPlayers();
             } catch (err) {
-                showAlert('error', '❌ ' + err.message);
+                showAlert('error', ' ' + err.message);
             }
         }
 
