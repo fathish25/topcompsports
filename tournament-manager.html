@@ -177,6 +177,13 @@
                     <tr><td colspan="9" style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No players registered yet</td></tr>
                 </tbody>
             </table>
+
+            <!-- زر Proceed to Mats الجديد -->
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #2a3548;">
+                <button class="btn btn-success" onclick="showStep('mats')" style="width: 100%; padding: 15px; font-size: 1.1rem;">
+                    Proceed to Mats →
+                </button>
+            </div>
         </div>
 
         <!-- Step 2: Mats Setup -->
@@ -252,7 +259,7 @@
                 <div class="tabs-nav" style="margin-bottom: 20px;">
                     <button class="btn btn-primary" onclick="showMatTab('categories')">📋 Categories</button>
                     <button class="btn btn-info" onclick="showMatTab('queue')"> Queue</button>
-                    <button class="btn btn-warning" onclick="showMatTab('callup')">📢 Call-Up</button>
+                    <button class="btn btn-warning" onclick="showMatTab('callup')"> Call-Up</button>
                     <button class="btn btn-success" onclick="showMatTab('standings')">🏆 Standings</button>
                 </div>
                 
@@ -274,7 +281,7 @@
             <div id="bulkContainer"></div>
             <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="btn btn-secondary" onclick="addBulkRow()"> Add Row</button>
-                <button class="btn btn-success" onclick="saveBulkPlayers()">💾 Save All</button>
+                <button class="btn btn-success" onclick="saveBulkPlayers()"> Save All</button>
             </div>
         </div>
     </div>
@@ -283,7 +290,7 @@
     <div class="modal-overlay" id="editModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">✏️ Edit Player</div>
+                <div class="modal-title">️ Edit Player</div>
                 <button class="modal-close" onclick="closeEditModal()"></button>
             </div>
             <input type="hidden" id="editPlayerId">
