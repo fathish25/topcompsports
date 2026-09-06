@@ -82,7 +82,7 @@
 
         <div class="step-indicator">
             <div class="step active" id="step1" onclick="showStep('players')">👥 Players</div>
-            <div class="step" id="step2" onclick="showStep('mats')">🥋 Mats</div>
+            <div class="step" id="step2" onclick="showStep('mats')"> Mats</div>
             <div class="step" id="step3" onclick="showStep('overview')">🏆 Brackets</div>
             <div class="step" id="step4" onclick="showStep('registrations')">📋 Registrations</div>
         </div>
@@ -92,8 +92,8 @@
             <div class="section-title">👥 Players Registration</div>
             <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="btn btn-success" onclick="openBulkModal()">➕ Add 10 Players</button>
-                <button class="btn btn-secondary" onclick="exportToExcel()">📊 Export</button>
-                <button class="btn btn-danger" onclick="clearAllPlayers()">🗑️ Clear All</button>
+                <button class="btn btn-secondary" onclick="exportToExcel()"> Export</button>
+                <button class="btn btn-danger" onclick="clearAllPlayers()">️ Clear All</button>
             </div>
             
             <div class="form-row">
@@ -105,7 +105,7 @@
                     <label class="form-label">Team</label>
                     <select class="form-select" id="playerTeam">
                         <option value="">Select team...</option>
-                        <option value="TCS Player">🏟️ TCS Player</option>
+                        <option value="TCS Player">️ TCS Player</option>
                         <option value="Free Player">🆓 Free Player</option>
                     </select>
                 </div>
@@ -230,7 +230,7 @@
         <div class="modal">
             <div class="modal-header">
                 <div class="modal-title">✏️ Edit Player</div>
-                <button class="modal-close" onclick="closeEditModal()">✕</button>
+                <button class="modal-close" onclick="closeEditModal()"></button>
             </div>
             <input type="hidden" id="editPlayerId">
             <div class="form-row" style="grid-template-columns: 1fr 1fr;">
@@ -254,14 +254,14 @@
     <div class="modal-overlay" id="matchModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title" id="matchModalTitle">🥋 Match Control</div>
+                <div class="modal-title" id="matchModalTitle"> Match Control</div>
                 <button class="modal-close" onclick="closeMatchModal()">✕</button>
             </div>
             <div id="matchModalContent"></div>
             <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                 <button class="btn btn-success" onclick="startMatchTimer()">▶ Start</button>
-                <button class="btn btn-warning" onclick="pauseMatchTimer()">⏸ Pause</button>
-                <button class="btn btn-danger" onclick="finishMatch()">🏁 Finish & Save</button>
+                <button class="btn btn-warning" onclick="pauseMatchTimer()"> Pause</button>
+                <button class="btn btn-danger" onclick="finishMatch()"> Finish & Save</button>
             </div>
         </div>
     </div>
@@ -650,7 +650,7 @@
                 showAlert('success', 'All players cleared');
                 await loadPlayers();
             } catch (err) {
-                showAlert('error', '❌ ' + err.message);
+                showAlert('error', ' ' + err.message);
             }
         }
 
@@ -718,7 +718,7 @@
                         <td>${p.ranking || 0}</td>
                         <td>
                             <button class="btn btn-warning btn-sm" onclick="openEditModal('${p.id}')">✏️</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteRegistration('${p.id}')">️</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteRegistration('${p.id}')">🗑️</button>
                         </td>
                     </tr>
                 `).join('');
