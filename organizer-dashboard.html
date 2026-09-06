@@ -268,7 +268,7 @@
             <h1 class="page-title" id="pageTitle">🏆 Organizer Dashboard</h1>
             <div class="page-actions">
                 <button class="btn btn-primary" onclick="window.openCreateModal()" id="btnCreate">➕ Create Tournament</button>
-                <button class="btn btn-secondary" onclick="window.loadTournaments()" id="btnRefresh"> Refresh</button>
+                <button class="btn btn-secondary" onclick="window.loadTournaments()" id="btnRefresh">🔄 Refresh</button>
             </div>
         </div>
 
@@ -296,14 +296,20 @@
                     <textarea class="form-textarea" id="tournamentDesc" placeholder="Tournament description..."></textarea>
                 </div>
                 
+                <!-- ✅ تاريخ البداية والنهاية -->
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">📅 Event Date *</label>
-                        <input type="date" class="form-input" id="tournamentDate" required>
+                        <label class="form-label"> Event Start Date *</label>
+                        <input type="date" class="form-input" id="eventStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">📅 Event End Date *</label>
+                        <input type="date" class="form-input" id="eventEndDate" required>
                     </div>
                 </div>
+                
                 <div class="form-group">
-                    <label class="form-label"> Location</label>
+                    <label class="form-label">📍 Location</label>
                     <input type="text" class="form-input" id="tournamentLocation" placeholder="Enter location">
                 </div>
                 <div class="form-row">
@@ -333,7 +339,7 @@
         // ===== Translations =====
         var translations = {
             en: {
-                pageTitle: ' Organizer Dashboard',
+                pageTitle: '🏆 Organizer Dashboard',
                 btnCreate: '➕ Create Tournament',
                 btnRefresh: '🔄 Refresh',
                 loading: 'Loading tournaments...',
@@ -344,11 +350,12 @@
                 players: 'Players',
                 matches: 'Matches',
                 capacity: 'Capacity',
-                manage: '⚙️ Manage',
+                manage: '️ Manage',
                 view: '👁️ View',
-                edit: '️ Edit',
+                edit: '✏️ Edit',
                 delete: '🗑️ Delete',
-                date: 'Date',
+                startDate: 'Start Date',
+                endDate: 'End Date',
                 location: 'Location',
                 successCreate: '✅ Tournament created successfully!',
                 successUpdate: '✅ Tournament updated successfully!',
@@ -363,7 +370,7 @@
             },
             ar: {
                 pageTitle: '🏆 لوحة تحكم المنظم',
-                btnCreate: ' إنشاء بطولة',
+                btnCreate: '➕ إنشاء بطولة',
                 btnRefresh: '🔄 تحديث',
                 loading: 'جاري التحميل...',
                 modalTitleCreate: 'إنشاء بطولة جديدة',
@@ -373,11 +380,12 @@
                 players: 'لاعبين',
                 matches: 'مباريات',
                 capacity: 'السعة',
-                manage: 'إدارة',
-                view: 'عرض',
-                edit: 'تعديل',
-                delete: 'حذف',
-                date: 'التاريخ',
+                manage: '⚙️ إدارة',
+                view: '👁️ عرض',
+                edit: '✏️ تعديل',
+                delete: '🗑️ حذف',
+                startDate: 'تاريخ البداية',
+                endDate: 'تاريخ النهاية',
                 location: 'الموقع',
                 successCreate: '✅ تم الإنشاء بنجاح!',
                 successUpdate: '✅ تم التحديث بنجاح!',
@@ -475,7 +483,8 @@
                 document.getElementById('editTournamentId').value = data.id;
                 document.getElementById('tournamentName').value = data.name;
                 document.getElementById('tournamentDesc').value = data.description || '';
-                document.getElementById('tournamentDate').value = data.event_date || data.tournament_date || '';
+                document.getElementById('eventStartDate').value = data.event_start_date || data.event_date || '';
+                document.getElementById('eventEndDate').value = data.event_end_date || data.event_date || '';
                 document.getElementById('tournamentLocation').value = data.location || '';
                 document.getElementById('maxParticipants').value = data.max_participants || 200;
                 document.getElementById('registrationFee').value = data.registration_fee || 0;
@@ -511,11 +520,22 @@
             var editId = document.getElementById('editTournamentId').value;
             console.log('Edit ID:', editId);
             
+            var startDate = document.getElementById('eventStartDate').value;
+            var endDate = document.getElementById('eventEndDate').value;
+            
+            // التحقق من أن تاريخ النهاية ليس قبل البداية
+            if (new Date(endDate) < new Date(startDate)) {
+                window.showAlert('error', 'End date cannot be before start date!');
+                return;
+            }
+            
             var tournamentData = {
                 organizer_id: currentUser.id,
                 name: document.getElementById('tournamentName').value,
                 description: document.getElementById('tournamentDesc').value,
-                event_date: document.getElementById('tournamentDate').value,
+                event_start_date: startDate,
+                event_end_date: endDate,
+                event_date: startDate, // للتوافق مع البيانات القديمة
                 location: document.getElementById('tournamentLocation').value,
                 max_participants: parseInt(document.getElementById('maxParticipants').value) || 200,
                 registration_fee: parseFloat(document.getElementById('registrationFee').value) || 0,
@@ -597,14 +617,32 @@
                 
                 for (var i = 0; i < data.length; i++) {
                     var t = data[i];
-                    var dateValue = t.event_date || t.tournament_date;
-                    var date = new Date(dateValue);
-                    var formattedDate = date.toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
                     
+                    // ✅ استخدام تاريخ البداية والنهاية
+                    var startDate = t.event_start_date || t.event_date;
+                    var endDate = t.event_end_date || t.event_date;
+                    
+                    var startDateObj = new Date(startDate);
+                    var endDateObj = new Date(endDate);
+                    
+                    // تنسيق التاريخ
+                    var dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+                    var formattedStartDate = startDateObj.toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', dateOptions);
+                    var formattedEndDate = endDateObj.toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', dateOptions);
+                    
+                    // عرض التاريخ (نفس اليوم أو أيام مختلفة)
+                    var dateDisplay = '';
+                    if (startDate === endDate) {
+                        dateDisplay = formattedStartDate;
+                    } else {
+                        dateDisplay = formattedStartDate + ' - ' + formattedEndDate;
+                    }
+                    
+                    // تحديد الحالة
                     var statusText = translations[currentLang].statusUpcoming;
-                    if (date < today && date.toDateString() !== today.toDateString()) {
+                    if (endDateObj < today && endDateObj.toDateString() !== today.toDateString()) {
                         statusText = translations[currentLang].statusCompleted;
-                    } else if (date.toDateString() === today.toDateString()) {
+                    } else if (startDateObj <= today && endDateObj >= today) {
                         statusText = translations[currentLang].statusToday;
                     }
 
@@ -625,10 +663,10 @@
                                 '<div class="tournament-meta">' +
                                     '<div class="tournament-meta-item">' +
                                         '<span>📅</span>' +
-                                        '<span>' + translations[currentLang].date + ': ' + formattedDate + '</span>' +
+                                        '<span>' + dateDisplay + '</span>' +
                                     '</div>' +
                                     '<div class="tournament-meta-item">' +
-                                        '<span></span>' +
+                                        '<span>📍</span>' +
                                         '<span>' + translations[currentLang].location + ': ' + locationValue + '</span>' +
                                     '</div>' +
                                 '</div>' +
@@ -664,7 +702,7 @@
                 }
             } catch (error) {
                 console.error('Load error:', error);
-                container.innerHTML = '<div class="alert alert-error show"> ' + error.message + '</div>';
+                container.innerHTML = '<div class="alert alert-error show">❌ ' + error.message + '</div>';
             }
         };
 
