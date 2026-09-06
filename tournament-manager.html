@@ -74,6 +74,7 @@
         .call-up-box { background: rgba(241,196,15,0.1); border: 2px solid #f1c40f; border-radius: 12px; padding: 30px; text-align: center; margin: 20px 0; }
         .call-up-names { font-size: 2rem; font-weight: bold; color: #f1c40f; margin: 20px 0; }
         .call-up-details { color: rgba(255,255,255,0.7); margin-bottom: 20px; }
+        .tabs-nav { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         
         @media (max-width: 768px) { 
             .form-row { grid-template-columns: 1fr; } 
@@ -102,7 +103,7 @@
         <div class="step-indicator">
             <div class="step active" id="step1" onclick="showStep('players')"> Players</div>
             <div class="step" id="step2" onclick="showStep('mats')"> Mats</div>
-            <div class="step" id="step3" onclick="showStep('overview')">🏆 Brackets</div>
+            <div class="step" id="step3" onclick="showStep('overview')"> Brackets</div>
             <div class="step" id="step4" onclick="showStep('registrations')">📋 Registrations</div>
             <div class="step" id="step5" onclick="showStep('matDashboard')"> Mat Dashboard</div>
         </div>
@@ -194,7 +195,7 @@
             <div style="margin-top: 30px; display: flex; gap: 10px;">
                 <button class="btn btn-back" onclick="showStep('players')">← Back to Players</button>
                 <button class="btn btn-primary" onclick="showStep('overview')"> View Brackets →</button>
-                <button class="btn btn-success" onclick="showStep('matDashboard')">🏆 Open Mat Dashboard</button>
+                <button class="btn btn-success" onclick="showStep('matDashboard')"> Open Mat Dashboard</button>
             </div>
         </div>
 
@@ -496,6 +497,7 @@
             if (isAuth) {
                 await loadDropdownData();
                 await loadPlayers();
+                await loadMatches();
                 
                 initMatsDropdown();
                 if (matsConfig.length === 0) {
@@ -784,23 +786,36 @@
         }
 
         function showStep(step) {
-            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            if (step === 'players') { document.getElementById('playersSection').classList.remove('hidden'); document.getElementById('step1').classList.add('active'); } 
-            else if (step === 'mats') { 
-                if (players.length === 0) { showAlert('error', 'Add players first!'); return; }
-                document.getElementById('matsSection').classList.remove('hidden'); document.getElementById('step2').classList.add('active'); renderMatsGrid(); 
-            } else if (step === 'overview') { 
-                if (players.length === 0) { showAlert('error', 'Add players first!'); return; }
-                document.getElementById('overviewSection').classList.remove('hidden'); document.getElementById('step3').classList.add('active'); generateCategoriesOverview(); loadMatches(); 
-            } else if (step === 'registrations') {
-                document.getElementById('registrationsSection').classList.remove('hidden');
-                document.getElementById('step4').classList.add('active');
-                loadRegistrations();
-            } else if (step === 'matDashboard') {
-                document.getElementById('matDashboardSection').classList.remove('hidden');
-                document.getElementById('step5').classList.add('active');
-                initMatDashboard();
+            try {
+                document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+                document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+                
+                if (step === 'players') { 
+                    document.getElementById('playersSection').classList.remove('hidden'); 
+                    document.getElementById('step1').classList.add('active'); 
+                } else if (step === 'mats') { 
+                    if (players.length === 0) { showAlert('error', 'Add players first!'); return; }
+                    document.getElementById('matsSection').classList.remove('hidden'); 
+                    document.getElementById('step2').classList.add('active'); 
+                    renderMatsGrid(); 
+                } else if (step === 'overview') { 
+                    if (players.length === 0) { showAlert('error', 'Add players first!'); return; }
+                    document.getElementById('overviewSection').classList.remove('hidden'); 
+                    document.getElementById('step3').classList.add('active'); 
+                    generateCategoriesOverview(); 
+                    loadMatches(); 
+                } else if (step === 'registrations') {
+                    document.getElementById('registrationsSection').classList.remove('hidden');
+                    document.getElementById('step4').classList.add('active');
+                    loadRegistrations();
+                } else if (step === 'matDashboard') {
+                    document.getElementById('matDashboardSection').classList.remove('hidden');
+                    document.getElementById('step5').classList.add('active');
+                    initMatDashboard();
+                }
+            } catch (err) {
+                console.error('Error in showStep:', err);
+                showAlert('error', 'Error switching steps: ' + err.message);
             }
         }
 
@@ -1046,17 +1061,30 @@
         }
 
         async function loadMatches() {
-            const { data, error } = await supabaseClient.from('matches').select('*').eq('tournament_id', tournamentId).order('created_at', { ascending: true });
-            if (error) { console.error('Error loading matches:', error); return; }
-            matches = data || [];
-            displayMatches();
+            try {
+                const { data, error } = await supabaseClient.from('matches').select('*').eq('tournament_id', tournamentId).order('created_at', { ascending: true });
+                if (error) { 
+                    console.error('Error loading matches:', error); 
+                    return; 
+                }
+                matches = data || [];
+                displayMatches();
+            } catch (err) {
+                console.error('Error in loadMatches:', err);
+            }
         }
 
         function displayMatches() {
             const container = document.getElementById('matchesList');
-            if (matches.length === 0) { container.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No matches yet. Click "Create All Brackets" to generate matches.</div>'; return; }
+            if (matches.length === 0) { 
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No matches yet. Click "Create All Brackets" to generate matches.</div>'; 
+                return; 
+            }
             const divisions = {};
-            matches.forEach(m => { if (!divisions[m.division]) divisions[m.division] = []; divisions[m.division].push(m); });
+            matches.forEach(m => { 
+                if (!divisions[m.division]) divisions[m.division] = []; 
+                divisions[m.division].push(m); 
+            });
             
             let html = '';
             Object.entries(divisions).forEach(([division, divMatches]) => {
@@ -1083,9 +1111,15 @@
         function openMatchModal(matchId) {
             const match = matches.find(m => m.id === matchId);
             if (!match) return;
-            if (match.status === 'completed') { showAlert('info', `This match is completed.\nWinner: ${match.winner_name || 'N/A'}\nScore: ${match.red_score} - ${match.blue_score}`); return; }
+            if (match.status === 'completed') { 
+                showAlert('info', `This match is completed.\nWinner: ${match.winner_name || 'N/A'}\nScore: ${match.red_score} - ${match.blue_score}`); 
+                return; 
+            }
             
-            currentMatchId = matchId; currentRedScore = match.red_score || 0; currentBlueScore = match.blue_score || 0; matchTime = 300;
+            currentMatchId = matchId; 
+            currentRedScore = match.red_score || 0; 
+            currentBlueScore = match.blue_score || 0; 
+            matchTime = 300;
             document.getElementById('matchModalTitle').textContent = ` Match: ${match.red_player_name} vs ${match.blue_player_name}`;
             document.getElementById('matchModalContent').innerHTML = `
                 <div style="text-align: center; margin-bottom: 20px;"><div style="font-size: 3rem; font-weight: bold; color: #10b981; margin: 20px 0;">05:00</div><div style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">${match.division}</div></div>
@@ -1095,11 +1129,20 @@
             document.getElementById('matchModal').classList.add('show');
         }
 
-        function closeMatchModal() { document.getElementById('matchModal').classList.remove('show'); clearInterval(timerInterval); currentMatchId = null; }
+        function closeMatchModal() { 
+            document.getElementById('matchModal').classList.remove('show'); 
+            clearInterval(timerInterval); 
+            currentMatchId = null; 
+        }
         
         function updateMatchScore(player, points) {
-            if (player === 'red') { currentRedScore = Math.max(0, currentRedScore + points); document.getElementById('redScoreDisplay').textContent = currentRedScore; } 
-            else { currentBlueScore = Math.max(0, currentBlueScore + points); document.getElementById('blueScoreDisplay').textContent = currentBlueScore; }
+            if (player === 'red') { 
+                currentRedScore = Math.max(0, currentRedScore + points); 
+                document.getElementById('redScoreDisplay').textContent = currentRedScore; 
+            } else { 
+                currentBlueScore = Math.max(0, currentBlueScore + points); 
+                document.getElementById('blueScoreDisplay').textContent = currentBlueScore; 
+            }
         }
 
         function startMatchTimer() {
@@ -1107,11 +1150,18 @@
             supabaseClient.from('matches').update({ status: 'in_progress', started_at: new Date().toISOString() }).eq('id', currentMatchId).then();
             timerInterval = setInterval(() => {
                 matchTime--;
-                if (matchTime <= 0) { clearInterval(timerInterval); timerInterval = null; showAlert('info', '⏰ Time is up!'); }
+                if (matchTime <= 0) { 
+                    clearInterval(timerInterval); 
+                    timerInterval = null; 
+                    showAlert('info', '⏰ Time is up!'); 
+                }
             }, 1000);
         }
 
-        function pauseMatchTimer() { clearInterval(timerInterval); timerInterval = null; }
+        function pauseMatchTimer() { 
+            clearInterval(timerInterval); 
+            timerInterval = null; 
+        }
 
         async function finishMatch() {
             if (!currentMatchId) return;
@@ -1121,217 +1171,285 @@
             else if (currentBlueScore > currentRedScore) winner = match.blue_player_name;
             
             try {
-                await supabaseClient.from('matches').update({ red_score: currentRedScore, blue_score: currentBlueScore, winner_name: winner, status: 'completed', completed_at: new Date().toISOString() }).eq('id', currentMatchId);
+                await supabaseClient.from('matches').update({ 
+                    red_score: currentRedScore, 
+                    blue_score: currentBlueScore, 
+                    winner_name: winner, 
+                    status: 'completed', 
+                    completed_at: new Date().toISOString() 
+                }).eq('id', currentMatchId);
                 showAlert('success', `✅ Match completed!\nWinner: ${winner}\nScore: ${currentRedScore} - ${currentBlueScore}`);
                 closeMatchModal();
                 await loadMatches();
-            } catch (err) { showAlert('error', '❌ Error saving match: ' + err.message); }
+            } catch (err) { 
+                showAlert('error', '❌ Error saving match: ' + err.message); 
+            }
         }
 
         // ===== Mat Dashboard Functions =====
         function initMatDashboard() {
-            renderMatTabs();
-            showMatTab('categories');
+            try {
+                renderMatTabs();
+                showMatTab('categories');
+            } catch (err) {
+                console.error('Error in initMatDashboard:', err);
+                showAlert('error', 'Error initializing mat dashboard: ' + err.message);
+            }
         }
 
         function renderMatTabs() {
-            const tabsContainer = document.getElementById('matTabs');
-            tabsContainer.innerHTML = '';
-            
-            matsConfig.forEach(mat => {
-                const tab = document.createElement('div');
-                tab.className = `mat-tab ${mat.id === currentMatId ? 'active' : ''}`;
-                tab.textContent = `Mat ${mat.id}`;
-                tab.onclick = () => {
-                    currentMatId = mat.id;
-                    renderMatTabs();
-                    showMatTab('categories');
-                };
-                tabsContainer.appendChild(tab);
-            });
+            try {
+                const tabsContainer = document.getElementById('matTabs');
+                if (!tabsContainer) {
+                    console.error('matTabs element not found');
+                    return;
+                }
+                tabsContainer.innerHTML = '';
+                
+                if (matsConfig.length === 0) {
+                    tabsContainer.innerHTML = '<div style="color: rgba(255,255,255,0.5); padding: 20px; text-align: center;">No mats configured. Please configure mats first.</div>';
+                    return;
+                }
+                
+                matsConfig.forEach(mat => {
+                    const tab = document.createElement('div');
+                    tab.className = `mat-tab ${mat.id === currentMatId ? 'active' : ''}`;
+                    tab.textContent = `Mat ${mat.id}`;
+                    tab.onclick = () => {
+                        currentMatId = mat.id;
+                        renderMatTabs();
+                        showMatTab('categories');
+                    };
+                    tabsContainer.appendChild(tab);
+                });
+            } catch (err) {
+                console.error('Error in renderMatTabs:', err);
+            }
         }
 
         function showMatTab(tabName) {
-            // Hide all tabs content
-            document.getElementById('matCategories').classList.add('hidden');
-            document.getElementById('matQueue').classList.add('hidden');
-            document.getElementById('matCallup').classList.add('hidden');
-            document.getElementById('matStandings').classList.add('hidden');
-            
-            // Show selected tab
-            if (tabName === 'categories') {
-                document.getElementById('matCategories').classList.remove('hidden');
-                renderMatCategories();
-            } else if (tabName === 'queue') {
-                document.getElementById('matQueue').classList.remove('hidden');
-                renderMatQueue();
-            } else if (tabName === 'callup') {
-                document.getElementById('matCallup').classList.remove('hidden');
-                renderMatCallup();
-            } else if (tabName === 'standings') {
-                document.getElementById('matStandings').classList.remove('hidden');
-                renderMatStandings();
+            try {
+                // Hide all tabs content
+                const categoriesEl = document.getElementById('matCategories');
+                const queueEl = document.getElementById('matQueue');
+                const callupEl = document.getElementById('matCallup');
+                const standingsEl = document.getElementById('matStandings');
+                
+                if (categoriesEl) categoriesEl.classList.add('hidden');
+                if (queueEl) queueEl.classList.add('hidden');
+                if (callupEl) callupEl.classList.add('hidden');
+                if (standingsEl) standingsEl.classList.add('hidden');
+                
+                // Show selected tab
+                if (tabName === 'categories') {
+                    if (categoriesEl) {
+                        categoriesEl.classList.remove('hidden');
+                        renderMatCategories();
+                    }
+                } else if (tabName === 'queue') {
+                    if (queueEl) {
+                        queueEl.classList.remove('hidden');
+                        renderMatQueue();
+                    }
+                } else if (tabName === 'callup') {
+                    if (callupEl) {
+                        callupEl.classList.remove('hidden');
+                        renderMatCallup();
+                    }
+                } else if (tabName === 'standings') {
+                    if (standingsEl) {
+                        standingsEl.classList.remove('hidden');
+                        renderMatStandings();
+                    }
+                }
+            } catch (err) {
+                console.error('Error in showMatTab:', err);
+                showAlert('error', 'Error switching tabs: ' + err.message);
             }
         }
 
         function renderMatCategories() {
-            const container = document.getElementById('matCategories');
-            const mat = matsConfig.find(m => m.id === currentMatId);
-            
-            if (!mat || (!mat.ageGroups.length && !mat.genders.length && !mat.weights.length && !mat.belts.length)) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No categories configured for this mat. Please configure mat settings first.</div>';
-                return;
+            try {
+                const container = document.getElementById('matCategories');
+                if (!container) return;
+                
+                const mat = matsConfig.find(m => m.id === currentMatId);
+                
+                if (!mat || (!mat.ageGroups.length && !mat.genders.length && !mat.weights.length && !mat.belts.length)) {
+                    container.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No categories configured for this mat. Please configure mat settings first.</div>';
+                    return;
+                }
+                
+                // Filter players based on mat configuration
+                const filteredPlayers = players.filter(p => {
+                    const matchAge = mat.ageGroups.length === 0 || mat.ageGroups.includes(p.age_group);
+                    const matchGender = mat.genders.length === 0 || mat.genders.includes(p.gender);
+                    const matchWeight = mat.weights.length === 0 || mat.weights.includes(p.weight);
+                    const matchBelt = mat.belts.length === 0 || mat.belts.includes(p.belt_level);
+                    return matchAge && matchGender && matchWeight && matchBelt;
+                });
+                
+                // Group by categories
+                const categories = {};
+                filteredPlayers.forEach(p => {
+                    const key = `${p.gender} | ${p.age_group} | ${p.weight}kg | ${p.belt_level}`;
+                    if (!categories[key]) categories[key] = [];
+                    categories[key].push(p);
+                });
+                
+                let html = `<h3 style="color: #f1c40f; margin-bottom: 20px;">Categories - Mat ${currentMatId}</h3>`;
+                if (Object.keys(categories).length === 0) {
+                    html += '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No players match this mat configuration</div>';
+                } else {
+                    Object.entries(categories).forEach(([cat, catPlayers]) => {
+                        html += `
+                            <div class="match-card">
+                                <div style="font-size: 1.2rem; font-weight: bold; color: #f1c40f; margin-bottom: 10px;">${cat}</div>
+                                <div style="color: rgba(255,255,255,0.7); margin-bottom: 10px;">${catPlayers.length} Players</div>
+                                <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5);">
+                                    Players: ${catPlayers.map(p => p.player_name).join(', ')}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                container.innerHTML = html;
+            } catch (err) {
+                console.error('Error in renderMatCategories:', err);
             }
-            
-            // Filter players based on mat configuration
-            const filteredPlayers = players.filter(p => {
-                const matchAge = mat.ageGroups.length === 0 || mat.ageGroups.includes(p.age_group);
-                const matchGender = mat.genders.length === 0 || mat.genders.includes(p.gender);
-                const matchWeight = mat.weights.length === 0 || mat.weights.includes(p.weight);
-                const matchBelt = mat.belts.length === 0 || mat.belts.includes(p.belt_level);
-                return matchAge && matchGender && matchWeight && matchBelt;
-            });
-            
-            // Group by categories
-            const categories = {};
-            filteredPlayers.forEach(p => {
-                const key = `${p.gender} | ${p.age_group} | ${p.weight}kg | ${p.belt_level}`;
-                if (!categories[key]) categories[key] = [];
-                categories[key].push(p);
-            });
-            
-            let html = `<h3 style="color: #f1c40f; margin-bottom: 20px;">Categories - Mat ${currentMatId}</h3>`;
-            Object.entries(categories).forEach(([cat, catPlayers]) => {
-                html += `
-                    <div class="match-card">
-                        <div style="font-size: 1.2rem; font-weight: bold; color: #f1c40f; margin-bottom: 10px;">${cat}</div>
-                        <div style="color: rgba(255,255,255,0.7); margin-bottom: 10px;">${catPlayers.length} Players</div>
-                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5);">
-                            Players: ${catPlayers.map(p => p.player_name).join(', ')}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
         }
 
         function renderMatQueue() {
-            const container = document.getElementById('matQueue');
-            const mat = matsConfig.find(m => m.id === currentMatId);
-            
-            // Get matches for this mat based on configuration
-            const matMatches = matches.filter(m => {
-                if (!mat) return false;
-                const matchAge = mat.ageGroups.length === 0 || mat.ageGroups.some(ag => m.division.includes(ag));
-                const matchGender = mat.genders.length === 0 || mat.genders.some(g => m.division.includes(g));
-                const matchWeight = mat.weights.length === 0 || mat.weights.some(w => m.division.includes(w));
-                const matchBelt = mat.belts.length === 0 || mat.belts.some(b => m.division.includes(b));
-                return matchAge && matchGender && matchWeight && matchBelt;
-            });
-            
-            let html = `<h3 style="color: #f1c40f; margin-bottom: 20px;">Match Queue - Mat ${currentMatId}</h3>`;
-            
-            if (matMatches.length === 0) {
-                html += '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No matches in queue. Create brackets first.</div>';
-            } else {
-                matMatches.forEach(m => {
-                    html += `
-                        <div class="match-card" onclick="openMatchModal('${m.id}')">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                                <div style="font-weight: bold; color: #f1c40f;">Match #${m.match_number}</div>
-                                <div style="color: rgba(255,255,255,0.6);">${m.status}</div>
-                            </div>
-                            <div class="match-players">
-                                <div class="player-box red">
-                                    <div style="font-size: 0.8rem; color: #ef4444;">🔴 RED</div>
-                                    <div style="font-weight: bold;">${m.red_player_name}</div>
-                                </div>
-                                <div class="vs-text">VS</div>
-                                <div class="player-box blue">
-                                    <div style="font-size: 0.8rem; color: #2563EB;">🔵 BLUE</div>
-                                    <div style="font-weight: bold;">${m.blue_player_name}</div>
-                                </div>
-                            </div>
-                            <button class="btn btn-success btn-sm" style="margin-top: 15px; width: 100%;">▶ Start Match</button>
-                        </div>
-                    `;
+            try {
+                const container = document.getElementById('matQueue');
+                if (!container) return;
+                
+                const mat = matsConfig.find(m => m.id === currentMatId);
+                
+                // Get matches for this mat based on configuration
+                const matMatches = matches.filter(m => {
+                    if (!mat) return false;
+                    const matchAge = mat.ageGroups.length === 0 || mat.ageGroups.some(ag => m.division.includes(ag));
+                    const matchGender = mat.genders.length === 0 || mat.genders.some(g => m.division.includes(g));
+                    const matchWeight = mat.weights.length === 0 || mat.weights.some(w => m.division.includes(w));
+                    const matchBelt = mat.belts.length === 0 || mat.belts.some(b => m.division.includes(b));
+                    return matchAge && matchGender && matchWeight && matchBelt;
                 });
+                
+                let html = `<h3 style="color: #f1c40f; margin-bottom: 20px;">Match Queue - Mat ${currentMatId}</h3>`;
+                
+                if (matMatches.length === 0) {
+                    html += '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No matches in queue. Create brackets first.</div>';
+                } else {
+                    matMatches.forEach(m => {
+                        html += `
+                            <div class="match-card" onclick="openMatchModal('${m.id}')">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <div style="font-weight: bold; color: #f1c40f;">Match #${m.match_number}</div>
+                                    <div style="color: rgba(255,255,255,0.6);">${m.status}</div>
+                                </div>
+                                <div class="match-players">
+                                    <div class="player-box red">
+                                        <div style="font-size: 0.8rem; color: #ef4444;">🔴 RED</div>
+                                        <div style="font-weight: bold;">${m.red_player_name}</div>
+                                    </div>
+                                    <div class="vs-text">VS</div>
+                                    <div class="player-box blue">
+                                        <div style="font-size: 0.8rem; color: #2563EB;">🔵 BLUE</div>
+                                        <div style="font-weight: bold;">${m.blue_player_name}</div>
+                                    </div>
+                                </div>
+                                <button class="btn btn-success btn-sm" style="margin-top: 15px; width: 100%;">▶ Start Match</button>
+                            </div>
+                        `;
+                    });
+                }
+                
+                container.innerHTML = html;
+            } catch (err) {
+                console.error('Error in renderMatQueue:', err);
             }
-            
-            container.innerHTML = html;
         }
 
         function renderMatCallup() {
-            const container = document.getElementById('matCallup');
-            const mat = matsConfig.find(m => m.id === currentMatId);
-            
-            // Get next match
-            const nextMatch = matches.find(m => m.status === 'scheduled');
-            
-            let html = `<h3 style="color: #f1c40f; margin-bottom: 20px;">Call-Up System</h3>`;
-            
-            if (!nextMatch) {
-                html += '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No upcoming matches</div>';
-            } else {
-                html += `
-                    <div class="call-up-box">
-                        <div style="font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 10px;">NEXT MATCH</div>
-                        <div class="call-up-names">${nextMatch.red_player_name} vs ${nextMatch.blue_player_name}</div>
-                        <div class="call-up-details">${nextMatch.division}</div>
-                        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-                            <button class="btn btn-success" onclick="callPlayer('${nextMatch.red_player_name}')">📢 Call ${nextMatch.red_player_name}</button>
-                            <button class="btn btn-success" onclick="callPlayer('${nextMatch.blue_player_name}')">📢 Call ${nextMatch.blue_player_name}</button>
+            try {
+                const container = document.getElementById('matCallup');
+                if (!container) return;
+                
+                // Get next match
+                const nextMatch = matches.find(m => m.status === 'scheduled');
+                
+                let html = `<h3 style="color: #f1c40f; margin-bottom: 20px;">Call-Up System</h3>`;
+                
+                if (!nextMatch) {
+                    html += '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No upcoming matches</div>';
+                } else {
+                    html += `
+                        <div class="call-up-box">
+                            <div style="font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 10px;">NEXT MATCH</div>
+                            <div class="call-up-names">${nextMatch.red_player_name} vs ${nextMatch.blue_player_name}</div>
+                            <div class="call-up-details">${nextMatch.division}</div>
+                            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                                <button class="btn btn-success" onclick="callPlayer('${nextMatch.red_player_name}')">📢 Call ${nextMatch.red_player_name}</button>
+                                <button class="btn btn-success" onclick="callPlayer('${nextMatch.blue_player_name}')">📢 Call ${nextMatch.blue_player_name}</button>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
+                
+                container.innerHTML = html;
+            } catch (err) {
+                console.error('Error in renderMatCallup:', err);
             }
-            
-            container.innerHTML = html;
         }
 
         function callPlayer(playerName) {
-            // In a real system, this would trigger an announcement
             showAlert('info', ` Calling ${playerName} to the mat!`);
         }
 
         function renderMatStandings() {
-            const container = document.getElementById('matStandings');
-            
-            // Get completed matches for this mat
-            const completedMatches = matches.filter(m => m.status === 'completed');
-            
-            let html = `<h3 style="color: #f1c40f; margin-bottom: 20px;">Standings - Mat ${currentMatId}</h3>`;
-            
-            if (completedMatches.length === 0) {
-                html += '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No completed matches yet</div>';
-            } else {
-                // Calculate standings
-                const standings = {};
-                completedMatches.forEach(m => {
-                    if (!standings[m.red_player_name]) standings[m.red_player_name] = { wins: 0, losses: 0 };
-                    if (!standings[m.blue_player_name]) standings[m.blue_player_name] = { wins: 0, losses: 0 };
+            try {
+                const container = document.getElementById('matStandings');
+                if (!container) return;
+                
+                // Get completed matches for this mat
+                const completedMatches = matches.filter(m => m.status === 'completed');
+                
+                let html = `<h3 style="color: #f1c40f; margin-bottom: 20px;">Standings - Mat ${currentMatId}</h3>`;
+                
+                if (completedMatches.length === 0) {
+                    html += '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No completed matches yet</div>';
+                } else {
+                    // Calculate standings
+                    const standings = {};
+                    completedMatches.forEach(m => {
+                        if (!standings[m.red_player_name]) standings[m.red_player_name] = { wins: 0, losses: 0 };
+                        if (!standings[m.blue_player_name]) standings[m.blue_player_name] = { wins: 0, losses: 0 };
+                        
+                        if (m.winner_name === m.red_player_name) {
+                            standings[m.red_player_name].wins++;
+                            standings[m.blue_player_name].losses++;
+                        } else if (m.winner_name === m.blue_player_name) {
+                            standings[m.blue_player_name].wins++;
+                            standings[m.red_player_name].losses++;
+                        }
+                    });
                     
-                    if (m.winner_name === m.red_player_name) {
-                        standings[m.red_player_name].wins++;
-                        standings[m.blue_player_name].losses++;
-                    } else if (m.winner_name === m.blue_player_name) {
-                        standings[m.blue_player_name].wins++;
-                        standings[m.red_player_name].losses++;
-                    }
-                });
+                    // Sort by wins
+                    const sortedStandings = Object.entries(standings).sort((a, b) => b[1].wins - a[1].wins);
+                    
+                    html += '<table><thead><tr><th>Rank</th><th>Player</th><th>Wins</th><th>Losses</th></tr></thead><tbody>';
+                    sortedStandings.forEach(([player, stats], index) => {
+                        html += `<tr><td>${index + 1}</td><td>${player}</td><td>${stats.wins}</td><td>${stats.losses}</td></tr>`;
+                    });
+                    html += '</tbody></table>';
+                }
                 
-                // Sort by wins
-                const sortedStandings = Object.entries(standings).sort((a, b) => b[1].wins - a[1].wins);
-                
-                html += '<table><thead><tr><th>Rank</th><th>Player</th><th>Wins</th><th>Losses</th></tr></thead><tbody>';
-                sortedStandings.forEach(([player, stats], index) => {
-                    html += `<tr><td>${index + 1}</td><td>${player}</td><td>${stats.wins}</td><td>${stats.losses}</td></tr>`;
-                });
-                html += '</tbody></table>';
+                container.innerHTML = html;
+            } catch (err) {
+                console.error('Error in renderMatStandings:', err);
             }
-            
-            container.innerHTML = html;
         }
 
         function openMatDashboard(matId) {
@@ -1345,6 +1463,10 @@
         }
 
         function openAllMatsInTabs() {
+            if (matsConfig.length === 0) {
+                showAlert('error', 'No mats configured');
+                return;
+            }
             matsConfig.forEach(mat => {
                 setTimeout(() => {
                     openMatInNewTab(mat.id);
@@ -1355,6 +1477,7 @@
 
         function showAlert(type, msg) {
             const a = document.getElementById('alert');
+            if (!a) return;
             a.className = `alert alert-${type} show`;
             a.textContent = msg;
             setTimeout(() => a.classList.remove('show'), 4000);
