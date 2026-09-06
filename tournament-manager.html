@@ -332,15 +332,13 @@
         let matchTime = 300;
         let matsConfig = JSON.parse(localStorage.getItem('matsConfig') || '[]');
 
-        // متغيرات لتخزين بيانات القوائم من قاعدة البيانات
         let ageGroupsData = [];
         let beltLevelsData = [];
         let weightClassesData = [];
 
-        // ===== دالة تحميل البيانات من قاعدة البيانات =====
+        // ===== 1. تحميل بيانات القوائم من قاعدة البيانات =====
         async function loadDropdownData() {
             try {
-                // 1. تحميل الفئات العمرية
                 const { data: ageData, error: ageError } = await supabaseClient.from('age_groups').select('*').order('min_age');
                 if (!ageError && ageData) {
                     ageGroupsData = ageData;
@@ -355,7 +353,6 @@
                     });
                 }
 
-                // 2. تحميل مستويات الأحزمة
                 const { data: beltData, error: beltError } = await supabaseClient.from('belt_levels').select('*').order('sort_order');
                 if (!beltError && beltData) {
                     beltLevelsData = beltData;
@@ -370,22 +367,26 @@
                     });
                 }
 
-                // 3. تحميل فئات الوزن
                 const { data: weightData, error: weightError } = await supabaseClient.from('weight_classes').select('*').order('min_weight');
                 if (!weightError && weightData) {
                     weightClassesData = weightData;
-                    updateWeightOptions(); // تحديث خيارات الوزن بناءً على الجنس
+                    updateWeightOptions();
                 }
             } catch (err) {
                 console.error('Error loading dropdown data:', err);
             }
         }
 
-        // ===== تحديث خيارات الوزن بناءً على الجنس =====
+        // ===== 2. تحديث خيارات الوزن بناءً على الجنس =====
         function updateWeightOptions() {
             const gender = document.getElementById('playerGender').value;
             const weightSelect = document.getElementById('playerWeight');
             weightSelect.innerHTML = '<option value="">Select Weight</option>';
+            
+            if (!weightClassesData || weightClassesData.length === 0) {
+                weightSelect.innerHTML = '<option value="">No weights available</option>';
+                return;
+            }
             
             const filteredWeights = weightClassesData.filter(w => w.gender === gender || w.gender === 'both');
             filteredWeights.forEach(w => {
@@ -395,10 +396,11 @@
                 } else if (w.max_weight >= 900) {
                     label += ` (${w.min_weight}+ kg)`;
                 }
-                weightSelect.innerHTML += `<option value="${w.name}" data-min="${w.min_weight}" data-max="${w.max_weight}">${label}</option>`;
+                weightSelect.innerHTML += `<option value="${w.name}" data-min="${w.min_weight}">${label}</option>`;
             });
         }
 
+        // ===== 3. التحميل الأولي للصفحة =====
         window.onload = async () => {
             const urlParams = new URLSearchParams(window.location.search);
             tournamentId = urlParams.get('tournament_id');
@@ -409,10 +411,8 @@
                 return;
             }
 
-            // تحميل البيانات من قاعدة البيانات أولاً
             await loadDropdownData();
-            await loadTournamentInfo();
-            await loadPlayers();
+            await loadPlayers(); // تم تعديل هذه الدالة لتقرأ مباشرة من الجدول
             
             initMatsDropdown();
             if (matsConfig.length === 0) {
@@ -434,16 +434,27 @@
             }
         }
 
-        async function loadTournamentInfo() {
-            const { data } = await supabaseClient.from('tournaments').select('max_participants').eq('id', tournamentId).single();
-            // يمكن إضافة عرض الحد الأقصى للاعبين هنا إذا لزم الأمر
-        }
-
+        // ===== 4. دالة جلب اللاعبين (مصححة: قراءة مباشرة من الجدول) =====
         async function loadPlayers() {
-            const { data, error } = await supabaseClient.rpc('get_tournament_players', { p_tournament_id: tournamentId });
-            if (error) { showAlert('error', 'Error: ' + error.message); return; }
-            players = data || [];
-            updatePlayersTable();
+            try {
+                const { data, error } = await supabaseClient
+                    .from('tournament_participants')
+                    .select('*')
+                    .eq('tournament_id', tournamentId)
+                    .order('created_at', { ascending: true });
+                
+                if (error) {
+                    console.error('Load players error:', error);
+                    showAlert('error', 'Error loading players: ' + error.message);
+                    return;
+                }
+                
+                players = data || [];
+                updatePlayersTable();
+            } catch (err) {
+                console.error('Unexpected error:', err);
+                showAlert('error', 'Unexpected error: ' + err.message);
+            }
         }
 
         function updatePlayersTable() {
@@ -464,6 +475,7 @@
             `).join('');
         }
 
+        // ===== 5. دالة إضافة لاعب (مصححة: إدراج مباشر في الجدول) =====
         async function addPlayer() {
             const name = document.getElementById('playerName').value.trim();
             const team = document.getElementById('playerTeam').value;
@@ -472,25 +484,41 @@
             
             const weightSelect = document.getElementById('playerWeight');
             const weightOption = weightSelect.options[weightSelect.selectedIndex];
-            const weightValue = weightOption && weightOption.getAttribute('data-min') ? weightOption.getAttribute('data-min') : weightSelect.value;
+            const weightValue = weightOption && weightOption.getAttribute('data-min') ? parseFloat(weightOption.getAttribute('data-min')) : null;
             
             const belt = document.getElementById('playerBelt').value;
             const giType = document.getElementById('playerGiType').value;
             
-            if (!name || !age || !weightSelect.value || !belt) { showAlert('error', 'Please fill all required fields'); return; }
+            if (!name || !age || !weightSelect.value || !belt) { 
+                showAlert('error', 'Please fill all required fields'); 
+                return; 
+            }
             
             try {
-                const { error } = await supabaseClient.rpc('add_tournament_player', {
-                    p_tournament_id: tournamentId, p_player_name: name, p_team: team, p_age_group: age,
-                    p_gender: gender, p_weight: parseFloat(weightValue) || weightSelect.value, p_belt_level: belt, p_gi_type: giType, p_ranking: 0
+                const { error } = await supabaseClient.from('tournament_participants').insert({
+                    tournament_id: tournamentId,
+                    player_name: name,
+                    team: team || null,
+                    age_group: age,
+                    gender: gender,
+                    weight: weightValue,
+                    belt_level: belt,
+                    gi_type: giType,
+                    ranking: 0
                 });
+                
                 if (error) throw error;
+                
                 showAlert('success', `✅ Player "${name}" added!`);
                 ['playerName','playerTeam','playerAge','playerWeight','playerBelt'].forEach(id => document.getElementById(id).value = '');
                 await loadPlayers();
-            } catch (err) { showAlert('error', '❌ ' + err.message); }
+            } catch (err) { 
+                console.error('Add player error:', err);
+                showAlert('error', '❌ ' + err.message); 
+            }
         }
 
+        // ===== 6. دوال الإضافة الجماعية =====
         function openBulkModal() {
             document.getElementById('bulkModal').classList.add('show');
             document.getElementById('bulkContainer').innerHTML = '';
@@ -504,19 +532,19 @@
             row.className = 'bulk-row';
             row.style.cssText = 'display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: end; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px;';
             
-            let ageOptions = '';
+            let ageOptions = '<option value="">Select Age</option>';
             ageGroupsData.forEach(ag => { ageOptions += `<option value="${ag.name}">${ag.name}</option>`; });
             
-            let beltOptions = '';
+            let beltOptions = '<option value="">Select Belt</option>';
             beltLevelsData.forEach(bl => { beltOptions += `<option value="${bl.name}">${bl.name}</option>`; });
 
             row.innerHTML = `
                 <input type="text" placeholder="Player Name *" class="b-name" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;">
                 <select class="b-team" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;"><option value="TCS Player">TCS Player</option><option value="Free Player">Free Player</option></select>
-                <select class="b-age" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;">${ageOptions || '<option>Adult</option>'}</select>
+                <select class="b-age" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;">${ageOptions}</select>
                 <select class="b-gender" onchange="updateBulkWeight(this)" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;"><option value="Male">Male</option><option value="Female">Female</option></select>
                 <select class="b-weight" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;"><option value="">Select Weight</option></select>
-                <select class="b-belt" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;">${beltOptions || '<option>White</option>'}</select>
+                <select class="b-belt" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;">${beltOptions}</select>
                 <button class="remove-btn" onclick="this.parentElement.remove()" style="background: #ef4444; color: #fff; border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer;">✕</button>
             `;
             container.appendChild(row);
@@ -542,28 +570,48 @@
         async function saveBulkPlayers() {
             const rows = document.querySelectorAll('.bulk-row');
             let count = 0;
+            const playersToInsert = [];
+            
             for (const row of rows) {
                 const name = row.querySelector('.b-name').value.trim();
                 const weightSelect = row.querySelector('.b-weight');
                 const weightOption = weightSelect.options[weightSelect.selectedIndex];
-                const weightValue = weightOption && weightOption.getAttribute('data-min') ? weightOption.getAttribute('data-min') : weightSelect.value;
+                const weightValue = weightOption && weightOption.getAttribute('data-min') ? parseFloat(weightOption.getAttribute('data-min')) : null;
                 
                 if (!name || !weightSelect.value) continue;
-                try {
-                    await supabaseClient.rpc('add_tournament_player', {
-                        p_tournament_id: tournamentId, p_player_name: name,
-                        p_team: row.querySelector('.b-team').value, p_age_group: row.querySelector('.b-age').value,
-                        p_gender: row.querySelector('.b-gender').value, p_weight: parseFloat(weightValue) || weightSelect.value,
-                        p_belt_level: row.querySelector('.b-belt').value, p_gi_type: 'Gi', p_ranking: 0
-                    });
-                    count++;
-                } catch (e) { console.error(e); }
+                
+                playersToInsert.push({
+                    tournament_id: tournamentId,
+                    player_name: name,
+                    team: row.querySelector('.b-team').value || null,
+                    age_group: row.querySelector('.b-age').value,
+                    gender: row.querySelector('.b-gender').value,
+                    weight: weightValue,
+                    belt_level: row.querySelector('.b-belt').value,
+                    gi_type: 'Gi',
+                    ranking: 0
+                });
+                count++;
             }
-            closeBulkModal();
-            await loadPlayers();
-            showAlert('success', `✅ Added ${count} players successfully!`);
+
+            if (count > 0) {
+                try {
+                    const { error } = await supabaseClient.from('tournament_participants').insert(playersToInsert);
+                    if (error) throw error;
+                    closeBulkModal();
+                    await loadPlayers();
+                    showAlert('success', `✅ Added ${count} players successfully!`);
+                } catch (e) {
+                    console.error(e);
+                    showAlert('error', '❌ Error saving bulk players: ' + e.message);
+                }
+            } else {
+                closeBulkModal();
+                showAlert('info', 'No valid players to add.');
+            }
         }
 
+        // ===== 7. دوال التعديل والحذف (مصححة: تحديث وحذف مباشر) =====
         function openEditModal(id) {
             const p = players.find(x => x.id === id);
             if (!p) return;
@@ -583,32 +631,48 @@
         async function saveEditPlayer() {
             const id = document.getElementById('editPlayerId').value;
             try {
-                const { error } = await supabaseClient.rpc('update_tournament_player', {
-                    p_player_id: id, p_player_name: document.getElementById('editPlayerName').value,
-                    p_team: document.getElementById('editPlayerTeam').value, p_age_group: document.getElementById('editPlayerAge').value,
-                    p_gender: document.getElementById('editPlayerGender').value, p_weight: parseFloat(document.getElementById('editPlayerWeight').value) || document.getElementById('editPlayerWeight').value,
-                    p_belt_level: document.getElementById('editPlayerBelt').value, p_gi_type: document.getElementById('editPlayerGiType').value,
-                    p_ranking: parseInt(document.getElementById('editPlayerRanking').value) || 0
-                });
+                const { error } = await supabaseClient.from('tournament_participants').update({
+                    player_name: document.getElementById('editPlayerName').value,
+                    team: document.getElementById('editPlayerTeam').value || null,
+                    age_group: document.getElementById('editPlayerAge').value,
+                    gender: document.getElementById('editPlayerGender').value,
+                    weight: parseFloat(document.getElementById('editPlayerWeight').value) || null,
+                    belt_level: document.getElementById('editPlayerBelt').value,
+                    gi_type: document.getElementById('editPlayerGiType').value,
+                    ranking: parseInt(document.getElementById('editPlayerRanking').value) || 0
+                }).eq('id', id);
+                
                 if (error) throw error;
                 showAlert('success', '✅ Player updated!');
                 closeEditModal();
                 await loadPlayers();
-            } catch (err) { showAlert('error', '❌ ' + err.message); }
+            } catch (err) { 
+                showAlert('error', '❌ ' + err.message); 
+            }
         }
 
         async function deletePlayer(id) {
             if (!confirm('Delete this player?')) return;
-            await supabaseClient.rpc('delete_tournament_player', { p_player_id: id });
-            await loadPlayers();
-            showAlert('success', 'Player deleted');
+            try {
+                const { error } = await supabaseClient.from('tournament_participants').delete().eq('id', id);
+                if (error) throw error;
+                showAlert('success', 'Player deleted');
+                await loadPlayers();
+            } catch (err) {
+                showAlert('error', '❌ ' + err.message);
+            }
         }
 
         async function clearAllPlayers() {
             if (!confirm('Delete ALL players?')) return;
-            for (const p of players) await supabaseClient.rpc('delete_tournament_player', { p_player_id: p.id });
-            await loadPlayers();
-            showAlert('success', 'All players cleared');
+            try {
+                const { error } = await supabaseClient.from('tournament_participants').delete().eq('tournament_id', tournamentId);
+                if (error) throw error;
+                showAlert('success', 'All players cleared');
+                await loadPlayers();
+            } catch (err) {
+                showAlert('error', '❌ ' + err.message);
+            }
         }
 
         function exportToExcel() {
@@ -688,7 +752,8 @@
         async function deleteRegistration(id) {
             if (!confirm('Are you sure you want to delete this player from the tournament?')) return;
             try {
-                await supabaseClient.rpc('delete_tournament_player', { p_player_id: id });
+                const { error } = await supabaseClient.from('tournament_participants').delete().eq('id', id);
+                if (error) throw error;
                 showAlert('success', '✅ Player deleted successfully');
                 loadRegistrations();
                 await loadPlayers();
@@ -789,7 +854,7 @@
             
             let html = '';
             Object.entries(categories).forEach(([cat, catPlayers]) => {
-                html += `<div style="background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; cursor: pointer;" onclick="openBracketModal('${cat}')"><div style="font-size: 2rem; font-weight: bold; color: #f1c40f;">${catPlayers.length}</div><div style="font-weight: bold; margin-bottom: 10px;">${cat}</div></div>`;
+                html += `<div style="background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; cursor: pointer;"><div style="font-size: 2rem; font-weight: bold; color: #f1c40f;">${catPlayers.length}</div><div style="font-weight: bold; margin-bottom: 10px;">${cat}</div></div>`;
             });
             list.innerHTML = html;
         }
@@ -860,10 +925,6 @@
             container.innerHTML = html;
         }
 
-        function openBracketModal(category) {
-            showAlert('info', `Bracket for ${category} - Feature coming soon!`);
-        }
-
         function openMatchModal(matchId) {
             const match = matches.find(m => m.id === matchId);
             if (!match) return;
@@ -906,7 +967,6 @@
             
             try {
                 await supabaseClient.from('matches').update({ red_score: currentRedScore, blue_score: currentBlueScore, winner_name: winner, status: 'completed', completed_at: new Date().toISOString() }).eq('id', currentMatchId);
-                await supabaseClient.from('match_results').insert({ tournament_id: tournamentId, red_player: match.red_player_name, blue_player: match.blue_player_name, red_score: currentRedScore, blue_score: currentBlueScore, winner: winner, division: match.division, mat_number: match.mat_number });
                 showAlert('success', `✅ Match completed!\nWinner: ${winner}\nScore: ${currentRedScore} - ${currentBlueScore}`);
                 closeMatchModal();
                 await loadMatches();
