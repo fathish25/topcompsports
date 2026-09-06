@@ -226,6 +226,44 @@
         .form-textarea { min-height: 80px; resize: vertical; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
+        /* ✅ Image Upload Styles */
+        .image-upload-container {
+            border: 2px dashed var(--primary-blue);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .image-upload-container:hover {
+            border-color: var(--accent-yellow);
+            background: rgba(255,184,0,0.05);
+        }
+
+        .image-upload-container input[type="file"] {
+            display: none;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .image-preview.show {
+            display: block;
+        }
+
+        .image-placeholder {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
         .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
         .alert.show { display: block; }
         .alert-success { background: rgba(16,185,129,0.2); border: 2px solid #10b981; color: #10b981; }
@@ -242,6 +280,7 @@
             .form-row { grid-template-columns: 1fr; }
             .stats-row { grid-template-columns: 1fr; }
             .page-title { font-size: 1.5rem; }
+            .tournament-image { height: 150px; }
         }
     </style>
 </head>
@@ -268,7 +307,7 @@
             <h1 class="page-title" id="pageTitle">🏆 Organizer Dashboard</h1>
             <div class="page-actions">
                 <button class="btn btn-primary" onclick="window.openCreateModal()" id="btnCreate">➕ Create Tournament</button>
-                <button class="btn btn-secondary" onclick="window.loadTournaments()" id="btnRefresh"> Refresh</button>
+                <button class="btn btn-secondary" onclick="window.loadTournaments()" id="btnRefresh">🔄 Refresh</button>
             </div>
         </div>
 
@@ -295,10 +334,22 @@
                     <label class="form-label">Description</label>
                     <textarea class="form-textarea" id="tournamentDesc" placeholder="Tournament description..."></textarea>
                 </div>
+
+                <!-- ✅ Tournament Image Upload -->
+                <div class="form-group">
+                    <label class="form-label"> Tournament Image (Optional)</label>
+                    <div class="image-upload-container" onclick="document.getElementById('tournamentImage').click()">
+                        <div class="image-placeholder">📷</div>
+                        <div>Click to upload image</div>
+                        <div style="font-size: 0.85rem; color: rgba(0,0,0,0.6); margin-top: 5px;">PNG, JPG up to 5MB</div>
+                        <input type="file" id="tournamentImage" accept="image/*" onchange="window.handleImagePreview(event)">
+                    </div>
+                    <img id="imagePreview" class="image-preview" alt="Preview">
+                </div>
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">📅 Event Start Date *</label>
+                        <label class="form-label"> Event Start Date *</label>
                         <input type="date" class="form-input" id="eventStartDate" required>
                     </div>
                     <div class="form-group">
@@ -330,7 +381,7 @@
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">📍 Location</label>
+                    <label class="form-label"> Location</label>
                     <input type="text" class="form-input" id="tournamentLocation" placeholder="Enter location">
                 </div>
                 <div class="form-row">
@@ -355,10 +406,11 @@
         var dbClient = null;
         var currentUser = null;
         var currentLang = localStorage.getItem('lang') || 'en';
+        var selectedImageFile = null;
 
         var translations = {
             en: {
-                pageTitle: ' Organizer Dashboard',
+                pageTitle: '🏆 Organizer Dashboard',
                 btnCreate: '➕ Create Tournament',
                 btnRefresh: '🔄 Refresh',
                 loading: 'Loading tournaments...',
@@ -369,9 +421,9 @@
                 players: 'Players',
                 matches: 'Matches',
                 capacity: 'Capacity',
-                manage: '️ Manage',
+                manage: '⚙️ Manage',
                 view: '👁️ View',
-                edit: '️ Edit',
+                edit: '✏️ Edit',
                 delete: '🗑️ Delete',
                 location: 'Location',
                 successCreate: '✅ Tournament created successfully!',
@@ -386,9 +438,9 @@
                 statusCompleted: 'Completed'
             },
             ar: {
-                pageTitle: '🏆 لوحة تحكم المنظم',
+                pageTitle: ' لوحة تحكم المنظم',
                 btnCreate: '➕ إنشاء بطولة',
-                btnRefresh: '🔄 تحديث',
+                btnRefresh: ' تحديث',
                 loading: 'جاري التحميل...',
                 modalTitleCreate: 'إنشاء بطولة جديدة',
                 modalTitleEdit: 'تعديل البطولة',
@@ -425,7 +477,7 @@
             return dbClient;
         }
 
-        // ===== Helper: Parse extra dates from description =====
+        // ===== Helper Functions =====
         function parseExtraDates(description) {
             try {
                 if (!description) return {};
@@ -442,6 +494,25 @@
             var datesJson = JSON.stringify(extraDates);
             return cleanDesc + (cleanDesc ? '\n' : '') + '<!--DATES-->' + datesJson + '<!--/DATES-->';
         }
+
+        // ✅ Image Preview Handler
+        window.handleImagePreview = function(event) {
+            var file = event.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    window.showAlert('error', 'Image size must be less than 5MB');
+                    return;
+                }
+                selectedImageFile = file;
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.classList.add('show');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
 
         window.changeLang = function(lang) {
             currentLang = lang;
@@ -481,6 +552,8 @@
             document.getElementById('tournamentForm').reset();
             document.getElementById('editTournamentId').value = '';
             document.getElementById('modalTitle').textContent = translations[currentLang].modalTitleCreate;
+            document.getElementById('imagePreview').classList.remove('show');
+            selectedImageFile = null;
             document.getElementById('tournamentModal').classList.add('show');
         };
 
@@ -507,6 +580,13 @@
                 document.getElementById('maxParticipants').value = data.max_participants || 200;
                 document.getElementById('registrationFee').value = data.registration_fee || 0;
                 
+                // Show existing image if exists
+                if (data.image_url) {
+                    var preview = document.getElementById('imagePreview');
+                    preview.src = data.image_url;
+                    preview.classList.add('show');
+                }
+                
                 document.getElementById('modalTitle').textContent = translations[currentLang].modalTitleEdit;
                 document.getElementById('tournamentModal').classList.add('show');
             } catch (error) {
@@ -516,6 +596,8 @@
 
         window.closeModal = function() {
             document.getElementById('tournamentModal').classList.remove('show');
+            selectedImageFile = null;
+            document.getElementById('imagePreview').classList.remove('show');
         };
 
         window.handleFormSubmit = async function(e) {
@@ -542,7 +624,6 @@
                 reg_late_end: document.getElementById('regLateEnd').value || null
             };
             
-            // ✅ استخدام الأعمدة الموجودة فقط في Schema Cache
             var tournamentData = {
                 organizer_id: currentUser.id,
                 name: document.getElementById('tournamentName').value,
@@ -556,9 +637,37 @@
                 updated_at: new Date().toISOString()
             };
 
+            // ✅ Upload image if selected
+            if (selectedImageFile) {
+                try {
+                    var fileExt = selectedImageFile.name.split('.').pop();
+                    var fileName = currentUser.id + '-' + Date.now() + '.' + fileExt;
+                    
+                    var { data: uploadData, error: uploadError } = await dbClient.storage
+                        .from('tournament_images')
+                        .upload(fileName, selectedImageFile, { upsert: true });
+                    
+                    if (uploadError) throw uploadError;
+                    
+                    var { data: { publicUrl } } = dbClient.storage
+                        .from('tournament_images')
+                        .getPublicUrl(fileName);
+                    
+                    tournamentData.image_url = publicUrl;
+                } catch (error) {
+                    console.error('Image upload error:', error);
+                    window.showAlert('error', 'Failed to upload image: ' + error.message);
+                    return;
+                }
+            }
+
             try {
                 var result;
                 if (editId) {
+                    // Don't overwrite image_url if no new image selected
+                    if (!selectedImageFile) {
+                        delete tournamentData.image_url;
+                    }
                     result = await dbClient.from('tournaments').update(tournamentData).eq('id', editId);
                     if (result.error) throw result.error;
                     window.showAlert('success', translations[currentLang].successUpdate);
@@ -588,7 +697,7 @@
                 var data = result.data;
                 if (!data || data.length === 0) {
                     var t = translations[currentLang];
-                    container.innerHTML = '<div class="empty-state"><div class="icon">🏆</div><h3>' + t.noTournaments + '</h3><p>' + t.noTournamentsDesc + '</p></div>';
+                    container.innerHTML = '<div class="empty-state"><div class="icon"></div><h3>' + t.noTournaments + '</h3><p>' + t.noTournamentsDesc + '</p></div>';
                     return;
                 }
 
@@ -616,7 +725,15 @@
                     if (endDate && new Date(endDate) < today) statusText = translations[currentLang].statusCompleted;
                     else if (startDate && new Date(startDate) <= today && endDate && new Date(endDate) >= today) statusText = translations[currentLang].statusToday;
 
-                    html += '<div class="tournament-card"><div class="tournament-image" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0066CC 0%,#003366 100%)"><span style="font-size:4rem;opacity:0.3">🏆</span></div><div class="tournament-content"><div class="tournament-header"><div><div class="tournament-name">' + t.name + '</div></div><span class="tournament-status">' + statusText + '</span></div><div class="tournament-meta"><div class="tournament-meta-item"><span>📅</span><span>' + dateDisplay + '</span></div><div class="tournament-meta-item"><span>📍</span><span>' + (t.location || 'TBD') + '</span></div></div><div class="stats-row"><div class="stat-item"><div class="stat-value" id="regCount_' + t.id + '">-</div><div class="stat-label">' + translations[currentLang].players + '</div></div><div class="stat-item"><div class="stat-value" id="matchCount_' + t.id + '">-</div><div class="stat-label">' + translations[currentLang].matches + '</div></div><div class="stat-item"><div class="stat-value">' + (t.max_participants || 200) + '</div><div class="stat-label">' + translations[currentLang].capacity + '</div></div></div><div class="tournament-actions"><a href="tournament-manager.html?tournament_id=' + t.id + '" class="btn btn-primary">' + translations[currentLang].manage + '</a><a href="tournament-details.html?tournament_id=' + t.id + '" target="_blank" class="btn btn-secondary">' + translations[currentLang].view + '</a><button class="btn btn-secondary" onclick="window.openEditModal(\'' + t.id + '\')">' + translations[currentLang].edit + '</button><button class="btn" style="background:#ef4444;color:white" onclick="window.deleteTournament(\'' + t.id + '\')">' + translations[currentLang].delete + '</button></div></div></div>';
+                    // ✅ Display image if exists, otherwise show trophy icon
+                    var imageHtml = '';
+                    if (t.image_url) {
+                        imageHtml = '<img src="' + t.image_url + '" alt="' + t.name + '" class="tournament-image" onerror="this.style.display=\'none\'">';
+                    } else {
+                        imageHtml = '<div class="tournament-image" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0066CC 0%,#003366 100%)"><span style="font-size:4rem;opacity:0.3"></span></div>';
+                    }
+
+                    html += '<div class="tournament-card">' + imageHtml + '<div class="tournament-content"><div class="tournament-header"><div><div class="tournament-name">' + t.name + '</div></div><span class="tournament-status">' + statusText + '</span></div><div class="tournament-meta"><div class="tournament-meta-item"><span>📅</span><span>' + dateDisplay + '</span></div><div class="tournament-meta-item"><span>📍</span><span>' + (t.location || 'TBD') + '</span></div></div><div class="stats-row"><div class="stat-item"><div class="stat-value" id="regCount_' + t.id + '">-</div><div class="stat-label">' + translations[currentLang].players + '</div></div><div class="stat-item"><div class="stat-value" id="matchCount_' + t.id + '">-</div><div class="stat-label">' + translations[currentLang].matches + '</div></div><div class="stat-item"><div class="stat-value">' + (t.max_participants || 200) + '</div><div class="stat-label">' + translations[currentLang].capacity + '</div></div></div><div class="tournament-actions"><a href="tournament-manager.html?tournament_id=' + t.id + '" class="btn btn-primary">' + translations[currentLang].manage + '</a><a href="tournament-details.html?tournament_id=' + t.id + '" target="_blank" class="btn btn-secondary">' + translations[currentLang].view + '</a><button class="btn btn-secondary" onclick="window.openEditModal(\'' + t.id + '\')">' + translations[currentLang].edit + '</button><button class="btn" style="background:#ef4444;color:white" onclick="window.deleteTournament(\'' + t.id + '\')">' + translations[currentLang].delete + '</button></div></div></div>';
                 }
                 
                 html += '</div>';
