@@ -57,7 +57,11 @@
         .stat-item { background: rgba(241,196,15,0.1); padding: 15px 25px; border-radius: 8px; border: 1px solid rgba(241,196,15,0.3); }
         .stat-value { font-size: 1.5rem; font-weight: bold; color: #f1c40f; }
         .stat-label { font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-top: 5px; }
-        @media (max-width: 768px) { .form-row { grid-template-columns: 1fr; } .container { padding: 20px; } }
+        @media (max-width: 768px) { 
+            .form-row { grid-template-columns: 1fr; } 
+            .container { padding: 20px; } 
+            .header { padding: 15px 20px; flex-direction: column; gap: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -75,7 +79,7 @@
         <div class="step-indicator">
             <div class="step active" id="step1" onclick="showStep('players')">👥 Players</div>
             <div class="step" id="step2" onclick="showStep('mats')">🥋 Mats</div>
-            <div class="step" id="step3" onclick="showStep('overview')"> Brackets</div>
+            <div class="step" id="step3" onclick="showStep('overview')">🏆 Brackets</div>
             <div class="step" id="step4" onclick="showStep('registrations')">📋 Registrations</div>
         </div>
 
@@ -83,7 +87,7 @@
         <div id="playersSection" class="section">
             <div class="section-title">👥 Players Registration</div>
             <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn btn-success" onclick="openBulkModal()"> Add 10 Players</button>
+                <button class="btn btn-success" onclick="openBulkModal()">➕ Add 10 Players</button>
                 <button class="btn btn-secondary" onclick="exportToExcel()">📊 Export</button>
                 <button class="btn btn-danger" onclick="clearAllPlayers()">🗑️ Clear All</button>
             </div>
@@ -97,31 +101,19 @@
                     <label class="form-label">Team</label>
                     <select class="form-select" id="playerTeam">
                         <option value="">Select team...</option>
-                        <option value="TCS Player"> TCS Player</option>
+                        <option value="TCS Player">🏟️ TCS Player</option>
                         <option value="Free Player">🆓 Free Player</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Age Group</label>
-                    <select class="form-select" id="playerAge" onchange="updateWeightAndBeltOptions()">
-                        <option value="">Select Age Group</option>
-                        <option value="Kids 1 (4-5 yrs)">Kids 1 (4-5 yrs)</option>
-                        <option value="Kids 2 (6-7 yrs)">Kids 2 (6-7 yrs)</option>
-                        <option value="Kids 3 (8-9 yrs)">Kids 3 (8-9 yrs)</option>
-                        <option value="Infant (10-11 yrs)">Infant (10-11 yrs)</option>
-                        <option value="Junior (12-13 yrs)">Junior (12-13 yrs)</option>
-                        <option value="Teen (14-15 yrs)">Teen (14-15 yrs)</option>
-                        <option value="Youth (16-17 yrs)">Youth (16-17 yrs)</option>
-                        <option value="Amateur/Professional (18-29 yrs)">Amateur/Professional (18-29 yrs)</option>
-                        <option value="Master 1 (30-35 yrs)">Master 1 (30-35 yrs)</option>
-                        <option value="Master 2 (36-40 yrs)">Master 2 (36-40 yrs)</option>
-                        <option value="Master 3 (41-45 yrs)">Master 3 (41-45 yrs)</option>
-                        <option value="Master 4 (46+ yrs)">Master 4 (46+ yrs)</option>
+                    <select class="form-select" id="playerAge" onchange="updateWeightOptions()">
+                        <option value="">Loading...</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Gender</label>
-                    <select class="form-select" id="playerGender" onchange="updateWeightAndBeltOptions()">
+                    <select class="form-select" id="playerGender" onchange="updateWeightOptions()">
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                     </select>
@@ -130,12 +122,12 @@
             
             <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label">Weight (kg)</label>
-                    <select class="form-select" id="playerWeight"><option value="">Select Weight</option></select>
+                    <label class="form-label">Weight Class</label>
+                    <select class="form-select" id="playerWeight"><option value="">Loading...</option></select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Belt Level</label>
-                    <select class="form-select" id="playerBelt"><option value="">Select Belt</option></select>
+                    <select class="form-select" id="playerBelt"><option value="">Loading...</option></select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Gi Type</label>
@@ -177,7 +169,7 @@
 
         <!-- Step 3: Brackets & Matches -->
         <div id="overviewSection" class="section hidden">
-            <div class="section-title"> Brackets & Matches</div>
+            <div class="section-title">🏆 Brackets & Matches</div>
             <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="btn btn-success" onclick="createAllBrackets()">🔄 Create All Brackets</button>
                 <button class="btn btn-info" onclick="loadMatches()">🔄 Refresh</button>
@@ -210,8 +202,8 @@
 
             <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="btn btn-primary" onclick="openAddPlayerModal()">➕ Add Player Manually</button>
-                <button class="btn btn-info" onclick="loadRegistrations()"> Refresh List</button>
-                <button class="btn btn-secondary" onclick="exportRegistrations()"> Export CSV</button>
+                <button class="btn btn-info" onclick="loadRegistrations()">🔄 Refresh List</button>
+                <button class="btn btn-secondary" onclick="exportRegistrations()">📥 Export CSV</button>
                 <button class="btn btn-secondary" onclick="showStep('players')">← Back to Players</button>
             </div>
 
@@ -273,20 +265,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Age Group</label>
-                    <select class="form-select" id="editPlayerAge">
-                        <option value="Kids 1 (4-5 yrs)">Kids 1</option>
-                        <option value="Kids 2 (6-7 yrs)">Kids 2</option>
-                        <option value="Kids 3 (8-9 yrs)">Kids 3</option>
-                        <option value="Infant (10-11 yrs)">Infant</option>
-                        <option value="Junior (12-13 yrs)">Junior</option>
-                        <option value="Teen (14-15 yrs)">Teen</option>
-                        <option value="Youth (16-17 yrs)">Youth</option>
-                        <option value="Amateur/Professional (18-29 yrs)">Amateur/Professional</option>
-                        <option value="Master 1 (30-35 yrs)">Master 1</option>
-                        <option value="Master 2 (36-40 yrs)">Master 2</option>
-                        <option value="Master 3 (41-45 yrs)">Master 3</option>
-                        <option value="Master 4 (46+ yrs)">Master 4</option>
-                    </select>
+                    <select class="form-select" id="editPlayerAge"></select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Gender</label>
@@ -301,17 +280,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Belt Level</label>
-                    <select class="form-select" id="editPlayerBelt">
-                        <option value="White">White</option>
-                        <option value="Grey">Grey</option>
-                        <option value="Yellow">Yellow</option>
-                        <option value="Orange">Orange</option>
-                        <option value="Green">Green</option>
-                        <option value="Blue">Blue</option>
-                        <option value="Purple">Purple</option>
-                        <option value="Brown">Brown</option>
-                        <option value="Black">Black</option>
-                    </select>
+                    <select class="form-select" id="editPlayerBelt"></select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Gi Type</label>
@@ -327,7 +296,7 @@
             </div>
             <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
                 <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
-                <button class="btn btn-warning" onclick="saveEditPlayer()"> Save Changes</button>
+                <button class="btn btn-warning" onclick="saveEditPlayer()">💾 Save Changes</button>
             </div>
         </div>
     </div>
@@ -363,22 +332,72 @@
         let matchTime = 300;
         let matsConfig = JSON.parse(localStorage.getItem('matsConfig') || '[]');
 
-        const WEIGHTS = {
-            'Male': {
-                'Amateur/Professional (18-29 yrs)': ['56', '62', '69', '77', '85', '94', '100', '120'],
-                'Master 1 (30-35 yrs)': ['56', '62', '69', '77', '85', '94', '100', '120'],
-                'Master 2 (36-40 yrs)': ['56', '62', '69', '77', '85', '94', '100', '120'],
-                'Master 3 (41-45 yrs)': ['56', '62', '69', '77', '85', '94', '100', '120'],
-                'Master 4 (46+ yrs)': ['56', '62', '69', '77', '85', '94', '100', '120']
-            },
-            'Female': {
-                'Amateur/Professional (18-29 yrs)': ['49', '55', '62', '70', '80', '90', '95'],
-                'Master 1 (30-35 yrs)': ['49', '55', '62', '70', '80', '90', '95'],
-                'Master 2 (36-40 yrs)': ['49', '55', '62', '70', '80', '90', '95'],
-                'Master 3 (41-45 yrs)': ['49', '55', '62', '70', '80', '90', '95'],
-                'Master 4 (46+ yrs)': ['49', '55', '62', '70', '80', '90', '95']
+        // متغيرات لتخزين بيانات القوائم من قاعدة البيانات
+        let ageGroupsData = [];
+        let beltLevelsData = [];
+        let weightClassesData = [];
+
+        // ===== دالة تحميل البيانات من قاعدة البيانات =====
+        async function loadDropdownData() {
+            try {
+                // 1. تحميل الفئات العمرية
+                const { data: ageData, error: ageError } = await supabaseClient.from('age_groups').select('*').order('min_age');
+                if (!ageError && ageData) {
+                    ageGroupsData = ageData;
+                    const ageSelect = document.getElementById('playerAge');
+                    const editAgeSelect = document.getElementById('editPlayerAge');
+                    ageSelect.innerHTML = '<option value="">Select Age Group</option>';
+                    editAgeSelect.innerHTML = '<option value="">Select Age Group</option>';
+                    ageData.forEach(ag => {
+                        const label = `${ag.name} (${ag.min_age}-${ag.max_age} yrs)`;
+                        ageSelect.innerHTML += `<option value="${ag.name}">${label}</option>`;
+                        editAgeSelect.innerHTML += `<option value="${ag.name}">${label}</option>`;
+                    });
+                }
+
+                // 2. تحميل مستويات الأحزمة
+                const { data: beltData, error: beltError } = await supabaseClient.from('belt_levels').select('*').order('sort_order');
+                if (!beltError && beltData) {
+                    beltLevelsData = beltData;
+                    const beltSelect = document.getElementById('playerBelt');
+                    const editBeltSelect = document.getElementById('editPlayerBelt');
+                    beltSelect.innerHTML = '<option value="">Select Belt</option>';
+                    editBeltSelect.innerHTML = '<option value="">Select Belt</option>';
+                    beltData.forEach(bl => {
+                        const label = `${bl.name} (${bl.category})`;
+                        beltSelect.innerHTML += `<option value="${bl.name}">${label}</option>`;
+                        editBeltSelect.innerHTML += `<option value="${bl.name}">${label}</option>`;
+                    });
+                }
+
+                // 3. تحميل فئات الوزن
+                const { data: weightData, error: weightError } = await supabaseClient.from('weight_classes').select('*').order('min_weight');
+                if (!weightError && weightData) {
+                    weightClassesData = weightData;
+                    updateWeightOptions(); // تحديث خيارات الوزن بناءً على الجنس
+                }
+            } catch (err) {
+                console.error('Error loading dropdown data:', err);
             }
-        };
+        }
+
+        // ===== تحديث خيارات الوزن بناءً على الجنس =====
+        function updateWeightOptions() {
+            const gender = document.getElementById('playerGender').value;
+            const weightSelect = document.getElementById('playerWeight');
+            weightSelect.innerHTML = '<option value="">Select Weight</option>';
+            
+            const filteredWeights = weightClassesData.filter(w => w.gender === gender || w.gender === 'both');
+            filteredWeights.forEach(w => {
+                let label = w.name;
+                if (w.min_weight !== null && w.max_weight !== null && w.max_weight < 900) {
+                    label += ` (${w.min_weight}-${w.max_weight} kg)`;
+                } else if (w.max_weight >= 900) {
+                    label += ` (${w.min_weight}+ kg)`;
+                }
+                weightSelect.innerHTML += `<option value="${w.name}" data-min="${w.min_weight}" data-max="${w.max_weight}">${label}</option>`;
+            });
+        }
 
         window.onload = async () => {
             const urlParams = new URLSearchParams(window.location.search);
@@ -390,11 +409,12 @@
                 return;
             }
 
+            // تحميل البيانات من قاعدة البيانات أولاً
+            await loadDropdownData();
             await loadTournamentInfo();
             await loadPlayers();
-            updateWeightAndBeltOptions();
-            initMatsDropdown();
             
+            initMatsDropdown();
             if (matsConfig.length === 0) {
                 updateMatsCount();
             } else {
@@ -414,28 +434,9 @@
             }
         }
 
-        function updateWeightAndBeltOptions() {
-            const ageGroup = document.getElementById('playerAge').value;
-            const gender = document.getElementById('playerGender').value;
-            const weightSelect = document.getElementById('playerWeight');
-            const beltSelect = document.getElementById('playerBelt');
-            
-            weightSelect.innerHTML = '<option value="">Select Weight</option>';
-            if (WEIGHTS[gender] && WEIGHTS[gender][ageGroup]) {
-                WEIGHTS[gender][ageGroup].forEach(w => {
-                    weightSelect.innerHTML += `<option value="${w}">${w} kg</option>`;
-                });
-            }
-            
-            beltSelect.innerHTML = '<option value="">Select Belt</option>';
-            ['White', 'Grey', 'Yellow', 'Orange', 'Green', 'Blue', 'Purple', 'Brown', 'Black'].forEach(b => {
-                beltSelect.innerHTML += `<option value="${b}">${b}</option>`;
-            });
-        }
-
         async function loadTournamentInfo() {
             const { data } = await supabaseClient.from('tournaments').select('max_participants').eq('id', tournamentId).single();
-            if (data) document.getElementById('maxPlayers').textContent = data.max_participants || 100;
+            // يمكن إضافة عرض الحد الأقصى للاعبين هنا إذا لزم الأمر
         }
 
         async function loadPlayers() {
@@ -468,22 +469,26 @@
             const team = document.getElementById('playerTeam').value;
             const age = document.getElementById('playerAge').value;
             const gender = document.getElementById('playerGender').value;
-            const weight = document.getElementById('playerWeight').value;
+            
+            const weightSelect = document.getElementById('playerWeight');
+            const weightOption = weightSelect.options[weightSelect.selectedIndex];
+            const weightValue = weightOption && weightOption.getAttribute('data-min') ? weightOption.getAttribute('data-min') : weightSelect.value;
+            
             const belt = document.getElementById('playerBelt').value;
             const giType = document.getElementById('playerGiType').value;
             
-            if (!name || !age || !weight || !belt) { showAlert('error', 'Please fill all required fields'); return; }
+            if (!name || !age || !weightSelect.value || !belt) { showAlert('error', 'Please fill all required fields'); return; }
             
             try {
                 const { error } = await supabaseClient.rpc('add_tournament_player', {
                     p_tournament_id: tournamentId, p_player_name: name, p_team: team, p_age_group: age,
-                    p_gender: gender, p_weight: parseFloat(weight), p_belt_level: belt, p_gi_type: giType, p_ranking: 0
+                    p_gender: gender, p_weight: parseFloat(weightValue) || weightSelect.value, p_belt_level: belt, p_gi_type: giType, p_ranking: 0
                 });
                 if (error) throw error;
                 showAlert('success', `✅ Player "${name}" added!`);
                 ['playerName','playerTeam','playerAge','playerWeight','playerBelt'].forEach(id => document.getElementById(id).value = '');
                 await loadPlayers();
-            } catch (err) { showAlert('error', ' ' + err.message); }
+            } catch (err) { showAlert('error', '❌ ' + err.message); }
         }
 
         function openBulkModal() {
@@ -498,22 +503,40 @@
             const row = document.createElement('div');
             row.className = 'bulk-row';
             row.style.cssText = 'display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1fr 1fr auto; gap: 10px; margin-bottom: 10px; align-items: end; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 8px;';
+            
+            let ageOptions = '';
+            ageGroupsData.forEach(ag => { ageOptions += `<option value="${ag.name}">${ag.name}</option>`; });
+            
+            let beltOptions = '';
+            beltLevelsData.forEach(bl => { beltOptions += `<option value="${bl.name}">${bl.name}</option>`; });
+
             row.innerHTML = `
                 <input type="text" placeholder="Player Name *" class="b-name" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;">
                 <select class="b-team" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;"><option value="TCS Player">TCS Player</option><option value="Free Player">Free Player</option></select>
-                <select class="b-age" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;">
-                    <option value="Amateur/Professional (18-29 yrs)">Adult</option>
-                    <option value="Kids 1 (4-5 yrs)">Kids 1</option><option value="Kids 2 (6-7 yrs)">Kids 2</option><option value="Kids 3 (8-9 yrs)">Kids 3</option>
-                    <option value="Infant (10-11 yrs)">Infant</option><option value="Junior (12-13 yrs)">Junior</option><option value="Teen (14-15 yrs)">Teen</option>
-                    <option value="Youth (16-17 yrs)">Youth</option>
-                    <option value="Master 1 (30-35 yrs)">Master 1</option><option value="Master 2 (36-40 yrs)">Master 2</option><option value="Master 3 (41-45 yrs)">Master 3</option><option value="Master 4 (46+ yrs)">Master 4</option>
-                </select>
-                <select class="b-gender" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;"><option value="Male">Male</option><option value="Female">Female</option></select>
-                <input type="number" placeholder="Weight" class="b-weight" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;">
-                <select class="b-belt" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;"><option value="White">White</option><option value="Blue">Blue</option><option value="Purple">Purple</option><option value="Brown">Brown</option><option value="Black">Black</option></select>
+                <select class="b-age" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;">${ageOptions || '<option>Adult</option>'}</select>
+                <select class="b-gender" onchange="updateBulkWeight(this)" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;"><option value="Male">Male</option><option value="Female">Female</option></select>
+                <select class="b-weight" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;"><option value="">Select Weight</option></select>
+                <select class="b-belt" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px; border-radius: 6px;">${beltOptions || '<option>White</option>'}</select>
                 <button class="remove-btn" onclick="this.parentElement.remove()" style="background: #ef4444; color: #fff; border: none; width: 30px; height: 30px; border-radius: 6px; cursor: pointer;">✕</button>
             `;
             container.appendChild(row);
+            updateBulkWeight(row.querySelector('.b-gender'));
+        }
+
+        function updateBulkWeight(genderSelect) {
+            const row = genderSelect.parentElement;
+            const gender = genderSelect.value;
+            const weightSelect = row.querySelector('.b-weight');
+            weightSelect.innerHTML = '<option value="">Select Weight</option>';
+            
+            const filteredWeights = weightClassesData.filter(w => w.gender === gender || w.gender === 'both');
+            filteredWeights.forEach(w => {
+                let label = w.name;
+                if (w.min_weight !== null && w.max_weight !== null && w.max_weight < 900) {
+                    label += ` (${w.min_weight}-${w.max_weight})`;
+                }
+                weightSelect.innerHTML += `<option value="${w.name}" data-min="${w.min_weight}">${label}</option>`;
+            });
         }
 
         async function saveBulkPlayers() {
@@ -521,13 +544,16 @@
             let count = 0;
             for (const row of rows) {
                 const name = row.querySelector('.b-name').value.trim();
-                const weight = row.querySelector('.b-weight').value;
-                if (!name || !weight) continue;
+                const weightSelect = row.querySelector('.b-weight');
+                const weightOption = weightSelect.options[weightSelect.selectedIndex];
+                const weightValue = weightOption && weightOption.getAttribute('data-min') ? weightOption.getAttribute('data-min') : weightSelect.value;
+                
+                if (!name || !weightSelect.value) continue;
                 try {
                     await supabaseClient.rpc('add_tournament_player', {
                         p_tournament_id: tournamentId, p_player_name: name,
                         p_team: row.querySelector('.b-team').value, p_age_group: row.querySelector('.b-age').value,
-                        p_gender: row.querySelector('.b-gender').value, p_weight: parseFloat(weight),
+                        p_gender: row.querySelector('.b-gender').value, p_weight: parseFloat(weightValue) || weightSelect.value,
                         p_belt_level: row.querySelector('.b-belt').value, p_gi_type: 'Gi', p_ranking: 0
                     });
                     count++;
@@ -560,7 +586,7 @@
                 const { error } = await supabaseClient.rpc('update_tournament_player', {
                     p_player_id: id, p_player_name: document.getElementById('editPlayerName').value,
                     p_team: document.getElementById('editPlayerTeam').value, p_age_group: document.getElementById('editPlayerAge').value,
-                    p_gender: document.getElementById('editPlayerGender').value, p_weight: parseFloat(document.getElementById('editPlayerWeight').value),
+                    p_gender: document.getElementById('editPlayerGender').value, p_weight: parseFloat(document.getElementById('editPlayerWeight').value) || document.getElementById('editPlayerWeight').value,
                     p_belt_level: document.getElementById('editPlayerBelt').value, p_gi_type: document.getElementById('editPlayerGiType').value,
                     p_ranking: parseInt(document.getElementById('editPlayerRanking').value) || 0
                 });
@@ -633,7 +659,6 @@
                     return;
                 }
 
-                // Update stats
                 document.getElementById('totalRegistrations').textContent = data.length;
                 document.getElementById('maleCount').textContent = data.filter(p => p.gender === 'Male').length;
                 document.getElementById('femaleCount').textContent = data.filter(p => p.gender === 'Female').length;
@@ -651,7 +676,7 @@
                         <td>${p.ranking || 0}</td>
                         <td>
                             <button class="btn btn-warning btn-sm" onclick="openEditModal('${p.id}')">✏️</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteRegistration('${p.id}')">️</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteRegistration('${p.id}')">🗑️</button>
                         </td>
                     </tr>
                 `).join('');
@@ -826,7 +851,7 @@
                             <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 15px; align-items: center;">
                                 <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; padding: 15px; border-radius: 8px;"><div style="font-size: 0.8rem; color: #ef4444;">🔴 RED</div><div style="font-weight: bold;">${m.red_player_name}</div></div>
                                 <div style="text-align: center; color: rgba(255,255,255,0.5);">VS</div>
-                                <div style="background: rgba(37, 99, 235, 0.15); border: 1px solid #2563EB; padding: 15px; border-radius: 8px;"><div style="font-size: 0.8rem; color: #2563EB;"> BLUE</div><div style="font-weight: bold;">${m.blue_player_name}</div></div>
+                                <div style="background: rgba(37, 99, 235, 0.15); border: 1px solid #2563EB; padding: 15px; border-radius: 8px;"><div style="font-size: 0.8rem; color: #2563EB;">🔵 BLUE</div><div style="font-weight: bold;">${m.blue_player_name}</div></div>
                             </div>
                         </div>`;
                 });
@@ -849,7 +874,7 @@
             document.getElementById('matchModalContent').innerHTML = `
                 <div style="text-align: center; margin-bottom: 20px;"><div style="font-size: 3rem; font-weight: bold; color: #10b981; margin: 20px 0;">05:00</div><div style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">${match.division}</div></div>
                 <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; padding: 15px; border-radius: 8px; margin-bottom: 15px;"><div style="font-size: 0.9rem; color: #ef4444;">🔴 RED</div><div style="font-size: 1.2rem; font-weight: bold;">${match.red_player_name}</div><div style="font-size: 2rem; font-weight: bold; color: #fff; margin-top: 10px;" id="redScoreDisplay">${currentRedScore}</div></div>
-                <div style="background: rgba(37, 99, 235, 0.15); border: 1px solid #2563EB; padding: 15px; border-radius: 8px;"><div style="font-size: 0.9rem; color: #2563EB;"> BLUE</div><div style="font-size: 1.2rem; font-weight: bold;">${match.blue_player_name}</div><div style="font-size: 2rem; font-weight: bold; color: #fff; margin-top: 10px;" id="blueScoreDisplay">${currentBlueScore}</div></div>
+                <div style="background: rgba(37, 99, 235, 0.15); border: 1px solid #2563EB; padding: 15px; border-radius: 8px;"><div style="font-size: 0.9rem; color: #2563EB;">🔵 BLUE</div><div style="font-size: 1.2rem; font-weight: bold;">${match.blue_player_name}</div><div style="font-size: 2rem; font-weight: bold; color: #fff; margin-top: 10px;" id="blueScoreDisplay">${currentBlueScore}</div></div>
             `;
             document.getElementById('matchModal').classList.add('show');
         }
