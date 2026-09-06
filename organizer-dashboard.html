@@ -344,7 +344,7 @@
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px; margin-top: 25px;">
-                    <button type="submit" class="btn btn-primary" style="flex: 1;"> Save</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">💾 Save</button>
                     <button type="button" class="btn btn-secondary" onclick="window.closeModal()">Cancel</button>
                 </div>
             </form>
@@ -360,7 +360,7 @@
             en: {
                 pageTitle: '🏆 Organizer Dashboard',
                 btnCreate: '➕ Create Tournament',
-                btnRefresh: '🔄 Refresh',
+                btnRefresh: ' Refresh',
                 loading: 'Loading tournaments...',
                 modalTitleCreate: 'Create New Tournament',
                 modalTitleEdit: 'Edit Tournament',
@@ -371,7 +371,7 @@
                 capacity: 'Capacity',
                 manage: '⚙️ Manage',
                 view: '👁️ View',
-                edit: '✏️ Edit',
+                edit: '️ Edit',
                 delete: '🗑️ Delete',
                 location: 'Location',
                 successCreate: '✅ Tournament created successfully!',
@@ -386,7 +386,7 @@
                 statusCompleted: 'Completed'
             },
             ar: {
-                pageTitle: ' لوحة تحكم المنظم',
+                pageTitle: '🏆 لوحة تحكم المنظم',
                 btnCreate: '➕ إنشاء بطولة',
                 btnRefresh: '🔄 تحديث',
                 loading: 'جاري التحميل...',
@@ -400,13 +400,13 @@
                 manage: '⚙️ إدارة',
                 view: '👁️ عرض',
                 edit: '✏️ تعديل',
-                delete: '🗑️ حذف',
+                delete: '️ حذف',
                 location: 'الموقع',
                 successCreate: '✅ تم الإنشاء بنجاح!',
                 successUpdate: '✅ تم التحديث بنجاح!',
                 successDelete: '✅ تم الحذف!',
                 errorCreate: '❌ خطأ في الإنشاء: ',
-                errorUpdate: ' خطأ في التحديث: ',
+                errorUpdate: '❌ خطأ في التحديث: ',
                 errorDelete: '❌ خطأ في الحذف: ',
                 confirmDelete: 'هل أنت متأكد من الحذف؟',
                 statusUpcoming: 'قادمة',
@@ -423,6 +423,26 @@
                 );
             }
             return dbClient;
+        }
+
+        // ===== Helper: Parse extra dates from description =====
+        function parseExtraDates(description) {
+            try {
+                if (!description) return {};
+                // Try to find JSON block in description
+                var match = description.match(/<!--DATES-->([^<]+)<!--\/DATES-->/);
+                if (match) {
+                    return JSON.parse(match[1]);
+                }
+            } catch (e) {}
+            return {};
+        }
+
+        function buildDescription(baseDesc, extraDates) {
+            // Remove old dates block if exists
+            var cleanDesc = (baseDesc || '').replace(/<!--DATES-->[^<]+<!--\/DATES-->/g, '').trim();
+            var datesJson = JSON.stringify(extraDates);
+            return cleanDesc + (cleanDesc ? '\n' : '') + '<!--DATES-->' + datesJson + '<!--/DATES-->';
         }
 
         window.changeLang = function(lang) {
@@ -473,15 +493,19 @@
                 if (result.error) throw result.error;
                 var data = result.data;
 
+                var extraDates = parseExtraDates(data.description);
+
                 document.getElementById('editTournamentId').value = data.id;
                 document.getElementById('tournamentName').value = data.name;
-                document.getElementById('tournamentDesc').value = data.description || '';
-                document.getElementById('eventStartDate').value = data.event_start_date || data.event_date || '';
-                document.getElementById('eventEndDate').value = data.event_end_date || data.event_date || '';
-                document.getElementById('regRegularStart').value = data.reg_regular_start || '';
-                document.getElementById('regRegularEnd').value = data.reg_regular_end || '';
-                document.getElementById('regLateStart').value = data.reg_late_start || '';
-                document.getElementById('regLateEnd').value = data.reg_late_end || '';
+                // Remove dates block from description for editing
+                var cleanDesc = (data.description || '').replace(/<!--DATES-->[^<]+<!--\/DATES-->/g, '').trim();
+                document.getElementById('tournamentDesc').value = cleanDesc;
+                document.getElementById('eventStartDate').value = extraDates.event_start_date || data.event_date || data.tournament_date || '';
+                document.getElementById('eventEndDate').value = extraDates.event_end_date || data.tournament_date || data.event_date || '';
+                document.getElementById('regRegularStart').value = extraDates.reg_regular_start || '';
+                document.getElementById('regRegularEnd').value = extraDates.reg_regular_end || data.registration_deadline || '';
+                document.getElementById('regLateStart').value = extraDates.reg_late_start || '';
+                document.getElementById('regLateEnd').value = extraDates.reg_late_end || '';
                 document.getElementById('tournamentLocation').value = data.location || '';
                 document.getElementById('maxParticipants').value = data.max_participants || 200;
                 document.getElementById('registrationFee').value = data.registration_fee || 0;
@@ -511,17 +535,24 @@
                 return;
             }
             
-            var tournamentData = {
-                organizer_id: currentUser.id,
-                name: document.getElementById('tournamentName').value,
-                description: document.getElementById('tournamentDesc').value,
+            var baseDesc = document.getElementById('tournamentDesc').value;
+            var extraDates = {
                 event_start_date: startDate,
                 event_end_date: endDate,
-                event_date: startDate,
                 reg_regular_start: document.getElementById('regRegularStart').value || null,
                 reg_regular_end: document.getElementById('regRegularEnd').value || null,
                 reg_late_start: document.getElementById('regLateStart').value || null,
-                reg_late_end: document.getElementById('regLateEnd').value || null,
+                reg_late_end: document.getElementById('regLateEnd').value || null
+            };
+            
+            // Use existing columns only
+            var tournamentData = {
+                organizer_id: currentUser.id,
+                name: document.getElementById('tournamentName').value,
+                description: buildDescription(baseDesc, extraDates),
+                event_date: startDate,
+                tournament_date: endDate,
+                registration_deadline: document.getElementById('regRegularEnd').value || null,
                 location: document.getElementById('tournamentLocation').value,
                 max_participants: parseInt(document.getElementById('maxParticipants').value) || 200,
                 registration_fee: parseFloat(document.getElementById('registrationFee').value) || 0,
@@ -561,7 +592,7 @@
                 var data = result.data;
                 if (!data || data.length === 0) {
                     var t = translations[currentLang];
-                    container.innerHTML = '<div class="empty-state"><div class="icon"></div><h3>' + t.noTournaments + '</h3><p>' + t.noTournamentsDesc + '</p></div>';
+                    container.innerHTML = '<div class="empty-state"><div class="icon">🏆</div><h3>' + t.noTournaments + '</h3><p>' + t.noTournamentsDesc + '</p></div>';
                     return;
                 }
 
@@ -570,14 +601,24 @@
                 
                 for (var i = 0; i < data.length; i++) {
                     var t = data[i];
-                    var startDate = t.event_start_date || t.event_date;
-                    var endDate = t.event_end_date || t.event_date;
-                    var dateDisplay = new Date(startDate).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
-                    if (startDate !== endDate) dateDisplay += ' - ' + new Date(endDate).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
+                    var extraDates = parseExtraDates(t.description);
+                    
+                    var startDate = extraDates.event_start_date || t.event_date || t.tournament_date;
+                    var endDate = extraDates.event_end_date || t.tournament_date || t.event_date;
+                    
+                    var dateDisplay = '';
+                    if (startDate) {
+                        dateDisplay = new Date(startDate).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
+                        if (endDate && startDate !== endDate) {
+                            dateDisplay += ' - ' + new Date(endDate).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
+                        }
+                    } else {
+                        dateDisplay = 'TBD';
+                    }
                     
                     var statusText = translations[currentLang].statusUpcoming;
-                    if (new Date(endDate) < today) statusText = translations[currentLang].statusCompleted;
-                    else if (new Date(startDate) <= today && new Date(endDate) >= today) statusText = translations[currentLang].statusToday;
+                    if (endDate && new Date(endDate) < today) statusText = translations[currentLang].statusCompleted;
+                    else if (startDate && new Date(startDate) <= today && endDate && new Date(endDate) >= today) statusText = translations[currentLang].statusToday;
 
                     html += '<div class="tournament-card"><div class="tournament-image" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0066CC 0%,#003366 100%)"><span style="font-size:4rem;opacity:0.3">🏆</span></div><div class="tournament-content"><div class="tournament-header"><div><div class="tournament-name">' + t.name + '</div></div><span class="tournament-status">' + statusText + '</span></div><div class="tournament-meta"><div class="tournament-meta-item"><span>📅</span><span>' + dateDisplay + '</span></div><div class="tournament-meta-item"><span>📍</span><span>' + (t.location || 'TBD') + '</span></div></div><div class="stats-row"><div class="stat-item"><div class="stat-value" id="regCount_' + t.id + '">-</div><div class="stat-label">' + translations[currentLang].players + '</div></div><div class="stat-item"><div class="stat-value" id="matchCount_' + t.id + '">-</div><div class="stat-label">' + translations[currentLang].matches + '</div></div><div class="stat-item"><div class="stat-value">' + (t.max_participants || 200) + '</div><div class="stat-label">' + translations[currentLang].capacity + '</div></div></div><div class="tournament-actions"><a href="tournament-manager.html?tournament_id=' + t.id + '" class="btn btn-primary">' + translations[currentLang].manage + '</a><a href="tournament-details.html?tournament_id=' + t.id + '" target="_blank" class="btn btn-secondary">' + translations[currentLang].view + '</a><button class="btn btn-secondary" onclick="window.openEditModal(\'' + t.id + '\')">' + translations[currentLang].edit + '</button><button class="btn" style="background:#ef4444;color:white" onclick="window.deleteTournament(\'' + t.id + '\')">' + translations[currentLang].delete + '</button></div></div></div>';
                 }
@@ -586,7 +627,7 @@
                 container.innerHTML = html;
                 for (var j = 0; j < data.length; j++) window.loadTournamentStats(data[j].id);
             } catch (error) {
-                container.innerHTML = '<div class="alert alert-error show">❌ ' + error.message + '</div>';
+                container.innerHTML = '<div class="alert alert-error show"> ' + error.message + '</div>';
             }
         };
 
