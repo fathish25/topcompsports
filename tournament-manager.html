@@ -326,7 +326,6 @@
                     ageSelect.innerHTML = '<option value="">Select Age Group</option>';
                     editAgeSelect.innerHTML = '<option value="">Select Age Group</option>';
                     
-                    // إزالة التكرار من الفئات العمرية
                     const uniqueAges = [];
                     const seenAges = new Set();
                     ageData.forEach(ag => {
@@ -345,7 +344,6 @@
 
                 const { data: beltData, error: beltError } = await supabaseClient.from('belt_levels').select('*').order('sort_order');
                 if (!beltError && beltData) {
-                    // إزالة التكرار من الأحزمة
                     const uniqueBelts = [];
                     const seenBelts = new Set();
                     beltData.forEach(bl => {
@@ -365,13 +363,12 @@
                     });
                 }
 
-                const { data: weightData, error: weightError } = await supabaseClient.from('weight_classes').select('*').order('min_weight');
+                const { data: weightData, error: weightError } = await supabaseClient.from('weight_classes').select('*').order('max_weight');
                 if (!weightError && weightData) {
-                    // إزالة التكرار من الموازين - كل ميزان مرة واحدة فقط
                     const uniqueWeights = [];
                     const seenWeights = new Set();
                     weightData.forEach(w => {
-                        const key = `${w.min_weight}-${w.max_weight}`;
+                        const key = `${w.max_weight}`;
                         if (!seenWeights.has(key)) {
                             seenWeights.add(key);
                             uniqueWeights.push(w);
@@ -385,14 +382,11 @@
             }
         }
 
-        // ===== تحديث النوع (Boys/Girls/Men/Women) بناءً على الفئة العمرية =====
+        // ===== تحديث النوع =====
         function updateGenderAndWeight() {
             const ageSelect = document.getElementById('playerAge');
             const genderSelect = document.getElementById('playerGender');
-            const selectedOption = ageSelect.options[ageSelect.selectedIndex];
-            const maxAge = selectedOption ? parseInt(selectedOption.getAttribute('data-max-age')) : 0;
             
-            // عرض جميع الخيارات الأربعة دائماً
             genderSelect.innerHTML = `
                 <option value="">Select Gender</option>
                 <option value="Boys">Boys</option>
@@ -404,9 +398,8 @@
             updateWeightOptions();
         }
 
-        // ===== تحديث خيارات الوزن - عرض الأرقام فقط بدون تكرار =====
+        // ===== تحديث خيارات الوزن (تم التعديل لعرض الرقم فقط بدون 0-) =====
         function updateWeightOptions() {
-            const gender = document.getElementById('playerGender').value;
             const weightSelect = document.getElementById('playerWeight');
             weightSelect.innerHTML = '<option value="">Select Weight</option>';
             
@@ -415,22 +408,25 @@
                 return;
             }
             
-            // عرض جميع الموازين كأرقام فقط بدون تكرار
             const uniqueWeights = new Set();
             weightClassesData.forEach(w => {
                 let label = '';
-                if (w.min_weight !== null && w.max_weight !== null && w.max_weight < 900) {
-                    label = `${w.min_weight}-${w.max_weight} kg`;
+                
+                // التعديل الجوهري: إذا كان الحد الأدنى 0، اعرض الحد الأقصى فقط
+                if (w.min_weight === 0 && w.max_weight) {
+                    label = `${w.max_weight} kg`;
                 } else if (w.max_weight >= 900) {
                     label = `${w.min_weight}+ kg`;
-                } else if (w.min_weight !== null) {
-                    label = `${w.min_weight} kg`;
+                } else if (w.min_weight !== null && w.max_weight !== null) {
+                    label = `${w.min_weight}-${w.max_weight} kg`;
+                } else {
+                    label = `${w.max_weight || w.min_weight} kg`;
                 }
                 
-                // التأكد من عدم التكرار
                 if (!uniqueWeights.has(label)) {
                     uniqueWeights.add(label);
-                    weightSelect.innerHTML += `<option value="${w.name}" data-min="${w.min_weight}">${label}</option>`;
+                    // نستخدم max_weight كقيمة للحفظ لأن الـ min_weight هو 0
+                    weightSelect.innerHTML += `<option value="${w.name}" data-weight="${w.max_weight}">${label}</option>`;
                 }
             });
         }
@@ -523,7 +519,8 @@
             
             const weightSelect = document.getElementById('playerWeight');
             const weightOption = weightSelect.options[weightSelect.selectedIndex];
-            const weightValue = weightOption && weightOption.getAttribute('data-min') ? parseFloat(weightOption.getAttribute('data-min')) : null;
+            // التعديل: قراءة data-weight بدلاً من data-min
+            const weightValue = weightOption && weightOption.getAttribute('data-weight') ? parseFloat(weightOption.getAttribute('data-weight')) : null;
             
             const belt = document.getElementById('playerBelt').value;
             const giType = document.getElementById('playerGiType').value;
@@ -595,27 +592,28 @@
             updateBulkWeight(row.querySelector('.b-gender'));
         }
 
+        // ===== تحديث وزن الإضافة الجماعية (تم التعديل لعرض الرقم فقط) =====
         function updateBulkWeight(genderSelect) {
             const row = genderSelect.parentElement;
-            const gender = genderSelect.value;
             const weightSelect = row.querySelector('.b-weight');
             weightSelect.innerHTML = '<option value="">Select Weight</option>';
             
-            // عرض جميع الموازين كأرقام فقط بدون تكرار
             const uniqueWeights = new Set();
             weightClassesData.forEach(w => {
                 let label = '';
-                if (w.min_weight !== null && w.max_weight !== null && w.max_weight < 900) {
-                    label = `${w.min_weight}-${w.max_weight} kg`;
+                if (w.min_weight === 0 && w.max_weight) {
+                    label = `${w.max_weight} kg`;
                 } else if (w.max_weight >= 900) {
                     label = `${w.min_weight}+ kg`;
-                } else if (w.min_weight !== null) {
-                    label = `${w.min_weight} kg`;
+                } else if (w.min_weight !== null && w.max_weight !== null) {
+                    label = `${w.min_weight}-${w.max_weight} kg`;
+                } else {
+                    label = `${w.max_weight || w.min_weight} kg`;
                 }
                 
                 if (!uniqueWeights.has(label)) {
                     uniqueWeights.add(label);
-                    weightSelect.innerHTML += `<option value="${w.name}" data-min="${w.min_weight}">${label}</option>`;
+                    weightSelect.innerHTML += `<option value="${w.name}" data-weight="${w.max_weight}">${label}</option>`;
                 }
             });
         }
@@ -629,7 +627,8 @@
                 const name = row.querySelector('.b-name').value.trim();
                 const weightSelect = row.querySelector('.b-weight');
                 const weightOption = weightSelect.options[weightSelect.selectedIndex];
-                const weightValue = weightOption && weightOption.getAttribute('data-min') ? parseFloat(weightOption.getAttribute('data-min')) : null;
+                // التعديل: قراءة data-weight
+                const weightValue = weightOption && weightOption.getAttribute('data-weight') ? parseFloat(weightOption.getAttribute('data-weight')) : null;
                 
                 if (!name || !weightSelect.value) continue;
                 
