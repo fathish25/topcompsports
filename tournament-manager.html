@@ -176,7 +176,7 @@
 
         <!-- Step 3: Brackets & Matches -->
         <div id="overviewSection" class="section hidden">
-            <div class="section-title">🏆 Brackets & Matches</div>
+            <div class="section-title"> Brackets & Matches</div>
             <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="btn btn-success" onclick="createAllBrackets()"> Create All Brackets</button>
                 <button class="btn btn-info" onclick="loadMatches()"> Refresh</button>
@@ -218,7 +218,7 @@
         <div class="modal">
             <div class="modal-header">
                 <div class="modal-title">➕ Add Multiple Players</div>
-                <button class="modal-close" onclick="closeBulkModal()">✕</button>
+                <button class="modal-close" onclick="closeBulkModal()"></button>
             </div>
             <div id="bulkContainer"></div>
             <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
@@ -356,7 +356,7 @@
 
                 const { data: weightData, error: weightError } = await supabaseClient.from('weight_classes').select('*').order('min_weight');
                 if (!weightError && weightData) {
-                    // إزالة التكرار من الموازين وعرض الأرقام فقط
+                    // إزالة التكرار من الموازين - كل ميزان مرة واحدة فقط
                     const uniqueWeights = [];
                     const seenWeights = new Set();
                     weightData.forEach(w => {
@@ -393,7 +393,7 @@
             updateWeightOptions();
         }
 
-        // ===== تحديث خيارات الوزن - عرض الأرقام فقط =====
+        // ===== تحديث خيارات الوزن - عرض الأرقام فقط بدون تكرار =====
         function updateWeightOptions() {
             const gender = document.getElementById('playerGender').value;
             const weightSelect = document.getElementById('playerWeight');
@@ -404,7 +404,8 @@
                 return;
             }
             
-            // عرض جميع الموازين كأرقام فقط بدون أسماء الفئات
+            // عرض جميع الموازين كأرقام فقط بدون تكرار
+            const uniqueWeights = new Set();
             weightClassesData.forEach(w => {
                 let label = '';
                 if (w.min_weight !== null && w.max_weight !== null && w.max_weight < 900) {
@@ -414,7 +415,12 @@
                 } else if (w.min_weight !== null) {
                     label = `${w.min_weight} kg`;
                 }
-                weightSelect.innerHTML += `<option value="${w.name}" data-min="${w.min_weight}">${label}</option>`;
+                
+                // التأكد من عدم التكرار
+                if (!uniqueWeights.has(label)) {
+                    uniqueWeights.add(label);
+                    weightSelect.innerHTML += `<option value="${w.name}" data-min="${w.min_weight}">${label}</option>`;
+                }
             });
         }
 
@@ -584,7 +590,8 @@
             const weightSelect = row.querySelector('.b-weight');
             weightSelect.innerHTML = '<option value="">Select Weight</option>';
             
-            // عرض جميع الموازين كأرقام فقط
+            // عرض جميع الموازين كأرقام فقط بدون تكرار
+            const uniqueWeights = new Set();
             weightClassesData.forEach(w => {
                 let label = '';
                 if (w.min_weight !== null && w.max_weight !== null && w.max_weight < 900) {
@@ -594,7 +601,11 @@
                 } else if (w.min_weight !== null) {
                     label = `${w.min_weight} kg`;
                 }
-                weightSelect.innerHTML += `<option value="${w.name}" data-min="${w.min_weight}">${label}</option>`;
+                
+                if (!uniqueWeights.has(label)) {
+                    uniqueWeights.add(label);
+                    weightSelect.innerHTML += `<option value="${w.name}" data-min="${w.min_weight}">${label}</option>`;
+                }
             });
         }
 
