@@ -268,7 +268,7 @@
             <h1 class="page-title" id="pageTitle">🏆 Organizer Dashboard</h1>
             <div class="page-actions">
                 <button class="btn btn-primary" onclick="window.openCreateModal()" id="btnCreate">➕ Create Tournament</button>
-                <button class="btn btn-secondary" onclick="window.loadTournaments()" id="btnRefresh">🔄 Refresh</button>
+                <button class="btn btn-secondary" onclick="window.loadTournaments()" id="btnRefresh"> Refresh</button>
             </div>
         </div>
 
@@ -358,9 +358,9 @@
 
         var translations = {
             en: {
-                pageTitle: '🏆 Organizer Dashboard',
+                pageTitle: ' Organizer Dashboard',
                 btnCreate: '➕ Create Tournament',
-                btnRefresh: ' Refresh',
+                btnRefresh: '🔄 Refresh',
                 loading: 'Loading tournaments...',
                 modalTitleCreate: 'Create New Tournament',
                 modalTitleEdit: 'Edit Tournament',
@@ -369,7 +369,7 @@
                 players: 'Players',
                 matches: 'Matches',
                 capacity: 'Capacity',
-                manage: '⚙️ Manage',
+                manage: '️ Manage',
                 view: '👁️ View',
                 edit: '️ Edit',
                 delete: '🗑️ Delete',
@@ -400,13 +400,13 @@
                 manage: '⚙️ إدارة',
                 view: '👁️ عرض',
                 edit: '✏️ تعديل',
-                delete: '️ حذف',
+                delete: '🗑️ حذف',
                 location: 'الموقع',
                 successCreate: '✅ تم الإنشاء بنجاح!',
                 successUpdate: '✅ تم التحديث بنجاح!',
                 successDelete: '✅ تم الحذف!',
                 errorCreate: '❌ خطأ في الإنشاء: ',
-                errorUpdate: '❌ خطأ في التحديث: ',
+                errorUpdate: ' خطأ في التحديث: ',
                 errorDelete: '❌ خطأ في الحذف: ',
                 confirmDelete: 'هل أنت متأكد من الحذف؟',
                 statusUpcoming: 'قادمة',
@@ -429,7 +429,6 @@
         function parseExtraDates(description) {
             try {
                 if (!description) return {};
-                // Try to find JSON block in description
                 var match = description.match(/<!--DATES-->([^<]+)<!--\/DATES-->/);
                 if (match) {
                     return JSON.parse(match[1]);
@@ -439,7 +438,6 @@
         }
 
         function buildDescription(baseDesc, extraDates) {
-            // Remove old dates block if exists
             var cleanDesc = (baseDesc || '').replace(/<!--DATES-->[^<]+<!--\/DATES-->/g, '').trim();
             var datesJson = JSON.stringify(extraDates);
             return cleanDesc + (cleanDesc ? '\n' : '') + '<!--DATES-->' + datesJson + '<!--/DATES-->';
@@ -497,13 +495,12 @@
 
                 document.getElementById('editTournamentId').value = data.id;
                 document.getElementById('tournamentName').value = data.name;
-                // Remove dates block from description for editing
                 var cleanDesc = (data.description || '').replace(/<!--DATES-->[^<]+<!--\/DATES-->/g, '').trim();
                 document.getElementById('tournamentDesc').value = cleanDesc;
                 document.getElementById('eventStartDate').value = extraDates.event_start_date || data.event_date || data.tournament_date || '';
                 document.getElementById('eventEndDate').value = extraDates.event_end_date || data.tournament_date || data.event_date || '';
                 document.getElementById('regRegularStart').value = extraDates.reg_regular_start || '';
-                document.getElementById('regRegularEnd').value = extraDates.reg_regular_end || data.registration_deadline || '';
+                document.getElementById('regRegularEnd').value = extraDates.reg_regular_end || '';
                 document.getElementById('regLateStart').value = extraDates.reg_late_start || '';
                 document.getElementById('regLateEnd').value = extraDates.reg_late_end || '';
                 document.getElementById('tournamentLocation').value = data.location || '';
@@ -545,14 +542,13 @@
                 reg_late_end: document.getElementById('regLateEnd').value || null
             };
             
-            // Use existing columns only
+            // ✅ استخدام الأعمدة الموجودة فقط في Schema Cache
             var tournamentData = {
                 organizer_id: currentUser.id,
                 name: document.getElementById('tournamentName').value,
                 description: buildDescription(baseDesc, extraDates),
                 event_date: startDate,
                 tournament_date: endDate,
-                registration_deadline: document.getElementById('regRegularEnd').value || null,
                 location: document.getElementById('tournamentLocation').value,
                 max_participants: parseInt(document.getElementById('maxParticipants').value) || 200,
                 registration_fee: parseFloat(document.getElementById('registrationFee').value) || 0,
