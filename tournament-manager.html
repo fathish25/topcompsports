@@ -57,10 +57,29 @@
         .stat-item { background: rgba(241,196,15,0.1); padding: 15px 25px; border-radius: 8px; border: 1px solid rgba(241,196,15,0.3); }
         .stat-value { font-size: 1.5rem; font-weight: bold; color: #f1c40f; }
         .stat-label { font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-top: 5px; }
+        
+        /* Mat Dashboard Styles */
+        .mat-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .mat-tab { background: rgba(255,255,255,0.05); padding: 10px 20px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1); cursor: pointer; transition: all 0.3s; }
+        .mat-tab:hover { background: rgba(241,196,15,0.1); border-color: #f1c40f; }
+        .mat-tab.active { background: rgba(241,196,15,0.2); border-color: #f1c40f; }
+        .mat-content { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; margin-top: 20px; }
+        .match-card { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s; }
+        .match-card:hover { border-color: #f1c40f; transform: translateY(-2px); }
+        .match-players { display: grid; grid-template-columns: 1fr auto 1fr; gap: 15px; margin-top: 15px; align-items: center; }
+        .player-box { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center; }
+        .player-box.red { background: rgba(239,68,68,0.15); border: 1px solid #ef4444; }
+        .player-box.blue { background: rgba(37,99,235,0.15); border: 1px solid #2563EB; }
+        .vs-text { font-size: 1.2rem; font-weight: bold; color: rgba(255,255,255,0.6); }
+        .call-up-box { background: rgba(241,196,15,0.1); border: 2px solid #f1c40f; border-radius: 12px; padding: 30px; text-align: center; margin: 20px 0; }
+        .call-up-names { font-size: 2rem; font-weight: bold; color: #f1c40f; margin: 20px 0; }
+        .call-up-details { color: rgba(255,255,255,0.7); margin-bottom: 20px; }
+        
         @media (max-width: 768px) { 
             .form-row { grid-template-columns: 1fr; } 
             .container { padding: 20px; } 
             .header { padding: 15px 20px; flex-direction: column; gap: 15px; }
+            .match-players { grid-template-columns: 1fr; gap: 10px; }
         }
     </style>
 </head>
@@ -85,13 +104,14 @@
             <div class="step" id="step2" onclick="showStep('mats')"> Mats</div>
             <div class="step" id="step3" onclick="showStep('overview')">🏆 Brackets</div>
             <div class="step" id="step4" onclick="showStep('registrations')">📋 Registrations</div>
+            <div class="step" id="step5" onclick="showStep('matDashboard')"> Mat Dashboard</div>
         </div>
 
         <!-- Step 1: Players -->
         <div id="playersSection" class="section">
             <div class="section-title"> Players Registration</div>
             <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn btn-success" onclick="openBulkModal()">➕ Add 10 Players</button>
+                <button class="btn btn-success" onclick="openBulkModal()"> Add 10 Players</button>
                 <button class="btn btn-secondary" onclick="exportToExcel()"> Export</button>
                 <button class="btn btn-danger" onclick="clearAllPlayers()">️ Clear All</button>
             </div>
@@ -167,10 +187,14 @@
                     <select class="form-select" id="numberOfMats" onchange="updateMatsCount()"></select>
                 </div>
             </div>
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-info" onclick="openAllMatsInTabs()">📂 Open All Mats in Separate Tabs</button>
+            </div>
             <div id="matsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-top: 20px;"></div>
             <div style="margin-top: 30px; display: flex; gap: 10px;">
                 <button class="btn btn-back" onclick="showStep('players')">← Back to Players</button>
                 <button class="btn btn-primary" onclick="showStep('overview')"> View Brackets →</button>
+                <button class="btn btn-success" onclick="showStep('matDashboard')">🏆 Open Mat Dashboard</button>
             </div>
         </div>
 
@@ -211,13 +235,39 @@
                 </table>
             </div>
         </div>
+
+        <!-- Step 5: Mat Dashboard -->
+        <div id="matDashboardSection" class="section hidden">
+            <div class="section-title"> Mat Dashboard</div>
+            <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-info" onclick="openMatInNewTab()">📂 Open in New Tab</button>
+                <button class="btn btn-warning" onclick="openAllMatsInTabs()"> Open All Mats</button>
+                <button class="btn btn-secondary" onclick="showStep('mats')">← Back to Mats</button>
+            </div>
+            
+            <div class="mat-tabs" id="matTabs"></div>
+            
+            <div id="matDashboardContent" class="mat-content">
+                <div class="tabs-nav" style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="showMatTab('categories')">📋 Categories</button>
+                    <button class="btn btn-info" onclick="showMatTab('queue')"> Queue</button>
+                    <button class="btn btn-warning" onclick="showMatTab('callup')">📢 Call-Up</button>
+                    <button class="btn btn-success" onclick="showMatTab('standings')">🏆 Standings</button>
+                </div>
+                
+                <div id="matCategories"></div>
+                <div id="matQueue" class="hidden"></div>
+                <div id="matCallup" class="hidden"></div>
+                <div id="matStandings" class="hidden"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Modal: Bulk Add -->
     <div class="modal-overlay" id="bulkModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">➕ Add Multiple Players</div>
+                <div class="modal-title"> Add Multiple Players</div>
                 <button class="modal-close" onclick="closeBulkModal()"></button>
             </div>
             <div id="bulkContainer"></div>
@@ -284,6 +334,7 @@
         let timerInterval = null;
         let matchTime = 300;
         let matsConfig = JSON.parse(localStorage.getItem('matsConfig') || '[]');
+        let currentMatId = 1;
 
         let ageGroupsData = [];
         let beltLevelsData = [];
@@ -746,6 +797,10 @@
                 document.getElementById('registrationsSection').classList.remove('hidden');
                 document.getElementById('step4').classList.add('active');
                 loadRegistrations();
+            } else if (step === 'matDashboard') {
+                document.getElementById('matDashboardSection').classList.remove('hidden');
+                document.getElementById('step5').classList.add('active');
+                initMatDashboard();
             }
         }
 
@@ -849,7 +904,7 @@
                 const card = document.createElement('div');
                 card.style.cssText = 'background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;';
                 card.innerHTML = `
-                    <h3 style="color:#f1c40f; margin-bottom: 15px;">🥋 Mat ${mat.id}</h3>
+                    <h3 style="color:#f1c40f; margin-bottom: 15px;"> Mat ${mat.id}</h3>
                     <div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">AGE GROUPS</strong>
                         <div style="margin-top: 5px;">${mat.ageGroups.map((a, i) => `<span style="background:rgba(241,196,15,0.2); padding:2px 8px; border-radius:12px; font-size:0.8rem; margin:2px; display:inline-block;">${a} <span style="cursor:pointer; color:#ef4444;" onclick="removeMatTag(${mat.id}, 'ageGroups', ${i})">×</span></span>`).join('') || '<span style="color: #556; font-size: 0.8rem;">None</span>'}</div>
                         <select onchange="if(this.value) addMatTag(${mat.id}, 'ageGroups', this.value)" style="margin-top: 5px; width: 100%; background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px; border-radius: 6px;"><option value="">-- Add Age Group --</option>${uniqueAgeGroups.map(a => `<option>${a}</option>`).join('')}</select>
@@ -865,6 +920,10 @@
                     <div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">BELTS</strong>
                         <div style="margin-top: 5px;">${mat.belts.map((b, i) => `<span style="background:rgba(241,196,15,0.2); padding:2px 8px; border-radius:12px; font-size:0.8rem; margin:2px; display:inline-block;">${b} <span style="cursor:pointer; color:#ef4444;" onclick="removeMatTag(${mat.id}, 'belts', ${i})">×</span></span>`).join('') || '<span style="color: #556; font-size: 0.8rem;">None</span>'}</div>
                         <select onchange="if(this.value) addMatTag(${mat.id}, 'belts', this.value)" style="margin-top: 5px; width: 100%; background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px; border-radius: 6px;"><option value="">-- Add Belt --</option>${uniqueBelts.map(b => `<option>${b}</option>`).join('')}</select>
+                    </div>
+                    <div style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button class="btn btn-info btn-sm" onclick="openMatDashboard(${mat.id})">📊 Open Dashboard</button>
+                        <button class="btn btn-warning btn-sm" onclick="openMatInNewTab(${mat.id})">📂 Open in New Tab</button>
                     </div>
                 `;
                 grid.appendChild(card);
@@ -903,7 +962,6 @@
             
             let html = '';
             Object.entries(categories).forEach(([cat, catPlayers]) => {
-                // إضافة onclick handler لفتح مباريات هذه الفئة
                 const escapedCat = cat.replace(/'/g, "\\'");
                 html += `<div onclick="showCategoryMatches('${escapedCat}')" style="background: rgba(255,255,255,0.03); border: 2px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.borderColor='#f1c40f'; this.style.background='rgba(241,196,15,0.1)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.03)'">
                     <div style="font-size: 2rem; font-weight: bold; color: #f1c40f;">${catPlayers.length}</div>
@@ -916,7 +974,6 @@
 
         // ===== عرض مباريات فئة معينة =====
         function showCategoryMatches(category) {
-            // فلترة المباريات حسب الفئة
             const categoryMatches = matches.filter(m => m.division.includes(category));
             
             const container = document.getElementById('matchesList');
@@ -939,7 +996,7 @@
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 15px; align-items: center;">
                             <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; padding: 15px; border-radius: 8px;">
-                                <div style="font-size: 0.8rem; color: #ef4444;">🔴 RED</div>
+                                <div style="font-size: 0.8rem; color: #ef4444;"> RED</div>
                                 <div style="font-weight: bold;">${m.red_player_name}</div>
                             </div>
                             <div style="text-align: center; color: rgba(255,255,255,0.5);">VS</div>
@@ -954,7 +1011,6 @@
             html += '</div>';
             container.innerHTML = html;
             
-            // التمرير إلى قسم المباريات
             document.getElementById('matchesList').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
@@ -1070,6 +1126,231 @@
                 closeMatchModal();
                 await loadMatches();
             } catch (err) { showAlert('error', '❌ Error saving match: ' + err.message); }
+        }
+
+        // ===== Mat Dashboard Functions =====
+        function initMatDashboard() {
+            renderMatTabs();
+            showMatTab('categories');
+        }
+
+        function renderMatTabs() {
+            const tabsContainer = document.getElementById('matTabs');
+            tabsContainer.innerHTML = '';
+            
+            matsConfig.forEach(mat => {
+                const tab = document.createElement('div');
+                tab.className = `mat-tab ${mat.id === currentMatId ? 'active' : ''}`;
+                tab.textContent = `Mat ${mat.id}`;
+                tab.onclick = () => {
+                    currentMatId = mat.id;
+                    renderMatTabs();
+                    showMatTab('categories');
+                };
+                tabsContainer.appendChild(tab);
+            });
+        }
+
+        function showMatTab(tabName) {
+            // Hide all tabs content
+            document.getElementById('matCategories').classList.add('hidden');
+            document.getElementById('matQueue').classList.add('hidden');
+            document.getElementById('matCallup').classList.add('hidden');
+            document.getElementById('matStandings').classList.add('hidden');
+            
+            // Show selected tab
+            if (tabName === 'categories') {
+                document.getElementById('matCategories').classList.remove('hidden');
+                renderMatCategories();
+            } else if (tabName === 'queue') {
+                document.getElementById('matQueue').classList.remove('hidden');
+                renderMatQueue();
+            } else if (tabName === 'callup') {
+                document.getElementById('matCallup').classList.remove('hidden');
+                renderMatCallup();
+            } else if (tabName === 'standings') {
+                document.getElementById('matStandings').classList.remove('hidden');
+                renderMatStandings();
+            }
+        }
+
+        function renderMatCategories() {
+            const container = document.getElementById('matCategories');
+            const mat = matsConfig.find(m => m.id === currentMatId);
+            
+            if (!mat || (!mat.ageGroups.length && !mat.genders.length && !mat.weights.length && !mat.belts.length)) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No categories configured for this mat. Please configure mat settings first.</div>';
+                return;
+            }
+            
+            // Filter players based on mat configuration
+            const filteredPlayers = players.filter(p => {
+                const matchAge = mat.ageGroups.length === 0 || mat.ageGroups.includes(p.age_group);
+                const matchGender = mat.genders.length === 0 || mat.genders.includes(p.gender);
+                const matchWeight = mat.weights.length === 0 || mat.weights.includes(p.weight);
+                const matchBelt = mat.belts.length === 0 || mat.belts.includes(p.belt_level);
+                return matchAge && matchGender && matchWeight && matchBelt;
+            });
+            
+            // Group by categories
+            const categories = {};
+            filteredPlayers.forEach(p => {
+                const key = `${p.gender} | ${p.age_group} | ${p.weight}kg | ${p.belt_level}`;
+                if (!categories[key]) categories[key] = [];
+                categories[key].push(p);
+            });
+            
+            let html = `<h3 style="color: #f1c40f; margin-bottom: 20px;">Categories - Mat ${currentMatId}</h3>`;
+            Object.entries(categories).forEach(([cat, catPlayers]) => {
+                html += `
+                    <div class="match-card">
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #f1c40f; margin-bottom: 10px;">${cat}</div>
+                        <div style="color: rgba(255,255,255,0.7); margin-bottom: 10px;">${catPlayers.length} Players</div>
+                        <div style="font-size: 0.85rem; color: rgba(255,255,255,0.5);">
+                            Players: ${catPlayers.map(p => p.player_name).join(', ')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function renderMatQueue() {
+            const container = document.getElementById('matQueue');
+            const mat = matsConfig.find(m => m.id === currentMatId);
+            
+            // Get matches for this mat based on configuration
+            const matMatches = matches.filter(m => {
+                if (!mat) return false;
+                const matchAge = mat.ageGroups.length === 0 || mat.ageGroups.some(ag => m.division.includes(ag));
+                const matchGender = mat.genders.length === 0 || mat.genders.some(g => m.division.includes(g));
+                const matchWeight = mat.weights.length === 0 || mat.weights.some(w => m.division.includes(w));
+                const matchBelt = mat.belts.length === 0 || mat.belts.some(b => m.division.includes(b));
+                return matchAge && matchGender && matchWeight && matchBelt;
+            });
+            
+            let html = `<h3 style="color: #f1c40f; margin-bottom: 20px;">Match Queue - Mat ${currentMatId}</h3>`;
+            
+            if (matMatches.length === 0) {
+                html += '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No matches in queue. Create brackets first.</div>';
+            } else {
+                matMatches.forEach(m => {
+                    html += `
+                        <div class="match-card" onclick="openMatchModal('${m.id}')">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <div style="font-weight: bold; color: #f1c40f;">Match #${m.match_number}</div>
+                                <div style="color: rgba(255,255,255,0.6);">${m.status}</div>
+                            </div>
+                            <div class="match-players">
+                                <div class="player-box red">
+                                    <div style="font-size: 0.8rem; color: #ef4444;">🔴 RED</div>
+                                    <div style="font-weight: bold;">${m.red_player_name}</div>
+                                </div>
+                                <div class="vs-text">VS</div>
+                                <div class="player-box blue">
+                                    <div style="font-size: 0.8rem; color: #2563EB;">🔵 BLUE</div>
+                                    <div style="font-weight: bold;">${m.blue_player_name}</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-success btn-sm" style="margin-top: 15px; width: 100%;">▶ Start Match</button>
+                        </div>
+                    `;
+                });
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function renderMatCallup() {
+            const container = document.getElementById('matCallup');
+            const mat = matsConfig.find(m => m.id === currentMatId);
+            
+            // Get next match
+            const nextMatch = matches.find(m => m.status === 'scheduled');
+            
+            let html = `<h3 style="color: #f1c40f; margin-bottom: 20px;">Call-Up System</h3>`;
+            
+            if (!nextMatch) {
+                html += '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No upcoming matches</div>';
+            } else {
+                html += `
+                    <div class="call-up-box">
+                        <div style="font-size: 1rem; color: rgba(255,255,255,0.7); margin-bottom: 10px;">NEXT MATCH</div>
+                        <div class="call-up-names">${nextMatch.red_player_name} vs ${nextMatch.blue_player_name}</div>
+                        <div class="call-up-details">${nextMatch.division}</div>
+                        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn btn-success" onclick="callPlayer('${nextMatch.red_player_name}')">📢 Call ${nextMatch.red_player_name}</button>
+                            <button class="btn btn-success" onclick="callPlayer('${nextMatch.blue_player_name}')">📢 Call ${nextMatch.blue_player_name}</button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function callPlayer(playerName) {
+            // In a real system, this would trigger an announcement
+            showAlert('info', ` Calling ${playerName} to the mat!`);
+        }
+
+        function renderMatStandings() {
+            const container = document.getElementById('matStandings');
+            
+            // Get completed matches for this mat
+            const completedMatches = matches.filter(m => m.status === 'completed');
+            
+            let html = `<h3 style="color: #f1c40f; margin-bottom: 20px;">Standings - Mat ${currentMatId}</h3>`;
+            
+            if (completedMatches.length === 0) {
+                html += '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">No completed matches yet</div>';
+            } else {
+                // Calculate standings
+                const standings = {};
+                completedMatches.forEach(m => {
+                    if (!standings[m.red_player_name]) standings[m.red_player_name] = { wins: 0, losses: 0 };
+                    if (!standings[m.blue_player_name]) standings[m.blue_player_name] = { wins: 0, losses: 0 };
+                    
+                    if (m.winner_name === m.red_player_name) {
+                        standings[m.red_player_name].wins++;
+                        standings[m.blue_player_name].losses++;
+                    } else if (m.winner_name === m.blue_player_name) {
+                        standings[m.blue_player_name].wins++;
+                        standings[m.red_player_name].losses++;
+                    }
+                });
+                
+                // Sort by wins
+                const sortedStandings = Object.entries(standings).sort((a, b) => b[1].wins - a[1].wins);
+                
+                html += '<table><thead><tr><th>Rank</th><th>Player</th><th>Wins</th><th>Losses</th></tr></thead><tbody>';
+                sortedStandings.forEach(([player, stats], index) => {
+                    html += `<tr><td>${index + 1}</td><td>${player}</td><td>${stats.wins}</td><td>${stats.losses}</td></tr>`;
+                });
+                html += '</tbody></table>';
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function openMatDashboard(matId) {
+            currentMatId = matId;
+            showStep('matDashboard');
+        }
+
+        function openMatInNewTab(matId) {
+            const url = `${window.location.origin}${window.location.pathname}?tournament_id=${tournamentId}&mat_id=${matId || currentMatId}`;
+            window.open(url, '_blank');
+        }
+
+        function openAllMatsInTabs() {
+            matsConfig.forEach(mat => {
+                setTimeout(() => {
+                    openMatInNewTab(mat.id);
+                }, mat.id * 500);
+            });
+            showAlert('info', `Opening ${matsConfig.length} mat dashboards in new tabs...`);
         }
 
         function showAlert(type, msg) {
