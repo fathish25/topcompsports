@@ -242,12 +242,12 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   <!-- صفحة اللاعبين -->
   <div id="view-players" class="view active">
     <div class="section">
-      <div class="section-title">👥 Players Registration <span id="playerCount" style="color: #8899aa;">0 / 200</span></div>
+      <div class="section-title"> Players Registration <span id="playerCount" style="color: #8899aa;">0 / 200</span></div>
       <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <button class="btn btn-primary" id="btnAddPlayer"> Add Player</button>
-        <button class="btn btn-secondary" id="btnAdd10"> Add 10</button>
+        <button class="btn btn-primary" id="btnAddPlayer">➕ Add Player</button>
+        <button class="btn btn-secondary" id="btnAdd10">➕ Add 10</button>
         <button class="btn btn-info" id="btnAdd50">➕ Add 50</button>
-        <button class="btn btn-info" id="btnImportCSV">📥 Import CSV</button>
+        <button class="btn btn-info" id="btnImportCSV"> Import CSV</button>
         <input type="file" id="csvImport" accept=".csv" style="display:none">
         <button class="btn btn-info" id="btnExportCSV">📤 Export CSV</button>
         <button class="btn btn-warning" id="btnSyncDB">🔄 Sync with DB</button>
@@ -258,7 +258,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
           <tbody id="playersTable"></tbody>
         </table>
       </div>
-      <button class="btn btn-primary" style="width: 100%; margin-top: 15px; padding: 12px;" id="btnProceedMats"> Proceed to Mats →</button>
+      <button class="btn btn-primary" style="width: 100%; margin-top: 15px; padding: 12px;" id="btnProceedMats">🥋 Proceed to Mats →</button>
     </div>
   </div>
 
@@ -347,21 +347,18 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   // ==========================================
   async function loadDropdownData() {
     try {
-      // تحميل الفئات العمرية
       const ageResult = await supabase.from('age_groups').select('*').order('min_age');
       if (!ageResult.error && ageResult.data) {
         ageGroupsData = ageResult.data;
         console.log('✅ Loaded age groups:', ageGroupsData.length);
       }
       
-      // تحميل مستويات الأحزمة
       const beltResult = await supabase.from('belt_levels').select('*').order('sort_order');
       if (!beltResult.error && beltResult.data) {
         beltLevelsData = beltResult.data;
         console.log('✅ Loaded belt levels:', beltLevelsData.length);
       }
       
-      // تحميل فئات الوزن
       const weightResult = await supabase.from('weight_classes').select('*').order('max_weight');
       if (!weightResult.error && weightResult.data) {
         weightClassesData = weightResult.data;
@@ -376,17 +373,14 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   // 4. التنقل بين الصفحات
   // ==========================================
   function showView(view) {
-    // إخفاء جميع الصفحات
     const views = document.querySelectorAll('.view');
     views.forEach(v => v.classList.remove('active'));
     
-    // إظهار الصفحة المطلوبة
     const viewEl = document.getElementById('view-' + view);
     if (viewEl) {
       viewEl.classList.add('active');
     }
     
-    // تحديث العنوان الفرعي
     const subtitles = {
       'players': 'Step 1: Players Registration',
       'mats': 'Step 2: Mats Setup',
@@ -400,7 +394,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       subtitleEl.innerText = subtitles[view] || '';
     }
     
-    // تنفيذ وظائف خاصة عند فتح كل صفحة
     if (view === 'mats') renderMats();
     if (view === 'settings') renderSettings();
     if (view === 'dashboard') {
@@ -413,7 +406,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     console.log('✅ Switched to view:', view);
   }
 
-  // التبديل بين التبويبات
   function switchTab(tab) {
     const tabs = document.querySelectorAll('.tab');
     tabs.forEach(t => t.classList.remove('active'));
@@ -438,7 +430,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   // 5. إدارة اللاعبين
   // ==========================================
   
-  // إضافة لاعب واحد
   function addPlayer() {
     if (players.length >= 200) {
       alert('Maximum 200 players reached!');
@@ -461,14 +452,12 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     console.log('✅ Player added. Total:', players.length);
   }
 
-  // إضافة عدة لاعبين
   function addPlayers(count) {
     for (let i = 0; i < count && players.length < 200; i++) {
       addPlayer();
     }
   }
 
-  // عرض جدول اللاعبين
   function renderPlayers() {
     const tbody = document.getElementById('playersTable');
     if (!tbody) {
@@ -481,7 +470,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     players.forEach((p, index) => {
       const tr = document.createElement('tr');
       
-      // خيارات الفئات العمرية من قاعدة البيانات
       let ageOptions = '<option value="">Select Age</option>';
       if (ageGroupsData.length > 0) {
         ageGroupsData.forEach(ag => {
@@ -493,7 +481,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         ageOptions += '<option ' + (p.ageGroup === 'Kids 1' ? 'selected' : '') + '>Kids 1</option>';
       }
       
-      // خيارات الأحزمة من قاعدة البيانات
       let beltOptions = '<option value="">Select Belt</option>';
       if (beltLevelsData.length > 0) {
         beltLevelsData.forEach(bl => {
@@ -505,7 +492,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         beltOptions += '<option ' + (p.belt === 'Blue' ? 'selected' : '') + '>Blue</option>';
       }
       
-      // خيارات الجنس
       const genderOptions = `
         <option ${p.gender === 'Men' ? 'selected' : ''}>Men</option>
         <option ${p.gender === 'Women' ? 'selected' : ''}>Women</option>
@@ -528,7 +514,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       tbody.appendChild(tr);
     });
     
-    // إضافة مستمعي الأحداث للتعديل
     document.querySelectorAll('.player-input').forEach(input => {
       input.addEventListener('change', function() {
         const index = parseInt(this.dataset.index);
@@ -565,7 +550,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     }
   }
 
-  // استيراد من CSV
   function importCSV(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -596,7 +580,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     event.target.value = '';
   }
 
-  // تصدير إلى CSV
   function exportCSV() {
     let csv = 'Name,Team,Age Group,Gender,Weight,Belt,Rank\n';
     players.forEach(p => {
@@ -701,7 +684,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
           </select>
         </div>
         <div style="display: flex; gap: 8px; margin-top: 10px;">
-          <button class="btn btn-info mat-dashboard-btn" style="flex: 1;" data-mat="${mat.id}">📋 Open Dashboard</button>
+          <button class="btn btn-info mat-dashboard-btn" style="flex: 1;" data-mat="${mat.id}"> Open Dashboard</button>
           <button class="btn btn-purple mat-newtab-btn" style="flex: 1;" data-mat="${mat.id}">🪟 New Tab</button>
         </div>
       `;
@@ -709,7 +692,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       grid.appendChild(div);
     });
     
-    // إضافة مستمعي الأحداث
     document.querySelectorAll('.tag-remove').forEach(btn => {
       btn.addEventListener('click', function() {
         const matId = parseInt(this.dataset.mat);
@@ -796,7 +778,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       return;
     }
     
-    // تجميع اللاعبين حسب الفئة
     const categoryMap = {};
     players.forEach(p => {
       const matchAge = mat.ageGroups.length === 0 || mat.ageGroups.includes(p.ageGroup);
@@ -868,7 +849,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       html += '</div>';
       
       if (playerCount >= 2) {
-        html += '<button class="btn btn-primary create-bracket-btn" style="width: 100%;" data-key="' + key + '"> Create Bracket</button>';
+        html += '<button class="btn btn-primary create-bracket-btn" style="width: 100%;" data-key="' + key + '">🏆 Create Bracket</button>';
       } else {
         html += '<button class="btn btn-secondary" style="width: 100%;" disabled>⚠️ Need ' + (2 - playerCount) + ' more player(s)</button>';
       }
@@ -897,7 +878,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       belt: parts[3]
     };
     
-    // الحصول على اللاعبين في هذه الفئة
     const categoryPlayers = players.filter(p => 
       p.ageGroup === category.ageGroup &&
       p.gender === category.gender &&
@@ -906,14 +886,12 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     ).sort((a, b) => a.rank - b.rank);
     
     if (categoryPlayers.length < 2) {
-      alert('⚠️ Need at least 2 players to create a bracket!');
+      alert('️ Need at least 2 players to create a bracket!');
       return;
     }
     
-    // توليد البراكيت
     const bracket = generateBracket(categoryPlayers);
     
-    // حفظ في categories
     categories[categoryKey] = {
       ...category,
       players: categoryPlayers,
@@ -921,7 +899,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       createdAt: new Date().toISOString()
     };
     
-    // عرض البراكيت
     renderBracketView(categoryKey);
     showView('bracket');
     
@@ -933,22 +910,18 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   function generateBracket(players) {
     const numPlayers = players.length;
     
-    // تحديد حجم البراكيت (أقرب قوة لـ 2)
     let bracketSize = 1;
     while (bracketSize < numPlayers) {
       bracketSize *= 2;
     }
     
-    // إنشاء مباريات الجولة الأولى
     const rounds = [];
     const firstRound = [];
     
-    // توزيع اللاعبين (1 ضد N، 2 ضد N-1، إلخ)
     for (let i = 0; i < bracketSize / 2; i++) {
       const player1 = players[i] || null;
       const player2 = players[bracketSize - 1 - i] || null;
       
-      // التحقق من BYE
       let status = 'pending';
       let winner = null;
       
@@ -974,7 +947,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     
     rounds.push(firstRound);
     
-    // إنشاء الجولات التالية فارغة
     let matchesInRound = firstRound.length;
     let roundNum = 2;
     
@@ -1036,19 +1008,16 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         html += `<div class="bracket-match ${match.status}">`;
         html += `<div style="font-size: 0.75rem; color: #8899aa; margin-bottom: 8px; text-align: center;">Match ${match.id}</div>`;
         
-        // اللاعب 1
         html += `<div class="match-player ${isWinner1 ? 'winner' : ''}">`;
         html += `<span>${p1Name} ${p1Seed}</span>`;
         html += `<span style="color: #f1c40f; font-weight: bold;">${match.score1}</span>`;
         html += `</div>`;
         
-        // اللاعب 2
         html += `<div class="match-player ${isWinner2 ? 'winner' : ''}">`;
         html += `<span>${p2Name} ${p2Seed}</span>`;
         html += `<span style="color: #f1c40f; font-weight: bold;">${match.score2}</span>`;
         html += `</div>`;
         
-        // زر بدء المباراة
         if (roundIndex === 0 && match.status === 'pending' && match.player1 && match.player2) {
           html += `<button class="btn btn-sm btn-primary" style="width: 100%; margin-top: 8px;" onclick="window.startMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">▶ Start Match</button>`;
         } else if (match.status === 'completed') {
@@ -1064,14 +1033,18 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     html += '</div>';
     container.innerHTML = html;
     
-    // تحديث العنوان
     document.getElementById('bracketTitle').innerHTML = 
       `🏆 ${data.gender} - ${data.ageGroup} - ${data.weight}kg - ${data.belt} Belt`;
   }
 
-  // بدء مباراة
+  // بدء مباراة - تم نقلها لـ window لتكون متاحة عالمياً
   window.startMatch = function(categoryKey, roundIndex, matchIndex) {
     const data = categories[categoryKey];
+    if (!data || !data.bracket) {
+      alert('❌ Bracket not found!');
+      return;
+    }
+    
     const match = data.bracket.rounds[roundIndex][matchIndex];
     
     if (!match.player1 || !match.player2) {
@@ -1095,7 +1068,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       match.score2 = 1;
     }
     
-    // تحديث الجولة التالية
     if (match.winner && roundIndex < data.bracket.rounds.length - 1) {
       const winnerPlayer = match.winner === match.player1.id ? match.player1 : match.player2;
       const nextRoundIndex = roundIndex + 1;
@@ -1129,7 +1101,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   function renderStandings() {
     const container = document.getElementById('tab-standings');
     if (!container) return;
-    container.innerHTML = '<h3 style="color: #f1c40f; margin-bottom: 15px;">🏆 Standings</h3><p style="color: #8899aa;">No results yet.</p>';
+    container.innerHTML = '<h3 style="color: #f1c40f; margin-bottom: 15px;"> Standings</h3><p style="color: #8899aa;">No results yet.</p>';
   }
 
   function clearMatFilters() {
@@ -1144,10 +1116,20 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     saveData();
   }
 
-  function openMatInNewTab(matId) {
-    const url = window.location.href.split('?')[0] + '?mat=' + matId;
-    window.open(url, '_blank');
-  }
+  // فتح البساط في تبويب جديد - تم التعديل
+  window.openMatInNewTab = function(matId) {
+    const baseUrl = window.location.href.split('?')[0];
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentTournamentId = urlParams.get('tournament_id');
+    
+    let newUrl = baseUrl + '?mat=' + matId;
+    if (currentTournamentId) {
+      newUrl += '&tournament_id=' + currentTournamentId;
+    }
+    
+    console.log('🪟 Opening new tab:', newUrl);
+    window.open(newUrl, '_blank');
+  };
 
   function openAllMatsInTabs() {
     mats.forEach((mat, i) => {
@@ -1212,7 +1194,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     }
   }
 
-  // حفظ البيانات محلياً
   function saveData() {
     localStorage.setItem('tournamentData', JSON.stringify({
       players: players,
@@ -1223,9 +1204,8 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     console.log('✅ Data saved to localStorage');
   }
 
-  // مسح كل البيانات
   function clearAll() {
-    if (confirm('️ Clear all data?')) {
+    if (confirm('⚠️ Clear all data?')) {
       players = [];
       mats = [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
       categories = {};
@@ -1245,7 +1225,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   // 9. إعداد مستمعي الأحداث
   // ==========================================
   function setupEventListeners() {
-    // أزرار الرأس
     document.getElementById('btnPlayers').addEventListener('click', function() {
       showView('players');
     });
@@ -1262,7 +1241,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     document.getElementById('btnSaveLocal').addEventListener('click', saveData);
     document.getElementById('btnClear').addEventListener('click', clearAll);
     
-    // أزرار صفحة اللاعبين
     document.getElementById('btnAddPlayer').addEventListener('click', addPlayer);
     document.getElementById('btnAdd10').addEventListener('click', function() { addPlayers(10); });
     document.getElementById('btnAdd50').addEventListener('click', function() { addPlayers(50); });
@@ -1278,24 +1256,20 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       showView('mats');
     });
     
-    // صفحة الأبسط
     document.getElementById('matsCount').addEventListener('change', updateMats);
     document.getElementById('btnOpenAllMats').addEventListener('click', openAllMatsInTabs);
     document.getElementById('btnOpenDashboard').addEventListener('click', function() {
       showView('dashboard');
     });
     
-    // صفحة الإعدادات
     document.getElementById('btnBackPlayers').addEventListener('click', function() {
       showView('players');
     });
     
-    // صفحة البراكيت
     document.getElementById('btnBackToDash').addEventListener('click', function() {
       showView('dashboard');
     });
     
-    // التبويبات
     document.getElementById('tabCategories').addEventListener('click', function() {
       switchTab('categories');
     });
@@ -1311,22 +1285,28 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   }
 
   // ==========================================
-  // 10. التشغيل الأولي
+  // 10. التشغيل الأولي - تم التعديل
   // ==========================================
   async function init() {
-    console.log(' Page loaded successfully!');
+    console.log('🚀 Page loaded successfully!');
     
-    // إعداد مستمعي الأحداث أولاً
     setupEventListeners();
     
-    // الحصول على tournament_id من URL
     const urlParams = new URLSearchParams(window.location.search);
     tournamentId = urlParams.get('tournament_id');
+    const matParam = urlParams.get('mat');
     
-    // تحميل البيانات من قاعدة البيانات
+    // إذا كان هناك معامل mat، افتح لوحة التحكم لهذا البساط
+    if (matParam) {
+      currentMat = parseInt(matParam);
+      console.log('✅ Opening mat:', currentMat);
+      setTimeout(() => {
+        showView('dashboard');
+      }, 500);
+    }
+    
     await loadDropdownData();
     
-    // تحميل البيانات المحفوظة
     const saved = localStorage.getItem('tournamentData');
     if (saved) {
       try {
@@ -1340,20 +1320,17 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       }
     }
     
-    // العرض الأولي
     renderPlayers();
     
-    console.log('🔍 System ready!');
+    console.log(' System ready!');
     console.log('- Players loaded:', players.length);
     console.log('- Mats configured:', mats.length);
     console.log('- Age groups:', ageGroupsData.length);
     console.log('- Belt levels:', beltLevelsData.length);
     
-    // الحفظ التلقائي كل 30 ثانية
     setInterval(saveData, 30000);
   }
 
-  // التشغيل عند تحميل الصفحة
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
