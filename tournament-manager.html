@@ -184,7 +184,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   <!-- Views -->
   <div id="view-settings" class="view">
     <div class="section">
-      <div class="section-title">⚙️ Fight Time Settings</div>
+      <div class="section-title">️ Fight Time Settings</div>
       <div style="margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
         <h3 style="color: #f1c40f; margin-bottom: 10px;">Regular Fight Times (minutes)</h3>
         <div id="regularTimes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;"></div>
@@ -203,7 +203,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       <div style="margin-bottom: 15px;">
         <button class="btn btn-primary" onclick="addPlayer()"> Add Player</button>
         <button class="btn btn-secondary" onclick="addPlayers(10)">➕ Add 10</button>
-        <button class="btn btn-info" onclick="document.getElementById('csvImport').click()">📥 Import CSV</button>
+        <button class="btn btn-info" onclick="document.getElementById('csvImport').click()"> Import CSV</button>
         <input type="file" id="csvImport" accept=".csv" style="display:none" onchange="importCSV(event)">
         <button class="btn btn-info" onclick="exportCSV()"> Export CSV</button>
         <button class="btn btn-warning" onclick="syncWithDatabase()"> Sync with DB</button>
@@ -220,7 +220,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 
   <div id="view-mats" class="view">
     <div class="section">
-      <div class="section-title">🥋 Mats Setup</div>
+      <div class="section-title"> Mats Setup</div>
       <div style="margin-bottom: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
         <label style="font-weight: bold; color: #f1c40f;">Number of Mats: </label>
         <select id="matsCount" onchange="updateMats()" style="width: auto; display: inline-block;">
@@ -339,7 +339,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         </div>
 
         <div>
-          <div class="sb-panel-header blue">🔵 Blue Player</div>
+          <div class="sb-panel-header blue"> Blue Player</div>
           <div class="sb-counters">
             <div class="sb-counter adv"><div class="label">⭐ Advantage</div><div class="value" id="blueAdv">0</div></div>
             <div class="sb-counter pen"><div class="label"> Penalty</div><div class="value" id="bluePen">0</div></div>
@@ -358,7 +358,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
           </div>
           <div class="sb-action-row">
             <button class="btn-adv" onclick="addAdvantage('blue')"><span class="icon">⭐</span><span>Advantage</span></button>
-            <button class="btn-pen" onclick="addPenalty('blue')"><span class="icon">🟥</span><span>Penalty</span></button>
+            <button class="btn-pen" onclick="addPenalty('blue')"><span class="icon"></span><span>Penalty</span></button>
           </div>
           <button class="sb-undo-btn" onclick="undoAction('blue')">↩️ Undo</button>
         </div>
@@ -388,26 +388,28 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   <div class="modal-content">
     <h2 style="color: #f1c40f; text-align: center; margin-bottom: 20px;"> Select Winner</h2>
     <div id="matchInfo" style="text-align: center; margin-bottom: 20px; padding: 15px; background: rgba(241,196,15,0.1); border-radius: 8px;"></div>
-    <button class="btn btn-danger" style="width: 100%; margin-bottom: 10px; padding: 15px;" onclick="declareWinner('red')">🔴 Red Wins</button>
-    <button class="btn btn-info" style="width: 100%; margin-bottom: 10px; padding: 15px;" onclick="declareWinner('blue')">🔵 Blue Wins</button>
+    <button class="btn btn-danger" style="width: 100%; margin-bottom: 10px; padding: 15px;" onclick="declareWinner('red')"> Red Wins</button>
+    <button class="btn btn-info" style="width: 100%; margin-bottom: 10px; padding: 15px;" onclick="declareWinner('blue')"> Blue Wins</button>
     <button class="btn btn-secondary" style="width: 100%; padding: 15px;" onclick="closeModal()">❌ Cancel</button>
   </div>
 </div>
 
 <div class="modal" id="editMatchModal">
   <div class="modal-content">
-    <h2 style="color: #f1c40f; text-align: center; margin-bottom: 20px;">⚙️ Edit Match</h2>
+    <h2 style="color: #f1c40f; text-align: center; margin-bottom: 20px;">️ Edit Match</h2>
     <div id="editMatchContent"></div>
   </div>
 </div>
 
 <script>
 // ==========================================
-// 1. SUPABASE INITIALIZATION
+// 1. SUPABASE INITIALIZATION - FIXED
 // ==========================================
 const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
-let supabase;
+
+// Use the global supabase from CDN, don't redeclare it
+let supabaseClient;
 
 // ==========================================
 // 2. DATA & STATE
@@ -562,17 +564,17 @@ function backToBracket() {
 }
 
 // ==========================================
-// 6. SYNC FUNCTIONS
+// 6. SYNC FUNCTIONS - FIXED
 // ==========================================
 async function syncWithDatabase() {
-  if (!supabase) {
+  if (!supabaseClient) {
     alert(' Database not connected');
     return;
   }
   
   showSyncIndicator();
   try {
-    const { data: dbPlayers, error } = await supabase
+    const { data: dbPlayers, error } = await supabaseClient
       .from('tournament_participants')
       .select('*')
       .eq('tournament_id', tournamentId || 'default');
@@ -602,11 +604,11 @@ async function syncWithDatabase() {
 }
 
 async function saveToDatabase() {
-  if (!supabase) return;
+  if (!supabaseClient) return;
   
   try {
     if (!tournamentId) {
-      const { data: tournament, error: tError } = await supabase
+      const { data: tournament, error: tError } = await supabaseClient
         .from('tournaments')
         .insert({ name: 'Tournament ' + new Date().toLocaleDateString() })
         .select()
@@ -627,7 +629,7 @@ async function saveToDatabase() {
       ranking: p.rank
     }));
     
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('tournament_participants')
       .upsert(playersToInsert, { onConflict: 'id' });
     
@@ -771,7 +773,7 @@ function renderMats() {
       </div>
       <div style="display: flex; gap: 8px; margin-top: 10px;">
         <button class="btn btn-info" style="flex: 1;" onclick="currentMat=${mat.id};showView('dashboard')"> Open Dashboard</button>
-        <button class="btn btn-purple" style="flex: 1;" onclick="openMatInNewTab(${mat.id})">🪟 Open in New Tab</button>
+        <button class="btn btn-purple" style="flex: 1;" onclick="openMatInNewTab(${mat.id})"> Open in New Tab</button>
       </div>`;
     grid.appendChild(div);
   });
@@ -1066,7 +1068,7 @@ function renderQueue() {
     });
   });
   let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📋 Match Queue - Mat ' + currentMat + '</h3>';
-  html += '<div style="margin-bottom: 15px;"><button class="btn btn-primary" onclick="regenerateQueue()">🔄 Regenerate</button></div>';
+  html += '<div style="margin-bottom: 15px;"><button class="btn btn-primary" onclick="regenerateQueue()"> Regenerate</button></div>';
   if (allMatches.length === 0) {
     html += '<p style="text-align: center; color: #8899aa; padding: 20px;">No pending matches. Open categories to generate brackets.</p>';
   } else {
@@ -1131,7 +1133,7 @@ function callPlayer(playerName) {
     oscillator.frequency.value = 800; oscillator.type = 'sine'; gainNode.gain.value = 0.3;
     oscillator.start(); setTimeout(() => oscillator.stop(), 500);
   } catch(e) {}
-  alert(`📢 Calling: ${playerName}\n\nPlease proceed to the mat!`);
+  alert(` Calling: ${playerName}\n\nPlease proceed to the mat!`);
 }
 
 function renderStandings() {
@@ -1434,15 +1436,15 @@ function openAllMatsInTabs() {
 }
 
 // ==========================================
-// 13. INITIALIZATION
+// 13. INITIALIZATION - FIXED
 // ==========================================
 window.onload = function() {
   console.log(' Page loaded. Initializing system...');
   
-  // Initialize Supabase
+  // Initialize Supabase client using the global supabase from CDN
   try {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log('✅ Supabase initialized');
+    supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('✅ Supabase client initialized');
   } catch(e) {
     console.error(' Supabase init error:', e);
   }
@@ -1487,7 +1489,7 @@ window.onload = function() {
   }
   
   // Sync with database if tournament_id exists
-  if (tournamentId && supabase) {
+  if (tournamentId && supabaseClient) {
     syncWithDatabase();
   }
   
