@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏆 TopCompSports Tournament System</title>
+<title> TopCompSports Tournament System</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -555,9 +555,9 @@ tr:hover { background: rgba(241,196,15,0.05); }
       <div class="db-status" id="dbStatus">● Connected to Database</div>
     </div>
     <div style="display: flex; gap: 5px; flex-wrap: wrap; justify-content: center;">
-      <button class="btn btn-info" id="btnPlayers">👥 Players</button>
-      <button class="btn btn-purple" id="btnMats">🥋 Mats</button>
-      <button class="btn btn-warning" id="btnSettings">⚙️ Settings</button>
+      <button class="btn btn-info" id="btnPlayers"> Players</button>
+      <button class="btn btn-purple" id="btnMats"> Mats</button>
+      <button class="btn btn-warning" id="btnSettings">️ Settings</button>
       <button class="btn btn-secondary" id="btnSync">🔄 Sync</button>
       <button class="btn btn-secondary" id="btnSaveLocal">💾 Save</button>
       <button class="btn btn-danger" id="btnClear">🗑️ Clear</button>
@@ -724,7 +724,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
       <div class="player-controls">
         <!-- Red Player Section -->
         <div class="player-section red">
-          <div class="section-title red">🔴 Red Player</div>
+          <div class="section-title red"> Red Player</div>
           
           <div class="ap-display">
             <div class="ap-box">
@@ -732,7 +732,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
               <div class="ap-value" id="advantage1">0</div>
             </div>
             <div class="ap-box">
-              <div class="ap-label">🟥 Penalty</div>
+              <div class="ap-label"> Penalty</div>
               <div class="ap-value" id="penalty1">0</div>
             </div>
           </div>
@@ -1364,7 +1364,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
     ).sort((a, b) => a.rank - b.rank);
     
     if (categoryPlayers.length < 2) {
-      alert('⚠️ Need at least 2 players to create a bracket!');
+      alert('️ Need at least 2 players to create a bracket!');
       return;
     }
     
@@ -1812,7 +1812,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
       }
     }
     
-    showNotification(`🏆 Winner: ${match.winner === match.player1.id ? match.player1.name : match.player2.name}!`);
+    showNotification(` Winner: ${match.winner === match.player1.id ? match.player1.name : match.player2.name}!`);
     
     renderBracketView(currentMatch.categoryKey);
     showView('bracket');
@@ -2256,7 +2256,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
         currentMat = data.currentMat || currentMat;
         console.log('✅ Loaded', players.length, 'players from storage');
       } catch(e) {
-        console.error('❌ Error loading data:', e);
+        console.error(' Error loading data:', e);
       }
     }
     
