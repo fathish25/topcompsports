@@ -341,7 +341,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
           </div>
           <div class="sb-action-row">
             <button class="btn-adv" onclick="addAdvantage('red')"><span class="icon">⭐</span><span>Advantage</span></button>
-            <button class="btn-pen" onclick="addPenalty('red')"><span class="icon">🟥</span><span>Penalty</span></button>
+            <button class="btn-pen" onclick="addPenalty('red')"><span class="icon"></span><span>Penalty</span></button>
           </div>
           <button class="sb-undo-btn" onclick="undoAction('red')">↩️ Undo</button>
         </div>
@@ -933,7 +933,7 @@ function renderMats() {
         <select onchange="if(this.value) addMatCategory(${mat.id}, 'weights', this.value)" style="margin-top: 5px;"><option value="">-- Add Weight --</option>${allWeights.map(w => `<option>${w}</option>`).join('')}</select>
       </div>
       <div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">BELTS</strong>
-        <div style="margin-top: 5px;">${mat.belts.map((b, i) => `<span class="tag">${b} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'belts', ${i})">✕</span></span>`).join('') || '<span style="color: #556; font-size: 0.8rem;">No belts added</span>'}</div>
+        <div style="margin-top: 5px;">${mat.belts.map((b, i) => `<span class="tag">${b} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'belts', ${i})"></span></span>`).join('') || '<span style="color: #556; font-size: 0.8rem;">No belts added</span>'}</div>
         <select onchange="if(this.value) addMatCategory(${mat.id}, 'belts', this.value)" style="margin-top: 5px;"><option value="">-- Add Belt --</option>${allBelts.map(b => `<option>${b}</option>`).join('')}</select>
       </div>
       <div style="display: flex; gap: 8px; margin-top: 10px;">
@@ -945,20 +945,36 @@ function renderMats() {
 }
 
 // ==========================================
-// 9. CATEGORIES & BRACKETS
+// 9. CATEGORIES & BRACKETS - UPDATED ✅
 // ==========================================
 function renderCategories() {
   const container = document.getElementById('tab-categories');
   if (!container) return;
   const mat = mats.find(m => m.id === currentMat);
-  if (!mat) { container.innerHTML = '<p style="text-align: center; color: #8899aa;">No mat selected</p>'; return; }
+  if (!mat) { 
+    container.innerHTML = '<p style="text-align: center; color: #8899aa;">No mat selected</p>'; 
+    return; 
+  }
+  
+  console.log('🔍 Debug - Mat Settings:', mat);
+  console.log('🔍 Debug - Total Players:', players.length);
+  console.log('🔍 Debug - Players:', players);
   
   const categoryList = [];
   mat.ageGroups.forEach(age => {
     mat.genders.forEach(gender => {
       mat.weights.forEach(weight => {
         mat.belts.forEach(belt => {
-          const categoryPlayers = players.filter(p => p.ageGroup === age && p.gender === gender && p.weight === weight && p.belt === belt && p.name).sort((x, y) => x.rank - y.rank);
+          const categoryPlayers = players.filter(p => 
+            p.ageGroup === age && 
+            p.gender === gender && 
+            p.weight === weight && 
+            p.belt === belt && 
+            p.name
+          ).sort((x, y) => x.rank - y.rank);
+          
+          console.log(`🔍 Category: ${age} | ${gender} | ${weight} | ${belt} - Players: ${categoryPlayers.length}`);
+          
           if (categoryPlayers.length >= 2) {
             categoryList.push({ age, gender, weight, belt, players: categoryPlayers });
           }
@@ -970,15 +986,82 @@ function renderCategories() {
   let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📋 Categories - Mat ' + currentMat + ' (Bracket System)</h3>';
   
   if (categoryList.length === 0) {
-    html += '<p style="text-align: center; color: #8899aa; padding: 30px;">No categories found. Add players with matching categories first.</p>';
+    // رسالة تفصيلية توضح المشكلة
+    html += `
+      <div style="text-align: center; padding: 40px; background: rgba(241,196,15,0.1); border-radius: 12px; border: 2px dashed #f1c40f;">
+        <div style="font-size: 3rem; margin-bottom: 15px;">⚠️</div>
+        <h3 style="color: #f1c40f; margin-bottom: 10px;">No Categories Found</h3>
+        
+        ${players.length === 0 ? `
+          <div style="background: rgba(192,57,43,0.2); padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p style="color: #e74c3c; font-weight: bold; margin-bottom: 10px;">❌ No Players Registered</p>
+            <p style="color: #8899aa;">You need to add players first!</p>
+          </div>
+          <button class="btn btn-primary" onclick="showView('players')" style="margin-top: 15px;">
+            👥 Add Players Now
+          </button>
+        ` : `
+          <div style="background: rgba(241,196,15,0.1); padding: 20px; border-radius: 8px; margin: 20px 0; text-align: left;">
+            <h4 style="color: #f1c40f; margin-bottom: 15px;">📊 Current Status:</h4>
+            <p style="color: #8899aa; margin-bottom: 10px;"><strong>Total Players:</strong> ${players.length}</p>
+            
+            <h4 style="color: #f1c40f; margin: 15px 0 10px;">Mat ${currentMat} Settings:</h4>
+            <ul style="color: #8899aa; text-align: left; display: inline-block; margin-bottom: 15px;">
+              <li>Age Groups: ${mat.ageGroups.length > 0 ? mat.ageGroups.join(', ') : '<span style="color: #e74c3c;">None</span>'}</li>
+              <li>Genders: ${mat.genders.length > 0 ? mat.genders.join(', ') : '<span style="color: #e74c3c;">None</span>'}</li>
+              <li>Weights: ${mat.weights.length > 0 ? mat.weights.join(', ') : '<span style="color: #e74c3c;">None</span>'}</li>
+              <li>Belts: ${mat.belts.length > 0 ? mat.belts.join(', ') : '<span style="color: #e74c3c;">None</span>'}</li>
+            </ul>
+            
+            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; margin-top: 15px;">
+              <p style="color: #f39c12; font-weight: bold; margin-bottom: 10px;">⚠️ Requirements:</p>
+              <p style="color: #8899aa; font-size: 0.9rem;">
+                You need at least <strong>2 players</strong> with the <strong>exact same</strong>:
+              </p>
+              <ul style="color: #8899aa; margin-top: 10px;">
+                <li>✓ Age Group</li>
+                <li>✓ Gender</li>
+                <li>✓ Weight</li>
+                <li>✓ Belt</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="showView('players')" style="margin-right: 10px;">
+              👥 View/Add Players
+            </button>
+            <button class="btn btn-info" onclick="showView('mats')">
+               Edit Mat Settings
+            </button>
+          </div>
+          
+          ${players.length > 0 ? `
+            <div style="margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px;">
+              <h4 style="color: #f1c40f; margin-bottom: 10px;"> Registered Players:</h4>
+              <div style="max-height: 200px; overflow-y: auto; text-align: left;">
+                ${players.map((p, i) => `
+                  <div style="padding: 8px; margin: 5px 0; background: rgba(255,255,255,0.05); border-radius: 5px; font-size: 0.85rem;">
+                    <strong>${i+1}. ${p.name || 'Unnamed'}</strong><br>
+                    <span style="color: #8899aa;">
+                      ${p.ageGroup} | ${p.gender} | ${p.weight || 'No weight'} | ${p.belt}
+                    </span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+        `}
+      </div>
+    `;
   } else {
     categoryList.forEach(cat => {
       const key = `${cat.age}-${cat.gender}-${cat.weight}-${cat.belt}`;
       const fightTime = getFightTime(cat.age);
       html += `<div class="category-card" onclick="openCategoryBracket('${key}', '${cat.gender}', '${cat.age}', '${cat.weight}', '${cat.belt}')">
-        <h3>👤 ${cat.gender} |  ${cat.age} | ⚖️ ${cat.weight} | 🎗️ ${cat.belt}</h3>
+        <h3> ${cat.gender} |  ${cat.age} | ⚖️ ${cat.weight} | ️ ${cat.belt}</h3>
         <div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 8px;">
-          👥 ${cat.players.length} Players | ️ ${fightTime} min | 🏆 Bracket System
+          👥 ${cat.players.length} Players | ⏱️ ${fightTime} min | 🏆 Bracket System
         </div>
         <div style="font-size: 0.85rem; color: #556;">
           Players: ${cat.players.map(p => p.name).join(', ')}
@@ -1146,8 +1229,8 @@ function renderWinnersPodium() {
   section.style.display = 'block';
   let html = '<div class="podium-container">';
   if (winners[1]) html += `<div class="podium-place second"><div class="podium-medal">🥈</div><div class="podium-name">${winners[1].name}</div><div class="podium-team">${winners[1].team||'N/A'}</div><div class="podium-rank">2nd Place</div></div>`;
-  if (winners[0]) html += `<div class="podium-place first"><div class="podium-medal">🏆</div><div class="podium-name">${winners[0].name}</div><div class="podium-team">${winners[0].team||'N/A'}</div><div class="podium-rank">Champion</div></div>`;
-  if (winners[2]) html += `<div class="podium-place third"><div class="podium-medal">🥉</div><div class="podium-name">${winners[2].name}</div><div class="podium-team">${winners[2].team||'N/A'}</div><div class="podium-rank">3rd Place</div></div>`;
+  if (winners[0]) html += `<div class="podium-place first"><div class="podium-medal"></div><div class="podium-name">${winners[0].name}</div><div class="podium-team">${winners[0].team||'N/A'}</div><div class="podium-rank">Champion</div></div>`;
+  if (winners[2]) html += `<div class="podium-place third"><div class="podium-medal"></div><div class="podium-name">${winners[2].name}</div><div class="podium-team">${winners[2].team||'N/A'}</div><div class="podium-rank">3rd Place</div></div>`;
   html += '</div>';
   content.innerHTML = html;
 }
@@ -1298,7 +1381,7 @@ function callPlayer(playerName) {
     oscillator.frequency.value = 800; oscillator.type = 'sine'; gainNode.gain.value = 0.3;
     oscillator.start(); setTimeout(() => oscillator.stop(), 500);
   } catch(e) {}
-  alert(`📢 Calling: ${playerName}\n\nPlease proceed to the mat!`);
+  alert(` Calling: ${playerName}\n\nPlease proceed to the mat!`);
 }
 
 function renderStandings() {
@@ -1331,7 +1414,7 @@ function renderStandings() {
   } else {
     html += `<table style="width: 100%; border-collapse: collapse;"><thead><tr style="background: #1a1f2e; color: #f1c40f;"><th style="padding: 12px; text-align: center;">Rank</th><th style="padding: 12px; text-align: center;">Player</th><th style="padding: 12px; text-align: center;">Team</th><th style="padding: 12px; text-align: center;">Categories</th><th style="padding: 12px; text-align: center;">Wins</th><th style="padding: 12px; text-align: center;">Losses</th><th style="padding: 12px; text-align: center;">Points</th></tr></thead><tbody>`;
     sortedPlayers.forEach((p, i) => {
-      html += `<tr><td style="padding: 10px; text-align: center; font-weight: bold; font-size: 1.2rem;">${i===0?'':i===1?'🥈':i===2?'🥉':i+1}</td><td style="padding: 10px; text-align: left;"><strong>${p.name}</strong></td><td style="padding: 10px;">${p.team||'N/A'}</td><td style="padding: 10px; font-size:0.85rem;">${p.categories.join(', ')}</td><td style="padding: 10px; color:#2ecc71; font-weight: bold;">${p.wins}</td><td style="padding: 10px; color:#e74c3c; font-weight: bold;">${p.losses}</td><td style="padding: 10px; color:#f1c40f; font-weight: bold;">${p.points}</td></tr>`;
+      html += `<tr><td style="padding: 10px; text-align: center; font-weight: bold; font-size: 1.2rem;">${i===0?'':i===1?'🥈':i===2?'':i+1}</td><td style="padding: 10px; text-align: left;"><strong>${p.name}</strong></td><td style="padding: 10px;">${p.team||'N/A'}</td><td style="padding: 10px; font-size:0.85rem;">${p.categories.join(', ')}</td><td style="padding: 10px; color:#2ecc71; font-weight: bold;">${p.wins}</td><td style="padding: 10px; color:#e74c3c; font-weight: bold;">${p.losses}</td><td style="padding: 10px; color:#f1c40f; font-weight: bold;">${p.points}</td></tr>`;
     });
     html += '</tbody></table>';
   }
@@ -1578,7 +1661,7 @@ function clearAll() {
     categories = {};
     localStorage.removeItem('tournamentData');
     renderPlayers();
-    alert('🗑️ All data cleared!');
+    alert('️ All data cleared!');
   }
 }
 
