@@ -6,7 +6,6 @@
 <title>🏆 TopCompSports Tournament System</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* === نفس الـ CSS الممتاز من الكود القديم === */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0a0e17; color: #fff; padding: 10px; }
 .container { max-width: 1600px; margin: 0 auto; }
@@ -156,41 +155,41 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 <div class="container">
   <div class="header">
     <div>
-      <h1> TopCompSports Tournament System</h1>
+      <h1>🏆 TopCompSports Tournament System</h1>
       <div style="color: #8899aa; font-size: 0.85rem;" id="subtitle">Step 1: Players Registration</div>
       <div id="dbStatus" style="color: #2ecc71; font-size: 0.75rem; margin-top: 5px;">● Connected to Database</div>
     </div>
     <div>
       <button class="btn btn-info" onclick="showView('players')">👥 Players</button>
-      <button class="btn btn-purple" onclick="showView('mats')"> Mats</button>
+      <button class="btn btn-purple" onclick="showView('mats')">🥋 Mats</button>
       <button class="btn btn-warning" onclick="showView('settings')">⚙️ Settings</button>
       <button class="btn btn-secondary" onclick="syncWithDatabase()">🔄 Sync</button>
-      <button class="btn btn-secondary" onclick="saveData()">💾 Save Local</button>
+      <button class="btn btn-secondary" onclick="saveData()"> Save Local</button>
       <button class="btn btn-danger" onclick="clearAll()">🗑️ Clear</button>
     </div>
   </div>
 
   <div class="tab-info-bar" id="tabInfoBar" style="display:none;">
     <div>
-      <span class="mat-badge" id="tabMatBadge"> Mat 1</span>
+      <span class="mat-badge" id="tabMatBadge">🥋 Mat 1</span>
       <span class="sync-status connected" id="tabSyncStatus">● Connected to Database</span>
     </div>
     <div>
-      <button class="btn btn-sm btn-secondary" onclick="showView('dashboard')">📋 Open Dashboard</button>
+      <button class="btn btn-sm btn-secondary" onclick="showView('dashboard')"> Open Dashboard</button>
       <button class="btn btn-sm btn-info" onclick="openAllMatsInTabs()">🪟 Open All Mats</button>
     </div>
   </div>
 
-  <!-- Views (نفس الـ Views من الكود القديم) -->
+  <!-- Views -->
   <div id="view-settings" class="view">
     <div class="section">
-      <div class="section-title">️ Fight Time Settings</div>
+      <div class="section-title">⚙️ Fight Time Settings</div>
       <div style="margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
         <h3 style="color: #f1c40f; margin-bottom: 10px;">Regular Fight Times (minutes)</h3>
         <div id="regularTimes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;"></div>
       </div>
       <div style="padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-        <h3 style="color: #f1c40f; margin-bottom: 10px;"> Default Golden Time Settings (minutes)</h3>
+        <h3 style="color: #f1c40f; margin-bottom: 10px;">⚡ Default Golden Time Settings (minutes)</h3>
         <div id="goldenTimes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;"></div>
       </div>
       <button class="btn btn-primary" style="margin-top: 15px;" onclick="showView('dashboard')">← Back to Dashboard</button>
@@ -200,13 +199,14 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   <div id="view-players" class="view active">
     <div class="section">
       <div class="section-title">👥 Players Registration <span id="playerCount" style="color: #8899aa; font-size: 0.9rem;">0 / 200</span></div>
-      <div style="margin-bottom: 15px;">
+      <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
         <button class="btn btn-primary" onclick="addPlayer()">➕ Add Player</button>
         <button class="btn btn-secondary" onclick="addPlayers(10)">➕ Add 10</button>
+        <button class="btn btn-info" onclick="addPlayers(50)">➕ Add 50</button>
         <button class="btn btn-info" onclick="document.getElementById('csvImport').click()">📥 Import CSV</button>
         <input type="file" id="csvImport" accept=".csv" style="display:none" onchange="importCSV(event)">
         <button class="btn btn-info" onclick="exportCSV()"> Export CSV</button>
-        <button class="btn btn-warning" onclick="syncWithDatabase()">🔄 Sync with DB</button>
+        <button class="btn btn-warning" onclick="syncWithDatabase()"> Sync with DB</button>
       </div>
       <div style="max-height: 500px; overflow-y: auto;">
         <table>
@@ -220,7 +220,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 
   <div id="view-mats" class="view">
     <div class="section">
-      <div class="section-title"> Mats Setup</div>
+      <div class="section-title">🥋 Mats Setup</div>
       <div style="margin-bottom: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
         <label style="font-weight: bold; color: #f1c40f;">Number of Mats: </label>
         <select id="matsCount" onchange="updateMats()" style="width: auto; display: inline-block;">
@@ -237,13 +237,13 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   <div id="view-dashboard" class="view">
     <div class="section">
       <div class="section-title">
-        <span> Mat Dashboard</span>
-        <button class="btn btn-info" onclick="openCurrentMatInNewTab()"> Open in New Tab</button>
+        <span>📊 Mat Dashboard</span>
+        <button class="btn btn-info" onclick="openCurrentMatInNewTab()">🪟 Open in New Tab</button>
         <button class="btn btn-purple btn-sm" onclick="openAllMatsInTabs()">🪟 Open All Mats</button>
       </div>
       <div class="tabs">
-        <button class="tab active" onclick="switchTab('categories')"> Categories</button>
-        <button class="tab" onclick="switchTab('queue')">📋 Queue</button>
+        <button class="tab active" onclick="switchTab('categories')">📋 Categories</button>
+        <button class="tab" onclick="switchTab('queue')">⏳ Queue</button>
         <button class="tab" onclick="switchTab('callup')">📢 Call-Up</button>
         <button class="tab" onclick="switchTab('standings')">🏆 Standings</button>
       </div>
@@ -317,7 +317,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
           <div class="sb-panel-header red">🔴 Red Player</div>
           <div class="sb-counters">
             <div class="sb-counter adv"><div class="label">⭐ Advantage</div><div class="value" id="redAdv">0</div></div>
-            <div class="sb-counter pen"><div class="label">🟥 Penalty</div><div class="value" id="redPen">0</div></div>
+            <div class="sb-counter pen"><div class="label"> Penalty</div><div class="value" id="redPen">0</div></div>
           </div>
           <div class="sb-points-grid">
             <button onclick="addScore('red', 1)">+1</button>
@@ -335,11 +335,11 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
             <button class="btn-adv" onclick="addAdvantage('red')"><span class="icon">⭐</span><span>Advantage</span></button>
             <button class="btn-pen" onclick="addPenalty('red')"><span class="icon">🟥</span><span>Penalty</span></button>
           </div>
-          <button class="sb-undo-btn" onclick="undoAction('red')">️ Undo</button>
+          <button class="sb-undo-btn" onclick="undoAction('red')">↩️ Undo</button>
         </div>
 
         <div>
-          <div class="sb-panel-header blue"> Blue Player</div>
+          <div class="sb-panel-header blue">🔵 Blue Player</div>
           <div class="sb-counters">
             <div class="sb-counter adv"><div class="label">⭐ Advantage</div><div class="value" id="blueAdv">0</div></div>
             <div class="sb-counter pen"><div class="label">🟥 Penalty</div><div class="value" id="bluePen">0</div></div>
@@ -365,18 +365,18 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       </div>
 
       <div class="sb-golden-time">
-        <span style="font-weight: bold; color: #f1c40f;">⚡ Golden Time:</span>
+        <span style="font-weight: bold; color: #f1c40f;"> Golden Time:</span>
         <input type="number" id="goldenTimeInput" min="1" max="10" value="1" title="Enter golden time in minutes">
         <span style="color: #8899aa;">minutes</span>
-        <button onclick="activateGoldenTime()"> Activate Golden Time</button>
+        <button onclick="activateGoldenTime()">⚡ Activate Golden Time</button>
         <span id="goldenTimeStatus" style="color: #2ecc71; font-weight: bold; display: none;">ACTIVE</span>
       </div>
 
       <div class="sb-bottom-bar">
         <button class="btn btn-info" onclick="backToBracket()">← Back to Bracket</button>
         <button class="btn btn-primary" onclick="startTimer()">▶ Start</button>
-        <button class="btn btn-warning" onclick="stopTimer()">⏸ Pause</button>
-        <button class="btn btn-danger" onclick="finishMatch()">🏁 Finish</button>
+        <button class="btn btn-warning" onclick="stopTimer()"> Pause</button>
+        <button class="btn btn-danger" onclick="finishMatch()"> Finish</button>
         <button class="btn btn-dark" onclick="swapPlayers()">🔄 Swap</button>
         <button class="btn btn-secondary" onclick="resetScoreboard()">↺ Reset</button>
       </div>
@@ -386,9 +386,9 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 
 <div class="modal" id="winnerModal">
   <div class="modal-content">
-    <h2 style="color: #f1c40f; text-align: center; margin-bottom: 20px;">🏆 Select Winner</h2>
+    <h2 style="color: #f1c40f; text-align: center; margin-bottom: 20px;"> Select Winner</h2>
     <div id="matchInfo" style="text-align: center; margin-bottom: 20px; padding: 15px; background: rgba(241,196,15,0.1); border-radius: 8px;"></div>
-    <button class="btn btn-danger" style="width: 100%; margin-bottom: 10px; padding: 15px;" onclick="declareWinner('red')">🔴 Red Wins</button>
+    <button class="btn btn-danger" style="width: 100%; margin-bottom: 10px; padding: 15px;" onclick="declareWinner('red')"> Red Wins</button>
     <button class="btn btn-info" style="width: 100%; margin-bottom: 10px; padding: 15px;" onclick="declareWinner('blue')">🔵 Blue Wins</button>
     <button class="btn btn-secondary" style="width: 100%; padding: 15px;" onclick="closeModal()">❌ Cancel</button>
   </div>
@@ -410,7 +410,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ==========================================
-// 2. DATA & STATE (نفس الكود القديم)
+// 2. DATA & STATE
 // ==========================================
 let players = [];
 let mats = [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
@@ -429,12 +429,11 @@ let isStandaloneTab = false;
 let tournamentId = null;
 
 // ==========================================
-// 3. SYNC FUNCTIONS (الجديد - الربط مع Supabase)
+// 3. SUPABASE FUNCTIONS
 // ==========================================
 async function syncWithDatabase() {
   showSyncIndicator();
   try {
-    // جلب اللاعبين من قاعدة البيانات
     const { data: dbPlayers, error } = await supabase
       .from('tournament_participants')
       .select('*')
@@ -443,7 +442,6 @@ async function syncWithDatabase() {
     if (error) throw error;
     
     if (dbPlayers && dbPlayers.length > 0) {
-      // تحويل بيانات Supabase إلى نفس هيكل الكود القديم
       players = dbPlayers.map(p => ({
         id: p.id,
         name: p.player_name || p.name || '',
@@ -455,21 +453,19 @@ async function syncWithDatabase() {
         rank: p.ranking || p.rank || 999
       }));
       
-      // حفظ في localStorage أيضاً
       saveData();
       renderPlayers();
-      alert(`✅ Synced ${players.length} players from database!`);
+      alert('✅ Synced ' + players.length + ' players from database!');
     }
   } catch (err) {
     console.error('Sync error:', err);
-    alert('️ Sync failed: ' + err.message);
+    alert('⚠️ Sync failed: ' + err.message);
   }
 }
 
 async function saveToDatabase() {
   try {
     if (!tournamentId) {
-      // إنشاء tournament جديد إذا لم يكن موجوداً
       const { data: tournament, error: tError } = await supabase
         .from('tournaments')
         .insert({ name: 'Tournament ' + new Date().toLocaleDateString() })
@@ -480,7 +476,6 @@ async function saveToDatabase() {
       tournamentId = tournament.id;
     }
     
-    // حفظ اللاعبين
     const playersToInsert = players.map(p => ({
       tournament_id: tournamentId,
       player_name: p.name,
@@ -504,7 +499,7 @@ async function saveToDatabase() {
 }
 
 // ==========================================
-// 4. NAVIGATION & VIEWS (نفس الكود القديم)
+// 4. NAVIGATION & VIEWS
 // ==========================================
 function showView(view) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -545,7 +540,7 @@ function backToBracket() {
 }
 
 // ==========================================
-// 5. PLAYERS MANAGEMENT (نفس الكود القديم)
+// 5. PLAYERS MANAGEMENT
 // ==========================================
 function addPlayer() {
   if (players.length >= 200) { alert('Maximum 200 players!'); return; }
@@ -587,20 +582,20 @@ function renderPlayers() {
   tbody.innerHTML = '';
   
   players.forEach((p, i) => {
-    const genderOptions = getGenderOptions(p.ageGroup).map(g => `<option ${p.gender===g?'selected':''}>${g}</option>`).join('');
-    const weightOptions = getWeightOptions(p.gender, p.ageGroup).map(w => `<option ${p.weight===w?'selected':''}>${w}</option>`).join('');
-    const beltOptions = getBeltOptions(p.ageGroup).map(b => `<option ${p.belt===b?'selected':''}>${b}</option>`).join('');
+    const genderOptions = getGenderOptions(p.ageGroup).map(g => '<option ' + (p.gender===g?'selected':'') + '>' + g + '</option>').join('');
+    const weightOptions = getWeightOptions(p.gender, p.ageGroup).map(w => '<option ' + (p.weight===w?'selected':'') + '>' + w + '</option>').join('');
+    const beltOptions = getBeltOptions(p.ageGroup).map(b => '<option ' + (p.belt===b?'selected':'') + '>' + b + '</option>').join('');
     
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i + 1}</td>
-      <td><input type="text" value="${p.name}" onchange="players[${i}].name=this.value; saveData();" placeholder="Enter name"></td>
-      <td><input type="text" value="${p.team}" onchange="players[${i}].team=this.value; saveData();" placeholder="Enter team"></td>
-      <td><select onchange="players[${i}].ageGroup=this.value; players[${i}].gender=getGenderOptions(this.value)[0]; players[${i}].weight=''; renderPlayers(); saveData();">${Object.keys(AGE_GROUPS).map(a => `<option ${p.ageGroup===a?'selected':''}>${a}</option>`).join('')}</select></td>
-      <td><select onchange="players[${i}].gender=this.value; players[${i}].weight=''; renderPlayers(); saveData();">${genderOptions}</select></td>
-      <td><select onchange="players[${i}].weight=this.value; saveData();">${weightOptions || '<option value="">-- Select Weight --</option>'}</select></td>
-      <td><select onchange="players[${i}].belt=this.value; saveData();">${beltOptions}</select></td>
-      <td><input type="number" value="${p.rank}" style="width: 60px;" onchange="players[${i}].rank=parseInt(this.value); saveData();"></td>
-      <td><button class="btn btn-danger btn-sm" onclick="players.splice(${i},1);renderPlayers();saveData();">✕</button></td>`;
+    tr.innerHTML = '<td>' + (i + 1) + '</td>' +
+      '<td><input type="text" value="' + p.name + '" onchange="players[' + i + '].name=this.value; saveData();" placeholder="Enter name"></td>' +
+      '<td><input type="text" value="' + p.team + '" onchange="players[' + i + '].team=this.value; saveData();" placeholder="Enter team"></td>' +
+      '<td><select onchange="players[' + i + '].ageGroup=this.value; players[' + i + '].gender=getGenderOptions(this.value)[0]; players[' + i + '].weight=\'\'; renderPlayers(); saveData();">' + Object.keys(AGE_GROUPS).map(a => '<option ' + (p.ageGroup===a?'selected':'') + '>' + a + '</option>').join('') + '</select></td>' +
+      '<td><select onchange="players[' + i + '].gender=this.value; players[' + i + '].weight=\'\'; renderPlayers(); saveData();">' + genderOptions + '</select></td>' +
+      '<td><select onchange="players[' + i + '].weight=this.value; saveData();">' + (weightOptions || '<option value="">-- Select Weight --</option>') + '</select></td>' +
+      '<td><select onchange="players[' + i + '].belt=this.value; saveData();">' + beltOptions + '</select></td>' +
+      '<td><input type="number" value="' + p.rank + '" style="width: 60px;" onchange="players[' + i + '].rank=parseInt(this.value); saveData();"></td>' +
+      '<td><button class="btn btn-danger btn-sm" onclick="players.splice(' + i + ',1);renderPlayers();saveData();">✕</button></td>';
     tbody.appendChild(tr);
   });
   
@@ -630,7 +625,7 @@ function importCSV(event) {
 
 function exportCSV() {
   let csv = 'Name,Team,Age Group,Gender,Weight,Belt,Rank\n';
-  players.forEach(p => { csv += `"${p.name}","${p.team}","${p.ageGroup}","${p.gender}","${p.weight}","${p.belt}",${p.rank}\n`; });
+  players.forEach(p => { csv += '"' + p.name + '","' + p.team + '","' + p.ageGroup + '","' + p.gender + '","' + p.weight + '","' + p.belt + '",' + p.rank + '\n'; });
   const blob = new Blob([csv], { type: 'text/csv' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -639,7 +634,7 @@ function exportCSV() {
 }
 
 // ==========================================
-// 6. MATS SETUP (نفس الكود القديم)
+// 6. MATS SETUP
 // ==========================================
 function updateMats() {
   const count = parseInt(document.getElementById('matsCount').value);
@@ -679,33 +674,33 @@ function renderMats() {
     const div = document.createElement('div');
     div.className = 'section';
     div.style.padding = '15px';
-    div.innerHTML = `<h3 style="color: #f1c40f; margin-bottom: 10px;">🥋 Mat ${mat.id}</h3>
-      <div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">AGE GROUPS</strong>
-        <div style="margin-top: 5px;">${mat.ageGroups.map((a, i) => `<span class="tag">${a} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'ageGroups', ${i})">✕</span></span>`).join('') || '<span style="color: #556; font-size: 0.8rem;">No age groups added</span>'}</div>
-        <select onchange="if(this.value) addMatCategory(${mat.id}, 'ageGroups', this.value)" style="margin-top: 5px;"><option value="">-- Add Age Group --</option>${allAges.map(a => `<option>${a}</option>`).join('')}</select>
-      </div>
-      <div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">GENDERS</strong>
-        <div style="margin-top: 5px;">${mat.genders.map((g, i) => `<span class="tag">${g} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'genders', ${i})">✕</span></span>`).join('') || '<span style="color: #556; font-size: 0.8rem;">No genders added</span>'}</div>
-        <select onchange="if(this.value) addMatCategory(${mat.id}, 'genders', this.value)" style="margin-top: 5px;"><option value="">-- Add Gender --</option>${allGenders.map(g => `<option>${g}</option>`).join('')}</select>
-      </div>
-      <div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">WEIGHTS</strong>
-        <div style="margin-top: 5px;">${mat.weights.map((w, i) => `<span class="tag">${w} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'weights', ${i})">✕</span></span>`).join('') || '<span style="color: #556; font-size: 0.8rem;">No weights added</span>'}</div>
-        <select onchange="if(this.value) addMatCategory(${mat.id}, 'weights', this.value)" style="margin-top: 5px;"><option value="">-- Add Weight --</option>${allWeights.map(w => `<option>${w}</option>`).join('')}</select>
-      </div>
-      <div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">BELTS</strong>
-        <div style="margin-top: 5px;">${mat.belts.map((b, i) => `<span class="tag">${b} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'belts', ${i})">✕</span></span>`).join('') || '<span style="color: #556; font-size: 0.8rem;">No belts added</span>'}</div>
-        <select onchange="if(this.value) addMatCategory(${mat.id}, 'belts', this.value)" style="margin-top: 5px;"><option value="">-- Add Belt --</option>${allBelts.map(b => `<option>${b}</option>`).join('')}</select>
-      </div>
-      <div style="display: flex; gap: 8px; margin-top: 10px;">
-        <button class="btn btn-info" style="flex: 1;" onclick="currentMat=${mat.id};showView('dashboard')"> Open Dashboard</button>
-        <button class="btn btn-purple" style="flex: 1;" onclick="openMatInNewTab(${mat.id})"> Open in New Tab</button>
-      </div>`;
+    div.innerHTML = '<h3 style="color: #f1c40f; margin-bottom: 10px;">🥋 Mat ' + mat.id + '</h3>' +
+      '<div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">AGE GROUPS</strong>' +
+        '<div style="margin-top: 5px;">' + (mat.ageGroups.map((a, i) => '<span class="tag">' + a + ' <span class="tag-remove" onclick="removeMatCategory(' + mat.id + ', \'ageGroups\', ' + i + ')">✕</span></span>').join('') || '<span style="color: #556; font-size: 0.8rem;">No age groups added</span>') + '</div>' +
+        '<select onchange="if(this.value) addMatCategory(' + mat.id + ', \'ageGroups\', this.value)" style="margin-top: 5px;"><option value="">-- Add Age Group --</option>' + allAges.map(a => '<option>' + a + '</option>').join('') + '</select>' +
+      '</div>' +
+      '<div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">GENDERS</strong>' +
+        '<div style="margin-top: 5px;">' + (mat.genders.map((g, i) => '<span class="tag">' + g + ' <span class="tag-remove" onclick="removeMatCategory(' + mat.id + ', \'genders\', ' + i + ')">✕</span></span>').join('') || '<span style="color: #556; font-size: 0.8rem;">No genders added</span>') + '</div>' +
+        '<select onchange="if(this.value) addMatCategory(' + mat.id + ', \'genders\', this.value)" style="margin-top: 5px;"><option value="">-- Add Gender --</option>' + allGenders.map(g => '<option>' + g + '</option>').join('') + '</select>' +
+      '</div>' +
+      '<div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">WEIGHTS</strong>' +
+        '<div style="margin-top: 5px;">' + (mat.weights.map((w, i) => '<span class="tag">' + w + ' <span class="tag-remove" onclick="removeMatCategory(' + mat.id + ', \'weights\', ' + i + ')">✕</span></span>').join('') || '<span style="color: #556; font-size: 0.8rem;">No weights added</span>') + '</div>' +
+        '<select onchange="if(this.value) addMatCategory(' + mat.id + ', \'weights\', this.value)" style="margin-top: 5px;"><option value="">-- Add Weight --</option>' + allWeights.map(w => '<option>' + w + '</option>').join('') + '</select>' +
+      '</div>' +
+      '<div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">BELTS</strong>' +
+        '<div style="margin-top: 5px;">' + (mat.belts.map((b, i) => '<span class="tag">' + b + ' <span class="tag-remove" onclick="removeMatCategory(' + mat.id + ', \'belts\', ' + i + ')">✕</span></span>').join('') || '<span style="color: #556; font-size: 0.8rem;">No belts added</span>') + '</div>' +
+        '<select onchange="if(this.value) addMatCategory(' + mat.id + ', \'belts\', this.value)" style="margin-top: 5px;"><option value="">-- Add Belt --</option>' + allBelts.map(b => '<option>' + b + '</option>').join('') + '</select>' +
+      '</div>' +
+      '<div style="display: flex; gap: 8px; margin-top: 10px;">' +
+        '<button class="btn btn-info" style="flex: 1;" onclick="currentMat=' + mat.id + ';showView(\'dashboard\')">📋 Open Dashboard</button>' +
+        '<button class="btn btn-purple" style="flex: 1;" onclick="openMatInNewTab(' + mat.id + ')">🪟 Open in New Tab</button>' +
+      '</div>';
     grid.appendChild(div);
   });
 }
 
 // ==========================================
-// 7. CATEGORIES & BRACKETS (نفس الكود القديم)
+// 7. CATEGORIES & BRACKETS
 // ==========================================
 function renderCategories() {
   const container = document.getElementById('tab-categories');
@@ -733,17 +728,17 @@ function renderCategories() {
     html += '<p style="text-align: center; color: #8899aa; padding: 30px;">No categories found. Add players with matching categories first.</p>';
   } else {
     categoryList.forEach(cat => {
-      const key = `${cat.age}-${cat.gender}-${cat.weight}-${cat.belt}`;
+      const key = cat.age + '-' + cat.gender + '-' + cat.weight + '-' + cat.belt;
       const fightTime = getFightTime(cat.age);
-      html += `<div class="category-card" onclick="openCategoryBracket('${key}', '${cat.gender}', '${cat.age}', '${cat.weight}', '${cat.belt}')">
-        <h3> ${cat.gender} | 🥋 ${cat.age} | ⚖️ ${cat.weight} | 🎗️ ${cat.belt}</h3>
-        <div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 8px;">
-          👥 ${cat.players.length} Players | ⏱️ ${fightTime} min |  Bracket System
-        </div>
-        <div style="font-size: 0.85rem; color: #556;">
-          Players: ${cat.players.map(p => p.name).join(', ')}
-        </div>
-      </div>`;
+      html += '<div class="category-card" onclick="openCategoryBracket(\'' + key + '\', \'' + cat.gender + '\', \'' + cat.age + '\', \'' + cat.weight + '\', \'' + cat.belt + '\')">' +
+        '<h3>👤 ' + cat.gender + ' | 🥋 ' + cat.age + ' | ⚖️ ' + cat.weight + ' | 🎗️ ' + cat.belt + '</h3>' +
+        '<div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 8px;">' +
+          '👥 ' + cat.players.length + ' Players | ⏱️ ' + fightTime + ' min | 🏆 Bracket System' +
+        '</div>' +
+        '<div style="font-size: 0.85rem; color: #556;">' +
+          'Players: ' + cat.players.map(p => p.name).join(', ') +
+        '</div>' +
+      '</div>';
     });
   }
   container.innerHTML = html;
@@ -757,7 +752,7 @@ function openCategoryBracket(key, gender, age, weight, belt) {
     saveData();
   }
   const bracketTitle = document.getElementById('bracketTitle');
-  if (bracketTitle) bracketTitle.innerHTML = `<span>🥋 Mat ${currentMat} - ${gender} - ${age} - ${weight} - ${belt}</span><span style="font-size: 0.9rem; color: #8899aa; margin-left: 10px;">| ${categories[key].players.length} Players | Fight Time: ${getFightTime(age)} min</span>`;
+  if (bracketTitle) bracketTitle.innerHTML = '<span>🥋 Mat ' + currentMat + ' - ' + gender + ' - ' + age + ' - ' + weight + ' - ' + belt + '</span><span style="font-size: 0.9rem; color: #8899aa; margin-left: 10px;">| ' + categories[key].players.length + ' Players | Fight Time: ' + getFightTime(age) + ' min</span>';
   renderCategoryBracket();
   showView('bracket');
 }
@@ -815,7 +810,7 @@ function getRoundNames(totalRounds) {
   const names = [];
   for (let i = 0; i < totalRounds; i++) {
     const remaining = totalRounds - i;
-    if (remaining === 1) names.push(' Finals');
+    if (remaining === 1) names.push('🏆 Finals');
     else if (remaining === 2) names.push('Semifinals');
     else if (remaining === 3) names.push('Quarterfinals');
     else if (remaining === 4) names.push('Round of 16');
@@ -851,14 +846,14 @@ function renderTreeBracket(container, cat) {
       const p2Winner = match.winner === 'blue' ? 'winner' : '';
       const byeClass = match.bye ? 'bye-player' : '';
       const isReady = match.p1 && match.p2 && !match.winner;
-      html += `<div class="bracket-match ${match.status==='completed'?'completed':''} ${match.bye?'bye':''}">
-        <div class="match-id">${match.id}</div>
-        <div class="bracket-player ${p1Class} ${p1Winner} ${byeClass}"><span>${p1Name}</span><span>${match.score1||''}</span></div>
-        <div class="bracket-player ${p2Class} ${p2Winner} ${byeClass}"><span>${p2Name}</span><span>${match.score2||''}</span></div>
-        ${match.bye ? '<div class="bye-label">BYE</div>' : ''}
-        ${isReady ? `<button class="play-btn" onclick="startBracketMatch(${rIdx}, ${mIdx})">▶ Play Match</button>` : ''}
-        ${!match.bye ? `<button class="edit-btn" style="margin-top:4px; width:100%;" onclick="editBracketMatch(${rIdx}, ${mIdx})">⚙️ Edit</button>` : ''}
-      </div>`;
+      html += '<div class="bracket-match ' + (match.status==='completed'?'completed':'') + ' ' + (match.bye?'bye':'') + '">' +
+        '<div class="match-id">' + match.id + '</div>' +
+        '<div class="bracket-player ' + p1Class + ' ' + p1Winner + ' ' + byeClass + '"><span>' + p1Name + '</span><span>' + (match.score1||'') + '</span></div>' +
+        '<div class="bracket-player ' + p2Class + ' ' + p2Winner + ' ' + byeClass + '"><span>' + p2Name + '</span><span>' + (match.score2||'') + '</span></div>' +
+        (match.bye ? '<div class="bye-label">BYE</div>' : '') +
+        (isReady ? '<button class="play-btn" onclick="startBracketMatch(' + rIdx + ', ' + mIdx + ')">▶ Play Match</button>' : '') +
+        (!match.bye ? '<button class="edit-btn" style="margin-top:4px; width:100%;" onclick="editBracketMatch(' + rIdx + ', ' + mIdx + ')">⚙️ Edit</button>' : '') +
+      '</div>';
     });
     html += '</div>';
   });
@@ -878,9 +873,9 @@ function renderMatchSchedule() {
   cat.rounds.forEach((round, rIdx) => {
     round.forEach((m, mIdx) => {
       const status = m.status === 'completed' ? 'completed' : 'pending';
-      const statusText = m.bye ? ' BYE' : (m.status === 'completed' ? '✅ Completed' : '⏳ Pending');
+      const statusText = m.bye ? '👋 BYE' : (m.status === 'completed' ? '✅ Completed' : '⏳ Pending');
       const winner = m.winner ? (m.winner === 'red' ? m.p1.name : m.p2.name) : '-';
-      html += `<tr class="${status}"><td>${m.id}</td><td>${m.p1?m.p1.name:'TBD'}</td><td>${m.p2?m.p2.name:'TBD'}</td><td>${statusText}</td><td>${winner}</td><td>${m.score1||0} - ${m.score2||0}</td></tr>`;
+      html += '<tr class="' + status + '"><td>' + m.id + '</td><td>' + (m.p1?m.p1.name:'TBD') + '</td><td>' + (m.p2?m.p2.name:'TBD') + '</td><td>' + statusText + '</td><td>' + winner + '</td><td>' + (m.score1||0) + ' - ' + (m.score2||0) + '</td></tr>';
     });
   });
   html += '</tbody></table>';
@@ -905,9 +900,9 @@ function renderWinnersPodium() {
   if (winners.length === 0) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   let html = '<div class="podium-container">';
-  if (winners[1]) html += `<div class="podium-place second"><div class="podium-medal"></div><div class="podium-name">${winners[1].name}</div><div class="podium-team">${winners[1].team||'N/A'}</div><div class="podium-rank">2nd Place</div></div>`;
-  if (winners[0]) html += `<div class="podium-place first"><div class="podium-medal">🏆</div><div class="podium-name">${winners[0].name}</div><div class="podium-team">${winners[0].team||'N/A'}</div><div class="podium-rank">Champion</div></div>`;
-  if (winners[2]) html += `<div class="podium-place third"><div class="podium-medal"></div><div class="podium-name">${winners[2].name}</div><div class="podium-team">${winners[2].team||'N/A'}</div><div class="podium-rank">3rd Place</div></div>`;
+  if (winners[1]) html += '<div class="podium-place second"><div class="podium-medal">🥈</div><div class="podium-name">' + winners[1].name + '</div><div class="podium-team">' + (winners[1].team||'N/A') + '</div><div class="podium-rank">2nd Place</div></div>';
+  if (winners[0]) html += '<div class="podium-place first"><div class="podium-medal"></div><div class="podium-name">' + winners[0].name + '</div><div class="podium-team">' + (winners[0].team||'N/A') + '</div><div class="podium-rank">Champion</div></div>';
+  if (winners[2]) html += '<div class="podium-place third"><div class="podium-medal"></div><div class="podium-name">' + winners[2].name + '</div><div class="podium-team">' + (winners[2].team||'N/A') + '</div><div class="podium-rank">3rd Place</div></div>';
   html += '</div>';
   content.innerHTML = html;
 }
@@ -937,12 +932,12 @@ function editBracketMatch(rIdx, mIdx) {
   const cat = categories[currentCategory.key];
   const match = cat.rounds[rIdx][mIdx];
   const availablePlayers = cat.players.filter(p => (!match.p1 || p.id !== match.p1.id) && (!match.p2 || p.id !== match.p2.id));
-  let html = `<div style="margin-bottom:15px;"><label style="display:block; margin-bottom:5px; color:#e74c3c;">Red Player:</label>
-    <select id="editRedPlayer">${[match.p1, ...availablePlayers].filter(Boolean).map(p => `<option value="${p.id}" ${match.p1 && p.id===match.p1.id?'selected':''}>${p.name} (Rank: ${p.rank})</option>`).join('')}</select></div>
-    <div style="margin-bottom:15px;"><label style="display:block; margin-bottom:5px; color:#3498db;">Blue Player:</label>
-    <select id="editBluePlayer">${[match.p2, ...availablePlayers].filter(Boolean).map(p => `<option value="${p.id}" ${match.p2 && p.id===match.p2.id?'selected':''}>${p.name} (Rank: ${p.rank})</option>`).join('')}</select></div>
-    <div style="margin-bottom:15px;"><button class="btn btn-warning" style="width:100%;" onclick="swapBracketPlayers(${rIdx}, ${mIdx})">🔄 Swap Players</button></div>
-    <div style="display:flex; gap:10px;"><button class="btn btn-primary" style="flex:1;" onclick="saveBracketMatchEdit(${rIdx}, ${mIdx})">💾 Save</button><button class="btn btn-secondary" style="flex:1;" onclick="closeEditMatch()">❌ Cancel</button></div>`;
+  let html = '<div style="margin-bottom:15px;"><label style="display:block; margin-bottom:5px; color:#e74c3c;">Red Player:</label>' +
+    '<select id="editRedPlayer">' + [match.p1, ...availablePlayers].filter(Boolean).map(p => '<option value="' + p.id + '" ' + (match.p1 && p.id===match.p1.id?'selected':'') + '>' + p.name + ' (Rank: ' + p.rank + ')</option>').join('') + '</select></div>' +
+    '<div style="margin-bottom:15px;"><label style="display:block; margin-bottom:5px; color:#3498db;">Blue Player:</label>' +
+    '<select id="editBluePlayer">' + [match.p2, ...availablePlayers].filter(Boolean).map(p => '<option value="' + p.id + '" ' + (match.p2 && p.id===match.p2.id?'selected':'') + '>' + p.name + ' (Rank: ' + p.rank + ')</option>').join('') + '</select></div>' +
+    '<div style="margin-bottom:15px;"><button class="btn btn-warning" style="width:100%;" onclick="swapBracketPlayers(' + rIdx + ', ' + mIdx + ')">🔄 Swap Players</button></div>' +
+    '<div style="display:flex; gap:10px;"><button class="btn btn-primary" style="flex:1;" onclick="saveBracketMatchEdit(' + rIdx + ', ' + mIdx + ')">💾 Save</button><button class="btn btn-secondary" style="flex:1;" onclick="closeEditMatch()">❌ Cancel</button></div>';
   document.getElementById('editMatchContent').innerHTML = html;
   document.getElementById('editMatchModal').classList.add('active');
 }
@@ -978,7 +973,7 @@ function closeEditMatch() {
 }
 
 // ==========================================
-// 8. QUEUE, CALL-UP, STANDINGS (نفس الكود القديم)
+// 8. QUEUE, CALL-UP, STANDINGS
 // ==========================================
 function renderQueue() {
   const container = document.getElementById('tab-queue');
@@ -999,14 +994,14 @@ function renderQueue() {
   } else {
     allMatches.forEach((m, i) => {
       const cat = categories[m.categoryKey];
-      html += `<div style="padding: 12px; margin-bottom: 8px; background: #151d2b; border-radius: 8px; border-left: 4px solid #f1c40f;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div><strong>${m.p1?m.p1.name:'TBD'}</strong> vs <strong>${m.p2?m.p2.name:'TBD'}</strong>
-            <div style="font-size: 0.8rem; color: #8899aa; margin-top: 3px;">️ ${cat.weight} | 🥋 ${cat.age} | ${cat.gender} | 🎗️ ${cat.belt}</div>
-          </div>
-          <button class="btn btn-primary btn-sm" onclick="startMatchFromQueue('${m.categoryKey}', ${m.roundIdx}, ${m.matchIdx})">▶ Start</button>
-        </div>
-      </div>`;
+      html += '<div style="padding: 12px; margin-bottom: 8px; background: #151d2b; border-radius: 8px; border-left: 4px solid #f1c40f;">' +
+        '<div style="display: flex; justify-content: space-between; align-items: center;">' +
+          '<div><strong>' + (m.p1?m.p1.name:'TBD') + '</strong> vs <strong>' + (m.p2?m.p2.name:'TBD') + '</strong>' +
+            '<div style="font-size: 0.8rem; color: #8899aa; margin-top: 3px;">⚖️ ' + cat.weight + ' | 🥋 ' + cat.age + ' | ' + cat.gender + ' | 🎗️ ' + cat.belt + '</div>' +
+          '</div>' +
+          '<button class="btn btn-primary btn-sm" onclick="startMatchFromQueue(\'' + m.categoryKey + '\', ' + m.roundIdx + ', ' + m.matchIdx + ')">▶ Start</button>' +
+        '</div>' +
+      '</div>';
     });
   }
   container.innerHTML = html;
@@ -1036,13 +1031,13 @@ function renderCallUp() {
   if (pendingMatches.length > 0) {
     const next = pendingMatches[0];
     const cat = categories[next.categoryKey];
-    html += `<div style="background: linear-gradient(135deg, #1e2a3a, #253447); border: 2px solid #f1c40f; border-radius: 12px; padding: 20px; text-align: center;">
-      <div style="font-size: 0.9rem; color: #8899aa; margin-bottom: 10px;">NEXT MATCH</div>
-      <div style="font-size: 1.5rem; font-weight: bold; color: #f1c40f; margin: 10px 0;">${next.p1?next.p1.name:'TBD'} vs ${next.p2?next.p2.name:'TBD'}</div>
-      <div style="color: #8899aa; margin-bottom: 15px;">⚖️ ${cat.weight} |  ${cat.age} | ${cat.gender} | 🎗️ ${cat.belt}</div>
-      <button class="btn btn-primary" onclick="callPlayer('${next.p1?next.p1.name:'Player 1'}')">📢 Call ${next.p1?next.p1.name:'Player 1'}</button>
-      <button class="btn btn-primary" style="margin-left: 10px;" onclick="callPlayer('${next.p2?next.p2.name:'Player 2'}')">📢 Call ${next.p2?next.p2.name:'Player 2'}</button>
-    </div>`;
+    html += '<div style="background: linear-gradient(135deg, #1e2a3a, #253447); border: 2px solid #f1c40f; border-radius: 12px; padding: 20px; text-align: center;">' +
+      '<div style="font-size: 0.9rem; color: #8899aa; margin-bottom: 10px;">NEXT MATCH</div>' +
+      '<div style="font-size: 1.5rem; font-weight: bold; color: #f1c40f; margin: 10px 0;">' + (next.p1?next.p1.name:'TBD') + ' vs ' + (next.p2?next.p2.name:'TBD') + '</div>' +
+      '<div style="color: #8899aa; margin-bottom: 15px;">️ ' + cat.weight + ' |  ' + cat.age + ' | ' + cat.gender + ' | 🎗️ ' + cat.belt + '</div>' +
+      '<button class="btn btn-primary" onclick="callPlayer(\'' + (next.p1?next.p1.name:'Player 1') + '\')"> Call ' + (next.p1?next.p1.name:'Player 1') + '</button>' +
+      '<button class="btn btn-primary" style="margin-left: 10px;" onclick="callPlayer(\'' + (next.p2?next.p2.name:'Player 2') + '\')"> Call ' + (next.p2?next.p2.name:'Player 2') + '</button>' +
+    '</div>';
   } else {
     html += '<p style="text-align: center; color: #8899aa; padding: 20px;">No pending matches.</p>';
   }
@@ -1058,7 +1053,7 @@ function callPlayer(playerName) {
     oscillator.frequency.value = 800; oscillator.type = 'sine'; gainNode.gain.value = 0.3;
     oscillator.start(); setTimeout(() => oscillator.stop(), 500);
   } catch(e) {}
-  alert(`📢 Calling: ${playerName}\n\nPlease proceed to the mat!`);
+  alert(' Calling: ' + playerName + '\n\nPlease proceed to the mat!');
 }
 
 function renderStandings() {
@@ -1070,14 +1065,14 @@ function renderStandings() {
     cat.rounds.forEach(r => r.forEach(m => {
       if (m.p1) {
         if (!allPlayers[m.p1.id]) allPlayers[m.p1.id] = { name: m.p1.name, team: m.p1.team, wins: 0, losses: 0, points: 0, categories: [] };
-        const catLabel = `${cat.age} - ${cat.weight} - ${cat.belt}`;
+        const catLabel = cat.age + ' - ' + cat.weight + ' - ' + cat.belt;
         if (!allPlayers[m.p1.id].categories.includes(catLabel)) allPlayers[m.p1.id].categories.push(catLabel);
         if (m.winner === 'red') { allPlayers[m.p1.id].wins++; allPlayers[m.p1.id].points += 3; }
         else if (m.winner === 'blue') allPlayers[m.p1.id].losses++;
       }
       if (m.p2) {
         if (!allPlayers[m.p2.id]) allPlayers[m.p2.id] = { name: m.p2.name, team: m.p2.team, wins: 0, losses: 0, points: 0, categories: [] };
-        const catLabel = `${cat.age} - ${cat.weight} - ${cat.belt}`;
+        const catLabel = cat.age + ' - ' + cat.weight + ' - ' + cat.belt;
         if (!allPlayers[m.p2.id].categories.includes(catLabel)) allPlayers[m.p2.id].categories.push(catLabel);
         if (m.winner === 'blue') { allPlayers[m.p2.id].wins++; allPlayers[m.p2.id].points += 3; }
         else if (m.winner === 'red') allPlayers[m.p2.id].losses++;
@@ -1089,9 +1084,9 @@ function renderStandings() {
   if (sortedPlayers.length === 0) {
     html += '<p style="text-align: center; color: #8899aa; padding: 20px;">No results yet.</p>';
   } else {
-    html += `<table style="width: 100%; border-collapse: collapse;"><thead><tr style="background: #1a1f2e; color: #f1c40f;"><th style="padding: 12px; text-align: center;">Rank</th><th style="padding: 12px; text-align: center;">Player</th><th style="padding: 12px; text-align: center;">Team</th><th style="padding: 12px; text-align: center;">Categories</th><th style="padding: 12px; text-align: center;">Wins</th><th style="padding: 12px; text-align: center;">Losses</th><th style="padding: 12px; text-align: center;">Points</th></tr></thead><tbody>`;
+    html += '<table style="width: 100%; border-collapse: collapse;"><thead><tr style="background: #1a1f2e; color: #f1c40f;"><th style="padding: 12px; text-align: center;">Rank</th><th style="padding: 12px; text-align: center;">Player</th><th style="padding: 12px; text-align: center;">Team</th><th style="padding: 12px; text-align: center;">Categories</th><th style="padding: 12px; text-align: center;">Wins</th><th style="padding: 12px; text-align: center;">Losses</th><th style="padding: 12px; text-align: center;">Points</th></tr></thead><tbody>';
     sortedPlayers.forEach((p, i) => {
-      html += `<tr><td style="padding: 10px; text-align: center; font-weight: bold; font-size: 1.2rem;">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td><td style="padding: 10px; text-align: left;"><strong>${p.name}</strong></td><td style="padding: 10px;">${p.team||'N/A'}</td><td style="padding: 10px; font-size:0.85rem;">${p.categories.join(', ')}</td><td style="padding: 10px; color:#2ecc71; font-weight: bold;">${p.wins}</td><td style="padding: 10px; color:#e74c3c; font-weight: bold;">${p.losses}</td><td style="padding: 10px; color:#f1c40f; font-weight: bold;">${p.points}</td></tr>`;
+      html += '<tr><td style="padding: 10px; text-align: center; font-weight: bold; font-size: 1.2rem;">' + (i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1) + '</td><td style="padding: 10px; text-align: left;"><strong>' + p.name + '</strong></td><td style="padding: 10px;">' + (p.team||'N/A') + '</td><td style="padding: 10px; font-size:0.85rem;">' + p.categories.join(', ') + '</td><td style="padding: 10px; color:#2ecc71; font-weight: bold;">' + p.wins + '</td><td style="padding: 10px; color:#e74c3c; font-weight: bold;">' + p.losses + '</td><td style="padding: 10px; color:#f1c40f; font-weight: bold;">' + p.points + '</td></tr>';
     });
     html += '</tbody></table>';
   }
@@ -1099,7 +1094,7 @@ function renderStandings() {
 }
 
 // ==========================================
-// 9. SCOREBOARD (نفس الكود القديم)
+// 9. SCOREBOARD
 // ==========================================
 function onScoreboardFieldChange() {}
 function onPlayerNameChange() {}
@@ -1145,7 +1140,7 @@ function addPenalty(player) {
   if (scoreboard[player].penalties >= 3) {
     scoreboard[player].isDQ = true;
     stopTimer();
-    alert('⚠️ Disqualification! 3 penalties!');
+    alert('️ Disqualification! 3 penalties!');
   }
   updateScoreboardDisplay();
 }
@@ -1184,7 +1179,7 @@ function updateTimerDisplay() {
   const mins = Math.floor(timeLeft / 60);
   const secs = timeLeft % 60;
   const timerEl = document.getElementById('timer');
-  if (timerEl) timerEl.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  if (timerEl) timerEl.innerText = mins.toString().padStart(2, '0') + ':' + secs.toString().padStart(2, '0');
 }
 
 function startTimer() {
@@ -1242,7 +1237,7 @@ function activateGoldenTime() {
   const statusEl = document.getElementById('goldenTimeStatus');
   if (statusEl) statusEl.style.display = 'inline';
   updateTimerDisplay();
-  alert(`⚡ Golden Time Activated! ${goldenMinutes} minute(s)`);
+  alert(' Golden Time Activated! ' + goldenMinutes + ' minute(s)');
 }
 
 function swapPlayers() {
@@ -1275,7 +1270,7 @@ function finishMatch() {
   const redScore = scoreboard.red.score;
   const blueScore = scoreboard.blue.score;
   const goldenText = isGoldenTime ? '<br><span style="color:#f1c40f;">(Golden Time)</span>' : '';
-  document.getElementById('matchInfo').innerHTML = `<strong>${redName}</strong> vs <strong>${blueName}</strong><br><br>Score: ${redScore} - ${blueScore}${goldenText}`;
+  document.getElementById('matchInfo').innerHTML = '<strong>' + redName + '</strong> vs <strong>' + blueName + '</strong><br><br>Score: ' + redScore + ' - ' + blueScore + goldenText;
   document.getElementById('winnerModal').classList.add('active');
 }
 
@@ -1292,11 +1287,11 @@ function declareWinner(winner) {
     const finalMatch = cat.rounds[cat.rounds.length - 1][0];
     if (finalMatch.winner) {
       const champion = finalMatch.winner === 'red' ? finalMatch.p1 : finalMatch.p2;
-      setTimeout(() => alert(' Champion: ' + champion.name + '!'), 500);
+      setTimeout(() => alert('🏆 Champion: ' + champion.name + '!'), 500);
     }
   }
   closeModal();
-  alert(`✅ ${winner.toUpperCase()} wins!`);
+  alert('✅ ' + winner.toUpperCase() + ' wins!');
   resetScoreboard();
   if (currentCategory) renderCategoryBracket();
 }
@@ -1304,12 +1299,11 @@ function declareWinner(winner) {
 function closeModal() { document.getElementById('winnerModal').classList.remove('active'); }
 
 // ==========================================
-// 10. DATA PERSISTENCE (هجين - localStorage + Supabase)
+// 10. DATA PERSISTENCE
 // ==========================================
 function saveData() {
   const data = { players, mats, categories, AGE_GROUPS, savedAt: new Date().toISOString() };
   localStorage.setItem('tournamentData', JSON.stringify(data));
-  // حفظ في قاعدة البيانات أيضاً (في الخلفية)
   saveToDatabase();
 }
 
@@ -1335,7 +1329,7 @@ function clearAll() {
     categories = {};
     localStorage.removeItem('tournamentData');
     renderPlayers();
-    alert('🗑️ All data cleared!');
+    alert('️ All data cleared!');
   }
 }
 
@@ -1348,7 +1342,7 @@ function showSyncIndicator() {
 }
 
 // ==========================================
-// 11. CONSTANTS (نفس الكود القديم)
+// 11. CONSTANTS
 // ==========================================
 const AGE_GROUPS = {
   'Kids 1': { age: '4-5', time: 2, goldenTime: 1, category: 'under16' },
@@ -1437,7 +1431,6 @@ window.onload = function() {
     if (header) header.style.display = 'none';
   }
   
-  // محاولة جلب البيانات من localStorage أولاً
   const saved = localStorage.getItem('tournamentData');
   if (saved) {
     try {
@@ -1450,7 +1443,6 @@ window.onload = function() {
     } catch(e) { console.error('Load error:', e); }
   }
   
-  // ثم المزامنة مع قاعدة البيانات
   if (tournamentId) {
     syncWithDatabase();
   }
