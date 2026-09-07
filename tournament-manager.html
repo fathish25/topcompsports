@@ -1,6 +1,3 @@
-الكود المدمج بين القديم و الحديث و جيد في التصميم ولكن الازرار لا تعمل 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -159,7 +156,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 <div class="container">
   <div class="header">
     <div>
-      <h1> TopCompSports Tournament System</h1>
+      <h1>🏆 TopCompSports Tournament System</h1>
       <div style="color: #8899aa; font-size: 0.85rem;" id="subtitle">Step 1: Players Registration</div>
       <div id="dbStatus" style="color: #2ecc71; font-size: 0.75rem; margin-top: 5px;">● Connected to Database</div>
     </div>
@@ -175,7 +172,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 
   <div class="tab-info-bar" id="tabInfoBar" style="display:none;">
     <div>
-      <span class="mat-badge" id="tabMatBadge"> Mat 1</span>
+      <span class="mat-badge" id="tabMatBadge">🥋 Mat 1</span>
       <span class="sync-status connected" id="tabSyncStatus">● Connected to Database</span>
     </div>
     <div>
@@ -184,16 +181,16 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     </div>
   </div>
 
-  <!-- Views (نفس الـ Views من الكود القديم) -->
+  <!-- Views -->
   <div id="view-settings" class="view">
     <div class="section">
-      <div class="section-title">️ Fight Time Settings</div>
+      <div class="section-title">⚙️ Fight Time Settings</div>
       <div style="margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
         <h3 style="color: #f1c40f; margin-bottom: 10px;">Regular Fight Times (minutes)</h3>
         <div id="regularTimes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;"></div>
       </div>
       <div style="padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-        <h3 style="color: #f1c40f; margin-bottom: 10px;"> Default Golden Time Settings (minutes)</h3>
+        <h3 style="color: #f1c40f; margin-bottom: 10px;"> Golden Time Settings (minutes)</h3>
         <div id="goldenTimes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;"></div>
       </div>
       <button class="btn btn-primary" style="margin-top: 15px;" onclick="showView('dashboard')">← Back to Dashboard</button>
@@ -202,14 +199,14 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 
   <div id="view-players" class="view active">
     <div class="section">
-      <div class="section-title">👥 Players Registration <span id="playerCount" style="color: #8899aa; font-size: 0.9rem;">0 / 200</span></div>
+      <div class="section-title"> Players Registration <span id="playerCount" style="color: #8899aa; font-size: 0.9rem;">0 / 200</span></div>
       <div style="margin-bottom: 15px;">
-        <button class="btn btn-primary" onclick="addPlayer()">➕ Add Player</button>
+        <button class="btn btn-primary" onclick="addPlayer()"> Add Player</button>
         <button class="btn btn-secondary" onclick="addPlayers(10)">➕ Add 10</button>
         <button class="btn btn-info" onclick="document.getElementById('csvImport').click()">📥 Import CSV</button>
         <input type="file" id="csvImport" accept=".csv" style="display:none" onchange="importCSV(event)">
         <button class="btn btn-info" onclick="exportCSV()"> Export CSV</button>
-        <button class="btn btn-warning" onclick="syncWithDatabase()">🔄 Sync with DB</button>
+        <button class="btn btn-warning" onclick="syncWithDatabase()"> Sync with DB</button>
       </div>
       <div style="max-height: 500px; overflow-y: auto;">
         <table>
@@ -223,7 +220,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 
   <div id="view-mats" class="view">
     <div class="section">
-      <div class="section-title"> Mats Setup</div>
+      <div class="section-title">🥋 Mats Setup</div>
       <div style="margin-bottom: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
         <label style="font-weight: bold; color: #f1c40f;">Number of Mats: </label>
         <select id="matsCount" onchange="updateMats()" style="width: auto; display: inline-block;">
@@ -240,12 +237,12 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   <div id="view-dashboard" class="view">
     <div class="section">
       <div class="section-title">
-        <span> Mat Dashboard</span>
-        <button class="btn btn-info" onclick="openCurrentMatInNewTab()"> Open in New Tab</button>
+        <span>📊 Mat Dashboard</span>
+        <button class="btn btn-info" onclick="openCurrentMatInNewTab()">🪟 Open in New Tab</button>
         <button class="btn btn-purple btn-sm" onclick="openAllMatsInTabs()">🪟 Open All Mats</button>
       </div>
       <div class="tabs">
-        <button class="tab active" onclick="switchTab('categories')"> Categories</button>
+        <button class="tab active" onclick="switchTab('categories')">📋 Categories</button>
         <button class="tab" onclick="switchTab('queue')">📋 Queue</button>
         <button class="tab" onclick="switchTab('callup')">📢 Call-Up</button>
         <button class="tab" onclick="switchTab('standings')">🏆 Standings</button>
@@ -338,14 +335,14 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
             <button class="btn-adv" onclick="addAdvantage('red')"><span class="icon">⭐</span><span>Advantage</span></button>
             <button class="btn-pen" onclick="addPenalty('red')"><span class="icon">🟥</span><span>Penalty</span></button>
           </div>
-          <button class="sb-undo-btn" onclick="undoAction('red')">️ Undo</button>
+          <button class="sb-undo-btn" onclick="undoAction('red')">↩️ Undo</button>
         </div>
 
         <div>
-          <div class="sb-panel-header blue"> Blue Player</div>
+          <div class="sb-panel-header blue">🔵 Blue Player</div>
           <div class="sb-counters">
             <div class="sb-counter adv"><div class="label">⭐ Advantage</div><div class="value" id="blueAdv">0</div></div>
-            <div class="sb-counter pen"><div class="label">🟥 Penalty</div><div class="value" id="bluePen">0</div></div>
+            <div class="sb-counter pen"><div class="label"> Penalty</div><div class="value" id="bluePen">0</div></div>
           </div>
           <div class="sb-points-grid">
             <button onclick="addScore('blue', 1)">+1</button>
@@ -371,7 +368,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         <span style="font-weight: bold; color: #f1c40f;">⚡ Golden Time:</span>
         <input type="number" id="goldenTimeInput" min="1" max="10" value="1" title="Enter golden time in minutes">
         <span style="color: #8899aa;">minutes</span>
-        <button onclick="activateGoldenTime()"> Activate Golden Time</button>
+        <button onclick="activateGoldenTime()">⚡ Activate Golden Time</button>
         <span id="goldenTimeStatus" style="color: #2ecc71; font-weight: bold; display: none;">ACTIVE</span>
       </div>
 
@@ -406,14 +403,14 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 
 <script>
 // ==========================================
-// 1. SUPABASE INITIALIZATION
+// 1. SUPABASE INITIALIZATION (مرة واحدة فقط)
 // ==========================================
 const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabase;
 
 // ==========================================
-// 2. DATA & STATE (نفس الكود القديم)
+// 2. DATA & STATE
 // ==========================================
 let players = [];
 let mats = [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
@@ -432,82 +429,86 @@ let isStandaloneTab = false;
 let tournamentId = null;
 
 // ==========================================
-// 3. SYNC FUNCTIONS (الجديد - الربط مع Supabase)
+// 3. INITIALIZATION
 // ==========================================
-async function syncWithDatabase() {
-  showSyncIndicator();
+window.onload = function() {
+  console.log(' Page loaded. Initializing system...');
+  
+  // Initialize Supabase
   try {
-    // جلب اللاعبين من قاعدة البيانات
-    const { data: dbPlayers, error } = await supabase
-      .from('tournament_participants')
-      .select('*')
-      .eq('tournament_id', tournamentId || 'default');
-    
-    if (error) throw error;
-    
-    if (dbPlayers && dbPlayers.length > 0) {
-      // تحويل بيانات Supabase إلى نفس هيكل الكود القديم
-      players = dbPlayers.map(p => ({
-        id: p.id,
-        name: p.player_name || p.name || '',
-        team: p.team || '',
-        ageGroup: p.age_group || p.ageGroup || 'Amateur/Professional',
-        gender: p.gender || 'Men',
-        weight: p.weight ? p.weight + 'kg' : '',
-        belt: p.belt_level || p.belt || 'White',
-        rank: p.ranking || p.rank || 999
-      }));
-      
-      // حفظ في localStorage أيضاً
-      saveData();
-      renderPlayers();
-      alert(`✅ Synced ${players.length} players from database!`);
-    }
-  } catch (err) {
-    console.error('Sync error:', err);
-    alert('️ Sync failed: ' + err.message);
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('✅ Supabase initialized');
+  } catch(e) {
+    console.error(' Supabase init error:', e);
   }
-}
-
-async function saveToDatabase() {
-  try {
-    if (!tournamentId) {
-      // إنشاء tournament جديد إذا لم يكن موجوداً
-      const { data: tournament, error: tError } = await supabase
-        .from('tournaments')
-        .insert({ name: 'Tournament ' + new Date().toLocaleDateString() })
-        .select()
-        .single();
-      
-      if (tError) throw tError;
-      tournamentId = tournament.id;
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const matParam = urlParams.get('mat');
+  const standaloneParam = urlParams.get('standalone');
+  tournamentId = urlParams.get('tournament_id');
+  
+  if (matParam) {
+    const matId = parseInt(matParam);
+    if (matId && mats.find(m => m.id === matId)) {
+      currentMat = matId;
     }
-    
-    // حفظ اللاعبين
-    const playersToInsert = players.map(p => ({
-      tournament_id: tournamentId,
-      player_name: p.name,
-      team: p.team,
-      age_group: p.ageGroup,
-      gender: p.gender,
-      weight: parseFloat(p.weight) || null,
-      belt_level: p.belt,
-      ranking: p.rank
-    }));
-    
-    const { error } = await supabase
-      .from('tournament_participants')
-      .upsert(playersToInsert, { onConflict: 'id' });
-    
-    if (error) throw error;
-    console.log('✅ Saved to database');
-  } catch (err) {
-    console.error('Save error:', err);
   }
-}
+  
+  if (standaloneParam === '1') {
+    isStandaloneTab = true;
+    const tabInfoBar = document.getElementById('tabInfoBar');
+    if (tabInfoBar) {
+      tabInfoBar.style.display = 'flex';
+      const matBadge = document.getElementById('tabMatBadge');
+      if (matBadge) matBadge.innerText = '🥋 Mat ' + currentMat;
+    }
+    const header = document.querySelector('.header');
+    if (header) header.style.display = 'none';
+  }
+  
+  // Load data from localStorage
+  const saved = localStorage.getItem('tournamentData');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      players = data.players || [];
+      mats = data.mats || [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
+      categories = data.categories || {};
+      if (data.AGE_GROUPS) Object.assign(AGE_GROUPS, data.AGE_GROUPS);
+      console.log('✅ Data loaded from localStorage. Players:', players.length);
+    } catch(e) { 
+      console.error('❌ Load error:', e); 
+    }
+  }
+  
+  // Sync with database if tournament_id exists
+  if (tournamentId && supabase) {
+    syncWithDatabase();
+  }
+  
+  // Populate division dropdown
+  const divSelect = document.getElementById('sbDivision');
+  if (divSelect) {
+    divSelect.innerHTML = '';
+    Object.keys(AGE_GROUPS).forEach(ag => {
+      const opt = document.createElement('option');
+      opt.value = ag;
+      opt.innerText = ag + ' (' + AGE_GROUPS[ag].age + ') - ' + AGE_GROUPS[ag].time + ' min';
+      divSelect.appendChild(opt);
+    });
+  }
+  
+  renderPlayers();
+  console.log('✅ Initial render complete');
+  
+  if (isStandaloneTab) {
+    renderMats();
+    setTimeout(() => showView('dashboard'), 100);
+  }
+};
 
 // ==========================================
-// 4. NAVIGATION & VIEWS (نفس الكود القديم)
+// 4. NAVIGATION & VIEWS
 // ==========================================
 function showView(view) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -548,7 +549,84 @@ function backToBracket() {
 }
 
 // ==========================================
-// 5. PLAYERS MANAGEMENT (نفس الكود القديم)
+// 5. SYNC FUNCTIONS
+// ==========================================
+async function syncWithDatabase() {
+  if (!supabase) {
+    alert(' Database not connected');
+    return;
+  }
+  
+  showSyncIndicator();
+  try {
+    const { data: dbPlayers, error } = await supabase
+      .from('tournament_participants')
+      .select('*')
+      .eq('tournament_id', tournamentId || 'default');
+    
+    if (error) throw error;
+    
+    if (dbPlayers && dbPlayers.length > 0) {
+      players = dbPlayers.map(p => ({
+        id: p.id,
+        name: p.player_name || p.name || '',
+        team: p.team || '',
+        ageGroup: p.age_group || p.ageGroup || 'Amateur/Professional',
+        gender: p.gender || 'Men',
+        weight: p.weight ? p.weight + 'kg' : '',
+        belt: p.belt_level || p.belt || 'White',
+        rank: p.ranking || p.rank || 999
+      }));
+      
+      saveData();
+      renderPlayers();
+      alert('✅ Synced ' + players.length + ' players from database!');
+    }
+  } catch (err) {
+    console.error('Sync error:', err);
+    alert('⚠️ Sync failed: ' + err.message);
+  }
+}
+
+async function saveToDatabase() {
+  if (!supabase) return;
+  
+  try {
+    if (!tournamentId) {
+      const { data: tournament, error: tError } = await supabase
+        .from('tournaments')
+        .insert({ name: 'Tournament ' + new Date().toLocaleDateString() })
+        .select()
+        .single();
+      
+      if (tError) throw tError;
+      tournamentId = tournament.id;
+    }
+    
+    const playersToInsert = players.map(p => ({
+      tournament_id: tournamentId,
+      player_name: p.name,
+      team: p.team,
+      age_group: p.ageGroup,
+      gender: p.gender,
+      weight: parseFloat(p.weight) || null,
+      belt_level: p.belt,
+      ranking: p.rank
+    }));
+    
+    const { error } = await supabase
+      .from('tournament_participants')
+      .upsert(playersToInsert, { onConflict: 'id' });
+    
+    if (error) throw error;
+    console.log('✅ Saved to database');
+  } catch (err) {
+    console.error('Save error:', err);
+  }
+}
+
+// ==========================================
+// 6. PLAYERS MANAGEMENT
 // ==========================================
 function addPlayer() {
   if (players.length >= 200) { alert('Maximum 200 players!'); return; }
@@ -642,7 +720,7 @@ function exportCSV() {
 }
 
 // ==========================================
-// 6. MATS SETUP (نفس الكود القديم)
+// 7. MATS SETUP
 // ==========================================
 function updateMats() {
   const count = parseInt(document.getElementById('matsCount').value);
@@ -700,15 +778,15 @@ function renderMats() {
         <select onchange="if(this.value) addMatCategory(${mat.id}, 'belts', this.value)" style="margin-top: 5px;"><option value="">-- Add Belt --</option>${allBelts.map(b => `<option>${b}</option>`).join('')}</select>
       </div>
       <div style="display: flex; gap: 8px; margin-top: 10px;">
-        <button class="btn btn-info" style="flex: 1;" onclick="currentMat=${mat.id};showView('dashboard')"> Open Dashboard</button>
-        <button class="btn btn-purple" style="flex: 1;" onclick="openMatInNewTab(${mat.id})"> Open in New Tab</button>
+        <button class="btn btn-info" style="flex: 1;" onclick="currentMat=${mat.id};showView('dashboard')">📋 Open Dashboard</button>
+        <button class="btn btn-purple" style="flex: 1;" onclick="openMatInNewTab(${mat.id})">🪟 Open in New Tab</button>
       </div>`;
     grid.appendChild(div);
   });
 }
 
 // ==========================================
-// 7. CATEGORIES & BRACKETS (نفس الكود القديم)
+// 8. CATEGORIES & BRACKETS
 // ==========================================
 function renderCategories() {
   const container = document.getElementById('tab-categories');
@@ -730,7 +808,7 @@ function renderCategories() {
     });
   });
   
-  let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📋 Categories - Mat ' + currentMat + ' (Bracket System)</h3>';
+  let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;"> Categories - Mat ' + currentMat + ' (Bracket System)</h3>';
   
   if (categoryList.length === 0) {
     html += '<p style="text-align: center; color: #8899aa; padding: 30px;">No categories found. Add players with matching categories first.</p>';
@@ -818,7 +896,7 @@ function getRoundNames(totalRounds) {
   const names = [];
   for (let i = 0; i < totalRounds; i++) {
     const remaining = totalRounds - i;
-    if (remaining === 1) names.push(' Finals');
+    if (remaining === 1) names.push('🏆 Finals');
     else if (remaining === 2) names.push('Semifinals');
     else if (remaining === 3) names.push('Quarterfinals');
     else if (remaining === 4) names.push('Round of 16');
@@ -881,7 +959,7 @@ function renderMatchSchedule() {
   cat.rounds.forEach((round, rIdx) => {
     round.forEach((m, mIdx) => {
       const status = m.status === 'completed' ? 'completed' : 'pending';
-      const statusText = m.bye ? ' BYE' : (m.status === 'completed' ? '✅ Completed' : '⏳ Pending');
+      const statusText = m.bye ? '✅ BYE' : (m.status === 'completed' ? '✅ Completed' : '⏳ Pending');
       const winner = m.winner ? (m.winner === 'red' ? m.p1.name : m.p2.name) : '-';
       html += `<tr class="${status}"><td>${m.id}</td><td>${m.p1?m.p1.name:'TBD'}</td><td>${m.p2?m.p2.name:'TBD'}</td><td>${statusText}</td><td>${winner}</td><td>${m.score1||0} - ${m.score2||0}</td></tr>`;
     });
@@ -908,9 +986,9 @@ function renderWinnersPodium() {
   if (winners.length === 0) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   let html = '<div class="podium-container">';
-  if (winners[1]) html += `<div class="podium-place second"><div class="podium-medal"></div><div class="podium-name">${winners[1].name}</div><div class="podium-team">${winners[1].team||'N/A'}</div><div class="podium-rank">2nd Place</div></div>`;
-  if (winners[0]) html += `<div class="podium-place first"><div class="podium-medal">🏆</div><div class="podium-name">${winners[0].name}</div><div class="podium-team">${winners[0].team||'N/A'}</div><div class="podium-rank">Champion</div></div>`;
-  if (winners[2]) html += `<div class="podium-place third"><div class="podium-medal"></div><div class="podium-name">${winners[2].name}</div><div class="podium-team">${winners[2].team||'N/A'}</div><div class="podium-rank">3rd Place</div></div>`;
+  if (winners[1]) html += `<div class="podium-place second"><div class="podium-medal">🥈</div><div class="podium-name">${winners[1].name}</div><div class="podium-team">${winners[1].team||'N/A'}</div><div class="podium-rank">2nd Place</div></div>`;
+  if (winners[0]) html += `<div class="podium-place first"><div class="podium-medal"></div><div class="podium-name">${winners[0].name}</div><div class="podium-team">${winners[0].team||'N/A'}</div><div class="podium-rank">Champion</div></div>`;
+  if (winners[2]) html += `<div class="podium-place third"><div class="podium-medal">🥉</div><div class="podium-name">${winners[2].name}</div><div class="podium-team">${winners[2].team||'N/A'}</div><div class="podium-rank">3rd Place</div></div>`;
   html += '</div>';
   content.innerHTML = html;
 }
@@ -981,7 +1059,7 @@ function closeEditMatch() {
 }
 
 // ==========================================
-// 8. QUEUE, CALL-UP, STANDINGS (نفس الكود القديم)
+// 9. QUEUE, CALL-UP, STANDINGS
 // ==========================================
 function renderQueue() {
   const container = document.getElementById('tab-queue');
@@ -1005,7 +1083,7 @@ function renderQueue() {
       html += `<div style="padding: 12px; margin-bottom: 8px; background: #151d2b; border-radius: 8px; border-left: 4px solid #f1c40f;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div><strong>${m.p1?m.p1.name:'TBD'}</strong> vs <strong>${m.p2?m.p2.name:'TBD'}</strong>
-            <div style="font-size: 0.8rem; color: #8899aa; margin-top: 3px;">️ ${cat.weight} | 🥋 ${cat.age} | ${cat.gender} | 🎗️ ${cat.belt}</div>
+            <div style="font-size: 0.8rem; color: #8899aa; margin-top: 3px;">⚖️ ${cat.weight} | 🥋 ${cat.age} | ${cat.gender} | ️ ${cat.belt}</div>
           </div>
           <button class="btn btn-primary btn-sm" onclick="startMatchFromQueue('${m.categoryKey}', ${m.roundIdx}, ${m.matchIdx})">▶ Start</button>
         </div>
@@ -1042,7 +1120,7 @@ function renderCallUp() {
     html += `<div style="background: linear-gradient(135deg, #1e2a3a, #253447); border: 2px solid #f1c40f; border-radius: 12px; padding: 20px; text-align: center;">
       <div style="font-size: 0.9rem; color: #8899aa; margin-bottom: 10px;">NEXT MATCH</div>
       <div style="font-size: 1.5rem; font-weight: bold; color: #f1c40f; margin: 10px 0;">${next.p1?next.p1.name:'TBD'} vs ${next.p2?next.p2.name:'TBD'}</div>
-      <div style="color: #8899aa; margin-bottom: 15px;">⚖️ ${cat.weight} |  ${cat.age} | ${cat.gender} | 🎗️ ${cat.belt}</div>
+      <div style="color: #8899aa; margin-bottom: 15px;">⚖️ ${cat.weight} | 🥋 ${cat.age} | ${cat.gender} | ️ ${cat.belt}</div>
       <button class="btn btn-primary" onclick="callPlayer('${next.p1?next.p1.name:'Player 1'}')">📢 Call ${next.p1?next.p1.name:'Player 1'}</button>
       <button class="btn btn-primary" style="margin-left: 10px;" onclick="callPlayer('${next.p2?next.p2.name:'Player 2'}')">📢 Call ${next.p2?next.p2.name:'Player 2'}</button>
     </div>`;
@@ -1094,7 +1172,7 @@ function renderStandings() {
   } else {
     html += `<table style="width: 100%; border-collapse: collapse;"><thead><tr style="background: #1a1f2e; color: #f1c40f;"><th style="padding: 12px; text-align: center;">Rank</th><th style="padding: 12px; text-align: center;">Player</th><th style="padding: 12px; text-align: center;">Team</th><th style="padding: 12px; text-align: center;">Categories</th><th style="padding: 12px; text-align: center;">Wins</th><th style="padding: 12px; text-align: center;">Losses</th><th style="padding: 12px; text-align: center;">Points</th></tr></thead><tbody>`;
     sortedPlayers.forEach((p, i) => {
-      html += `<tr><td style="padding: 10px; text-align: center; font-weight: bold; font-size: 1.2rem;">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td><td style="padding: 10px; text-align: left;"><strong>${p.name}</strong></td><td style="padding: 10px;">${p.team||'N/A'}</td><td style="padding: 10px; font-size:0.85rem;">${p.categories.join(', ')}</td><td style="padding: 10px; color:#2ecc71; font-weight: bold;">${p.wins}</td><td style="padding: 10px; color:#e74c3c; font-weight: bold;">${p.losses}</td><td style="padding: 10px; color:#f1c40f; font-weight: bold;">${p.points}</td></tr>`;
+      html += `<tr><td style="padding: 10px; text-align: center; font-weight: bold; font-size: 1.2rem;">${i===0?'':i===1?'🥈':i===2?'🥉':i+1}</td><td style="padding: 10px; text-align: left;"><strong>${p.name}</strong></td><td style="padding: 10px;">${p.team||'N/A'}</td><td style="padding: 10px; font-size:0.85rem;">${p.categories.join(', ')}</td><td style="padding: 10px; color:#2ecc71; font-weight: bold;">${p.wins}</td><td style="padding: 10px; color:#e74c3c; font-weight: bold;">${p.losses}</td><td style="padding: 10px; color:#f1c40f; font-weight: bold;">${p.points}</td></tr>`;
     });
     html += '</tbody></table>';
   }
@@ -1102,7 +1180,7 @@ function renderStandings() {
 }
 
 // ==========================================
-// 9. SCOREBOARD (نفس الكود القديم)
+// 10. SCOREBOARD
 // ==========================================
 function onScoreboardFieldChange() {}
 function onPlayerNameChange() {}
@@ -1148,7 +1226,7 @@ function addPenalty(player) {
   if (scoreboard[player].penalties >= 3) {
     scoreboard[player].isDQ = true;
     stopTimer();
-    alert('⚠️ Disqualification! 3 penalties!');
+    alert('️ Disqualification! 3 penalties!');
   }
   updateScoreboardDisplay();
 }
@@ -1198,12 +1276,12 @@ function startTimer() {
     if (timeLeft <= 0) {
       stopTimer();
       if (isGoldenTime) {
-        alert(' Golden Time ended!');
+        alert('🥇 Golden Time ended!');
         isGoldenTime = false;
         const statusEl = document.getElementById('goldenTimeStatus');
         if (statusEl) statusEl.style.display = 'none';
       } else {
-        alert('⏰ Time\'s up!');
+        alert(' Time\'s up!');
       }
     }
   }, 1000);
@@ -1295,7 +1373,7 @@ function declareWinner(winner) {
     const finalMatch = cat.rounds[cat.rounds.length - 1][0];
     if (finalMatch.winner) {
       const champion = finalMatch.winner === 'red' ? finalMatch.p1 : finalMatch.p2;
-      setTimeout(() => alert(' Champion: ' + champion.name + '!'), 500);
+      setTimeout(() => alert('🏆 Champion: ' + champion.name + '!'), 500);
     }
   }
   closeModal();
@@ -1307,12 +1385,11 @@ function declareWinner(winner) {
 function closeModal() { document.getElementById('winnerModal').classList.remove('active'); }
 
 // ==========================================
-// 10. DATA PERSISTENCE (هجين - localStorage + Supabase)
+// 11. DATA PERSISTENCE
 // ==========================================
 function saveData() {
   const data = { players, mats, categories, AGE_GROUPS, savedAt: new Date().toISOString() };
   localStorage.setItem('tournamentData', JSON.stringify(data));
-  // حفظ في قاعدة البيانات أيضاً (في الخلفية)
   saveToDatabase();
 }
 
@@ -1327,7 +1404,7 @@ function loadData() {
     renderPlayers();
     alert('✅ Data loaded! (Saved: ' + (data.savedAt ? new Date(data.savedAt).toLocaleString() : 'unknown') + ')');
   } else {
-    alert('❌ No saved data!');
+    alert(' No saved data!');
   }
 }
 
@@ -1351,7 +1428,7 @@ function showSyncIndicator() {
 }
 
 // ==========================================
-// 11. CONSTANTS (نفس الكود القديم)
+// 12. CONSTANTS
 // ==========================================
 const AGE_GROUPS = {
   'Kids 1': { age: '4-5', time: 2, goldenTime: 1, category: 'under16' },
@@ -1410,73 +1487,27 @@ const BELTS = {
   'Professional': ['Purple', 'Brown', 'Black']
 };
 
-// ==========================================
-// 12. INITIALIZATION
-// ==========================================
-window.onload = function() {
-  console.log('Page loaded. Initializing hybrid system...');
-  
-  const urlParams = new URLSearchParams(window.location.search);
-  const matParam = urlParams.get('mat');
-  const standaloneParam = urlParams.get('standalone');
-  tournamentId = urlParams.get('tournament_id');
-  
-  if (matParam) {
-    const matId = parseInt(matParam);
-    if (matId && mats.find(m => m.id === matId)) {
-      currentMat = matId;
-    }
-  }
-  
-  if (standaloneParam === '1') {
-    isStandaloneTab = true;
-    const tabInfoBar = document.getElementById('tabInfoBar');
-    if (tabInfoBar) {
-      tabInfoBar.style.display = 'flex';
-      const matBadge = document.getElementById('tabMatBadge');
-      if (matBadge) matBadge.innerText = ' Mat ' + currentMat;
-    }
-    const header = document.querySelector('.header');
-    if (header) header.style.display = 'none';
-  }
-  
-  // محاولة جلب البيانات من localStorage أولاً
-  const saved = localStorage.getItem('tournamentData');
-  if (saved) {
-    try {
-      const data = JSON.parse(saved);
-      players = data.players || [];
-      mats = data.mats || [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
-      categories = data.categories || {};
-      if (data.AGE_GROUPS) Object.assign(AGE_GROUPS, data.AGE_GROUPS);
-      console.log('Data loaded from localStorage. Players:', players.length);
-    } catch(e) { console.error('Load error:', e); }
-  }
-  
-  // ثم المزامنة مع قاعدة البيانات
-  if (tournamentId) {
-    syncWithDatabase();
-  }
-  
-  const divSelect = document.getElementById('sbDivision');
-  if (divSelect) {
-    divSelect.innerHTML = '';
-    Object.keys(AGE_GROUPS).forEach(ag => {
-      const opt = document.createElement('option');
-      opt.value = ag;
-      opt.innerText = ag + ' (' + AGE_GROUPS[ag].age + ') - ' + AGE_GROUPS[ag].time + ' min';
-      divSelect.appendChild(opt);
-    });
-  }
-  
-  renderPlayers();
-  console.log('Initial render complete');
-  
-  if (isStandaloneTab) {
-    renderMats();
-    setTimeout(() => showView('dashboard'), 100);
-  }
-};
+// Helper functions
+function openMatInNewTab(matId) {
+  const url = window.location.pathname + '?mat=' + matId + '&standalone=1';
+  window.open(url, '_blank');
+}
+
+function openCurrentMatInNewTab() {
+  openMatInNewTab(currentMat);
+}
+
+function openAllMatsInTabs() {
+  mats.forEach((mat, i) => {
+    setTimeout(() => {
+      openMatInNewTab(mat.id);
+    }, i * 500);
+  });
+}
+
+function renderSettings() {
+  // Placeholder for settings render
+}
 </script>
 
 </body>
