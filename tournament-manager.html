@@ -1,130 +1,559 @@
-window.renderCategories = function() {
-  var container = document.getElementById('tab-categories');
-  if (!container) return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tournament Manager - TopCompSports</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #2c3e50; }
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; }
+.header h1 { font-size: 1.8rem; margin-bottom: 5px; }
+.nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.nav-tab { padding: 12px 24px; background: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+.nav-tab:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.nav-tab.active { background: #667eea; color: white; }
+.section { background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+.section-title { font-size: 1.4rem; font-weight: bold; color: #2c3e50; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 3px solid #667eea; }
+.btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+.btn:hover { transform: translateY(-2px); }
+.btn-primary { background: #667eea; color: white; }
+.btn-success { background: #10b981; color: white; }
+.btn-warning { background: #f59e0b; color: white; }
+.btn-danger { background: #ef4444; color: white; }
+.btn-secondary { background: #6c757d; color: white; }
+.btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+th { background: #f8fafc; font-weight: 600; color: #475569; }
+input, select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; width: 100%; }
+input:focus, select:focus { outline: none; border-color: #667eea; }
+.badge { padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; }
+.badge-success { background: #d1fae5; color: #065f46; }
+.badge-warning { background: #fef3c7; color: #92400e; }
+.grid { display: grid; gap: 15px; }
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+@media (max-width: 768px) {
+  .header h1 { font-size: 1.3rem; }
+  .nav-tabs { flex-direction: column; }
+  .nav-tab { width: 100%; }
+  table { font-size: 0.85rem; }
+  th, td { padding: 8px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1> Tournament Manager</h1>
+    <div id="tournamentInfo">Loading...</div>
+  </div>
+
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('players')">👥 Players</button>
+    <button class="nav-tab" onclick="showTab('mats')">🥋 Mats</button>
+    <button class="nav-tab" onclick="showTab('brackets')"> Brackets</button>
+    <button class="nav-tab" onclick="showTab('settings')">⚙️ Settings</button>
+  </div>
+
+  <!-- Players Tab -->
+  <div id="tab-players" class="tab-content">
+    <div class="section">
+      <div class="section-title">Players Registration <span id="playerCount" class="badge badge-success">0</span></div>
+      <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn btn-success" onclick="addPlayer()">➕ Add Player</button>
+        <button class="btn btn-secondary" onclick="addPlayers(10)">➕ Add 10</button>
+        <button class="btn btn-primary" onclick="syncWithDatabase()">🔄 Sync DB</button>
+        <button class="btn btn-warning" onclick="exportCSV()">📥 Export CSV</button>
+      </div>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Name</th><th>Team</th><th>Age Group</th><th>Gender</th><th>Weight</th><th>Belt</th><th>Rank</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="playersTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mats Tab -->
+  <div id="tab-mats" class="tab-content">
+    <div class="section">
+      <div class="section-title">🥋 Mats Configuration</div>
+      <div style="margin-bottom: 15px;">
+        <label style="font-weight: 600;">Number of Mats:</label>
+        <select id="matsCount" onchange="updateMats()" style="width: 150px; margin-left: 10px;">
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+          <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+        </select>
+      </div>
+      <div id="matsGrid" class="grid grid-2"></div>
+    </div>
+  </div>
+
+  <!-- Brackets Tab -->
+  <div id="tab-brackets" class="tab-content">
+    <div class="section">
+      <div class="section-title"> Tournament Brackets</div>
+      <div id="bracketsContent">
+        <p style="color: #64748b; text-align: center; padding: 40px;">
+          Configure mats and add players to generate brackets
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Tab -->
+  <div id="tab-settings" class="tab-content">
+    <div class="section">
+      <div class="section-title">⚙️ Tournament Settings</div>
+      <div id="settingsContent">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Initialize Supabase
+const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Global State
+let tournamentId = null;
+let players = [];
+let mats = [{ id: 1, ageGroups: [], genders: [], weights: [], belts: [] }];
+let categories = {};
+
+// Initialize
+window.onload = async function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  tournamentId = urlParams.get('tournament_id');
   
-  var mat = null;
-  for (var i = 0; i < mats.length; i++) {
-    if (mats[i].id === currentMat) {
-      mat = mats[i];
-      break;
-    }
-  }
-  
-  if (!mat) {
-    container.innerHTML = '<p style="text-align:center;color:#8899aa;">No mat selected</p>';
+  if (!tournamentId) {
+    alert('No tournament selected!');
+    window.location.href = 'organizer-dashboard.html';
     return;
   }
   
-  var html = '<h3 style="color:#f1c40f;margin-bottom:15px;">📋 Categories - Mat ' + currentMat + '</h3>';
+  await loadData();
+  renderPlayers();
+  renderMats();
+};
+
+// Navigation
+window.showTab = function(tabName) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  
+  document.getElementById('tab-' + tabName).style.display = 'block';
+  event.target.classList.add('active');
+  
+  if (tabName === 'brackets') renderBrackets();
+};
+
+// Data Management
+window.loadData = async function() {
+  try {
+    // Load tournament info
+    const { data: tournament, error: tError } = await supabase
+      .from('tournaments')
+      .select('*')
+      .eq('id', tournamentId)
+      .single();
+    
+    if (tError) throw tError;
+    
+    document.getElementById('tournamentInfo').innerHTML = `
+      <div style="font-size: 1.1rem;">${tournament.name}</div>
+      <div style="opacity: 0.9; font-size: 0.9rem;">
+        📅 ${tournament.start_date || 'TBD'} - ${tournament.end_date || 'TBD'}
+      </div>
+    `;
+    
+    // Load players
+    const { data: playersData, error: pError } = await supabase
+      .from('tournament_participants')
+      .select('*')
+      .eq('tournament_id', tournamentId)
+      .order('ranking');
+    
+    if (!pError && playersData) {
+      players = playersData.map(p => ({
+        id: p.id,
+        name: p.player_name,
+        team: p.team || '',
+        ageGroup: p.age_group,
+        gender: p.gender,
+        weight: p.weight || '',
+        belt: p.belt_level,
+        rank: p.ranking || 0
+      }));
+    }
+    
+    // Load mats config
+    const { data: matsData } = await supabase
+      .from('mats')
+      .select('*')
+      .eq('tournament_id', tournamentId);
+    
+    if (matsData && matsData.length > 0) {
+      mats = matsData;
+      document.getElementById('matsCount').value = mats.length;
+    }
+    
+  } catch (error) {
+    console.error('Error loading data:', error);
+  }
+};
+
+window.syncWithDatabase = async function() {
+  try {
+    const playersToSync = players.map(p => ({
+      id: p.id,
+      tournament_id: tournamentId,
+      player_name: p.name,
+      team: p.team,
+      age_group: p.ageGroup,
+      gender: p.gender,
+      weight: parseFloat(p.weight) || null,
+      belt_level: p.belt,
+      ranking: p.rank
+    }));
+    
+    const { error } = await supabase
+      .from('tournament_participants')
+      .upsert(playersToSync, { onConflict: 'id' });
+    
+    if (error) throw error;
+    
+    alert('✅ Synced ' + players.length + ' players to database!');
+  } catch (error) {
+    alert(' Sync failed: ' + error.message);
+  }
+};
+
+// Players Management
+window.addPlayer = function() {
+  if (players.length >= 200) {
+    alert('Maximum 200 players reached!');
+    return;
+  }
+  
+  players.push({
+    id: Date.now(),
+    name: '',
+    team: '',
+    ageGroup: 'Amateur/Professional',
+    gender: 'Men',
+    weight: '',
+    belt: 'White',
+    rank: players.length + 1
+  });
+  
+  renderPlayers();
+};
+
+window.addPlayers = function(count) {
+  for (let i = 0; i < count && players.length < 200; i++) {
+    window.addPlayer();
+  }
+};
+
+window.renderPlayers = function() {
+  const tbody = document.getElementById('playersTable');
+  if (!tbody) return;
+  
+  tbody.innerHTML = '';
+  
+  players.forEach((player, index) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${index + 1}</td>
+      <td><input type="text" value="${player.name}" onchange="updatePlayer(${index}, 'name', this.value)" placeholder="Player Name"></td>
+      <td><input type="text" value="${player.team}" onchange="updatePlayer(${index}, 'team', this.value)" placeholder="Team"></td>
+      <td>
+        <select onchange="updatePlayer(${index}, 'ageGroup', this.value)">
+          <option ${player.ageGroup === 'Kids 1' ? 'selected' : ''}>Kids 1</option>
+          <option ${player.ageGroup === 'Kids 2' ? 'selected' : ''}>Kids 2</option>
+          <option ${player.ageGroup === 'Kids 3' ? 'selected' : ''}>Kids 3</option>
+          <option ${player.ageGroup === 'Infant' ? 'selected' : ''}>Infant</option>
+          <option ${player.ageGroup === 'Junior' ? 'selected' : ''}>Junior</option>
+          <option ${player.ageGroup === 'Teen' ? 'selected' : ''}>Teen</option>
+          <option ${player.ageGroup === 'Youth' ? 'selected' : ''}>Youth</option>
+          <option ${player.ageGroup === 'Amateur/Professional' ? 'selected' : ''}>Amateur/Professional</option>
+          <option ${player.ageGroup === 'Master 1' ? 'selected' : ''}>Master 1</option>
+          <option ${player.ageGroup === 'Master 2' ? 'selected' : ''}>Master 2</option>
+        </select>
+      </td>
+      <td>
+        <select onchange="updatePlayer(${index}, 'gender', this.value)">
+          <option ${player.gender === 'Men' ? 'selected' : ''}>Men</option>
+          <option ${player.gender === 'Women' ? 'selected' : ''}>Women</option>
+          <option ${player.gender === 'Boys' ? 'selected' : ''}>Boys</option>
+          <option ${player.gender === 'Girls' ? 'selected' : ''}>Girls</option>
+        </select>
+      </td>
+      <td><input type="text" value="${player.weight}" onchange="updatePlayer(${index}, 'weight', this.value)" placeholder="Weight (kg)"></td>
+      <td>
+        <select onchange="updatePlayer(${index}, 'belt', this.value)">
+          <option ${player.belt === 'White' ? 'selected' : ''}>White</option>
+          <option ${player.belt === 'Blue' ? 'selected' : ''}>Blue</option>
+          <option ${player.belt === 'Purple' ? 'selected' : ''}>Purple</option>
+          <option ${player.belt === 'Brown' ? 'selected' : ''}>Brown</option>
+          <option ${player.belt === 'Black' ? 'selected' : ''}>Black</option>
+        </select>
+      </td>
+      <td><input type="number" value="${player.rank}" onchange="updatePlayer(${index}, 'rank', this.value)" style="width: 70px;"></td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="deletePlayer(${index})">🗑️</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+  
+  document.getElementById('playerCount').textContent = players.length;
+};
+
+window.updatePlayer = function(index, field, value) {
+  players[index][field] = field === 'rank' ? parseInt(value) || 0 : value;
+};
+
+window.deletePlayer = function(index) {
+  if (confirm('Delete this player?')) {
+    players.splice(index, 1);
+    renderPlayers();
+  }
+};
+
+window.exportCSV = function() {
+  let csv = 'Name,Team,Age Group,Gender,Weight,Belt,Rank\n';
+  players.forEach(p => {
+    csv += `"${p.name}","${p.team}","${p.ageGroup}","${p.gender}","${p.weight}","${p.belt}",${p.rank}\n`;
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `players_${tournamentId}.csv`;
+  a.click();
+};
+
+// Mats Management
+window.updateMats = function() {
+  const count = parseInt(document.getElementById('matsCount').value);
+  
+  while (mats.length < count) {
+    mats.push({
+      id: mats.length + 1,
+      tournament_id: tournamentId,
+      ageGroups: [],
+      genders: [],
+      weights: [],
+      belts: []
+    });
+  }
+  
+  mats = mats.slice(0, count);
+  renderMats();
+};
+
+window.renderMats = function() {
+  const grid = document.getElementById('matsGrid');
+  if (!grid) return;
+  
+  grid.innerHTML = '';
+  
+  mats.forEach(mat => {
+    const div = document.createElement('div');
+    div.className = 'section';
+    div.innerHTML = `
+      <h3 style="color: #667eea; margin-bottom: 15px;">🥋 Mat ${mat.id}</h3>
+      
+      <div style="margin-bottom: 12px;">
+        <label style="font-weight: 600; font-size: 0.9rem; color: #64748b;">Age Groups:</label>
+        <div style="margin-top: 5px;">
+          ${mat.ageGroups.map((age, i) => `
+            <span class="badge badge-warning" style="margin-right: 5px; margin-bottom: 5px; display: inline-block;">
+              ${age} <span style="cursor: pointer; margin-left: 5px;" onclick="removeMatCategory(${mat.id}, 'ageGroups', ${i})">×</span>
+            </span>
+          `).join('') || '<span style="color: #94a3b8; font-size: 0.85rem;">None selected</span>'}
+        </div>
+        <select onchange="addMatCategory(${mat.id}, 'ageGroups', this.value)" style="margin-top: 5px; width: 100%;">
+          <option value="">Add Age Group...</option>
+          <option>Kids 1</option><option>Kids 2</option><option>Kids 3</option>
+          <option>Infant</option><option>Junior</option><option>Teen</option>
+          <option>Youth</option><option>Amateur/Professional</option>
+          <option>Master 1</option><option>Master 2</option>
+        </select>
+      </div>
+      
+      <div style="margin-bottom: 12px;">
+        <label style="font-weight: 600; font-size: 0.9rem; color: #64748b;">Genders:</label>
+        <div style="margin-top: 5px;">
+          ${mat.genders.map((g, i) => `
+            <span class="badge badge-warning" style="margin-right: 5px; margin-bottom: 5px; display: inline-block;">
+              ${g} <span style="cursor: pointer; margin-left: 5px;" onclick="removeMatCategory(${mat.id}, 'genders', ${i})">×</span>
+            </span>
+          `).join('') || '<span style="color: #94a3b8; font-size: 0.85rem;">None selected</span>'}
+        </div>
+        <select onchange="addMatCategory(${mat.id}, 'genders', this.value)" style="margin-top: 5px; width: 100%;">
+          <option value="">Add Gender...</option>
+          <option>Men</option><option>Women</option><option>Boys</option><option>Girls</option>
+        </select>
+      </div>
+      
+      <div style="margin-bottom: 12px;">
+        <label style="font-weight: 600; font-size: 0.9rem; color: #64748b;">Weights:</label>
+        <div style="margin-top: 5px;">
+          ${mat.weights.map((w, i) => `
+            <span class="badge badge-warning" style="margin-right: 5px; margin-bottom: 5px; display: inline-block;">
+              ${w}kg <span style="cursor: pointer; margin-left: 5px;" onclick="removeMatCategory(${mat.id}, 'weights', ${i})">×</span>
+            </span>
+          `).join('') || '<span style="color: #94a3b8; font-size: 0.85rem;">None selected</span>'}
+        </div>
+        <input type="text" placeholder="Add weight (e.g., 77)" onkeydown="if(event.key==='Enter'){addMatCategory(${mat.id}, 'weights', this.value); this.value='';}" style="margin-top: 5px;">
+      </div>
+      
+      <div style="margin-bottom: 12px;">
+        <label style="font-weight: 600; font-size: 0.9rem; color: #64748b;">Belts:</label>
+        <div style="margin-top: 5px;">
+          ${mat.belts.map((b, i) => `
+            <span class="badge badge-warning" style="margin-right: 5px; margin-bottom: 5px; display: inline-block;">
+              ${b} <span style="cursor: pointer; margin-left: 5px;" onclick="removeMatCategory(${mat.id}, 'belts', ${i})">×</span>
+            </span>
+          `).join('') || '<span style="color: #94a3b8; font-size: 0.85rem;">None selected</span>'}
+        </div>
+        <select onchange="addMatCategory(${mat.id}, 'belts', this.value)" style="margin-top: 5px; width: 100%;">
+          <option value="">Add Belt...</option>
+          <option>White</option><option>Blue</option><option>Purple</option><option>Brown</option><option>Black</option>
+        </select>
+      </div>
+    `;
+    
+    grid.appendChild(div);
+  });
+};
+
+window.addMatCategory = function(matId, type, value) {
+  if (!value) return;
+  
+  const mat = mats.find(m => m.id === matId);
+  if (mat && !mat[type].includes(value)) {
+    mat[type].push(value);
+    renderMats();
+  }
+};
+
+window.removeMatCategory = function(matId, type, index) {
+  const mat = mats.find(m => m.id === matId);
+  if (mat) {
+    mat[type].splice(index, 1);
+    renderMats();
+  }
+};
+
+window.renderBrackets = function() {
+  const content = document.getElementById('bracketsContent');
+  if (!content) return;
   
   if (players.length === 0) {
-    html += '<div style="text-align:center;padding:40px;color:#8899aa;">';
-    html += '<div style="font-size:3rem;margin-bottom:15px;">👥</div>';
-    html += '<div>No players registered yet</div>';
-    html += '<button class="btn btn-primary" style="margin-top:15px;" onclick="showView(\'players\')">➕ Add Players</button>';
-    html += '</div>';
-    container.innerHTML = html;
+    content.innerHTML = `
+      <div style="text-align: center; padding: 60px 20px; color: #64748b;">
+        <div style="font-size: 4rem; margin-bottom: 20px;">👥</div>
+        <h3 style="margin-bottom: 10px;">No Players Yet</h3>
+        <p>Add players to generate tournament brackets</p>
+        <button class="btn btn-primary" onclick="showTab('players')" style="margin-top: 20px;">
+          ➕ Add Players
+        </button>
+      </div>
+    `;
     return;
   }
   
   // Group players by category
-  var categoryMap = {};
-  for (var i = 0; i < players.length; i++) {
-    var p = players[i];
-    
-    // Check if player matches mat filters
-    var matchAge = mat.ageGroups.length === 0 || mat.ageGroups.indexOf(p.ageGroup) !== -1;
-    var matchGender = mat.genders.length === 0 || mat.genders.indexOf(p.gender) !== -1;
-    var matchWeight = mat.weights.length === 0 || mat.weights.indexOf(p.weight) !== -1;
-    var matchBelt = mat.belts.length === 0 || mat.belts.indexOf(p.belt) !== -1;
-    
-    if (matchAge && matchGender && matchWeight && matchBelt) {
-      var key = p.ageGroup + '|' + p.gender + '|' + p.weight + '|' + p.belt;
-      if (!categoryMap[key]) {
-        categoryMap[key] = {
-          ageGroup: p.ageGroup,
-          gender: p.gender,
-          weight: p.weight,
-          belt: p.belt,
-          players: []
-        };
-      }
-      categoryMap[key].players.push(p);
+  const categories = {};
+  players.forEach(p => {
+    const key = `${p.ageGroup}|${p.gender}|${p.weight}|${p.belt}`;
+    if (!categories[key]) {
+      categories[key] = {
+        ageGroup: p.ageGroup,
+        gender: p.gender,
+        weight: p.weight,
+        belt: p.belt,
+        players: []
+      };
     }
-  }
+    categories[key].players.push(p);
+  });
   
-  var categoryKeys = Object.keys(categoryMap);
+  let html = '<div class="grid grid-2">';
   
-  if (categoryKeys.length === 0) {
-    html += '<div style="text-align:center;padding:40px;color:#8899aa;">';
-    html += '<div style="font-size:3rem;margin-bottom:15px;"></div>';
-    html += '<div>No categories match the mat filters</div>';
-    html += '<div style="margin-top:10px;font-size:0.9rem;">Mat Filters: ' + (mat.ageGroups.join(', ') || 'All') + ' | ' + (mat.genders.join(', ') || 'All') + '</div>';
-    html += '<button class="btn btn-warning" style="margin-top:15px;" onclick="clearMatFilters()">Clear Mat Filters</button>';
-    html += '</div>';
-    container.innerHTML = html;
-    return;
-  }
-  
-  html += '<div style="margin-bottom:15px;padding:15px;background:rgba(241,196,15,0.1);border-radius:8px;">';
-  html += '<div style="color:#f1c40f;font-weight:bold;margin-bottom:5px;">📊 Summary</div>';
-  html += '<div style="color:#8899aa;">Total Players: ' + players.length + ' | Matching: ' + categoryKeys.reduce(function(sum, key) { return sum + categoryMap[key].players.length; }, 0) + '</div>';
-  html += '<div style="color:#8899aa;font-size:0.9rem;margin-top:5px;">Mat Filters: ' + (mat.ageGroups.join(', ') || 'All Ages') + ' | ' + (mat.genders.join(', ') || 'All Genders') + '</div>';
-  html += '</div>';
-  
-  html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:15px;">';
-  
-  for (var i = 0; i < categoryKeys.length; i++) {
-    var cat = categoryMap[categoryKeys[i]];
-    var playerCount = cat.players.length;
+  Object.values(categories).forEach((cat, idx) => {
+    const playerCount = cat.players.length;
+    const isReady = playerCount >= 2;
     
-    var borderColor = playerCount >= 2 ? '#27ae60' : '#e74c3c';
-    var statusIcon = playerCount >= 2 ? '✅' : '️';
-    var statusText = playerCount >= 2 ? 'Ready' : 'Need more players';
-    
-    html += '<div style="background:#151d2b;border:2px solid ' + borderColor + ';border-radius:10px;padding:15px;">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
-    html += '<div style="font-size:1.1rem;font-weight:bold;color:#f1c40f;">' + statusIcon + ' Category</div>';
-    html += '<div style="background:' + borderColor + ';color:#fff;padding:4px 12px;border-radius:12px;font-size:0.85rem;">' + playerCount + ' Players</div>';
-    html += '</div>';
-    
-    html += '<div style="color:#8899aa;font-size:0.9rem;margin-bottom:10px;">';
-    html += '<div><strong>Age:</strong> ' + cat.ageGroup + '</div>';
-    html += '<div><strong>Gender:</strong> ' + cat.gender + '</div>';
-    if (cat.weight) html += '<div><strong>Weight:</strong> ' + cat.weight + 'kg</div>';
-    html += '<div><strong>Belt:</strong> ' + cat.belt + '</div>';
-    html += '</div>';
-    
-    html += '<div style="color:#8899aa;font-size:0.85rem;margin-bottom:10px;">';
-    html += '<div><strong>Players:</strong> ' + cat.players.map(function(p) { return p.name || 'Unnamed'; }).join(', ') + '</div>';
-    html += '</div>';
-    
-    if (playerCount >= 2) {
-      html += '<button class="btn btn-primary" style="width:100%;" onclick="createBracket(\'' + categoryKeys[i] + '\')"> Create Bracket</button>';
-    } else {
-      html += '<button class="btn btn-secondary" style="width:100%;" disabled>⚠️ Need ' + (2 - playerCount) + ' more player(s)</button>';
-    }
-    
-    html += '</div>';
-  }
+    html += `
+      <div class="section" style="border-left: 4px solid ${isReady ? '#10b981' : '#f59e0b'};">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+          <div>
+            <h4 style="color: #2c3e50; margin-bottom: 5px;">Category ${idx + 1}</h4>
+            <div style="color: #64748b; font-size: 0.9rem;">
+              <div>📅 ${cat.ageGroup}</div>
+              <div>👤 ${cat.gender}</div>
+              ${cat.weight ? `<div>⚖️ ${cat.weight}kg</div>` : ''}
+              <div>🥋 ${cat.belt}</div>
+            </div>
+          </div>
+          <span class="badge ${isReady ? 'badge-success' : 'badge-warning'}">
+            ${playerCount} Player${playerCount !== 1 ? 's' : ''}
+          </span>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+          <strong style="font-size: 0.85rem; color: #64748b;">Players:</strong>
+          <div style="margin-top: 5px; color: #475569; font-size: 0.9rem;">
+            ${cat.players.map(p => p.name || 'Unnamed').join(', ')}
+          </div>
+        </div>
+        
+        ${isReady ? `
+          <button class="btn btn-primary" style="width: 100%;" onclick="generateBracket(${idx})">
+            🏆 Generate Bracket
+          </button>
+        ` : `
+          <button class="btn btn-secondary" style="width: 100%;" disabled>
+            ⚠️ Need ${2 - playerCount} more player${2 - playerCount !== 1 ? 's' : ''}
+          </button>
+        `}
+      </div>
+    `;
+  });
   
   html += '</div>';
-  container.innerHTML = html;
+  content.innerHTML = html;
 };
 
-window.clearMatFilters = function() {
-  for (var i = 0; i < mats.length; i++) {
-    mats[i].ageGroups = [];
-    mats[i].genders = [];
-    mats[i].weights = [];
-    mats[i].belts = [];
-  }
-  renderMats();
-  renderCategories();
-  saveData();
+window.generateBracket = function(categoryIndex) {
+  alert('Bracket generation feature coming soon!');
 };
 
-window.createBracket = function(categoryKey) {
-  alert('Create bracket for category: ' + categoryKey);
-  // This would create the bracket in a full implementation
-};
+// Utility
+function saveToLocal() {
+  localStorage.setItem('tournament_' + tournamentId, JSON.stringify({
+    players: players,
+    mats: mats,
+    timestamp: new Date().toISOString()
+  }));
+}
+
+// Auto-save
+setInterval(saveToLocal, 30000); // Save every 30 seconds
+</script>
+
+</body>
+</html>
