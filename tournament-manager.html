@@ -571,10 +571,10 @@ tr:hover { background: rgba(241,196,15,0.05); }
       <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
         <button class="btn btn-primary" id="btnAddPlayer">➕ Add Player</button>
         <button class="btn btn-secondary" id="btnAdd10">➕ Add 10</button>
-        <button class="btn btn-info" id="btnImportCSV"> Import CSV</button>
+        <button class="btn btn-info" id="btnImportCSV">📥 Import CSV</button>
         <input type="file" id="csvImport" accept=".csv" style="display:none">
-        <button class="btn btn-info" id="btnExportCSV"> Export CSV</button>
-        <button class="btn btn-warning" id="btnSyncDB"> Sync with DB</button>
+        <button class="btn btn-info" id="btnExportCSV">📤 Export CSV</button>
+        <button class="btn btn-warning" id="btnSyncDB">🔄 Sync with DB</button>
       </div>
       <div class="table-container">
         <table>
@@ -589,14 +589,14 @@ tr:hover { background: rgba(241,196,15,0.05); }
   <!-- Mats View -->
   <div id="view-mats" class="view">
     <div class="section">
-      <div class="section-title-main">🥋 Mats Setup</div>
+      <div class="section-title-main"> Mats Setup</div>
       <div style="margin-bottom: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
         <label style="font-weight: bold; color: #f1c40f;">Number of Mats: </label>
         <select id="matsCount" style="width: auto; display: inline-block;">
           <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
           <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
         </select>
-        <button class="btn btn-info btn-sm" style="margin-left: 15px;" id="btnOpenAllMats">🪟 Open All Mats</button>
+        <button class="btn btn-info btn-sm" style="margin-left: 15px;" id="btnOpenAllMats"> Open All Mats</button>
       </div>
       <div id="matsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;"></div>
       <button class="btn btn-primary btn-block mt-2" id="btnOpenDashboard">🏆 Open Mat Dashboard →</button>
@@ -617,7 +617,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
     <div class="section">
       <div class="section-title-main">📊 Mat Dashboard</div>
       <div class="tabs">
-        <button class="tab active" id="tabCategories"> Categories</button>
+        <button class="tab active" id="tabCategories">📋 Categories</button>
         <button class="tab" id="tabQueue">⏳ Queue</button>
         <button class="tab" id="tabCallup">📢 Call-Up</button>
         <button class="tab" id="tabStandings">🏆 Standings</button>
@@ -724,7 +724,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
       <div class="player-controls">
         <!-- Red Player Section -->
         <div class="player-section red">
-          <div class="section-title red"> Red Player</div>
+          <div class="section-title red">🔴 Red Player</div>
           
           <div class="ap-display">
             <div class="ap-box">
@@ -732,7 +732,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
               <div class="ap-value" id="advantage1">0</div>
             </div>
             <div class="ap-box">
-              <div class="ap-label"> Penalty</div>
+              <div class="ap-label">🟥 Penalty</div>
               <div class="ap-value" id="penalty1">0</div>
             </div>
           </div>
@@ -750,7 +750,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
 
           <div class="large-action-buttons">
             <button class="action-btn advantage" onclick="addAdvantage(1)">⭐ Advantage</button>
-            <button class="action-btn penalty" onclick="addPenalty(1)">🟥 Penalty</button>
+            <button class="action-btn penalty" onclick="addPenalty(1)"> Penalty</button>
           </div>
 
           <button class="undo-btn" onclick="undoPlayer(1)">↩️ Undo</button>
@@ -787,7 +787,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
             <button class="action-btn penalty" onclick="addPenalty(2)">🟥 Penalty</button>
           </div>
 
-          <button class="undo-btn" onclick="undoPlayer(2)">️ Undo</button>
+          <button class="undo-btn" onclick="undoPlayer(2)">↩️ Undo</button>
         </div>
       </div>
 
@@ -797,7 +797,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
           <span style="color: #f39c12; font-weight: bold;">⚡ Golden Time:</span>
           <input type="number" class="golden-time-input" id="goldenTimeMinutes" value="1" min="1" max="10">
           <span style="color: #8899aa;">minutes</span>
-          <button class="btn btn-warning" onclick="activateGoldenTime()" id="btnActivateGolden"> Activate Golden Time</button>
+          <button class="btn btn-warning" onclick="activateGoldenTime()" id="btnActivateGolden">⚡ Activate Golden Time</button>
         </div>
       </div>
 
@@ -872,7 +872,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
         console.log('✅ Loaded weight classes:', weightClassesData.length);
       }
     } catch (err) {
-      console.error(' Error loading dropdown data:', err);
+      console.error('❌ Error loading dropdown data:', err);
     }
   }
 
@@ -1038,6 +1038,53 @@ tr:hover { background: rgba(241,196,15,0.05); }
     if (countEl) countEl.innerText = players.length + ' / 200';
   }
 
+  // CSV Import/Export Functions - FIXED
+  function importCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = e => {
+      const lines = e.target.result.split('\n').filter(l => l.trim());
+      for (let i = 1; i < lines.length && players.length < 200; i++) {
+        const vals = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+        if (vals.length >= 3) {
+          players.push({
+            id: Date.now() + i + Math.random(),
+            name: vals[0] || '',
+            team: vals[1] || '',
+            ageGroup: vals[2] || 'Amateur/Professional',
+            gender: 'Men',
+            weight: vals[4] || '',
+            belt: vals[5] || 'White',
+            rank: parseInt(vals[6]) || players.length + 1
+          });
+        }
+      }
+      renderPlayers();
+      saveData();
+      showNotification('✅ Imported ' + (lines.length - 1) + ' players!');
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  }
+
+  function exportCSV() {
+    let csv = 'Name,Team,Age Group,Gender,Weight,Belt,Rank\n';
+    players.forEach(p => {
+      csv += `"${p.name}","${p.team}","${p.ageGroup}","${p.gender}","${p.weight}","${p.belt}",${p.rank}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'players.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    showNotification('✅ CSV exported successfully!');
+  }
+
   // Mat Management
   function updateMats() {
     const count = parseInt(document.getElementById('matsCount').value);
@@ -1076,7 +1123,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
       ).join('') || '<span style="color: #556; font-size: 0.8rem;">No genders</span>';
       
       const weightTags = mat.weights.map((w, i) => 
-        `<span class="tag">${w} <span class="tag-remove" data-mat="${mat.id}" data-type="weights" data-index="${i}"></span></span>`
+        `<span class="tag">${w} <span class="tag-remove" data-mat="${mat.id}" data-type="weights" data-index="${i}">✕</span></span>`
       ).join('') || '<span style="color: #556; font-size: 0.8rem;">No weights</span>';
       
       const beltTags = mat.belts.map((b, i) => 
@@ -1084,7 +1131,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
       ).join('') || '<span style="color: #556; font-size: 0.8rem;">No belts</span>';
       
       div.innerHTML = `
-        <h3 style="color: #f1c40f; margin-bottom: 10px;"> Mat ${mat.id}</h3>
+        <h3 style="color: #f1c40f; margin-bottom: 10px;">🥋 Mat ${mat.id}</h3>
         <div style="margin-bottom: 10px;">
           <strong style="color: #8899aa; font-size: 0.8rem;">AGE GROUPS</strong>
           <div style="margin-top: 5px;">${ageTags}</div>
@@ -1119,7 +1166,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
         </div>
         <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
           <button class="btn btn-info mat-dashboard-btn" style="flex: 1;" data-mat="${mat.id}">📋 Dashboard</button>
-          <button class="btn btn-purple mat-newtab-btn" style="flex: 1;" data-mat="${mat.id}"> New Tab</button>
+          <button class="btn btn-purple mat-newtab-btn" style="flex: 1;" data-mat="${mat.id}">🪟 New Tab</button>
         </div>
       `;
       
@@ -1279,9 +1326,9 @@ tr:hover { background: rgba(241,196,15,0.05); }
       html += '</div>';
       
       if (isReady) {
-        html += '<button class="btn btn-primary btn-block create-bracket-btn" data-key="' + key + '"> Create Bracket</button>';
+        html += '<button class="btn btn-primary btn-block create-bracket-btn" data-key="' + key + '">🏆 Create Bracket</button>';
       } else {
-        html += '<button class="btn btn-secondary btn-block" disabled>⚠️ Need ' + (2 - playerCount) + ' more player(s)</button>';
+        html += '<button class="btn btn-secondary btn-block" disabled>️ Need ' + (2 - playerCount) + ' more player(s)</button>';
       }
       
       html += '</div>';
@@ -1465,13 +1512,13 @@ tr:hover { background: rgba(241,196,15,0.05); }
         if (match.status === 'pending' && match.player1 && match.player2) {
           html += '<div class="bracket-match-actions">';
           html += `<button class="btn btn-sm btn-primary" onclick="window.openScoreboard('${categoryKey}', ${roundIndex}, ${matchIndex})">▶ Play</button>`;
-          html += `<button class="btn btn-sm btn-warning" onclick="window.openEditMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">⚙️ Edit</button>`;
+          html += `<button class="btn btn-sm btn-warning" onclick="window.openEditMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">️ Edit</button>`;
           html += '</div>';
         } else if (match.status === 'completed') {
           html += `<div style="text-align: center; margin-top: 8px; color: #27ae60; font-size: 0.85rem;">✅ Completed</div>`;
           html += `<button class="btn btn-sm btn-warning btn-block" style="margin-top: 5px;" onclick="window.openEditMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">⚙️ Edit</button>`;
         } else if (!match.player1 || !match.player2) {
-          html += `<div style="text-align: center; margin-top: 8px; color: #8899aa; font-size: 0.85rem;"> Waiting</div>`;
+          html += `<div style="text-align: center; margin-top: 8px; color: #8899aa; font-size: 0.85rem;">⏳ Waiting</div>`;
           if (match.player1 || match.player2) {
             html += `<button class="btn btn-sm btn-warning btn-block" style="margin-top: 5px;" onclick="window.openEditMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">⚙️ Edit</button>`;
           }
@@ -1892,7 +1939,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
         
         if (item.match.status === 'pending' && item.match.player1 && item.match.player2) {
           html += `<button class="btn btn-sm btn-primary" onclick="window.openScoreboard('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">▶ Play</button>`;
-          html += `<button class="btn btn-sm btn-warning" onclick="window.openEditMatch('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">️ Edit</button>`;
+          html += `<button class="btn btn-sm btn-warning" onclick="window.openEditMatch('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">⚙️ Edit</button>`;
         }
         
         html += `</div>`;
@@ -1929,12 +1976,12 @@ tr:hover { background: rgba(241,196,15,0.05); }
     
     if (currentMatches.length > 0) {
       html += '<div style="margin-bottom: 20px; padding: 15px; background: rgba(241,196,15,0.1); border-radius: 8px; border: 2px solid #f1c40f;">';
-      html += '<h4 style="color: #f1c40f; margin-bottom: 10px;"> CURRENTLY FIGHTING</h4>';
+      html += '<h4 style="color: #f1c40f; margin-bottom: 10px;">🔴 CURRENTLY FIGHTING</h4>';
       currentMatches.forEach(item => {
         html += `<div style="padding: 10px; background: #1a1f2e; border-radius: 6px; margin-bottom: 10px;">`;
         html += `<div style="font-size: 1.2rem; font-weight: bold; color: #fff;">${item.match.player1.name} vs ${item.match.player2.name}</div>`;
         html += `<div style="color: #8899aa;">${item.category.ageGroup} | ${item.category.gender} | ${item.category.weight}kg</div>`;
-        html += `<button class="btn btn-sm btn-primary mt-2" onclick="window.openScoreboard('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">📋 Open Scoreboard</button>`;
+        html += `<button class="btn btn-sm btn-primary mt-2" onclick="window.openScoreboard('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})"> Open Scoreboard</button>`;
         html += `</div>`;
       });
       html += '</div>';
@@ -2117,7 +2164,7 @@ tr:hover { background: rgba(241,196,15,0.05); }
       const key = getStorageKey();
       localStorage.removeItem(key);
       renderPlayers();
-      showNotification('🗑️ All data cleared!');
+      showNotification('️ All data cleared!');
     }
   }
 
