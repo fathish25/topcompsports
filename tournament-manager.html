@@ -176,7 +176,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       <span class="sync-status connected" id="tabSyncStatus">● Connected to Database</span>
     </div>
     <div>
-      <button class="btn btn-sm btn-secondary" onclick="showView('dashboard')">📋 Open Dashboard</button>
+      <button class="btn btn-sm btn-secondary" onclick="showView('dashboard')"> Open Dashboard</button>
       <button class="btn btn-sm btn-info" onclick="openAllMatsInTabs()">🪟 Open All Mats</button>
     </div>
   </div>
@@ -238,14 +238,14 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     <div class="section">
       <div class="section-title">
         <span>📊 Mat Dashboard</span>
-        <button class="btn btn-info" onclick="openCurrentMatInNewTab()">🪟 Open in New Tab</button>
-        <button class="btn btn-purple btn-sm" onclick="openAllMatsInTabs()">🪟 Open All Mats</button>
+        <button class="btn btn-info" onclick="openCurrentMatInNewTab()"> Open in New Tab</button>
+        <button class="btn btn-purple btn-sm" onclick="openAllMatsInTabs()"> Open All Mats</button>
       </div>
       <div class="tabs">
         <button class="tab active" onclick="switchTab('categories')">📋 Categories</button>
-        <button class="tab" onclick="switchTab('queue')">📋 Queue</button>
-        <button class="tab" onclick="switchTab('callup')">📢 Call-Up</button>
-        <button class="tab" onclick="switchTab('standings')">🏆 Standings</button>
+        <button class="tab" onclick="switchTab('queue')"> Queue</button>
+        <button class="tab" onclick="switchTab('callup')"> Call-Up</button>
+        <button class="tab" onclick="switchTab('standings')"> Standings</button>
       </div>
       <div id="tab-categories" class="tab-content active"></div>
       <div id="tab-queue" class="tab-content"></div>
@@ -378,7 +378,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         <button class="btn btn-warning" onclick="stopTimer()">⏸ Pause</button>
         <button class="btn btn-danger" onclick="finishMatch()"> Finish</button>
         <button class="btn btn-dark" onclick="swapPlayers()">🔄 Swap</button>
-        <button class="btn btn-secondary" onclick="resetScoreboard()">↺ Reset</button>
+        <button class="btn btn-secondary" onclick="resetScoreboard()"> Reset</button>
       </div>
     </div>
   </div>
@@ -431,24 +431,15 @@ let isStandaloneTab = false;
 let tournamentId = null;
 
 // ==========================================
-// 3. CONSTANTS
+// 3. CONSTANTS - سيتم ملؤها من قاعدة البيانات
 // ==========================================
-const AGE_GROUPS = {
-  'Kids 1': { age: '4-5', time: 2, goldenTime: 1, category: 'under16' },
-  'Kids 2': { age: '6-7', time: 2, goldenTime: 1, category: 'under16' },
-  'Kids 3': { age: '8-9', time: 2, goldenTime: 1, category: 'under16' },
-  'Infant': { age: '10-11', time: 3, goldenTime: 1, category: 'under16' },
-  'Junior': { age: '12-13', time: 3, goldenTime: 1, category: 'under16' },
-  'Teen': { age: '14-15', time: 3, goldenTime: 1, category: 'under16' },
-  'Youth': { age: '16-17', time: 4, goldenTime: 1, category: 'over16' },
-  'Amateur/Professional': { age: '18-29', time: 5, goldenTime: 1, category: 'over16' },
-  'Master 1': { age: '30-35', time: 5, goldenTime: 1, category: 'over16' },
-  'Master 2': { age: '36-40', time: 5, goldenTime: 1, category: 'over16' },
-  'Master 3': { age: '41-45', time: 5, goldenTime: 1, category: 'over16' },
-  'Master 4': { age: '46+', time: 5, goldenTime: 1, category: 'over16' }
-};
+let AGE_GROUPS = {};
+let WEIGHT_CLASSES = {};
+let BELT_LEVELS = [];
+let GENDERS = [];
 
-const WEIGHTS = {
+// البيانات الاحتياطية (في حالة عدم وجود اتصال بقاعدة البيانات)
+const FALLBACK_WEIGHTS = {
   'Boys': {
     'Kids 1': ['-16kg','-18kg','-21kg','-24kg','-28kg','-32kg','-36kg','-40kg','+40kg'],
     'Kids 2': ['-18kg','-20kg','-23kg','-26kg','-30kg','-34kg','-38kg','-42kg','+42kg'],
@@ -483,7 +474,7 @@ const WEIGHTS = {
   }
 };
 
-const BELTS = {
+const FALLBACK_BELTS = {
   'Kids': ['White', 'Grey', 'Yellow', 'Orange', 'Green'],
   'Youth': ['White', 'Blue', 'Purple'],
   'Amateur': ['White', 'Blue'],
@@ -493,26 +484,184 @@ const BELTS = {
 // ==========================================
 // 4. HELPER FUNCTIONS
 // ==========================================
+
+// دالة جديدة لجلب البيانات من قاعدة البيانات
+async function loadReferenceData() {
+  if (!supabaseClient) {
+    console.log('⚠️ Supabase client not initialized, using fallback data');
+    // استخدام البيانات الاحتياطية
+    AGE_GROUPS = {
+      'Kids 1': { age: '4-5', time: 2, goldenTime: 1, category: 'under16' },
+      'Kids 2': { age: '6-7', time: 2, goldenTime: 1, category: 'under16' },
+      'Kids 3': { age: '8-9', time: 2, goldenTime: 1, category: 'under16' },
+      'Infant': { age: '10-11', time: 3, goldenTime: 1, category: 'under16' },
+      'Junior': { age: '12-13', time: 3, goldenTime: 1, category: 'under16' },
+      'Teen': { age: '14-15', time: 3, goldenTime: 1, category: 'under16' },
+      'Youth': { age: '16-17', time: 4, goldenTime: 1, category: 'over16' },
+      'Amateur/Professional': { age: '18-29', time: 5, goldenTime: 1, category: 'over16' },
+      'Master 1': { age: '30-35', time: 5, goldenTime: 1, category: 'over16' },
+      'Master 2': { age: '36-40', time: 5, goldenTime: 1, category: 'over16' },
+      'Master 3': { age: '41-45', time: 5, goldenTime: 1, category: 'over16' },
+      'Master 4': { age: '46+', time: 5, goldenTime: 1, category: 'over16' }
+    };
+    return;
+  }
+  
+  try {
+    console.log('🔄 Loading reference data from database...');
+    
+    // جلب الفئات العمرية
+    const { data: ageData, error: ageError } = await supabaseClient
+      .from('age_groups')
+      .select('*')
+      .order('min_age');
+    
+    if (!ageError && ageData && ageData.length > 0) {
+      ageData.forEach(ag => {
+        AGE_GROUPS[ag.name] = {
+          age: `${ag.min_age}-${ag.max_age}`,
+          time: ag.duration || 5,
+          goldenTime: 1,
+          category: ag.min_age < 16 ? 'under16' : 'over16'
+        };
+      });
+      console.log('✅ Loaded age groups:', ageData.length);
+    } else {
+      console.log('️ No age groups in DB, using fallback');
+      // استخدام البيانات الاحتياطية
+      AGE_GROUPS = {
+        'Kids 1': { age: '4-5', time: 2, goldenTime: 1, category: 'under16' },
+        'Kids 2': { age: '6-7', time: 2, goldenTime: 1, category: 'under16' },
+        'Kids 3': { age: '8-9', time: 2, goldenTime: 1, category: 'under16' },
+        'Infant': { age: '10-11', time: 3, goldenTime: 1, category: 'under16' },
+        'Junior': { age: '12-13', time: 3, goldenTime: 1, category: 'under16' },
+        'Teen': { age: '14-15', time: 3, goldenTime: 1, category: 'under16' },
+        'Youth': { age: '16-17', time: 4, goldenTime: 1, category: 'over16' },
+        'Amateur/Professional': { age: '18-29', time: 5, goldenTime: 1, category: 'over16' },
+        'Master 1': { age: '30-35', time: 5, goldenTime: 1, category: 'over16' },
+        'Master 2': { age: '36-40', time: 5, goldenTime: 1, category: 'over16' },
+        'Master 3': { age: '41-45', time: 5, goldenTime: 1, category: 'over16' },
+        'Master 4': { age: '46+', time: 5, goldenTime: 1, category: 'over16' }
+      };
+    }
+    
+    // جلب فئات الوزن
+    const { data: weightData, error: weightError } = await supabaseClient
+      .from('weight_classes')
+      .select('*')
+      .order('max_weight');
+    
+    if (!weightError && weightData && weightData.length > 0) {
+      weightData.forEach(wc => {
+        const gender = wc.gender || 'Men';
+        const ageGroup = wc.age_group || 'Amateur/Professional';
+        
+        if (!WEIGHT_CLASSES[gender]) WEIGHT_CLASSES[gender] = {};
+        if (!WEIGHT_CLASSES[gender][ageGroup]) WEIGHT_CLASSES[gender][ageGroup] = [];
+        
+        WEIGHT_CLASSES[gender][ageGroup].push(wc.name || `${wc.min_weight}-${wc.max_weight}kg`);
+      });
+      console.log('✅ Loaded weight classes');
+    } else {
+      console.log('⚠️ No weight classes in DB, using fallback');
+      WEIGHT_CLASSES = FALLBACK_WEIGHTS;
+    }
+    
+    // جلب مستويات الأحزمة
+    const { data: beltData, error: beltError } = await supabaseClient
+      .from('belt_levels')
+      .select('*')
+      .order('sort_order');
+    
+    if (!beltError && beltData && beltData.length > 0) {
+      BELT_LEVELS = beltData.map(b => b.name);
+      console.log('✅ Loaded belt levels:', BELT_LEVELS.length);
+    } else {
+      console.log('⚠️ No belt levels in DB, using fallback');
+      BELT_LEVELS = ['White', 'Blue', 'Purple', 'Brown', 'Black'];
+    }
+    
+    // جلب الجنسين
+    const { data: genderData, error: genderError } = await supabaseClient
+      .from('genders')
+      .select('*');
+    
+    if (!genderError && genderData && genderData.length > 0) {
+      GENDERS = genderData.map(g => g.name);
+      console.log('✅ Loaded genders:', GENDERS.length);
+    } else {
+      console.log('️ No genders in DB, using fallback');
+      GENDERS = ['Men', 'Women', 'Boys', 'Girls'];
+    }
+    
+  } catch (err) {
+    console.error('❌ Error loading reference data:', err);
+    // استخدام البيانات الاحتياطية في حالة الخطأ
+    AGE_GROUPS = {
+      'Kids 1': { age: '4-5', time: 2, goldenTime: 1, category: 'under16' },
+      'Kids 2': { age: '6-7', time: 2, goldenTime: 1, category: 'under16' },
+      'Kids 3': { age: '8-9', time: 2, goldenTime: 1, category: 'under16' },
+      'Infant': { age: '10-11', time: 3, goldenTime: 1, category: 'under16' },
+      'Junior': { age: '12-13', time: 3, goldenTime: 1, category: 'under16' },
+      'Teen': { age: '14-15', time: 3, goldenTime: 1, category: 'under16' },
+      'Youth': { age: '16-17', time: 4, goldenTime: 1, category: 'over16' },
+      'Amateur/Professional': { age: '18-29', time: 5, goldenTime: 1, category: 'over16' },
+      'Master 1': { age: '30-35', time: 5, goldenTime: 1, category: 'over16' },
+      'Master 2': { age: '36-40', time: 5, goldenTime: 1, category: 'over16' },
+      'Master 3': { age: '41-45', time: 5, goldenTime: 1, category: 'over16' },
+      'Master 4': { age: '46+', time: 5, goldenTime: 1, category: 'over16' }
+    };
+    WEIGHT_CLASSES = FALLBACK_WEIGHTS;
+    BELT_LEVELS = ['White', 'Blue', 'Purple', 'Brown', 'Black'];
+    GENDERS = ['Men', 'Women', 'Boys', 'Girls'];
+  }
+}
+
 function getGenderOptions(ageGroup) {
+  // إذا كانت البيانات موجودة من قاعدة البيانات
+  if (GENDERS.length > 0) {
+    return GENDERS;
+  }
+  
+  // fallback للبيانات الثابتة
   const category = AGE_GROUPS[ageGroup]?.category;
   if (category === 'under16') return ['Boys', 'Girls'];
   return ['Men', 'Women'];
 }
 
 function getWeightOptions(gender, ageGroup) {
-  if (WEIGHTS[gender] && WEIGHTS[gender][ageGroup]) return WEIGHTS[gender][ageGroup];
+  // إذا كانت البيانات موجودة من قاعدة البيانات
+  if (WEIGHT_CLASSES[gender] && WEIGHT_CLASSES[gender][ageGroup]) {
+    return WEIGHT_CLASSES[gender][ageGroup];
+  }
+  
+  // fallback للبيانات الثابتة
+  if (FALLBACK_WEIGHTS[gender] && FALLBACK_WEIGHTS[gender][ageGroup]) {
+    return FALLBACK_WEIGHTS[gender][ageGroup];
+  }
   return [];
 }
 
 function getBeltOptions(ageGroup) {
+  // إذا كانت البيانات موجودة من قاعدة البيانات
+  if (BELT_LEVELS.length > 0) {
+    return BELT_LEVELS;
+  }
+  
+  // fallback للبيانات الثابتة
   const category = AGE_GROUPS[ageGroup]?.category;
-  if (category === 'under16') return BELTS['Kids'];
-  if (ageGroup === 'Youth') return BELTS['Youth'];
+  if (category === 'under16') return FALLBACK_BELTS['Kids'];
+  if (ageGroup === 'Youth') return FALLBACK_BELTS['Youth'];
   return ['White', 'Blue', 'Purple', 'Brown', 'Black'];
 }
 
-function getFightTime(ageGroup) { return AGE_GROUPS[ageGroup]?.time || 5; }
-function getGoldenTime(ageGroup) { return AGE_GROUPS[ageGroup]?.goldenTime || 1; }
+function getFightTime(ageGroup) { 
+  return AGE_GROUPS[ageGroup]?.time || 5; 
+}
+
+function getGoldenTime(ageGroup) { 
+  return AGE_GROUPS[ageGroup]?.goldenTime || 1; 
+}
 
 function showSyncIndicator() {
   const indicator = document.getElementById('syncIndicator');
@@ -1367,7 +1516,7 @@ function declareWinner(winner) {
     const finalMatch = cat.rounds[cat.rounds.length - 1][0];
     if (finalMatch.winner) {
       const champion = finalMatch.winner === 'red' ? finalMatch.p1 : finalMatch.p2;
-      setTimeout(() => alert('🏆 Champion: ' + champion.name + '!'), 500);
+      setTimeout(() => alert(' Champion: ' + champion.name + '!'), 500);
     }
   }
   closeModal();
@@ -1438,10 +1587,10 @@ function openAllMatsInTabs() {
 // ==========================================
 // 13. INITIALIZATION - FIXED
 // ==========================================
-window.onload = function() {
-  console.log(' Page loaded. Initializing system...');
+window.onload = async function() {
+  console.log('🚀 Page loaded. Initializing system...');
   
-  // Initialize Supabase client using the global supabase from CDN
+  // Initialize Supabase client
   try {
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     console.log('✅ Supabase client initialized');
@@ -1467,11 +1616,15 @@ window.onload = function() {
     if (tabInfoBar) {
       tabInfoBar.style.display = 'flex';
       const matBadge = document.getElementById('tabMatBadge');
-      if (matBadge) matBadge.innerText = '🥋 Mat ' + currentMat;
+      if (matBadge) matBadge.innerText = ' Mat ' + currentMat;
     }
     const header = document.querySelector('.header');
     if (header) header.style.display = 'none';
   }
+  
+  // جلب البيانات المرجعية من قاعدة البيانات أولاً
+  console.log('🔄 Loading reference data...');
+  await loadReferenceData();
   
   // Load data from localStorage
   const saved = localStorage.getItem('tournamentData');
@@ -1481,7 +1634,10 @@ window.onload = function() {
       players = data.players || [];
       mats = data.mats || [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
       categories = data.categories || {};
-      if (data.AGE_GROUPS) Object.assign(AGE_GROUPS, data.AGE_GROUPS);
+      // دمج AGE_GROUPS من localStorage مع البيانات من قاعدة البيانات
+      if (data.AGE_GROUPS) {
+        AGE_GROUPS = { ...AGE_GROUPS, ...data.AGE_GROUPS };
+      }
       console.log('✅ Data loaded from localStorage. Players:', players.length);
     } catch(e) { 
       console.error('❌ Load error:', e); 
@@ -1490,7 +1646,7 @@ window.onload = function() {
   
   // Sync with database if tournament_id exists
   if (tournamentId && supabaseClient) {
-    syncWithDatabase();
+    await syncWithDatabase();
   }
   
   // Populate division dropdown
