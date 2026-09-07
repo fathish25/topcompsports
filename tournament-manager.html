@@ -244,7 +244,7 @@
         <div id="matDashboardSection" class="section hidden">
             <div class="section-title"> Mat Dashboard</div>
             <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn btn-info" onclick="openMatInNewTab()">📂 Open in New Tab</button>
+                <button class="btn btn-info" onclick="openMatInNewTab()"> Open in New Tab</button>
                 <button class="btn btn-warning" onclick="openAllMatsInTabs()"> Open All Mats</button>
                 <button class="btn btn-secondary" onclick="showStep('mats')">← Back to Mats</button>
             </div>
@@ -497,12 +497,11 @@
             `).join('');
         }
 
-        // ===== تم الإصلاح: إضافة حقل Gender =====
         async function addPlayer() {
             const name = document.getElementById('playerName').value.trim();
             const team = document.getElementById('playerTeam').value;
             const age = document.getElementById('playerAge').value;
-            const gender = document.getElementById('playerGender').value; // تم إضافته
+            const gender = document.getElementById('playerGender').value;
             const weightSelect = document.getElementById('playerWeight');
             const weightOption = weightSelect.options[weightSelect.selectedIndex];
             const weightValue = weightOption && weightOption.getAttribute('data-weight') ? parseFloat(weightOption.getAttribute('data-weight')) : null;
@@ -520,7 +519,7 @@
                     player_name: name, 
                     team: team || null, 
                     age_group: age,
-                    gender: gender, // تم إضافته
+                    gender: gender,
                     weight: weightValue, 
                     belt_level: belt, 
                     gi_type: giType, 
@@ -584,7 +583,6 @@
             });
         }
 
-        // ===== تم الإصلاح: إضافة حقل Gender في الإضافة الجماعية =====
         async function saveBulkPlayers() {
             const rows = document.querySelectorAll('.bulk-row');
             let count = 0;
@@ -594,7 +592,7 @@
                 const weightSelect = row.querySelector('.b-weight');
                 const weightOption = weightSelect.options[weightSelect.selectedIndex];
                 const weightValue = weightOption && weightOption.getAttribute('data-weight') ? parseFloat(weightOption.getAttribute('data-weight')) : null;
-                const gender = row.querySelector('.b-gender').value; // تم إضافته
+                const gender = row.querySelector('.b-gender').value;
                 
                 if (!name || !weightSelect.value || !gender) continue;
                 
@@ -603,7 +601,7 @@
                     player_name: name, 
                     team: row.querySelector('.b-team').value || null,
                     age_group: row.querySelector('.b-age').value, 
-                    gender: gender, // تم إضافته
+                    gender: gender,
                     weight: weightValue, 
                     belt_level: row.querySelector('.b-belt').value, 
                     gi_type: 'Gi', 
@@ -1077,7 +1075,7 @@
                 closeMatchModal();
                 await loadMatches();
             } catch (err) { 
-                showAlert('error', '❌ Error saving match: ' + err.message); 
+                showAlert('error', ' Error saving match: ' + err.message); 
             }
         }
 
