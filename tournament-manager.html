@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏆 TopCompSports Tournament System</title>
+<title> TopCompSports Tournament System</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* === نفس الـ CSS الممتاز من الكود القديم === */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0a0e17; color: #fff; padding: 10px; }
 .container { max-width: 1600px; margin: 0 auto; }
@@ -39,6 +38,8 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 .sync-indicator { position: fixed; top: 10px; right: 10px; padding: 8px 15px; background: #27ae60; color: #fff; border-radius: 20px; font-size: 0.85rem; font-weight: bold; z-index: 9999; display: none; box-shadow: 0 4px 15px rgba(39,174,96,0.4); }
 .sync-indicator.active { display: block; animation: syncPulse 1s ease-in-out; }
 @keyframes syncPulse { 0% { transform: scale(0.8); opacity: 0; } 50% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+.tag { background: rgba(241,196,15,0.2); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; margin: 3px; display: inline-flex; align-items: center; gap: 5px; }
+.tag-remove { cursor: pointer; color: #e74c3c; font-weight: bold; }
 @media (max-width: 768px) {
   .header { flex-direction: column; text-align: center; }
   .btn { margin: 2px; padding: 8px 12px; font-size: 0.85rem; }
@@ -59,27 +60,26 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       <div id="dbStatus" style="color: #2ecc71; font-size: 0.75rem; margin-top: 5px;">● Connected to Database</div>
     </div>
     <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-      <button class="btn btn-info" onclick="window.showView('players')">👥 Players</button>
-      <button class="btn btn-purple" onclick="window.showView('mats')"> Mats</button>
-      <button class="btn btn-warning" onclick="window.showView('settings')">⚙️ Settings</button>
-      <button class="btn btn-secondary" onclick="window.syncWithDatabase()">🔄 Sync</button>
-      <button class="btn btn-secondary" onclick="window.saveData()">💾 Save Local</button>
-      <button class="btn btn-danger" onclick="window.clearAll()">🗑️ Clear</button>
+      <button class="btn btn-info" id="btnPlayers">👥 Players</button>
+      <button class="btn btn-purple" id="btnMats">🥋 Mats</button>
+      <button class="btn btn-warning" id="btnSettings">⚙️ Settings</button>
+      <button class="btn btn-secondary" id="btnSync">🔄 Sync</button>
+      <button class="btn btn-secondary" id="btnSaveLocal">💾 Save Local</button>
+      <button class="btn btn-danger" id="btnClear">🗑️ Clear</button>
     </div>
   </div>
 
-  <!-- PLAYERS VIEW -->
   <div id="view-players" class="view active">
     <div class="section">
       <div class="section-title">👥 Players Registration <span id="playerCount" style="color: #8899aa;">0 / 200</span></div>
       <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <button class="btn btn-primary" onclick="window.addPlayer()">➕ Add Player</button>
-        <button class="btn btn-secondary" onclick="window.addPlayers(10)">➕ Add 10</button>
-        <button class="btn btn-info" onclick="window.addPlayers(50)">➕ Add 50</button>
-        <button class="btn btn-info" onclick="document.getElementById('csvImport').click()">📥 Import CSV</button>
-        <input type="file" id="csvImport" accept=".csv" style="display:none" onchange="window.importCSV(event)">
-        <button class="btn btn-info" onclick="window.exportCSV()">📤 Export CSV</button>
-        <button class="btn btn-warning" onclick="window.syncWithDatabase()">🔄 Sync with DB</button>
+        <button class="btn btn-primary" id="btnAddPlayer">➕ Add Player</button>
+        <button class="btn btn-secondary" id="btnAdd10">➕ Add 10</button>
+        <button class="btn btn-info" id="btnAdd50">➕ Add 50</button>
+        <button class="btn btn-info" id="btnImportCSV">📥 Import CSV</button>
+        <input type="file" id="csvImport" accept=".csv" style="display:none">
+        <button class="btn btn-info" id="btnExportCSV">📤 Export CSV</button>
+        <button class="btn btn-warning" id="btnSyncDB">🔄 Sync with DB</button>
       </div>
       <div style="overflow-x: auto;">
         <table>
@@ -87,45 +87,42 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
           <tbody id="playersTable"></tbody>
         </table>
       </div>
-      <button class="btn btn-primary" style="width: 100%; margin-top: 15px; padding: 12px;" onclick="window.showView('mats')">🥋 Proceed to Mats →</button>
+      <button class="btn btn-primary" style="width: 100%; margin-top: 15px; padding: 12px;" id="btnProceedMats"> Proceed to Mats →</button>
     </div>
   </div>
 
-  <!-- MATS VIEW -->
   <div id="view-mats" class="view">
     <div class="section">
       <div class="section-title">🥋 Mats Setup</div>
       <div style="margin-bottom: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
         <label style="font-weight: bold; color: #f1c40f;">Number of Mats: </label>
-        <select id="matsCount" onchange="window.updateMats()" style="width: auto; display: inline-block;">
+        <select id="matsCount" style="width: auto; display: inline-block;">
           <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
           <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
         </select>
-        <button class="btn btn-info btn-sm" style="margin-left: 15px;" onclick="window.openAllMatsInTabs()">🪟 Open All Mats</button>
+        <button class="btn btn-info btn-sm" style="margin-left: 15px;" id="btnOpenAllMats">🪟 Open All Mats</button>
       </div>
       <div id="matsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;"></div>
-      <button class="btn btn-primary" style="width: 100%; margin-top: 15px; padding: 12px;" onclick="window.showView('dashboard')">🏆 Open Mat Dashboard →</button>
+      <button class="btn btn-primary" style="width: 100%; margin-top: 15px; padding: 12px;" id="btnOpenDashboard">🏆 Open Mat Dashboard →</button>
     </div>
   </div>
 
-  <!-- SETTINGS VIEW -->
   <div id="view-settings" class="view">
     <div class="section">
-      <div class="section-title">⚙️ Fight Time Settings</div>
+      <div class="section-title">️ Fight Time Settings</div>
       <div id="settingsContent">Loading settings...</div>
-      <button class="btn btn-primary" style="margin-top: 15px;" onclick="window.showView('players')">← Back to Players</button>
+      <button class="btn btn-primary" style="margin-top: 15px;" id="btnBackPlayers">← Back to Players</button>
     </div>
   </div>
 
-  <!-- DASHBOARD VIEW -->
   <div id="view-dashboard" class="view">
     <div class="section">
       <div class="section-title">📊 Mat Dashboard</div>
       <div class="tabs">
-        <button class="tab active" onclick="window.switchTab('categories')">📋 Categories</button>
-        <button class="tab" onclick="window.switchTab('queue')">⏳ Queue</button>
-        <button class="tab" onclick="window.switchTab('callup')">📢 Call-Up</button>
-        <button class="tab" onclick="window.switchTab('standings')">🏆 Standings</button>
+        <button class="tab active" id="tabCategories">📋 Categories</button>
+        <button class="tab" id="tabQueue">⏳ Queue</button>
+        <button class="tab" id="tabCallup">📢 Call-Up</button>
+        <button class="tab" id="tabStandings">🏆 Standings</button>
       </div>
       <div id="tab-categories" class="tab-content active"></div>
       <div id="tab-queue" class="tab-content"></div>
@@ -136,662 +133,799 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 </div>
 
 <script>
-// ==========================================
-// 1. SUPABASE INITIALIZATION
-// ==========================================
-const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+(function() {
+  'use strict';
+  
+  // ==========================================
+  // 1. SUPABASE INITIALIZATION
+  // ==========================================
+  const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ==========================================
-// 2. GLOBAL VARIABLES
-// ==========================================
-let players = [];
-let mats = [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
-let categories = {};
-let currentMat = 1;
-let tournamentId = null;
-let ageGroupsData = [];
-let beltLevelsData = [];
-let weightClassesData = [];
+  // ==========================================
+  // 2. GLOBAL VARIABLES
+  // ==========================================
+  let players = [];
+  let mats = [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
+  let categories = {};
+  let currentMat = 1;
+  let tournamentId = null;
+  let ageGroupsData = [];
+  let beltLevelsData = [];
+  let weightClassesData = [];
 
-// ==========================================
-// 3. LOAD DROPDOWN DATA FROM DATABASE
-// ==========================================
-window.loadDropdownData = async function() {
-  try {
-    // Load Age Groups
-    const ageResult = await supabase.from('age_groups').select('*').order('min_age');
-    if (!ageResult.error && ageResult.data) {
-      ageGroupsData = ageResult.data;
-      console.log('✅ Loaded age groups:', ageGroupsData.length);
-    }
-    
-    // Load Belt Levels
-    const beltResult = await supabase.from('belt_levels').select('*').order('sort_order');
-    if (!beltResult.error && beltResult.data) {
-      beltLevelsData = beltResult.data;
-      console.log('✅ Loaded belt levels:', beltLevelsData.length);
-    }
-    
-    // Load Weight Classes
-    const weightResult = await supabase.from('weight_classes').select('*').order('max_weight');
-    if (!weightResult.error && weightResult.data) {
-      weightClassesData = weightResult.data;
-      console.log('✅ Loaded weight classes:', weightClassesData.length);
-    }
-  } catch (err) {
-    console.error('❌ Error loading dropdown data:', err);
-  }
-};
-
-// ==========================================
-// 4. NAVIGATION FUNCTIONS
-// ==========================================
-window.showView = function(view) {
-  const views = document.querySelectorAll('.view');
-  views.forEach(v => v.classList.remove('active'));
-  
-  const viewEl = document.getElementById('view-' + view);
-  if (viewEl) {
-    viewEl.classList.add('active');
-  }
-  
-  const subtitles = {
-    'players': 'Step 1: Players Registration',
-    'mats': 'Step 2: Mats Setup',
-    'settings': 'Step 3: Settings',
-    'dashboard': 'Mat Dashboard'
-  };
-  
-  const subtitleEl = document.getElementById('subtitle');
-  if (subtitleEl) {
-    subtitleEl.innerText = subtitles[view] || '';
-  }
-  
-  if (view === 'mats') window.renderMats();
-  if (view === 'settings') window.renderSettings();
-  if (view === 'dashboard') {
-    window.renderCategories();
-    window.renderQueue();
-    window.renderCallUp();
-    window.renderStandings();
-  }
-  
-  console.log('✅ Switched to view:', view);
-};
-
-window.switchTab = function(tab) {
-  const tabs = document.querySelectorAll('.tab');
-  tabs.forEach(t => t.classList.remove('active'));
-  
-  const contents = document.querySelectorAll('.tab-content');
-  contents.forEach(c => c.classList.remove('active'));
-  
-  if (event && event.target) {
-    event.target.classList.add('active');
-  }
-  
-  const tabEl = document.getElementById('tab-' + tab);
-  if (tabEl) {
-    tabEl.classList.add('active');
-  }
-  
-  if (tab === 'categories') window.renderCategories();
-  if (tab === 'queue') window.renderQueue();
-  if (tab === 'callup') window.renderCallUp();
-  if (tab === 'standings') window.renderStandings();
-};
-
-// ==========================================
-// 5. PLAYER MANAGEMENT FUNCTIONS
-// ==========================================
-window.addPlayer = function() {
-  if (players.length >= 200) {
-    alert('Maximum 200 players reached!');
-    return;
-  }
-  
-  players.push({
-    id: Date.now(),
-    name: '',
-    team: '',
-    ageGroup: 'Amateur/Professional',
-    gender: 'Men',
-    weight: '',
-    belt: 'White',
-    rank: players.length + 1
-  });
-  
-  window.renderPlayers();
-  window.saveData();
-  console.log('✅ Player added. Total:', players.length);
-};
-
-window.addPlayers = function(count) {
-  for (let i = 0; i < count && players.length < 200; i++) {
-    window.addPlayer();
-  }
-};
-
-window.renderPlayers = function() {
-  const tbody = document.getElementById('playersTable');
-  if (!tbody) {
-    console.error('❌ playersTable not found!');
-    return;
-  }
-  
-  tbody.innerHTML = '';
-  
-  players.forEach((p, index) => {
-    const tr = document.createElement('tr');
-    
-    // Build age group options
-    let ageOptions = '<option value="">Select Age</option>';
-    if (ageGroupsData.length > 0) {
-      ageGroupsData.forEach(ag => {
-        const selected = p.ageGroup === ag.name ? 'selected' : '';
-        ageOptions += `<option value="${ag.name}" ${selected}>${ag.name} (${ag.min_age}-${ag.max_age})</option>`;
-      });
-    } else {
-      ageOptions += '<option ' + (p.ageGroup === 'Amateur/Professional' ? 'selected' : '') + '>Amateur/Professional</option>';
-      ageOptions += '<option ' + (p.ageGroup === 'Kids 1' ? 'selected' : '') + '>Kids 1</option>';
-    }
-    
-    // Build belt options
-    let beltOptions = '<option value="">Select Belt</option>';
-    if (beltLevelsData.length > 0) {
-      beltLevelsData.forEach(bl => {
-        const selected = p.belt === bl.name ? 'selected' : '';
-        beltOptions += `<option value="${bl.name}" ${selected}>${bl.name}</option>`;
-      });
-    } else {
-      beltOptions += '<option ' + (p.belt === 'White' ? 'selected' : '') + '>White</option>';
-      beltOptions += '<option ' + (p.belt === 'Blue' ? 'selected' : '') + '>Blue</option>';
-    }
-    
-    // Gender options
-    const genderOptions = `
-      <option ${p.gender === 'Men' ? 'selected' : ''}>Men</option>
-      <option ${p.gender === 'Women' ? 'selected' : ''}>Women</option>
-      <option ${p.gender === 'Boys' ? 'selected' : ''}>Boys</option>
-      <option ${p.gender === 'Girls' ? 'selected' : ''}>Girls</option>
-    `;
-    
-    tr.innerHTML = `
-      <td>${index + 1}</td>
-      <td><input type="text" value="${p.name}" onchange="window.updatePlayer(${index}, 'name', this.value)" placeholder="Name"></td>
-      <td><input type="text" value="${p.team}" onchange="window.updatePlayer(${index}, 'team', this.value)" placeholder="Team"></td>
-      <td><select onchange="window.updatePlayer(${index}, 'ageGroup', this.value)">${ageOptions}</select></td>
-      <td><select onchange="window.updatePlayer(${index}, 'gender', this.value)">${genderOptions}</select></td>
-      <td><input type="text" value="${p.weight}" onchange="window.updatePlayer(${index}, 'weight', this.value)" placeholder="Weight"></td>
-      <td><select onchange="window.updatePlayer(${index}, 'belt', this.value)">${beltOptions}</select></td>
-      <td><input type="number" value="${p.rank}" onchange="window.updatePlayer(${index}, 'rank', this.value)" style="width: 60px;"></td>
-      <td><button class="btn btn-danger btn-sm" onclick="window.deletePlayer(${index})">✕</button></td>
-    `;
-    
-    tbody.appendChild(tr);
-  });
-  
-  const countEl = document.getElementById('playerCount');
-  if (countEl) {
-    countEl.innerText = players.length + ' / 200';
-  }
-};
-
-window.updatePlayer = function(index, field, value) {
-  players[index][field] = field === 'rank' ? parseInt(value) || 0 : value;
-  window.saveData();
-};
-
-window.deletePlayer = function(index) {
-  if (confirm('Delete this player?')) {
-    players.splice(index, 1);
-    window.renderPlayers();
-    window.saveData();
-  }
-};
-
-window.importCSV = function(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  
-  const reader = new FileReader();
-  reader.onload = e => {
-    const lines = e.target.result.split('\n').filter(l => l.trim());
-    for (let i = 1; i < lines.length && players.length < 200; i++) {
-      const vals = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
-      if (vals.length >= 3) {
-        players.push({
-          id: Date.now() + i,
-          name: vals[0] || '',
-          team: vals[1] || '',
-          ageGroup: vals[2] || 'Amateur/Professional',
-          gender: 'Men',
-          weight: vals[4] || '',
-          belt: vals[5] || 'White',
-          rank: parseInt(vals[6]) || players.length + 1
-        });
+  // ==========================================
+  // 3. LOAD DROPDOWN DATA FROM DATABASE
+  // ==========================================
+  async function loadDropdownData() {
+    try {
+      const ageResult = await supabase.from('age_groups').select('*').order('min_age');
+      if (!ageResult.error && ageResult.data) {
+        ageGroupsData = ageResult.data;
+        console.log('✅ Loaded age groups:', ageGroupsData.length);
       }
+      
+      const beltResult = await supabase.from('belt_levels').select('*').order('sort_order');
+      if (!beltResult.error && beltResult.data) {
+        beltLevelsData = beltResult.data;
+        console.log('✅ Loaded belt levels:', beltLevelsData.length);
+      }
+      
+      const weightResult = await supabase.from('weight_classes').select('*').order('max_weight');
+      if (!weightResult.error && weightResult.data) {
+        weightClassesData = weightResult.data;
+        console.log('✅ Loaded weight classes:', weightClassesData.length);
+      }
+    } catch (err) {
+      console.error('❌ Error loading dropdown data:', err);
     }
-    window.renderPlayers();
-    window.saveData();
-    alert('✅ Imported ' + (lines.length - 1) + ' players!');
-  };
-  reader.readAsText(file);
-};
+  }
 
-window.exportCSV = function() {
-  let csv = 'Name,Team,Age Group,Gender,Weight,Belt,Rank\n';
-  players.forEach(p => {
-    csv += `"${p.name}","${p.team}","${p.ageGroup}","${p.gender}","${p.weight}","${p.belt}",${p.rank}\n`;
-  });
-  
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'players.csv';
-  a.click();
-};
+  // ==========================================
+  // 4. NAVIGATION FUNCTIONS
+  // ==========================================
+  function showView(view) {
+    const views = document.querySelectorAll('.view');
+    views.forEach(v => v.classList.remove('active'));
+    
+    const viewEl = document.getElementById('view-' + view);
+    if (viewEl) {
+      viewEl.classList.add('active');
+    }
+    
+    const subtitles = {
+      'players': 'Step 1: Players Registration',
+      'mats': 'Step 2: Mats Setup',
+      'settings': 'Step 3: Settings',
+      'dashboard': 'Mat Dashboard'
+    };
+    
+    const subtitleEl = document.getElementById('subtitle');
+    if (subtitleEl) {
+      subtitleEl.innerText = subtitles[view] || '';
+    }
+    
+    if (view === 'mats') renderMats();
+    if (view === 'settings') renderSettings();
+    if (view === 'dashboard') {
+      renderCategories();
+      renderQueue();
+      renderCallUp();
+      renderStandings();
+    }
+    
+    console.log('✅ Switched to view:', view);
+  }
 
-// ==========================================
-// 6. MATS MANAGEMENT
-// ==========================================
-window.updateMats = function() {
-  const count = parseInt(document.getElementById('matsCount').value);
-  
-  while (mats.length < count) {
-    mats.push({
-      id: mats.length + 1,
-      weights: [],
-      ageGroups: [],
-      belts: [],
-      genders: []
+  function switchTab(tab) {
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    
+    const contents = document.querySelectorAll('.tab-content');
+    contents.forEach(c => c.classList.remove('active'));
+    
+    const tabEl = document.getElementById('tab-' + tab);
+    if (tabEl) {
+      tabEl.classList.add('active');
+      const tabButton = document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1));
+      if (tabButton) tabButton.classList.add('active');
+    }
+    
+    if (tab === 'categories') renderCategories();
+    if (tab === 'queue') renderQueue();
+    if (tab === 'callup') renderCallUp();
+    if (tab === 'standings') renderStandings();
+  }
+
+  // ==========================================
+  // 5. PLAYER MANAGEMENT FUNCTIONS
+  // ==========================================
+  function addPlayer() {
+    if (players.length >= 200) {
+      alert('Maximum 200 players reached!');
+      return;
+    }
+    
+    players.push({
+      id: Date.now(),
+      name: '',
+      team: '',
+      ageGroup: 'Amateur/Professional',
+      gender: 'Men',
+      weight: '',
+      belt: 'White',
+      rank: players.length + 1
+    });
+    
+    renderPlayers();
+    saveData();
+    console.log('✅ Player added. Total:', players.length);
+  }
+
+  function addPlayers(count) {
+    for (let i = 0; i < count && players.length < 200; i++) {
+      addPlayer();
+    }
+  }
+
+  function renderPlayers() {
+    const tbody = document.getElementById('playersTable');
+    if (!tbody) {
+      console.error('❌ playersTable not found!');
+      return;
+    }
+    
+    tbody.innerHTML = '';
+    
+    players.forEach((p, index) => {
+      const tr = document.createElement('tr');
+      
+      let ageOptions = '<option value="">Select Age</option>';
+      if (ageGroupsData.length > 0) {
+        ageGroupsData.forEach(ag => {
+          const selected = p.ageGroup === ag.name ? 'selected' : '';
+          ageOptions += `<option value="${ag.name}" ${selected}>${ag.name} (${ag.min_age}-${ag.max_age})</option>`;
+        });
+      } else {
+        ageOptions += '<option ' + (p.ageGroup === 'Amateur/Professional' ? 'selected' : '') + '>Amateur/Professional</option>';
+        ageOptions += '<option ' + (p.ageGroup === 'Kids 1' ? 'selected' : '') + '>Kids 1</option>';
+      }
+      
+      let beltOptions = '<option value="">Select Belt</option>';
+      if (beltLevelsData.length > 0) {
+        beltLevelsData.forEach(bl => {
+          const selected = p.belt === bl.name ? 'selected' : '';
+          beltOptions += `<option value="${bl.name}" ${selected}>${bl.name}</option>`;
+        });
+      } else {
+        beltOptions += '<option ' + (p.belt === 'White' ? 'selected' : '') + '>White</option>';
+        beltOptions += '<option ' + (p.belt === 'Blue' ? 'selected' : '') + '>Blue</option>';
+      }
+      
+      const genderOptions = `
+        <option ${p.gender === 'Men' ? 'selected' : ''}>Men</option>
+        <option ${p.gender === 'Women' ? 'selected' : ''}>Women</option>
+        <option ${p.gender === 'Boys' ? 'selected' : ''}>Boys</option>
+        <option ${p.gender === 'Girls' ? 'selected' : ''}>Girls</option>
+      `;
+      
+      tr.innerHTML = `
+        <td>${index + 1}</td>
+        <td><input type="text" value="${p.name}" data-index="${index}" data-field="name" class="player-input" placeholder="Name"></td>
+        <td><input type="text" value="${p.team}" data-index="${index}" data-field="team" class="player-input" placeholder="Team"></td>
+        <td><select data-index="${index}" data-field="ageGroup" class="player-select">${ageOptions}</select></td>
+        <td><select data-index="${index}" data-field="gender" class="player-select">${genderOptions}</select></td>
+        <td><input type="text" value="${p.weight}" data-index="${index}" data-field="weight" class="player-input" placeholder="Weight"></td>
+        <td><select data-index="${index}" data-field="belt" class="player-select">${beltOptions}</select></td>
+        <td><input type="number" value="${p.rank}" data-index="${index}" data-field="rank" class="player-input" style="width: 60px;"></td>
+        <td><button class="btn btn-danger btn-sm delete-player" data-index="${index}">✕</button></td>
+      `;
+      
+      tbody.appendChild(tr);
+    });
+    
+    // Add event listeners
+    document.querySelectorAll('.player-input').forEach(input => {
+      input.addEventListener('change', function() {
+        const index = parseInt(this.dataset.index);
+        const field = this.dataset.field;
+        const value = this.type === 'number' ? parseInt(this.value) || 0 : this.value;
+        players[index][field] = value;
+        saveData();
+      });
+    });
+    
+    document.querySelectorAll('.player-select').forEach(select => {
+      select.addEventListener('change', function() {
+        const index = parseInt(this.dataset.index);
+        const field = this.dataset.field;
+        players[index][field] = this.value;
+        saveData();
+      });
+    });
+    
+    document.querySelectorAll('.delete-player').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const index = parseInt(this.dataset.index);
+        if (confirm('Delete this player?')) {
+          players.splice(index, 1);
+          renderPlayers();
+          saveData();
+        }
+      });
+    });
+    
+    const countEl = document.getElementById('playerCount');
+    if (countEl) {
+      countEl.innerText = players.length + ' / 200';
+    }
+  }
+
+  function importCSV(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = e => {
+      const lines = e.target.result.split('\n').filter(l => l.trim());
+      for (let i = 1; i < lines.length && players.length < 200; i++) {
+        const vals = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+        if (vals.length >= 3) {
+          players.push({
+            id: Date.now() + i,
+            name: vals[0] || '',
+            team: vals[1] || '',
+            ageGroup: vals[2] || 'Amateur/Professional',
+            gender: 'Men',
+            weight: vals[4] || '',
+            belt: vals[5] || 'White',
+            rank: parseInt(vals[6]) || players.length + 1
+          });
+        }
+      }
+      renderPlayers();
+      saveData();
+      alert('✅ Imported ' + (lines.length - 1) + ' players!');
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  }
+
+  function exportCSV() {
+    let csv = 'Name,Team,Age Group,Gender,Weight,Belt,Rank\n';
+    players.forEach(p => {
+      csv += `"${p.name}","${p.team}","${p.ageGroup}","${p.gender}","${p.weight}","${p.belt}",${p.rank}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'players.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ==========================================
+  // 6. MATS MANAGEMENT
+  // ==========================================
+  function updateMats() {
+    const count = parseInt(document.getElementById('matsCount').value);
+    
+    while (mats.length < count) {
+      mats.push({
+        id: mats.length + 1,
+        weights: [],
+        ageGroups: [],
+        belts: [],
+        genders: []
+      });
+    }
+    
+    mats = mats.slice(0, count);
+    renderMats();
+    saveData();
+  }
+
+  function renderMats() {
+    const grid = document.getElementById('matsGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    const allWeights = [...new Set(players.map(p => p.weight).filter(w => w))];
+    const allAges = [...new Set(players.map(p => p.ageGroup))];
+    const allBelts = [...new Set(players.map(p => p.belt))];
+    const allGenders = [...new Set(players.map(p => p.gender))];
+    
+    mats.forEach(mat => {
+      const div = document.createElement('div');
+      div.className = 'section';
+      div.style.padding = '15px';
+      
+      const ageTags = mat.ageGroups.map((a, i) => 
+        `<span class="tag">${a} <span class="tag-remove" data-mat="${mat.id}" data-type="ageGroups" data-index="${i}">✕</span></span>`
+      ).join('') || '<span style="color: #556; font-size: 0.8rem;">No age groups</span>';
+      
+      const genderTags = mat.genders.map((g, i) => 
+        `<span class="tag">${g} <span class="tag-remove" data-mat="${mat.id}" data-type="genders" data-index="${i}">✕</span></span>`
+      ).join('') || '<span style="color: #556; font-size: 0.8rem;">No genders</span>';
+      
+      const weightTags = mat.weights.map((w, i) => 
+        `<span class="tag">${w} <span class="tag-remove" data-mat="${mat.id}" data-type="weights" data-index="${i}"></span></span>`
+      ).join('') || '<span style="color: #556; font-size: 0.8rem;">No weights</span>';
+      
+      const beltTags = mat.belts.map((b, i) => 
+        `<span class="tag">${b} <span class="tag-remove" data-mat="${mat.id}" data-type="belts" data-index="${i}">✕</span></span>`
+      ).join('') || '<span style="color: #556; font-size: 0.8rem;">No belts</span>';
+      
+      div.innerHTML = `
+        <h3 style="color: #f1c40f; margin-bottom: 10px;"> Mat ${mat.id}</h3>
+        <div style="margin-bottom: 10px;">
+          <strong style="color: #8899aa; font-size: 0.8rem;">AGE GROUPS</strong>
+          <div style="margin-top: 5px;">${ageTags}</div>
+          <select class="mat-add-select" data-mat="${mat.id}" data-type="ageGroups" style="margin-top: 5px;">
+            <option value="">-- Add Age Group --</option>
+            ${allAges.map(a => `<option>${a}</option>`).join('')}
+          </select>
+        </div>
+        <div style="margin-bottom: 10px;">
+          <strong style="color: #8899aa; font-size: 0.8rem;">GENDERS</strong>
+          <div style="margin-top: 5px;">${genderTags}</div>
+          <select class="mat-add-select" data-mat="${mat.id}" data-type="genders" style="margin-top: 5px;">
+            <option value="">-- Add Gender --</option>
+            ${allGenders.map(g => `<option>${g}</option>`).join('')}
+          </select>
+        </div>
+        <div style="margin-bottom: 10px;">
+          <strong style="color: #8899aa; font-size: 0.8rem;">WEIGHTS</strong>
+          <div style="margin-top: 5px;">${weightTags}</div>
+          <select class="mat-add-select" data-mat="${mat.id}" data-type="weights" style="margin-top: 5px;">
+            <option value="">-- Add Weight --</option>
+            ${allWeights.map(w => `<option>${w}</option>`).join('')}
+          </select>
+        </div>
+        <div style="margin-bottom: 10px;">
+          <strong style="color: #8899aa; font-size: 0.8rem;">BELTS</strong>
+          <div style="margin-top: 5px;">${beltTags}</div>
+          <select class="mat-add-select" data-mat="${mat.id}" data-type="belts" style="margin-top: 5px;">
+            <option value="">-- Add Belt --</option>
+            ${allBelts.map(b => `<option>${b}</option>`).join('')}
+          </select>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+          <button class="btn btn-info mat-dashboard-btn" style="flex: 1;" data-mat="${mat.id}">📋 Open Dashboard</button>
+          <button class="btn btn-purple mat-newtab-btn" style="flex: 1;" data-mat="${mat.id}">🪟 New Tab</button>
+        </div>
+      `;
+      
+      grid.appendChild(div);
+    });
+    
+    // Add event listeners for tag removal
+    document.querySelectorAll('.tag-remove').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const matId = parseInt(this.dataset.mat);
+        const type = this.dataset.type;
+        const index = parseInt(this.dataset.index);
+        removeMatCategory(matId, type, index);
+      });
+    });
+    
+    // Add event listeners for mat add selects
+    document.querySelectorAll('.mat-add-select').forEach(select => {
+      select.addEventListener('change', function() {
+        const matId = parseInt(this.dataset.mat);
+        const type = this.dataset.type;
+        const value = this.value;
+        if (value) {
+          addMatCategory(matId, type, value);
+          this.value = '';
+        }
+      });
+    });
+    
+    // Add event listeners for mat buttons
+    document.querySelectorAll('.mat-dashboard-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        currentMat = parseInt(this.dataset.mat);
+        showView('dashboard');
+      });
+    });
+    
+    document.querySelectorAll('.mat-newtab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const matId = parseInt(this.dataset.mat);
+        openMatInNewTab(matId);
+      });
     });
   }
-  
-  mats = mats.slice(0, count);
-  window.renderMats();
-  window.saveData();
-};
 
-window.renderMats = function() {
-  const grid = document.getElementById('matsGrid');
-  if (!grid) return;
-  
-  grid.innerHTML = '';
-  
-  const allWeights = [...new Set(players.map(p => p.weight).filter(w => w))];
-  const allAges = [...new Set(players.map(p => p.ageGroup))];
-  const allBelts = [...new Set(players.map(p => p.belt))];
-  const allGenders = [...new Set(players.map(p => p.gender))];
-  
-  mats.forEach(mat => {
-    const div = document.createElement('div');
-    div.className = 'section';
-    div.style.padding = '15px';
+  function addMatCategory(matId, type, value) {
+    const mat = mats.find(m => m.id === matId);
+    if (!mat) return;
     
-    const ageTags = mat.ageGroups.map((a, i) => 
-      `<span class="tag">${a} <span class="tag-remove" onclick="window.removeMatCategory(${mat.id}, 'ageGroups', ${i})"></span></span>`
-    ).join('') || '<span style="color: #556; font-size: 0.8rem;">No age groups</span>';
-    
-    const genderTags = mat.genders.map((g, i) => 
-      `<span class="tag">${g} <span class="tag-remove" onclick="window.removeMatCategory(${mat.id}, 'genders', ${i})"></span></span>`
-    ).join('') || '<span style="color: #556; font-size: 0.8rem;">No genders</span>';
-    
-    const weightTags = mat.weights.map((w, i) => 
-      `<span class="tag">${w} <span class="tag-remove" onclick="window.removeMatCategory(${mat.id}, 'weights', ${i})">✕</span></span>`
-    ).join('') || '<span style="color: #556; font-size: 0.8rem;">No weights</span>';
-    
-    const beltTags = mat.belts.map((b, i) => 
-      `<span class="tag">${b} <span class="tag-remove" onclick="window.removeMatCategory(${mat.id}, 'belts', ${i})">✕</span></span>`
-    ).join('') || '<span style="color: #556; font-size: 0.8rem;">No belts</span>';
-    
-    div.innerHTML = `
-      <h3 style="color: #f1c40f; margin-bottom: 10px;">🥋 Mat ${mat.id}</h3>
-      <div style="margin-bottom: 10px;">
-        <strong style="color: #8899aa; font-size: 0.8rem;">AGE GROUPS</strong>
-        <div style="margin-top: 5px;">${ageTags}</div>
-        <select onchange="if(this.value) window.addMatCategory(${mat.id}, 'ageGroups', this.value)" style="margin-top: 5px;">
-          <option value="">-- Add Age Group --</option>
-          ${allAges.map(a => `<option>${a}</option>`).join('')}
-        </select>
-      </div>
-      <div style="margin-bottom: 10px;">
-        <strong style="color: #8899aa; font-size: 0.8rem;">GENDERS</strong>
-        <div style="margin-top: 5px;">${genderTags}</div>
-        <select onchange="if(this.value) window.addMatCategory(${mat.id}, 'genders', this.value)" style="margin-top: 5px;">
-          <option value="">-- Add Gender --</option>
-          ${allGenders.map(g => `<option>${g}</option>`).join('')}
-        </select>
-      </div>
-      <div style="margin-bottom: 10px;">
-        <strong style="color: #8899aa; font-size: 0.8rem;">WEIGHTS</strong>
-        <div style="margin-top: 5px;">${weightTags}</div>
-        <select onchange="if(this.value) window.addMatCategory(${mat.id}, 'weights', this.value)" style="margin-top: 5px;">
-          <option value="">-- Add Weight --</option>
-          ${allWeights.map(w => `<option>${w}</option>`).join('')}
-        </select>
-      </div>
-      <div style="margin-bottom: 10px;">
-        <strong style="color: #8899aa; font-size: 0.8rem;">BELTS</strong>
-        <div style="margin-top: 5px;">${beltTags}</div>
-        <select onchange="if(this.value) window.addMatCategory(${mat.id}, 'belts', this.value)" style="margin-top: 5px;">
-          <option value="">-- Add Belt --</option>
-          ${allBelts.map(b => `<option>${b}</option>`).join('')}
-        </select>
-      </div>
-      <div style="display: flex; gap: 8px; margin-top: 10px;">
-        <button class="btn btn-info" style="flex: 1;" onclick="currentMat=${mat.id};window.showView('dashboard')">📋 Open Dashboard</button>
-        <button class="btn btn-purple" style="flex: 1;" onclick="window.openMatInNewTab(${mat.id})">🪟 New Tab</button>
-      </div>
-    `;
-    
-    grid.appendChild(div);
-  });
-};
-
-window.addMatCategory = function(matId, type, value) {
-  const mat = mats.find(m => m.id === matId);
-  if (!mat) return;
-  
-  if (!mat[type].includes(value)) {
-    mat[type].push(value);
-    window.renderMats();
-    window.saveData();
+    if (!mat[type].includes(value)) {
+      mat[type].push(value);
+      renderMats();
+      saveData();
+    }
   }
-};
 
-window.removeMatCategory = function(matId, type, index) {
-  const mat = mats.find(m => m.id === matId);
-  if (!mat) return;
-  
-  mat[type].splice(index, 1);
-  window.renderMats();
-  window.saveData();
-};
-
-// ==========================================
-// 7. DASHBOARD FUNCTIONS
-// ==========================================
-window.renderCategories = function() {
-  const container = document.getElementById('tab-categories');
-  if (!container) return;
-  
-  const mat = mats.find(m => m.id === currentMat);
-  if (!mat) {
-    container.innerHTML = '<p style="text-align: center; color: #8899aa;">No mat selected</p>';
-    return;
-  }
-  
-  let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📋 Categories - Mat ' + currentMat + '</h3>';
-  
-  if (players.length === 0) {
-    html += '<div style="text-align: center; padding: 40px; color: #8899aa;">';
-    html += '<div style="font-size: 3rem; margin-bottom: 15px;">👥</div>';
-    html += '<div>No players registered yet</div>';
-    html += '<button class="btn btn-primary" style="margin-top: 15px;" onclick="window.showView(\'players\')">➕ Add Players</button>';
-    html += '</div>';
-    container.innerHTML = html;
-    return;
-  }
-  
-  // Group players by category
-  const categoryMap = {};
-  players.forEach(p => {
-    const matchAge = mat.ageGroups.length === 0 || mat.ageGroups.includes(p.ageGroup);
-    const matchGender = mat.genders.length === 0 || mat.genders.includes(p.gender);
-    const matchWeight = mat.weights.length === 0 || mat.weights.includes(p.weight);
-    const matchBelt = mat.belts.length === 0 || mat.belts.includes(p.belt);
+  function removeMatCategory(matId, type, index) {
+    const mat = mats.find(m => m.id === matId);
+    if (!mat) return;
     
-    if (matchAge && matchGender && matchWeight && matchBelt) {
-      const key = p.ageGroup + '|' + p.gender + '|' + p.weight + '|' + p.belt;
-      if (!categoryMap[key]) {
-        categoryMap[key] = {
-          ageGroup: p.ageGroup,
-          gender: p.gender,
-          weight: p.weight,
-          belt: p.belt,
-          players: []
-        };
+    mat[type].splice(index, 1);
+    renderMats();
+    saveData();
+  }
+
+  // ==========================================
+  // 7. DASHBOARD FUNCTIONS
+  // ==========================================
+  function renderCategories() {
+    const container = document.getElementById('tab-categories');
+    if (!container) return;
+    
+    const mat = mats.find(m => m.id === currentMat);
+    if (!mat) {
+      container.innerHTML = '<p style="text-align: center; color: #8899aa;">No mat selected</p>';
+      return;
+    }
+    
+    let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📋 Categories - Mat ' + currentMat + '</h3>';
+    
+    if (players.length === 0) {
+      html += '<div style="text-align: center; padding: 40px; color: #8899aa;">';
+      html += '<div style="font-size: 3rem; margin-bottom: 15px;">👥</div>';
+      html += '<div>No players registered yet</div>';
+      html += '<button class="btn btn-primary" style="margin-top: 15px;" id="btnAddPlayersFromDash">➕ Add Players</button>';
+      html += '</div>';
+      container.innerHTML = html;
+      
+      document.getElementById('btnAddPlayersFromDash').addEventListener('click', function() {
+        showView('players');
+      });
+      return;
+    }
+    
+    const categoryMap = {};
+    players.forEach(p => {
+      const matchAge = mat.ageGroups.length === 0 || mat.ageGroups.includes(p.ageGroup);
+      const matchGender = mat.genders.length === 0 || mat.genders.includes(p.gender);
+      const matchWeight = mat.weights.length === 0 || mat.weights.includes(p.weight);
+      const matchBelt = mat.belts.length === 0 || mat.belts.includes(p.belt);
+      
+      if (matchAge && matchGender && matchWeight && matchBelt) {
+        const key = p.ageGroup + '|' + p.gender + '|' + p.weight + '|' + p.belt;
+        if (!categoryMap[key]) {
+          categoryMap[key] = {
+            ageGroup: p.ageGroup,
+            gender: p.gender,
+            weight: p.weight,
+            belt: p.belt,
+            players: []
+          };
+        }
+        categoryMap[key].players.push(p);
       }
-      categoryMap[key].players.push(p);
+    });
+    
+    const categoryKeys = Object.keys(categoryMap);
+    
+    if (categoryKeys.length === 0) {
+      html += '<div style="text-align: center; padding: 40px; color: #8899aa;">';
+      html += '<div style="font-size: 3rem; margin-bottom: 15px;">⚠️</div>';
+      html += '<div>No categories match the mat filters</div>';
+      html += '<div style="margin-top: 10px; font-size: 0.9rem;">Mat Filters: ' + (mat.ageGroups.join(', ') || 'All') + ' | ' + (mat.genders.join(', ') || 'All') + '</div>';
+      html += '<button class="btn btn-warning" style="margin-top: 15px;" id="btnClearFilters">Clear Mat Filters</button>';
+      html += '</div>';
+      container.innerHTML = html;
+      
+      document.getElementById('btnClearFilters').addEventListener('click', function() {
+        clearMatFilters();
+      });
+      return;
     }
-  });
-  
-  const categoryKeys = Object.keys(categoryMap);
-  
-  if (categoryKeys.length === 0) {
-    html += '<div style="text-align: center; padding: 40px; color: #8899aa;">';
-    html += '<div style="font-size: 3rem; margin-bottom: 15px;">️</div>';
-    html += '<div>No categories match the mat filters</div>';
-    html += '<div style="margin-top: 10px; font-size: 0.9rem;">Mat Filters: ' + (mat.ageGroups.join(', ') || 'All') + ' | ' + (mat.genders.join(', ') || 'All') + '</div>';
-    html += '<button class="btn btn-warning" style="margin-top: 15px;" onclick="window.clearMatFilters()">Clear Mat Filters</button>';
+    
+    html += '<div style="margin-bottom: 15px; padding: 15px; background: rgba(241,196,15,0.1); border-radius: 8px;">';
+    html += '<div style="color: #f1c40f; font-weight: bold; margin-bottom: 5px;">📊 Summary</div>';
+    html += '<div style="color: #8899aa;">Total Players: ' + players.length + ' | Matching: ' + categoryKeys.reduce((sum, key) => sum + categoryMap[key].players.length, 0) + '</div>';
+    html += '<div style="color: #8899aa; font-size: 0.9rem; margin-top: 5px;">Mat Filters: ' + (mat.ageGroups.join(', ') || 'All Ages') + ' | ' + (mat.genders.join(', ') || 'All Genders') + '</div>';
+    html += '</div>';
+    
+    html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">';
+    
+    categoryKeys.forEach((key, idx) => {
+      const cat = categoryMap[key];
+      const playerCount = cat.players.length;
+      const borderColor = playerCount >= 2 ? '#27ae60' : '#e74c3c';
+      const statusIcon = playerCount >= 2 ? '✅' : '⚠️';
+      
+      html += '<div class="category-card-' + idx + '" style="background: #151d2b; border: 2px solid ' + borderColor + '; border-radius: 10px; padding: 15px;">';
+      html += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">';
+      html += '<div style="font-size: 1.1rem; font-weight: bold; color: #f1c40f;">' + statusIcon + ' Category</div>';
+      html += '<div style="background: ' + borderColor + '; color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 0.85rem;">' + playerCount + ' Players</div>';
+      html += '</div>';
+      
+      html += '<div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 10px;">';
+      html += '<div><strong>Age:</strong> ' + cat.ageGroup + '</div>';
+      html += '<div><strong>Gender:</strong> ' + cat.gender + '</div>';
+      if (cat.weight) html += '<div><strong>Weight:</strong> ' + cat.weight + 'kg</div>';
+      html += '<div><strong>Belt:</strong> ' + cat.belt + '</div>';
+      html += '</div>';
+      
+      html += '<div style="color: #8899aa; font-size: 0.85rem; margin-bottom: 10px;">';
+      html += '<div><strong>Players:</strong> ' + cat.players.map(p => p.name || 'Unnamed').join(', ') + '</div>';
+      html += '</div>';
+      
+      if (playerCount >= 2) {
+        html += '<button class="btn btn-primary create-bracket-btn" style="width: 100%;" data-key="' + key + '"> Create Bracket</button>';
+      } else {
+        html += '<button class="btn btn-secondary" style="width: 100%;" disabled>⚠️ Need ' + (2 - playerCount) + ' more player(s)</button>';
+      }
+      
+      html += '</div>';
+    });
+    
     html += '</div>';
     container.innerHTML = html;
-    return;
+    
+    document.querySelectorAll('.create-bracket-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const key = this.dataset.key;
+        createBracket(key);
+      });
+    });
   }
-  
-  html += '<div style="margin-bottom: 15px; padding: 15px; background: rgba(241,196,15,0.1); border-radius: 8px;">';
-  html += '<div style="color: #f1c40f; font-weight: bold; margin-bottom: 5px;">📊 Summary</div>';
-  html += '<div style="color: #8899aa;">Total Players: ' + players.length + ' | Matching: ' + categoryKeys.reduce((sum, key) => sum + categoryMap[key].players.length, 0) + '</div>';
-  html += '<div style="color: #8899aa; font-size: 0.9rem; margin-top: 5px;">Mat Filters: ' + (mat.ageGroups.join(', ') || 'All Ages') + ' | ' + (mat.genders.join(', ') || 'All Genders') + '</div>';
-  html += '</div>';
-  
-  html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">';
-  
-  categoryKeys.forEach(key => {
-    const cat = categoryMap[key];
-    const playerCount = cat.players.length;
-    const borderColor = playerCount >= 2 ? '#27ae60' : '#e74c3c';
-    const statusIcon = playerCount >= 2 ? '✅' : '⚠️';
-    
-    html += '<div style="background: #151d2b; border: 2px solid ' + borderColor + '; border-radius: 10px; padding: 15px;">';
-    html += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">';
-    html += '<div style="font-size: 1.1rem; font-weight: bold; color: #f1c40f;">' + statusIcon + ' Category</div>';
-    html += '<div style="background: ' + borderColor + '; color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 0.85rem;">' + playerCount + ' Players</div>';
-    html += '</div>';
-    
-    html += '<div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 10px;">';
-    html += '<div><strong>Age:</strong> ' + cat.ageGroup + '</div>';
-    html += '<div><strong>Gender:</strong> ' + cat.gender + '</div>';
-    if (cat.weight) html += '<div><strong>Weight:</strong> ' + cat.weight + 'kg</div>';
-    html += '<div><strong>Belt:</strong> ' + cat.belt + '</div>';
-    html += '</div>';
-    
-    html += '<div style="color: #8899aa; font-size: 0.85rem; margin-bottom: 10px;">';
-    html += '<div><strong>Players:</strong> ' + cat.players.map(p => p.name || 'Unnamed').join(', ') + '</div>';
-    html += '</div>';
-    
-    if (playerCount >= 2) {
-      html += '<button class="btn btn-primary" style="width: 100%;" onclick="window.createBracket(\'' + key + '\')">🏆 Create Bracket</button>';
-    } else {
-      html += '<button class="btn btn-secondary" style="width: 100%;" disabled>⚠️ Need ' + (2 - playerCount) + ' more player(s)</button>';
+
+  function renderQueue() {
+    const container = document.getElementById('tab-queue');
+    if (!container) return;
+    container.innerHTML = '<h3 style="color: #f1c40f; margin-bottom: 15px;">⏳ Match Queue</h3><p style="color: #8899aa;">No matches scheduled yet.</p>';
+  }
+
+  function renderCallUp() {
+    const container = document.getElementById('tab-callup');
+    if (!container) return;
+    container.innerHTML = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📢 Call-Up System</h3><p style="color: #8899aa;">No matches to call.</p>';
+  }
+
+  function renderStandings() {
+    const container = document.getElementById('tab-standings');
+    if (!container) return;
+    container.innerHTML = '<h3 style="color: #f1c40f; margin-bottom: 15px;">🏆 Standings</h3><p style="color: #8899aa;">No results yet.</p>';
+  }
+
+  function clearMatFilters() {
+    mats.forEach(mat => {
+      mat.ageGroups = [];
+      mat.genders = [];
+      mat.weights = [];
+      mat.belts = [];
+    });
+    renderMats();
+    renderCategories();
+    saveData();
+  }
+
+  function createBracket(categoryKey) {
+    alert('Create bracket for category: ' + categoryKey);
+  }
+
+  function openMatInNewTab(matId) {
+    const url = window.location.href.split('?')[0] + '?mat=' + matId;
+    window.open(url, '_blank');
+  }
+
+  function openAllMatsInTabs() {
+    mats.forEach((mat, i) => {
+      setTimeout(() => {
+        openMatInNewTab(mat.id);
+      }, i * 300);
+    });
+  }
+
+  // ==========================================
+  // 8. DATABASE SYNC
+  // ==========================================
+  async function syncWithDatabase() {
+    const indicator = document.getElementById('syncIndicator');
+    if (indicator) {
+      indicator.classList.add('active');
+      setTimeout(() => indicator.classList.remove('active'), 2000);
     }
     
-    html += '</div>';
-  });
-  
-  html += '</div>';
-  container.innerHTML = html;
-};
-
-window.renderQueue = function() {
-  const container = document.getElementById('tab-queue');
-  if (!container) return;
-  container.innerHTML = '<h3 style="color: #f1c40f; margin-bottom: 15px;"> Match Queue</h3><p style="color: #8899aa;">No matches scheduled yet.</p>';
-};
-
-window.renderCallUp = function() {
-  const container = document.getElementById('tab-callup');
-  if (!container) return;
-  container.innerHTML = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📢 Call-Up System</h3><p style="color: #8899aa;">No matches to call.</p>';
-};
-
-window.renderStandings = function() {
-  const container = document.getElementById('tab-standings');
-  if (!container) return;
-  container.innerHTML = '<h3 style="color: #f1c40f; margin-bottom: 15px;"> Standings</h3><p style="color: #8899aa;">No results yet.</p>';
-};
-
-window.clearMatFilters = function() {
-  mats.forEach(mat => {
-    mat.ageGroups = [];
-    mat.genders = [];
-    mat.weights = [];
-    mat.belts = [];
-  });
-  window.renderMats();
-  window.renderCategories();
-  window.saveData();
-};
-
-window.createBracket = function(categoryKey) {
-  alert('Create bracket for category: ' + categoryKey);
-};
-
-window.openMatInNewTab = function(matId) {
-  const url = window.location.href.split('?')[0] + '?mat=' + matId;
-  window.open(url, '_blank');
-};
-
-window.openAllMatsInTabs = function() {
-  mats.forEach((mat, i) => {
-    setTimeout(() => {
-      window.openMatInNewTab(mat.id);
-    }, i * 300);
-  });
-};
-
-// ==========================================
-// 8. DATABASE SYNC
-// ==========================================
-window.syncWithDatabase = async function() {
-  const indicator = document.getElementById('syncIndicator');
-  if (indicator) {
-    indicator.classList.add('active');
-    setTimeout(() => indicator.classList.remove('active'), 2000);
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      tournamentId = urlParams.get('tournament_id');
+      
+      if (!tournamentId) {
+        const tResult = await supabase
+          .from('tournaments')
+          .insert({ name: 'Tournament ' + new Date().toLocaleDateString() })
+          .select()
+          .single();
+        
+        if (tResult.error) throw tResult.error;
+        tournamentId = tResult.data.id;
+      }
+      
+      const playersToSync = players.map(p => ({
+        id: p.id,
+        tournament_id: tournamentId,
+        player_name: p.name,
+        team: p.team,
+        age_group: p.ageGroup,
+        gender: p.gender,
+        weight: parseFloat(p.weight) || null,
+        belt_level: p.belt,
+        ranking: p.rank
+      }));
+      
+      if (playersToSync.length > 0) {
+        const result = await supabase
+          .from('tournament_participants')
+          .upsert(playersToSync, { onConflict: 'id' });
+        
+        if (result.error) throw result.error;
+        alert('✅ Synced ' + players.length + ' players to database!');
+      } else {
+        alert('No players to sync');
+      }
+      
+      console.log('✅ Sync complete');
+    } catch (err) {
+      console.error('❌ Sync error:', err);
+      alert('⚠️ Sync failed: ' + err.message);
+    }
   }
-  
-  try {
+
+  function saveData() {
+    localStorage.setItem('tournamentData', JSON.stringify({
+      players: players,
+      mats: mats,
+      categories: categories,
+      savedAt: new Date().toISOString()
+    }));
+    console.log('✅ Data saved to localStorage');
+  }
+
+  function clearAll() {
+    if (confirm('⚠️ Clear all data?')) {
+      players = [];
+      mats = [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
+      categories = {};
+      localStorage.removeItem('tournamentData');
+      renderPlayers();
+      alert('🗑️ All data cleared!');
+    }
+  }
+
+  function renderSettings() {
+    const content = document.getElementById('settingsContent');
+    if (!content) return;
+    content.innerHTML = '<p style="color: #8899aa;">Fight time settings would be loaded from database here.</p>';
+  }
+
+  // ==========================================
+  // 9. EVENT LISTeners SETUP
+  // ==========================================
+  function setupEventListeners() {
+    // Header buttons
+    document.getElementById('btnPlayers').addEventListener('click', function() {
+      showView('players');
+    });
+    
+    document.getElementById('btnMats').addEventListener('click', function() {
+      showView('mats');
+    });
+    
+    document.getElementById('btnSettings').addEventListener('click', function() {
+      showView('settings');
+    });
+    
+    document.getElementById('btnSync').addEventListener('click', syncWithDatabase);
+    document.getElementById('btnSaveLocal').addEventListener('click', saveData);
+    document.getElementById('btnClear').addEventListener('click', clearAll);
+    
+    // Player view buttons
+    document.getElementById('btnAddPlayer').addEventListener('click', addPlayer);
+    document.getElementById('btnAdd10').addEventListener('click', function() { addPlayers(10); });
+    document.getElementById('btnAdd50').addEventListener('click', function() { addPlayers(50); });
+    
+    document.getElementById('btnImportCSV').addEventListener('click', function() {
+      document.getElementById('csvImport').click();
+    });
+    
+    document.getElementById('csvImport').addEventListener('change', importCSV);
+    document.getElementById('btnExportCSV').addEventListener('click', exportCSV);
+    document.getElementById('btnSyncDB').addEventListener('click', syncWithDatabase);
+    document.getElementById('btnProceedMats').addEventListener('click', function() {
+      showView('mats');
+    });
+    
+    // Mats view
+    document.getElementById('matsCount').addEventListener('change', updateMats);
+    document.getElementById('btnOpenAllMats').addEventListener('click', openAllMatsInTabs);
+    document.getElementById('btnOpenDashboard').addEventListener('click', function() {
+      showView('dashboard');
+    });
+    
+    // Settings view
+    document.getElementById('btnBackPlayers').addEventListener('click', function() {
+      showView('players');
+    });
+    
+    // Dashboard tabs
+    document.getElementById('tabCategories').addEventListener('click', function() {
+      switchTab('categories');
+    });
+    document.getElementById('tabQueue').addEventListener('click', function() {
+      switchTab('queue');
+    });
+    document.getElementById('tabCallup').addEventListener('click', function() {
+      switchTab('callup');
+    });
+    document.getElementById('tabStandings').addEventListener('click', function() {
+      switchTab('standings');
+    });
+  }
+
+  // ==========================================
+  // 10. INITIALIZATION
+  // ==========================================
+  async function init() {
+    console.log('🚀 Page loaded successfully!');
+    
+    // Setup event listeners FIRST
+    setupEventListeners();
+    
     // Get tournament_id from URL
     const urlParams = new URLSearchParams(window.location.search);
     tournamentId = urlParams.get('tournament_id');
     
-    if (!tournamentId) {
-      // Create new tournament
-      const tResult = await supabase
-        .from('tournaments')
-        .insert({ name: 'Tournament ' + new Date().toLocaleDateString() })
-        .select()
-        .single();
-      
-      if (tResult.error) throw tResult.error;
-      tournamentId = tResult.data.id;
+    // Load dropdown data from database
+    await loadDropdownData();
+    
+    // Load saved data from localStorage
+    const saved = localStorage.getItem('tournamentData');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        players = data.players || [];
+        mats = data.mats || [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
+        categories = data.categories || {};
+        console.log('✅ Loaded', players.length, 'players from storage');
+      } catch(e) {
+        console.error('❌ Error loading data:', e);
+      }
     }
     
-    // Sync players to database
-    const playersToSync = players.map(p => ({
-      id: p.id,
-      tournament_id: tournamentId,
-      player_name: p.name,
-      team: p.team,
-      age_group: p.ageGroup,
-      gender: p.gender,
-      weight: parseFloat(p.weight) || null,
-      belt_level: p.belt,
-      ranking: p.rank
-    }));
+    // Render initial view
+    renderPlayers();
     
-    if (playersToSync.length > 0) {
-      const result = await supabase
-        .from('tournament_participants')
-        .upsert(playersToSync, { onConflict: 'id' });
-      
-      if (result.error) throw result.error;
-      alert('✅ Synced ' + players.length + ' players to database!');
-    } else {
-      alert('No players to sync');
-    }
+    // Verify functions are accessible
+    console.log('🔍 System ready!');
+    console.log('- Players loaded:', players.length);
+    console.log('- Mats configured:', mats.length);
+    console.log('- Age groups:', ageGroupsData.length);
+    console.log('- Belt levels:', beltLevelsData.length);
     
-    console.log('✅ Sync complete');
-  } catch (err) {
-    console.error('❌ Sync error:', err);
-    alert('⚠️ Sync failed: ' + err.message);
+    // Auto-save every 30 seconds
+    setInterval(saveData, 30000);
   }
-};
 
-window.saveData = function() {
-  localStorage.setItem('tournamentData', JSON.stringify({
-    players: players,
-    mats: mats,
-    categories: categories,
-    savedAt: new Date().toISOString()
-  }));
-  console.log('✅ Data saved to localStorage');
-};
-
-window.clearAll = function() {
-  if (confirm('️ Clear all data?')) {
-    players = [];
-    mats = [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
-    categories = {};
-    localStorage.removeItem('tournamentData');
-    window.renderPlayers();
-    alert('🗑️ All data cleared!');
-  }
-};
-
-window.renderSettings = function() {
-  const content = document.getElementById('settingsContent');
-  if (!content) return;
-  content.innerHTML = '<p style="color: #8899aa;">Fight time settings would be loaded from database here.</p>';
-};
-
-// ==========================================
-// 9. INITIALIZATION
-// ==========================================
-window.onload = async function() {
-  console.log(' Page loaded successfully!');
-  
-  // Get tournament_id from URL
-  const urlParams = new URLSearchParams(window.location.search);
-  tournamentId = urlParams.get('tournament_id');
-  
-  // Load dropdown data from database FIRST
-  await window.loadDropdownData();
-  
-  // Load saved data from localStorage
-  const saved = localStorage.getItem('tournamentData');
-  if (saved) {
-    try {
-      const data = JSON.parse(saved);
-      players = data.players || [];
-      mats = data.mats || [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
-      categories = data.categories || {};
-      console.log('✅ Loaded', players.length, 'players from storage');
-    } catch(e) {
-      console.error(' Error loading data:', e);
-    }
+  // Run initialization when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
   
-  // Render initial view
-  window.renderPlayers();
-  
-  // Verify functions are accessible
-  console.log('🔍 Functions check:');
-  console.log('- addPlayer:', typeof window.addPlayer);
-  console.log('- addPlayers:', typeof window.addPlayers);
-  console.log('- showView:', typeof window.showView);
-  console.log('- syncWithDatabase:', typeof window.syncWithDatabase);
-  console.log('- renderPlayers:', typeof window.renderPlayers);
-  console.log('- renderMats:', typeof window.renderMats);
-  console.log('- loadDropdownData:', typeof window.loadDropdownData);
-  
-  // Auto-save every 30 seconds
-  setInterval(window.saveData, 30000);
-};
+})();
 </script>
 
 </body>
