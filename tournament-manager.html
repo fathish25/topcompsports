@@ -316,119 +316,342 @@ input:focus, select:focus, textarea:focus {
   font-size: 0.75rem;
 }
 
-/* Scoreboard */
+/* Advanced Scoreboard Styles */
 .scoreboard-container {
-  max-width: 1000px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 10px;
 }
-.scoreboard-header {
-  text-align: center;
-  padding: 20px;
+
+.scoreboard-top-bar {
   background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
-  border-radius: 12px;
-  margin-bottom: 20px;
   border: 2px solid #f1c40f;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
 }
-.scoreboard-title {
+
+.match-info-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.match-title {
+  font-size: 1.8rem;
   color: #f1c40f;
-  font-size: 1.4rem;
-  margin-bottom: 8px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
-.scoreboard-subtitle {
+
+.match-subtitle {
   color: #8899aa;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
-.scoreboard-players {
+
+.scoreboard-settings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.setting-label {
+  color: #8899aa;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.scoreboard-main {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   gap: 20px;
-  align-items: center;
-  margin-bottom: 25px;
+  align-items: stretch;
+  margin-bottom: 20px;
 }
-.scoreboard-player {
+
+.player-card {
   background: #1a1f2e;
+  border: 3px solid #2a3548;
   border-radius: 12px;
   padding: 20px;
-  text-align: center;
-  border: 2px solid #2a3548;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   transition: all 0.3s;
 }
-.scoreboard-player.active {
-  border-color: #f1c40f;
-  box-shadow: 0 0 20px rgba(241,196,15,0.3);
+
+.player-card.red {
+  border-color: #e74c3c;
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.2);
 }
-.scoreboard-player.winner {
-  border-color: #27ae60;
-  background: rgba(39,174,96,0.2);
+
+.player-card.blue {
+  border-color: #3498db;
+  box-shadow: 0 0 20px rgba(52, 152, 219, 0.2);
 }
+
+.player-card.active {
+  transform: scale(1.02);
+}
+
+.player-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #0f1724;
+  border: 3px solid #f1c40f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.player-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.player-logo-placeholder {
+  color: #f1c40f;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
 .player-name {
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: bold;
   color: #fff;
   margin-bottom: 5px;
+  text-align: center;
 }
+
 .player-team {
   color: #8899aa;
-  font-size: 0.85rem;
-  margin-bottom: 15px;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  text-align: center;
 }
-.player-score {
-  font-size: 3.5rem;
+
+.player-score-box {
+  width: 100%;
+  background: #0f1724;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.player-score-box.red .score-value {
+  color: #e74c3c;
+}
+
+.player-score-box.blue .score-value {
+  color: #3498db;
+}
+
+.score-value {
+  font-size: 4rem;
   font-weight: bold;
-  color: #f1c40f;
-  margin: 15px 0;
+  font-family: 'Courier New', monospace;
+  line-height: 1;
 }
-.score-controls {
+
+.score-controls-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
-  margin-bottom: 10px;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 15px;
 }
-.score-btn {
-  padding: 8px;
+
+.score-btn-small {
+  padding: 12px;
   border: none;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   transition: all 0.2s;
 }
-.score-btn:hover { transform: translateY(-2px); }
-.score-btn-1 { background: #27ae60; color: #fff; }
-.score-btn-2 { background: #2980b9; color: #fff; }
-.score-btn-3 { background: #8e44ad; color: #fff; }
-.score-btn-4 { background: #e74c3c; color: #fff; }
-.score-btn-win { 
-  background: #f1c40f; 
-  color: #000; 
-  width: 100%; 
-  padding: 10px; 
-  margin-top: 8px;
-  font-weight: bold;
+
+.score-btn-small:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
-.vs-divider {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #f1c40f;
+
+.score-btn-small.positive {
+  background: #27ae60;
+  color: #fff;
+}
+
+.score-btn-small.negative {
+  background: #34495e;
+  color: #fff;
+}
+
+.advantage-penalty {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.ap-box {
+  background: #0f1724;
+  border-radius: 8px;
+  padding: 12px;
   text-align: center;
 }
-.scoreboard-actions {
+
+.ap-label {
+  font-size: 0.8rem;
+  color: #8899aa;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.ap-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #f1c40f;
+}
+
+.ap-btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.2s;
+}
+
+.ap-btn.advantage {
+  background: #f39c12;
+  color: #000;
+}
+
+.ap-btn.penalty {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.ap-btn:hover {
+  transform: translateY(-2px);
+}
+
+.vs-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #f1c40f;
+  padding: 20px;
+}
+
+.timer-display {
+  background: #0f1724;
+  border: 3px solid #f1c40f;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.timer-value {
+  font-size: 4rem;
+  font-weight: bold;
+  color: #f1c40f;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 3px;
+}
+
+.timer-label {
+  color: #8899aa;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.golden-time-section {
+  background: rgba(243, 156, 18, 0.1);
+  border: 2px solid #f39c12;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.golden-time-title {
+  color: #f39c12;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.golden-time-controls {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.golden-time-input {
+  width: 100px;
+  padding: 10px;
+  background: #0f1724;
+  border: 2px solid #f39c12;
+  color: #fff;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.scoreboard-actions-bar {
   display: flex;
   gap: 10px;
   justify-content: center;
   flex-wrap: wrap;
+  padding: 20px;
+  background: #151d2b;
+  border-radius: 12px;
   margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #2a3548;
 }
-.match-timer {
-  text-align: center;
-  font-size: 2.5rem;
-  color: #f1c40f;
-  margin: 15px 0;
+
+.undo-btn {
+  background: #34495e;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
   font-weight: bold;
-  font-family: 'Courier New', monospace;
+  transition: all 0.2s;
+}
+
+.undo-btn:hover {
+  background: #2c3e50;
+  transform: translateY(-2px);
 }
 
 /* Match Queue */
@@ -542,6 +765,25 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .scoreboard-main {
+    grid-template-columns: 1fr;
+  }
+  
+  .vs-divider {
+    transform: rotate(90deg);
+    padding: 10px;
+  }
+  
+  .player-score-box {
+    padding: 15px;
+  }
+  
+  .score-value {
+    font-size: 3rem;
+  }
+}
+
 @media (max-width: 768px) {
   .header { flex-direction: column; text-align: center; padding: 15px; }
   .header h1 { font-size: 1.2rem; }
@@ -552,22 +794,45 @@ input:focus, select:focus, textarea:focus {
   th, td { padding: 6px; }
   .bracket-rounds { gap: 15px; }
   .bracket-round { min-width: 200px; }
-  .scoreboard-players { grid-template-columns: 1fr; }
-  .vs-divider { margin: 10px 0; font-size: 1.5rem; }
-  .player-score { font-size: 2.5rem; }
-  .score-controls { grid-template-columns: repeat(2, 1fr); }
   .tabs { justify-content: center; }
   .tab { padding: 10px 15px; font-size: 0.85rem; }
   .modal-content { padding: 20px; }
   .category-grid { grid-template-columns: 1fr; }
+  
+  .score-value {
+    font-size: 2.5rem;
+  }
+  
+  .timer-value {
+    font-size: 3rem;
+  }
+  
+  .player-name {
+    font-size: 1.3rem;
+  }
+  
+  .score-controls-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 480px) {
   body { padding: 5px; }
   .header h1 { font-size: 1rem; }
   .btn { padding: 6px 10px; font-size: 0.8rem; }
-  .player-score { font-size: 2rem; }
-  .match-timer { font-size: 2rem; }
+  
+  .score-value {
+    font-size: 2rem;
+  }
+  
+  .timer-value {
+    font-size: 2.5rem;
+  }
+  
+  .player-logo {
+    width: 60px;
+    height: 60px;
+  }
 }
 
 /* Utility */
@@ -597,7 +862,7 @@ input:focus, select:focus, textarea:focus {
       <button class="btn btn-warning" id="btnSettings">⚙️ Settings</button>
       <button class="btn btn-secondary" id="btnSync"> Sync</button>
       <button class="btn btn-secondary" id="btnSaveLocal">💾 Save</button>
-      <button class="btn btn-danger" id="btnClear">🗑️ Clear</button>
+      <button class="btn btn-danger" id="btnClear">️ Clear</button>
     </div>
   </div>
 
@@ -610,7 +875,7 @@ input:focus, select:focus, textarea:focus {
         <button class="btn btn-secondary" id="btnAdd10">➕ Add 10</button>
         <button class="btn btn-info" id="btnImportCSV"> Import CSV</button>
         <input type="file" id="csvImport" accept=".csv" style="display:none">
-        <button class="btn btn-info" id="btnExportCSV">📤 Export CSV</button>
+        <button class="btn btn-info" id="btnExportCSV"> Export CSV</button>
         <button class="btn btn-warning" id="btnSyncDB">🔄 Sync with DB</button>
       </div>
       <div class="table-container">
@@ -626,7 +891,7 @@ input:focus, select:focus, textarea:focus {
   <!-- Mats View -->
   <div id="view-mats" class="view">
     <div class="section">
-      <div class="section-title">🥋 Mats Setup</div>
+      <div class="section-title"> Mats Setup</div>
       <div style="margin-bottom: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
         <label style="font-weight: bold; color: #f1c40f;">Number of Mats: </label>
         <select id="matsCount" style="width: auto; display: inline-block;">
@@ -677,7 +942,7 @@ input:focus, select:focus, textarea:focus {
     </div>
   </div>
 
-  <!-- Scoreboard View -->
+  <!-- Advanced Scoreboard View -->
   <div id="view-scoreboard" class="view">
     <div class="section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
@@ -741,6 +1006,9 @@ input:focus, select:focus, textarea:focus {
   let currentEditCategoryKey = null;
   let currentEditRoundIndex = null;
   let currentEditMatchIndex = null;
+  let goldenTimeActive = false;
+  let goldenTimeMinutes = 1;
+  let matchDuration = 120; // Default 2 minutes in seconds
 
   // Storage Key
   function getStorageKey() {
@@ -1214,7 +1482,7 @@ input:focus, select:focus, textarea:focus {
       
       html += '<div class="category-card ' + (isReady ? 'ready' : 'not-ready') + '">';
       html += '<div class="category-header">';
-      html += '<div class="category-title">🏷️ Category</div>';
+      html += '<div class="category-title">️ Category</div>';
       html += '<div class="category-count">' + playerCount + ' Players</div>';
       html += '</div>';
       
@@ -1230,7 +1498,6 @@ input:focus, select:focus, textarea:focus {
       html += '</div>';
       
       if (isReady) {
-        // ✅ FIX: استخدام data-key بدلاً من onclick مباشرة
         html += '<button class="btn btn-primary btn-block create-bracket-btn" data-key="' + key + '">🏆 Create Bracket</button>';
       } else {
         html += '<button class="btn btn-secondary btn-block" disabled>️ Need ' + (2 - playerCount) + ' more player(s)</button>';
@@ -1242,7 +1509,6 @@ input:focus, select:focus, textarea:focus {
     html += '</div>';
     container.innerHTML = html;
     
-    // ✅ FIX: استخدام Event Delegation بدلاً من onclick
     document.querySelectorAll('.create-bracket-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         const key = this.dataset.key;
@@ -1251,7 +1517,6 @@ input:focus, select:focus, textarea:focus {
     });
   }
 
-  // ✅ FIX: جعل الدالة متاحة عالمياً
   function createBracket(categoryKey) {
     console.log('🏆 Creating bracket for:', categoryKey);
     
@@ -1293,7 +1558,6 @@ input:focus, select:focus, textarea:focus {
     console.log('✅ Bracket created for:', categoryKey);
   }
   
-  // ✅ FIX: جعل الدالة متاحة على window
   window.createBracket = createBracket;
 
   function generateBracket(playersList) {
@@ -1331,6 +1595,10 @@ input:focus, select:focus, textarea:focus {
         status: status,
         score1: 0,
         score2: 0,
+        advantage1: 0,
+        advantage2: 0,
+        penalty1: 0,
+        penalty2: 0,
         current: i === 0 && !!(player1 && player2)
       });
     }
@@ -1352,6 +1620,10 @@ input:focus, select:focus, textarea:focus {
           status: 'pending',
           score1: 0,
           score2: 0,
+          advantage1: 0,
+          advantage2: 0,
+          penalty1: 0,
+          penalty2: 0,
           current: false
         });
       }
@@ -1434,7 +1706,7 @@ input:focus, select:focus, textarea:focus {
     container.innerHTML = html;
     
     document.getElementById('bracketTitle').innerHTML = 
-      `🏆 ${data.gender} - ${data.ageGroup} - ${data.weight}kg - ${data.belt} Belt`;
+      ` ${data.gender} - ${data.ageGroup} - ${data.weight}kg - ${data.belt} Belt`;
   }
 
   // Edit Match Modal Functions
@@ -1507,6 +1779,10 @@ input:focus, select:focus, textarea:focus {
       currentEditMatch.status = 'pending';
       currentEditMatch.score1 = 0;
       currentEditMatch.score2 = 0;
+      currentEditMatch.advantage1 = 0;
+      currentEditMatch.advantage2 = 0;
+      currentEditMatch.penalty1 = 0;
+      currentEditMatch.penalty2 = 0;
     }
     
     renderBracketView(currentEditCategoryKey);
@@ -1516,11 +1792,11 @@ input:focus, select:focus, textarea:focus {
     showNotification('✅ Match updated successfully!');
   };
 
-  // Scoreboard Functions
+  // Advanced Scoreboard Functions
   window.openScoreboard = function(categoryKey, roundIndex, matchIndex) {
     const data = categories[categoryKey];
     if (!data || !data.bracket) {
-      alert('❌ Bracket not found!');
+      alert(' Bracket not found!');
       return;
     }
     
@@ -1539,11 +1815,37 @@ input:focus, select:focus, textarea:focus {
     };
     currentBracketKey = categoryKey;
     
-    renderScoreboard();
+    // Set match duration based on age group
+    setMatchDuration(data.ageGroup);
+    
+    renderAdvancedScoreboard();
     showView('scoreboard');
   };
 
-  function renderScoreboard() {
+  function setMatchDuration(ageGroup) {
+    // Get duration from age group settings or database
+    const ageData = ageGroupsData.find(ag => ag.name === ageGroup);
+    if (ageData && ageData.duration) {
+      matchDuration = ageData.duration * 60; // Convert minutes to seconds
+    } else {
+      // Default durations based on age group name
+      if (ageGroup.includes('Kids') || ageGroup.includes('Youth')) {
+        matchDuration = 120; // 2 minutes
+      } else if (ageGroup.includes('Junior')) {
+        matchDuration = 240; // 4 minutes
+      } else {
+        matchDuration = 300; // 5 minutes
+      }
+    }
+  }
+
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  function renderAdvancedScoreboard() {
     if (!currentMatch) return;
     
     const data = categories[currentMatch.categoryKey];
@@ -1551,59 +1853,206 @@ input:focus, select:focus, textarea:focus {
     const container = document.getElementById('scoreboardContent');
     
     document.getElementById('scoreboardTitle').innerHTML = 
-      `🥊 ${data.gender} - ${data.ageGroup} - ${data.weight}kg - ${data.belt} Belt`;
+      ` ${data.gender} - ${data.ageGroup} - ${data.weight}kg - ${data.belt} Belt`;
     
     const p1 = match.player1;
     const p2 = match.player2;
     
     let html = `
-      <div class="scoreboard-header">
-        <div class="scoreboard-title">Match ${match.id}</div>
-        <div class="scoreboard-subtitle">${data.ageGroup} | ${data.gender} | ${data.weight}kg | ${data.belt}</div>
-        <div class="match-timer" id="matchTimer">00:00</div>
+      <div class="scoreboard-top-bar">
+        <div class="match-info-header">
+          <div class="match-title">Match ${match.id}</div>
+          <div class="match-subtitle">${data.ageGroup} | ${data.gender} | ${data.weight}kg | ${data.belt}</div>
+        </div>
+        
+        <div class="scoreboard-settings">
+          <div class="setting-group">
+            <label class="setting-label">Age Group</label>
+            <select class="form-select" id="sbAgeGroup" onchange="updateMatchSettings()">
+              ${ageGroupsData.map(ag => `<option value="${ag.name}" ${ag.name === data.ageGroup ? 'selected' : ''}>${ag.name}</option>`).join('')}
+            </select>
+          </div>
+          <div class="setting-group">
+            <label class="setting-label">Gender</label>
+            <select class="form-select" id="sbGender" onchange="updateMatchSettings()">
+              <option ${data.gender === 'Men' ? 'selected' : ''}>Men</option>
+              <option ${data.gender === 'Women' ? 'selected' : ''}>Women</option>
+              <option ${data.gender === 'Boys' ? 'selected' : ''}>Boys</option>
+              <option ${data.gender === 'Girls' ? 'selected' : ''}>Girls</option>
+            </select>
+          </div>
+          <div class="setting-group">
+            <label class="setting-label">Weight</label>
+            <input type="text" class="form-input" id="sbWeight" value="${data.weight}" onchange="updateMatchSettings()">
+          </div>
+          <div class="setting-group">
+            <label class="setting-label">Belt</label>
+            <select class="form-select" id="sbBelt" onchange="updateMatchSettings()">
+              ${beltLevelsData.map(bl => `<option value="${bl.name}" ${bl.name === data.belt ? 'selected' : ''}>${bl.name}</option>`).join('')}
+            </select>
+          </div>
+        </div>
       </div>
       
-      <div class="scoreboard-players">
-        <div class="scoreboard-player ${match.current ? 'active' : ''} ${match.winner === p1?.id ? 'winner' : ''}">
+      <div class="timer-display">
+        <div class="timer-value" id="matchTimer">${formatTime(matchDuration)}</div>
+        <div class="timer-label">Match Time</div>
+      </div>
+      
+      <div class="scoreboard-main">
+        <div class="player-card red ${match.current ? 'active' : ''} ${match.winner === p1?.id ? 'winner' : ''}">
+          <div class="player-logo">
+            <div class="player-logo-placeholder">${p1.name.charAt(0)}</div>
+          </div>
           <div class="player-name">${p1.name}</div>
           <div class="player-team">${p1.team || 'No Team'} | Rank #${p1.rank}</div>
-          <div class="player-score" id="score1">${match.score1}</div>
-          <div class="score-controls">
-            <button class="score-btn score-btn-1" onclick="window.addScore(1, 1)">+1</button>
-            <button class="score-btn score-btn-2" onclick="window.addScore(1, 2)">+2</button>
-            <button class="score-btn score-btn-3" onclick="window.addScore(1, 3)">+3</button>
-            <button class="score-btn score-btn-4" onclick="window.addScore(1, 4)">+4</button>
+          
+          <div class="player-score-box red">
+            <div class="score-value" id="score1">${match.score1}</div>
           </div>
-          <button class="score-btn score-btn-win" onclick="window.declareWinner(1)">🏆 Declare Winner</button>
+          
+          <div class="advantage-penalty">
+            <div class="ap-box">
+              <div class="ap-label">⭐ Advantage</div>
+              <div class="ap-value" id="advantage1">${match.advantage1 || 0}</div>
+              <button class="ap-btn advantage" onclick="window.addAdvantage(1)">Add</button>
+            </div>
+            <div class="ap-box">
+              <div class="ap-label">🟥 Penalty</div>
+              <div class="ap-value" id="penalty1">${match.penalty1 || 0}</div>
+              <button class="ap-btn penalty" onclick="window.addPenalty(1)">Add</button>
+            </div>
+          </div>
+          
+          <div class="score-controls-grid">
+            <button class="score-btn-small positive" onclick="window.addScore(1, 1)">+1</button>
+            <button class="score-btn-small positive" onclick="window.addScore(1, 2)">+2</button>
+            <button class="score-btn-small positive" onclick="window.addScore(1, 3)">+3</button>
+            <button class="score-btn-small positive" onclick="window.addScore(1, 4)">+4</button>
+          </div>
+          
+          <button class="ap-btn advantage" style="margin-top: 10px;" onclick="window.declareWinner(1)">🏆 Declare Winner</button>
+          <button class="undo-btn" style="width: 100%; margin-top: 10px;" onclick="window.undoPlayer(1)">↩️ Undo</button>
         </div>
         
         <div class="vs-divider">VS</div>
         
-        <div class="scoreboard-player ${match.current ? 'active' : ''} ${match.winner === p2?.id ? 'winner' : ''}">
+        <div class="player-card blue ${match.current ? 'active' : ''} ${match.winner === p2?.id ? 'winner' : ''}">
+          <div class="player-logo">
+            <div class="player-logo-placeholder">${p2.name.charAt(0)}</div>
+          </div>
           <div class="player-name">${p2.name}</div>
           <div class="player-team">${p2.team || 'No Team'} | Rank #${p2.rank}</div>
-          <div class="player-score" id="score2">${match.score2}</div>
-          <div class="score-controls">
-            <button class="score-btn score-btn-1" onclick="window.addScore(2, 1)">+1</button>
-            <button class="score-btn score-btn-2" onclick="window.addScore(2, 2)">+2</button>
-            <button class="score-btn score-btn-3" onclick="window.addScore(2, 3)">+3</button>
-            <button class="score-btn score-btn-4" onclick="window.addScore(2, 4)">+4</button>
+          
+          <div class="player-score-box blue">
+            <div class="score-value" id="score2">${match.score2}</div>
           </div>
-          <button class="score-btn score-btn-win" onclick="window.declareWinner(2)">🏆 Declare Winner</button>
+          
+          <div class="advantage-penalty">
+            <div class="ap-box">
+              <div class="ap-label">⭐ Advantage</div>
+              <div class="ap-value" id="advantage2">${match.advantage2 || 0}</div>
+              <button class="ap-btn advantage" onclick="window.addAdvantage(2)">Add</button>
+            </div>
+            <div class="ap-box">
+              <div class="ap-label">🟥 Penalty</div>
+              <div class="ap-value" id="penalty2">${match.penalty2 || 0}</div>
+              <button class="ap-btn penalty" onclick="window.addPenalty(2)">Add</button>
+            </div>
+          </div>
+          
+          <div class="score-controls-grid">
+            <button class="score-btn-small positive" onclick="window.addScore(2, 1)">+1</button>
+            <button class="score-btn-small positive" onclick="window.addScore(2, 2)">+2</button>
+            <button class="score-btn-small positive" onclick="window.addScore(2, 3)">+3</button>
+            <button class="score-btn-small positive" onclick="window.addScore(2, 4)">+4</button>
+          </div>
+          
+          <button class="ap-btn advantage" style="margin-top: 10px;" onclick="window.declareWinner(2)">🏆 Declare Winner</button>
+          <button class="undo-btn" style="width: 100%; margin-top: 10px;" onclick="window.undoPlayer(2)">↩️ Undo</button>
         </div>
       </div>
       
-      <div class="scoreboard-actions">
-        <button class="btn btn-warning" onclick="window.resetScores()">🔄 Reset Scores</button>
-        <button class="btn btn-secondary" onclick="window.undoLastScore()">↩️ Undo</button>
-        <button class="btn btn-info" onclick="window.toggleTimer()">⏱️ ${timerRunning ? 'Pause' : 'Start'} Timer</button>
+      <div class="golden-time-section">
+        <div class="golden-time-title">⚡ Golden Time</div>
+        <div class="golden-time-controls">
+          <input type="number" class="golden-time-input" id="goldenTimeMinutes" value="${goldenTimeMinutes}" min="1" max="10">
+          <span style="color: #8899aa;">minutes</span>
+          <button class="btn btn-warning" onclick="window.activateGoldenTime()" ${goldenTimeActive ? 'disabled' : ''}>
+            ${goldenTimeActive ? '✅ Active' : ' Activate Golden Time'}
+          </button>
+          <button class="btn btn-secondary" onclick="window.resetGoldenTime()">🔄 Reset</button>
+        </div>
+      </div>
+      
+      <div class="scoreboard-actions-bar">
+        <button class="btn btn-secondary" onclick="window.backToBracket()">← Back to Bracket</button>
+        <button class="btn btn-primary" onclick="window.startTimer()" id="btnStartTimer">▶ Start</button>
+        <button class="btn btn-warning" onclick="window.pauseTimer()" id="btnPauseTimer">⏸ Pause</button>
+        <button class="btn btn-danger" onclick="window.finishMatch()">✅ Finish</button>
+        <button class="btn btn-info" onclick="window.swapSides()">🔄 Swap</button>
+        <button class="btn btn-secondary" onclick="window.resetMatch()">🗑️ Reset</button>
       </div>
     `;
     
     container.innerHTML = html;
+    
+    // Initialize timer display
+    updateTimerDisplay();
   }
 
-  // Score Functions
+  function updateTimerDisplay() {
+    const timerEl = document.getElementById('matchTimer');
+    if (timerEl) {
+      timerEl.textContent = formatTime(timerSeconds);
+    }
+  }
+
+  window.startTimer = function() {
+    if (timerRunning) return;
+    timerRunning = true;
+    timerInterval = setInterval(() => {
+      if (timerSeconds > 0) {
+        timerSeconds--;
+        updateTimerDisplay();
+        saveData();
+      } else {
+        window.pauseTimer();
+        showNotification('⏰ Time\'s up!');
+      }
+    }, 1000);
+  };
+
+  window.pauseTimer = function() {
+    timerRunning = false;
+    if (timerInterval) {
+      clearInterval(timerInterval);
+    }
+  };
+
+  window.resetTimer = function() {
+    window.pauseTimer();
+    timerSeconds = matchDuration;
+    updateTimerDisplay();
+    saveData();
+  };
+
+  window.activateGoldenTime = function() {
+    goldenTimeMinutes = parseInt(document.getElementById('goldenTimeMinutes').value) || 1;
+    goldenTimeActive = true;
+    timerSeconds = goldenTimeMinutes * 60;
+    updateTimerDisplay();
+    showNotification('⚡ Golden Time Activated!');
+    saveData();
+  };
+
+  window.resetGoldenTime = function() {
+    goldenTimeActive = false;
+    timerSeconds = matchDuration;
+    updateTimerDisplay();
+    saveData();
+  };
+
   window.addScore = function(playerNum, points) {
     if (!currentMatch) return;
     
@@ -1619,7 +2068,47 @@ input:focus, select:focus, textarea:focus {
       match.score2 += points;
     }
     
-    renderScoreboard();
+    renderAdvancedScoreboard();
+    saveData();
+  };
+
+  window.addAdvantage = function(playerNum) {
+    if (!currentMatch) return;
+    const match = currentMatch.match;
+    if (playerNum === 1) {
+      match.advantage1 = (match.advantage1 || 0) + 1;
+    } else {
+      match.advantage2 = (match.advantage2 || 0) + 1;
+    }
+    renderAdvancedScoreboard();
+    saveData();
+  };
+
+  window.addPenalty = function(playerNum) {
+    if (!currentMatch) return;
+    const match = currentMatch.match;
+    if (playerNum === 1) {
+      match.penalty1 = (match.penalty1 || 0) + 1;
+    } else {
+      match.penalty2 = (match.penalty2 || 0) + 1;
+    }
+    renderAdvancedScoreboard();
+    saveData();
+  };
+
+  window.undoPlayer = function(playerNum) {
+    if (!currentMatch) return;
+    const match = currentMatch.match;
+    if (playerNum === 1) {
+      if (match.score1 > 0) match.score1--;
+      else if (match.advantage1 > 0) match.advantage1--;
+      else if (match.penalty1 > 0) match.penalty1--;
+    } else {
+      if (match.score2 > 0) match.score2--;
+      else if (match.advantage2 > 0) match.advantage2--;
+      else if (match.penalty2 > 0) match.penalty2--;
+    }
+    renderAdvancedScoreboard();
     saveData();
   };
 
@@ -1666,43 +2155,86 @@ input:focus, select:focus, textarea:focus {
     saveData();
     
     currentMatch = null;
-    timerRunning = false;
-    if (timerInterval) clearInterval(timerInterval);
+    window.pauseTimer();
   };
 
-  window.resetScores = function() {
+  window.swapSides = function() {
+    if (!currentMatch) return;
+    const match = currentMatch.match;
+    const tempPlayer = match.player1;
+    match.player1 = match.player2;
+    match.player2 = tempPlayer;
+    
+    const tempScore = match.score1;
+    match.score1 = match.score2;
+    match.score2 = tempScore;
+    
+    const tempAdv = match.advantage1;
+    match.advantage1 = match.advantage2;
+    match.advantage2 = tempAdv;
+    
+    const tempPen = match.penalty1;
+    match.penalty1 = match.penalty2;
+    match.penalty2 = tempPen;
+    
+    renderAdvancedScoreboard();
+    saveData();
+  };
+
+  window.resetMatch = function() {
     if (!currentMatch) return;
     const match = currentMatch.match;
     match.score1 = 0;
     match.score2 = 0;
-    renderScoreboard();
+    match.advantage1 = 0;
+    match.advantage2 = 0;
+    match.penalty1 = 0;
+    match.penalty2 = 0;
+    match.winner = null;
+    match.status = 'pending';
+    window.resetTimer();
+    renderAdvancedScoreboard();
     saveData();
   };
 
-  window.undoLastScore = function() {
+  window.finishMatch = function() {
     if (!currentMatch) return;
     const match = currentMatch.match;
-    if (match.score1 > 0) match.score1 = Math.max(0, match.score1 - 1);
-    else if (match.score2 > 0) match.score2 = Math.max(0, match.score2 - 1);
-    renderScoreboard();
-    saveData();
+    
+    if (!match.winner) {
+      // Auto-declare winner based on score
+      if (match.score1 > match.score2) {
+        window.declareWinner(1);
+      } else if (match.score2 > match.score1) {
+        window.declareWinner(2);
+      } else {
+        alert('⚠️ Scores are tied! Please declare a winner manually.');
+      }
+    } else {
+      window.declareWinner(match.winner === match.player1.id ? 1 : 2);
+    }
   };
 
-  window.toggleTimer = function() {
-    if (timerRunning) {
-      clearInterval(timerInterval);
-      timerRunning = false;
+  window.backToBracket = function() {
+    if (currentBracketKey) {
+      renderBracketView(currentBracketKey);
+      showView('bracket');
     } else {
-      timerRunning = true;
-      timerInterval = setInterval(() => {
-        timerSeconds++;
-        const mins = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
-        const secs = (timerSeconds % 60).toString().padStart(2, '0');
-        const timerEl = document.getElementById('matchTimer');
-        if (timerEl) timerEl.innerText = `${mins}:${secs}`;
-      }, 1000);
+      showView('dashboard');
     }
-    renderScoreboard();
+  };
+
+  window.updateMatchSettings = function() {
+    if (!currentMatch) return;
+    const data = categories[currentMatch.categoryKey];
+    data.ageGroup = document.getElementById('sbAgeGroup').value;
+    data.gender = document.getElementById('sbGender').value;
+    data.weight = document.getElementById('sbWeight').value;
+    data.belt = document.getElementById('sbBelt').value;
+    setMatchDuration(data.ageGroup);
+    window.resetTimer();
+    saveData();
+    showNotification('✅ Settings updated!');
   };
 
   // Queue Functions
@@ -1776,7 +2308,7 @@ input:focus, select:focus, textarea:focus {
         
         if (item.match.status === 'pending' && item.match.player1 && item.match.player2) {
           html += `<button class="btn btn-sm btn-primary" onclick="window.openScoreboard('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">▶ Play</button>`;
-          html += `<button class="btn btn-sm btn-warning" onclick="window.openEditMatch('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">⚙️ Edit</button>`;
+          html += `<button class="btn btn-sm btn-warning" onclick="window.openEditMatch('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">️ Edit</button>`;
         }
         
         html += `</div>`;
