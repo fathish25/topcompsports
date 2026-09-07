@@ -8,13 +8,15 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { 
-  font-family: 'Segoe UI', Tahoma, sans-serif; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
   background: #0a0e17; 
   color: #fff; 
   padding: 10px; 
+  line-height: 1.6;
 }
 .container { max-width: 1600px; margin: 0 auto; }
 
+/* Buttons */
 .btn { 
   padding: 10px 18px; 
   border: none; 
@@ -22,20 +24,24 @@ body {
   font-weight: bold; 
   cursor: pointer; 
   margin: 3px; 
-  transition: all 0.2s; 
+  transition: all 0.3s ease; 
   display: inline-flex; 
   align-items: center; 
   gap: 6px; 
+  font-size: 0.9rem;
 }
-.btn:hover { transform: translateY(-2px); }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.btn:active { transform: translateY(0); }
 .btn-primary { background: #27ae60; color: #fff; }
 .btn-secondary { background: #34495e; color: #fff; }
 .btn-danger { background: #c0392b; color: #fff; }
 .btn-warning { background: #f39c12; color: #000; }
 .btn-info { background: #2980b9; color: #fff; }
 .btn-purple { background: #8e44ad; color: #fff; }
-.btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+.btn-block { width: 100%; justify-content: center; }
 
+/* Sections */
 .section { 
   background: #1a1f2e; 
   border-radius: 12px; 
@@ -52,6 +58,7 @@ body {
   padding-bottom: 10px; 
 }
 
+/* Header */
 .header { 
   background: #151d2b; 
   padding: 15px 25px; 
@@ -64,48 +71,63 @@ body {
   gap: 10px; 
 }
 .header h1 { color: #f1c40f; font-size: 1.5rem; }
+.header-subtitle { color: #8899aa; font-size: 0.85rem; margin-top: 5px; }
+.db-status { color: #2ecc71; font-size: 0.75rem; margin-top: 5px; }
 
+/* Views */
 .view { display: none; }
 .view.active { display: block; animation: fadeIn 0.3s; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 8px; text-align: left; border-bottom: 1px solid #2a3548; }
-th { background: #151d2b; color: #8899aa; font-size: 0.8rem; text-transform: uppercase; }
+/* Tables */
+.table-container { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 800px; }
+th, td { padding: 10px; text-align: left; border-bottom: 1px solid #2a3548; }
+th { background: #151d2b; color: #8899aa; font-size: 0.8rem; text-transform: uppercase; font-weight: 600; }
+tr:hover { background: rgba(241,196,15,0.05); }
 
-input, select { 
+/* Forms */
+input, select, textarea { 
   background: #0f1724; 
   border: 1px solid #2a3548; 
   color: #fff; 
-  padding: 6px 10px; 
-  border-radius: 5px; 
-  font-size: 0.85rem; 
-  width: 100%; 
+  padding: 8px 12px; 
+  border-radius: 6px; 
+  font-size: 0.9rem; 
+  width: 100%;
+  transition: border-color 0.3s;
 }
-input:focus, select:focus { outline: none; border-color: #f1c40f; }
+input:focus, select:focus, textarea:focus { 
+  outline: none; 
+  border-color: #f1c40f; 
+}
 
+/* Tabs */
 .tabs { 
   display: flex; 
   gap: 5px; 
-  margin-bottom: 15px; 
+  margin-bottom: 20px; 
   background: rgba(0,0,0,0.2); 
   padding: 5px; 
   border-radius: 10px; 
   flex-wrap: wrap; 
 }
 .tab { 
-  padding: 10px 18px; 
+  padding: 12px 20px; 
   border: none; 
   background: transparent; 
   color: #8899aa; 
   cursor: pointer; 
   font-weight: bold; 
-  border-radius: 8px; 
+  border-radius: 8px;
+  transition: all 0.3s;
 }
+.tab:hover { color: #fff; background: rgba(241,196,15,0.1); }
 .tab.active { background: #f1c40f; color: #000; }
 .tab-content { display: none; }
-.tab-content.active { display: block; }
+.tab-content.active { display: block; animation: fadeIn 0.3s; }
 
+/* Sync Indicator */
 .sync-indicator { 
   position: fixed; 
   top: 10px; 
@@ -127,6 +149,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   100% { transform: scale(1); opacity: 1; } 
 }
 
+/* Tags */
 .tag { 
   background: rgba(241,196,15,0.2); 
   padding: 4px 10px; 
@@ -139,11 +162,165 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 }
 .tag-remove { cursor: pointer; color: #e74c3c; font-weight: bold; }
 
-/* === Scoreboard Styles === */
-.scoreboard-container {
-  max-width: 900px;
-  margin: 0 auto;
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
   padding: 20px;
+}
+.modal-overlay.active {
+  display: flex;
+}
+.modal-content {
+  background: #1a1f2e;
+  border: 2px solid #f1c40f;
+  border-radius: 12px;
+  padding: 25px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.modal-title {
+  color: #f1c40f;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+.modal-close {
+  background: none;
+  border: none;
+  color: #8899aa;
+  font-size: 1.8rem;
+  cursor: pointer;
+  line-height: 1;
+}
+.modal-close:hover { color: #fff; }
+.form-group {
+  margin-bottom: 18px;
+}
+.form-label {
+  display: block;
+  color: #8899aa;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.form-select, .form-input {
+  width: 100%;
+  padding: 10px;
+  background: #0f1724;
+  border: 1px solid #2a3548;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+.form-select:focus, .form-input:focus {
+  outline: none;
+  border-color: #f1c40f;
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.modal-actions .btn {
+  flex: 1;
+  padding: 12px;
+}
+
+/* Bracket Styles */
+.bracket-container {
+  overflow-x: auto;
+  padding: 20px;
+  background: #0d1117;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+.bracket-rounds {
+  display: flex;
+  gap: 25px;
+  min-width: max-content;
+}
+.bracket-round {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  min-width: 240px;
+}
+.round-title {
+  text-align: center;
+  color: #f1c40f;
+  margin-bottom: 20px;
+  padding: 10px;
+  background: rgba(241,196,15,0.1);
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+.bracket-match {
+  background: #1a1f2e;
+  border: 2px solid #2a3548;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+  min-width: 220px;
+  transition: all 0.3s;
+}
+.bracket-match:hover { border-color: #3a4558; }
+.bracket-match.completed { border-color: #27ae60; }
+.bracket-match.current { border-color: #f1c40f; box-shadow: 0 0 15px rgba(241,196,15,0.3); }
+.match-player {
+  padding: 8px;
+  margin-bottom: 5px;
+  background: rgba(241,196,15,0.1);
+  border-radius: 4px;
+  border-left: 3px solid #f1c40f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.match-player.winner {
+  background: rgba(39,174,96,0.3);
+  border-left-color: #27ae60;
+  color: #2ecc71;
+  font-weight: bold;
+}
+.match-player .score {
+  color: #f1c40f;
+  font-weight: bold;
+}
+.bracket-match-actions {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
+}
+.bracket-match-actions .btn {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 0.75rem;
+}
+
+/* Scoreboard */
+.scoreboard-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 10px;
 }
 .scoreboard-header {
   text-align: center;
@@ -155,8 +332,8 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 }
 .scoreboard-title {
   color: #f1c40f;
-  font-size: 1.5rem;
-  margin-bottom: 10px;
+  font-size: 1.4rem;
+  margin-bottom: 8px;
 }
 .scoreboard-subtitle {
   color: #8899aa;
@@ -167,7 +344,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   grid-template-columns: 1fr auto 1fr;
   gap: 20px;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 .scoreboard-player {
   background: #1a1f2e;
@@ -175,6 +352,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   padding: 20px;
   text-align: center;
   border: 2px solid #2a3548;
+  transition: all 0.3s;
 }
 .scoreboard-player.active {
   border-color: #f1c40f;
@@ -185,42 +363,50 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   background: rgba(39,174,96,0.2);
 }
 .player-name {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: bold;
   color: #fff;
   margin-bottom: 5px;
 }
 .player-team {
   color: #8899aa;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   margin-bottom: 15px;
 }
 .player-score {
-  font-size: 4rem;
+  font-size: 3.5rem;
   font-weight: bold;
   color: #f1c40f;
   margin: 15px 0;
 }
 .score-controls {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 5px;
-  justify-content: center;
-  flex-wrap: wrap;
+  margin-bottom: 10px;
 }
 .score-btn {
-  padding: 10px 15px;
+  padding: 8px;
   border: none;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  transition: all 0.2s;
 }
+.score-btn:hover { transform: translateY(-2px); }
 .score-btn-1 { background: #27ae60; color: #fff; }
 .score-btn-2 { background: #2980b9; color: #fff; }
 .score-btn-3 { background: #8e44ad; color: #fff; }
-.score-btn-win { background: #f1c40f; color: #000; width: 100%; margin-top: 10px; padding: 12px; }
-.score-btn:hover { transform: translateY(-2px); }
-
+.score-btn-4 { background: #e74c3c; color: #fff; }
+.score-btn-win { 
+  background: #f1c40f; 
+  color: #000; 
+  width: 100%; 
+  padding: 10px; 
+  margin-top: 8px;
+  font-weight: bold;
+}
 .vs-divider {
   font-size: 2rem;
   font-weight: bold;
@@ -233,16 +419,19 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   justify-content: center;
   flex-wrap: wrap;
   margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #2a3548;
 }
 .match-timer {
   text-align: center;
-  font-size: 2rem;
+  font-size: 2.5rem;
   color: #f1c40f;
   margin: 15px 0;
   font-weight: bold;
+  font-family: 'Courier New', monospace;
 }
 
-/* === Match Queue Styles === */
+/* Match Queue */
 .match-queue-item {
   background: #1a1f2e;
   border: 1px solid #2a3548;
@@ -254,7 +443,9 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
+  transition: all 0.3s;
 }
+.match-queue-item:hover { border-color: #3a4558; }
 .match-queue-item.current {
   border-color: #f1c40f;
   background: rgba(241,196,15,0.1);
@@ -263,9 +454,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   border-color: #2980b9;
   background: rgba(41,128,185,0.1);
 }
-.match-queue-item.upcoming {
-  border-color: #2a3548;
-}
 .match-players {
   flex: 1;
   min-width: 200px;
@@ -273,7 +461,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 .match-status {
   padding: 4px 12px;
   border-radius: 12px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: bold;
 }
 .status-current { background: #f1c40f; color: #000; }
@@ -281,73 +469,114 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 .status-upcoming { background: #34495e; color: #fff; }
 .status-completed { background: #27ae60; color: #fff; }
 
-/* === Bracket Styles === */
-.bracket-container {
-  overflow-x: auto;
-  padding: 20px;
-  background: #0d1117;
-  border-radius: 10px;
-  margin-top: 20px;
+/* Category Cards */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 15px;
 }
-.bracket-rounds {
-  display: flex;
-  gap: 30px;
-  min-width: max-content;
-}
-.bracket-round {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  min-width: 250px;
-}
-.round-title {
-  text-align: center;
-  color: #f1c40f;
-  margin-bottom: 20px;
-  padding: 10px;
-  background: rgba(241,196,15,0.1);
-  border-radius: 8px;
-  font-weight: bold;
-}
-.bracket-match {
-  background: #1a1f2e;
+.category-card {
+  background: #151d2b;
   border: 2px solid #2a3548;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 15px;
-  min-width: 220px;
+  border-radius: 10px;
+  padding: 18px;
   transition: all 0.3s;
 }
-.bracket-match.completed { border-color: #27ae60; }
-.bracket-match.pending:hover { border-color: #f1c40f; }
-.match-player {
-  padding: 8px;
-  margin-bottom: 5px;
-  background: rgba(241,196,15,0.1);
-  border-radius: 4px;
-  border-left: 3px solid #f1c40f;
+.category-card:hover { transform: translateY(-3px); }
+.category-card.ready { border-color: #27ae60; }
+.category-card.not-ready { border-color: #e74c3c; }
+.category-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 12px;
 }
-.match-player.winner {
-  background: rgba(39,174,96,0.3);
-  border-left-color: #27ae60;
-  color: #2ecc71;
+.category-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #f1c40f;
+}
+.category-count {
+  background: #27ae60;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
   font-weight: bold;
 }
+.category-info {
+  color: #8899aa;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  line-height: 1.8;
+}
+.category-players {
+  color: #8899aa;
+  font-size: 0.8rem;
+  margin-bottom: 15px;
+  padding: 8px;
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+}
 
+/* Notification */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  background: #27ae60;
+  color: white;
+  border-radius: 8px;
+  z-index: 10001;
+  animation: slideIn 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+@keyframes slideIn {
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOut {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(400px); opacity: 0; }
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .header { flex-direction: column; text-align: center; }
+  .header { flex-direction: column; text-align: center; padding: 15px; }
+  .header h1 { font-size: 1.2rem; }
   .btn { margin: 2px; padding: 8px 12px; font-size: 0.85rem; }
-  table { font-size: 0.75rem; }
-  th, td { padding: 4px; }
+  .section { padding: 15px; }
+  .section-title { font-size: 1.1rem; }
+  table { font-size: 0.8rem; }
+  th, td { padding: 6px; }
   .bracket-rounds { gap: 15px; }
   .bracket-round { min-width: 200px; }
   .scoreboard-players { grid-template-columns: 1fr; }
-  .vs-divider { margin: 10px 0; }
-  .player-score { font-size: 3rem; }
+  .vs-divider { margin: 10px 0; font-size: 1.5rem; }
+  .player-score { font-size: 2.5rem; }
+  .score-controls { grid-template-columns: repeat(2, 1fr); }
+  .tabs { justify-content: center; }
+  .tab { padding: 10px 15px; font-size: 0.85rem; }
+  .modal-content { padding: 20px; }
+  .category-grid { grid-template-columns: 1fr; }
 }
+
+@media (max-width: 480px) {
+  body { padding: 5px; }
+  .header h1 { font-size: 1rem; }
+  .btn { padding: 6px 10px; font-size: 0.8rem; }
+  .player-score { font-size: 2rem; }
+  .match-timer { font-size: 2rem; }
+}
+
+/* Utility */
+.text-center { text-align: center; }
+.mt-2 { margin-top: 10px; }
+.mb-2 { margin-bottom: 10px; }
+.p-2 { padding: 10px; }
+.bg-dark { background: rgba(0,0,0,0.2); }
+.rounded { border-radius: 8px; }
 </style>
 </head>
 <body>
@@ -355,68 +584,72 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 <div class="sync-indicator" id="syncIndicator">🔄 Syncing...</div>
 
 <div class="container">
+  <!-- Header -->
   <div class="header">
     <div>
       <h1>🏆 TopCompSports Tournament System</h1>
-      <div style="color: #8899aa; font-size: 0.85rem;" id="subtitle">Step 1: Players Registration</div>
-      <div id="dbStatus" style="color: #2ecc71; font-size: 0.75rem; margin-top: 5px;">● Connected to Database</div>
+      <div class="header-subtitle" id="subtitle">Step 1: Players Registration</div>
+      <div class="db-status" id="dbStatus">● Connected to Database</div>
     </div>
-    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
-      <button class="btn btn-info" id="btnPlayers"> Players</button>
-      <button class="btn btn-purple" id="btnMats"> Mats</button>
+    <div style="display: flex; gap: 5px; flex-wrap: wrap; justify-content: center;">
+      <button class="btn btn-info" id="btnPlayers">👥 Players</button>
+      <button class="btn btn-purple" id="btnMats">🥋 Mats</button>
       <button class="btn btn-warning" id="btnSettings">⚙️ Settings</button>
       <button class="btn btn-secondary" id="btnSync">🔄 Sync</button>
-      <button class="btn btn-secondary" id="btnSaveLocal">💾 Save Local</button>
+      <button class="btn btn-secondary" id="btnSaveLocal">💾 Save</button>
       <button class="btn btn-danger" id="btnClear">🗑️ Clear</button>
     </div>
   </div>
 
+  <!-- Players View -->
   <div id="view-players" class="view active">
     <div class="section">
       <div class="section-title">👥 Players Registration <span id="playerCount" style="color: #8899aa;">0 / 200</span></div>
       <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
         <button class="btn btn-primary" id="btnAddPlayer">➕ Add Player</button>
         <button class="btn btn-secondary" id="btnAdd10">➕ Add 10</button>
-        <button class="btn btn-info" id="btnAdd50">➕ Add 50</button>
         <button class="btn btn-info" id="btnImportCSV">📥 Import CSV</button>
         <input type="file" id="csvImport" accept=".csv" style="display:none">
         <button class="btn btn-info" id="btnExportCSV">📤 Export CSV</button>
         <button class="btn btn-warning" id="btnSyncDB">🔄 Sync with DB</button>
       </div>
-      <div style="overflow-x: auto;">
+      <div class="table-container">
         <table>
           <thead><tr><th>#</th><th>Name</th><th>Team</th><th>Age Group</th><th>Gender</th><th>Weight</th><th>Belt</th><th>Rank</th><th>Action</th></tr></thead>
           <tbody id="playersTable"></tbody>
         </table>
       </div>
-      <button class="btn btn-primary" style="width: 100%; margin-top: 15px; padding: 12px;" id="btnProceedMats">🥋 Proceed to Mats →</button>
+      <button class="btn btn-primary btn-block mt-2" id="btnProceedMats"> Proceed to Mats →</button>
     </div>
   </div>
 
+  <!-- Mats View -->
   <div id="view-mats" class="view">
     <div class="section">
-      <div class="section-title">🥋 Mats Setup</div>
+      <div class="section-title"> Mats Setup</div>
       <div style="margin-bottom: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
         <label style="font-weight: bold; color: #f1c40f;">Number of Mats: </label>
         <select id="matsCount" style="width: auto; display: inline-block;">
           <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
           <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
         </select>
-        <button class="btn btn-info btn-sm" style="margin-left: 15px;" id="btnOpenAllMats"> Open All Mats</button>
+        <button class="btn btn-info btn-sm" style="margin-left: 15px;" id="btnOpenAllMats">🪟 Open All Mats</button>
       </div>
       <div id="matsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;"></div>
-      <button class="btn btn-primary" style="width: 100%; margin-top: 15px; padding: 12px;" id="btnOpenDashboard">🏆 Open Mat Dashboard →</button>
+      <button class="btn btn-primary btn-block mt-2" id="btnOpenDashboard">🏆 Open Mat Dashboard →</button>
     </div>
   </div>
 
+  <!-- Settings View -->
   <div id="view-settings" class="view">
     <div class="section">
-      <div class="section-title">⚙️ Fight Time Settings</div>
+      <div class="section-title">️ Fight Time Settings</div>
       <div id="settingsContent">Loading settings...</div>
-      <button class="btn btn-primary" style="margin-top: 15px;" id="btnBackPlayers">← Back to Players</button>
+      <button class="btn btn-secondary mt-2" id="btnBackPlayers">← Back to Players</button>
     </div>
   </div>
 
+  <!-- Dashboard View -->
   <div id="view-dashboard" class="view">
     <div class="section">
       <div class="section-title">📊 Mat Dashboard</div>
@@ -433,6 +666,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     </div>
   </div>
 
+  <!-- Bracket View -->
   <div id="view-bracket" class="view">
     <div class="section">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
@@ -455,14 +689,41 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   </div>
 </div>
 
+<!-- Edit Match Modal -->
+<div class="modal-overlay" id="editMatchModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ Edit Match</div>
+      <button class="modal-close" onclick="closeEditModal()">&times;</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Red Player:</label>
+      <select class="form-select" id="editRedPlayer"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Blue Player:</label>
+      <select class="form-select" id="editBluePlayer"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-warning btn-block" onclick="swapPlayers()">🔄 Swap Players</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveMatchEdit()">💾 Save</button>
+      <button class="btn btn-secondary" onclick="closeEditModal()">❌ Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function() {
   'use strict';
   
+  // Supabase Configuration
   const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
   const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // Global Variables
   let players = [];
   let mats = [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
   let categories = {};
@@ -471,14 +732,22 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   let ageGroupsData = [];
   let beltLevelsData = [];
   let weightClassesData = [];
-  let currentMatch = null; // For scoreboard
+  let currentMatch = null;
   let currentBracketKey = null;
+  let timerInterval = null;
+  let timerSeconds = 0;
+  let timerRunning = false;
+  let currentEditMatch = null;
+  let currentEditCategoryKey = null;
+  let currentEditRoundIndex = null;
+  let currentEditMatchIndex = null;
 
-  // Tournament-specific storage key
+  // Storage Key
   function getStorageKey() {
     return 'tournament_' + (tournamentId || 'default');
   }
 
+  // Load Dropdown Data from Database
   async function loadDropdownData() {
     try {
       const ageResult = await supabase.from('age_groups').select('*').order('min_age');
@@ -503,6 +772,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     }
   }
 
+  // View Management
   function showView(view) {
     const views = document.querySelectorAll('.view');
     views.forEach(v => v.classList.remove('active'));
@@ -538,6 +808,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     console.log('✅ Switched to view:', view);
   }
 
+  // Tab Management
   function switchTab(tab) {
     const tabs = document.querySelectorAll('.tab');
     tabs.forEach(t => t.classList.remove('active'));
@@ -558,6 +829,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     if (tab === 'standings') renderStandings();
   }
 
+  // Player Management
   function addPlayer() {
     if (players.length >= 200) {
       alert('Maximum 200 players reached!');
@@ -588,10 +860,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 
   function renderPlayers() {
     const tbody = document.getElementById('playersTable');
-    if (!tbody) {
-      console.error('❌ playersTable not found!');
-      return;
-    }
+    if (!tbody) return;
     
     tbody.innerHTML = '';
     
@@ -640,6 +909,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       tbody.appendChild(tr);
     });
     
+    // Event listeners
     document.querySelectorAll('.player-input').forEach(input => {
       input.addEventListener('change', function() {
         const index = parseInt(this.dataset.index);
@@ -671,11 +941,10 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     });
     
     const countEl = document.getElementById('playerCount');
-    if (countEl) {
-      countEl.innerText = players.length + ' / 200';
-    }
+    if (countEl) countEl.innerText = players.length + ' / 200';
   }
 
+  // CSV Import/Export
   function importCSV(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -700,7 +969,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       }
       renderPlayers();
       saveData();
-      alert('✅ Imported ' + (lines.length - 1) + ' players!');
+      showNotification('✅ Imported ' + (lines.length - 1) + ' players!');
     };
     reader.readAsText(file);
     event.target.value = '';
@@ -721,17 +990,12 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     URL.revokeObjectURL(url);
   }
 
+  // Mat Management
   function updateMats() {
     const count = parseInt(document.getElementById('matsCount').value);
     
     while (mats.length < count) {
-      mats.push({
-        id: mats.length + 1,
-        weights: [],
-        ageGroups: [],
-        belts: [],
-        genders: []
-      });
+      mats.push({ id: mats.length + 1, weights: [], ageGroups: [], belts: [], genders: [] });
     }
     
     mats = mats.slice(0, count);
@@ -745,7 +1009,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     
     grid.innerHTML = '';
     
-    // Get ALL unique values from all players
     const allWeights = [...new Set(players.map(p => p.weight).filter(w => w))];
     const allAges = [...new Set(players.map(p => p.ageGroup).filter(a => a))];
     const allBelts = [...new Set(players.map(p => p.belt).filter(b => b))];
@@ -761,11 +1024,11 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       ).join('') || '<span style="color: #556; font-size: 0.8rem;">No age groups</span>';
       
       const genderTags = mat.genders.map((g, i) => 
-        `<span class="tag">${g} <span class="tag-remove" data-mat="${mat.id}" data-type="genders" data-index="${i}"></span></span>`
+        `<span class="tag">${g} <span class="tag-remove" data-mat="${mat.id}" data-type="genders" data-index="${i}">✕</span></span>`
       ).join('') || '<span style="color: #556; font-size: 0.8rem;">No genders</span>';
       
       const weightTags = mat.weights.map((w, i) => 
-        `<span class="tag">${w} <span class="tag-remove" data-mat="${mat.id}" data-type="weights" data-index="${i}">✕</span></span>`
+        `<span class="tag">${w} <span class="tag-remove" data-mat="${mat.id}" data-type="weights" data-index="${i}"></span></span>`
       ).join('') || '<span style="color: #556; font-size: 0.8rem;">No weights</span>';
       
       const beltTags = mat.belts.map((b, i) => 
@@ -806,8 +1069,8 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
             ${allBelts.map(b => `<option>${b}</option>`).join('')}
           </select>
         </div>
-        <div style="display: flex; gap: 8px; margin-top: 10px;">
-          <button class="btn btn-info mat-dashboard-btn" style="flex: 1;" data-mat="${mat.id}">📋 Open Dashboard</button>
+        <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+          <button class="btn btn-info mat-dashboard-btn" style="flex: 1;" data-mat="${mat.id}">📋 Dashboard</button>
           <button class="btn btn-purple mat-newtab-btn" style="flex: 1;" data-mat="${mat.id}">🪟 New Tab</button>
         </div>
       `;
@@ -815,6 +1078,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       grid.appendChild(div);
     });
     
+    // Event listeners
     document.querySelectorAll('.tag-remove').forEach(btn => {
       btn.addEventListener('click', function() {
         const matId = parseInt(this.dataset.mat);
@@ -871,6 +1135,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     saveData();
   }
 
+  // Category Management
   function renderCategories() {
     const container = document.getElementById('tab-categories');
     if (!container) return;
@@ -884,10 +1149,10 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📋 Categories - Mat ' + currentMat + '</h3>';
     
     if (players.length === 0) {
-      html += '<div style="text-align: center; padding: 40px; color: #8899aa;">';
+      html += '<div class="text-center p-2" style="color: #8899aa; padding: 40px;">';
       html += '<div style="font-size: 3rem; margin-bottom: 15px;">👥</div>';
       html += '<div>No players registered yet</div>';
-      html += '<button class="btn btn-primary" style="margin-top: 15px;" id="btnAddPlayersFromDash">➕ Add Players</button>';
+      html += '<button class="btn btn-primary mt-2" id="btnAddPlayersFromDash">➕ Add Players</button>';
       html += '</div>';
       container.innerHTML = html;
       
@@ -923,17 +1188,16 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     const categoryKeys = Object.keys(categoryMap);
     
     if (categoryKeys.length === 0) {
-      html += '<div style="text-align: center; padding: 40px; color: #8899aa;">';
+      html += '<div class="text-center p-2" style="color: #8899aa; padding: 40px;">';
       html += '<div style="font-size: 3rem; margin-bottom: 15px;">⚠️</div>';
       html += '<div>No categories match the mat filters</div>';
-      html += '<div style="margin-top: 10px; font-size: 0.9rem;">Mat Filters: ' + (mat.ageGroups.join(', ') || 'All') + ' | ' + (mat.genders.join(', ') || 'All') + '</div>';
-      html += '<button class="btn btn-warning" style="margin-top: 15px;" id="btnClearFilters">Clear Mat Filters</button>';
+      html += '<button class="btn btn-warning mt-2" id="btnClearFilters">Clear Mat Filters</button>';
       html += '</div>';
       container.innerHTML = html;
       
       setTimeout(() => {
         const btn = document.getElementById('btnClearFilters');
-        if (btn) btn.addEventListener('click', function() { clearMatFilters(); });
+        if (btn) btn.addEventListener('click', clearMatFilters);
       }, 100);
       return;
     }
@@ -941,38 +1205,36 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     html += '<div style="margin-bottom: 15px; padding: 15px; background: rgba(241,196,15,0.1); border-radius: 8px;">';
     html += '<div style="color: #f1c40f; font-weight: bold; margin-bottom: 5px;">📊 Summary</div>';
     html += '<div style="color: #8899aa;">Total Players: ' + players.length + ' | Matching: ' + categoryKeys.reduce((sum, key) => sum + categoryMap[key].players.length, 0) + '</div>';
-    html += '<div style="color: #8899aa; font-size: 0.9rem; margin-top: 5px;">Mat Filters: ' + (mat.ageGroups.join(', ') || 'All Ages') + ' | ' + (mat.genders.join(', ') || 'All Genders') + '</div>';
     html += '</div>';
     
-    html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">';
+    html += '<div class="category-grid">';
     
     categoryKeys.forEach((key, idx) => {
       const cat = categoryMap[key];
       const playerCount = cat.players.length;
-      const borderColor = playerCount >= 2 ? '#27ae60' : '#e74c3c';
-      const statusIcon = playerCount >= 2 ? '✅' : '️';
+      const isReady = playerCount >= 2;
       
-      html += '<div class="category-card-' + idx + '" style="background: #151d2b; border: 2px solid ' + borderColor + '; border-radius: 10px; padding: 15px;">';
-      html += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">';
-      html += '<div style="font-size: 1.1rem; font-weight: bold; color: #f1c40f;">' + statusIcon + ' Category</div>';
-      html += '<div style="background: ' + borderColor + '; color: #fff; padding: 4px 12px; border-radius: 12px; font-size: 0.85rem;">' + playerCount + ' Players</div>';
+      html += '<div class="category-card ' + (isReady ? 'ready' : 'not-ready') + '">';
+      html += '<div class="category-header">';
+      html += '<div class="category-title"> Category</div>';
+      html += '<div class="category-count">' + playerCount + ' Players</div>';
       html += '</div>';
       
-      html += '<div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 10px;">';
+      html += '<div class="category-info">';
       html += '<div><strong>Age:</strong> ' + cat.ageGroup + '</div>';
       html += '<div><strong>Gender:</strong> ' + cat.gender + '</div>';
       if (cat.weight) html += '<div><strong>Weight:</strong> ' + cat.weight + 'kg</div>';
       html += '<div><strong>Belt:</strong> ' + cat.belt + '</div>';
       html += '</div>';
       
-      html += '<div style="color: #8899aa; font-size: 0.85rem; margin-bottom: 10px;">';
-      html += '<div><strong>Players:</strong> ' + cat.players.map(p => p.name || 'Unnamed').join(', ') + '</div>';
+      html += '<div class="category-players">';
+      html += '<strong>Players:</strong> ' + cat.players.map(p => p.name || 'Unnamed').join(', ');
       html += '</div>';
       
-      if (playerCount >= 2) {
-        html += '<button class="btn btn-primary create-bracket-btn" style="width: 100%;" data-key="' + key + '"> Create Bracket</button>';
+      if (isReady) {
+        html += '<button class="btn btn-primary btn-block" data-key="' + key + '" onclick="createBracket(\'' + key + '\')">🏆 Create Bracket</button>';
       } else {
-        html += '<button class="btn btn-secondary" style="width: 100%;" disabled>️ Need ' + (2 - playerCount) + ' more player(s)</button>';
+        html += '<button class="btn btn-secondary btn-block" disabled>️ Need ' + (2 - playerCount) + ' more player(s)</button>';
       }
       
       html += '</div>';
@@ -980,13 +1242,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     
     html += '</div>';
     container.innerHTML = html;
-    
-    document.querySelectorAll('.create-bracket-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const key = this.dataset.key;
-        createBracket(key);
-      });
-    });
   }
 
   function createBracket(categoryKey) {
@@ -1019,10 +1274,11 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       createdAt: new Date().toISOString()
     };
     
+    currentBracketKey = categoryKey;
     renderBracketView(categoryKey);
     showView('bracket');
-    
     saveData();
+    
     console.log('✅ Bracket created for:', categoryKey);
   }
 
@@ -1061,7 +1317,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         status: status,
         score1: 0,
         score2: 0,
-        current: false
+        current: i === 0 && !!(player1 && player2)
       });
     }
     
@@ -1090,12 +1346,10 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       roundNum++;
     }
     
-    return {
-      rounds: rounds,
-      createdAt: new Date().toISOString()
-    };
+    return { rounds: rounds, createdAt: new Date().toISOString() };
   }
 
+  // Bracket View
   function renderBracketView(categoryKey) {
     const container = document.getElementById('bracketContent');
     const data = categories[categoryKey];
@@ -1106,7 +1360,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     }
     
     const bracket = data.bracket;
-    const roundNames = ['Round of ' + bracket.rounds[0].length * 2, 'Quarterfinals', 'Semifinals', 'Finals'];
+    const roundNames = ['Round of ' + bracket.rounds[0].length * 2, 'Round of 16', 'Quarterfinals', 'Semifinals', 'Finals'];
     
     let html = '<div class="bracket-rounds">';
     
@@ -1133,20 +1387,27 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         
         html += `<div class="match-player ${isWinner1 ? 'winner' : ''}">`;
         html += `<span>${p1Name} ${p1Seed}</span>`;
-        html += `<span style="color: #f1c40f; font-weight: bold;">${match.score1}</span>`;
+        html += `<span class="score">${match.score1}</span>`;
         html += `</div>`;
         
         html += `<div class="match-player ${isWinner2 ? 'winner' : ''}">`;
         html += `<span>${p2Name} ${p2Seed}</span>`;
-        html += `<span style="color: #f1c40f; font-weight: bold;">${match.score2}</span>`;
+        html += `<span class="score">${match.score2}</span>`;
         html += `</div>`;
         
         if (match.status === 'pending' && match.player1 && match.player2) {
-          html += `<button class="btn btn-sm btn-primary" style="width: 100%; margin-top: 8px;" data-category="${categoryKey}" data-round="${roundIndex}" data-match="${matchIndex}" class="start-match-btn">▶ Start Match</button>`;
+          html += '<div class="bracket-match-actions">';
+          html += `<button class="btn btn-sm btn-primary" onclick="openScoreboard('${categoryKey}', ${roundIndex}, ${matchIndex})">▶ Play</button>`;
+          html += `<button class="btn btn-sm btn-warning" onclick="openEditMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">⚙️ Edit</button>`;
+          html += '</div>';
         } else if (match.status === 'completed') {
           html += `<div style="text-align: center; margin-top: 8px; color: #27ae60; font-size: 0.85rem;">✅ Completed</div>`;
+          html += `<button class="btn btn-sm btn-warning btn-block" style="margin-top: 5px;" onclick="openEditMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">⚙️ Edit</button>`;
         } else if (!match.player1 || !match.player2) {
           html += `<div style="text-align: center; margin-top: 8px; color: #8899aa; font-size: 0.85rem;">⏳ Waiting</div>`;
+          if (match.player1 || match.player2) {
+            html += `<button class="btn btn-sm btn-warning btn-block" style="margin-top: 5px;" onclick="openEditMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">⚙️ Edit</button>`;
+          }
         }
         
         html += '</div>';
@@ -1159,21 +1420,90 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     container.innerHTML = html;
     
     document.getElementById('bracketTitle').innerHTML = 
-      ` ${data.gender} - ${data.ageGroup} - ${data.weight}kg - ${data.belt} Belt`;
-    
-    // Add event listeners for start match buttons
-    document.querySelectorAll('.start-match-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const catKey = this.dataset.category;
-        const rIdx = parseInt(this.dataset.round);
-        const mIdx = parseInt(this.dataset.match);
-        openScoreboard(catKey, rIdx, mIdx);
-      });
-    });
+      `🏆 ${data.gender} - ${data.ageGroup} - ${data.weight}kg - ${data.belt} Belt`;
   }
 
-  // Open Scoreboard instead of prompt
-  function openScoreboard(categoryKey, roundIndex, matchIndex) {
+  // Edit Match Modal Functions
+  window.openEditMatch = function(categoryKey, roundIndex, matchIndex) {
+    const data = categories[categoryKey];
+    if (!data || !data.bracket) return;
+    
+    const match = data.bracket.rounds[roundIndex][matchIndex];
+    
+    currentEditCategoryKey = categoryKey;
+    currentEditRoundIndex = roundIndex;
+    currentEditMatchIndex = matchIndex;
+    currentEditMatch = match;
+    
+    const categoryPlayers = players.filter(p => 
+      p.ageGroup === data.ageGroup &&
+      p.gender === data.gender &&
+      p.weight === data.weight &&
+      p.belt === data.belt
+    ).sort((a, b) => a.rank - b.rank);
+    
+    const redSelect = document.getElementById('editRedPlayer');
+    const blueSelect = document.getElementById('editBluePlayer');
+    
+    redSelect.innerHTML = '<option value="">Select Player</option>';
+    blueSelect.innerHTML = '<option value="">Select Player</option>';
+    
+    categoryPlayers.forEach(p => {
+      const selected1 = match.player1 && match.player1.id === p.id ? 'selected' : '';
+      const selected2 = match.player2 && match.player2.id === p.id ? 'selected' : '';
+      redSelect.innerHTML += `<option value="${p.id}" ${selected1}>${p.name} (Rank: ${p.rank})</option>`;
+      blueSelect.innerHTML += `<option value="${p.id}" ${selected2}>${p.name} (Rank: ${p.rank})</option>`;
+    });
+    
+    document.getElementById('editMatchModal').classList.add('active');
+  };
+
+  window.closeEditModal = function() {
+    document.getElementById('editMatchModal').classList.remove('active');
+    currentEditMatch = null;
+  };
+
+  window.swapPlayers = function() {
+    const redSelect = document.getElementById('editRedPlayer');
+    const blueSelect = document.getElementById('editBluePlayer');
+    
+    const tempValue = redSelect.value;
+    redSelect.value = blueSelect.value;
+    blueSelect.value = tempValue;
+  };
+
+  window.saveMatchEdit = function() {
+    if (!currentEditMatch || !currentEditCategoryKey) return;
+    
+    const data = categories[currentEditCategoryKey];
+    const redPlayerId = document.getElementById('editRedPlayer').value;
+    const bluePlayerId = document.getElementById('editBluePlayer').value;
+    
+    const redPlayer = players.find(p => p.id == redPlayerId);
+    const bluePlayer = players.find(p => p.id == bluePlayerId);
+    
+    const oldPlayer1Id = currentEditMatch.player1?.id;
+    const oldPlayer2Id = currentEditMatch.player2?.id;
+    
+    currentEditMatch.player1 = redPlayer || null;
+    currentEditMatch.player2 = bluePlayer || null;
+    
+    if (redPlayerId !== oldPlayer1Id || bluePlayerId !== oldPlayer2Id) {
+      currentEditMatch.winner = null;
+      currentEditMatch.status = 'pending';
+      currentEditMatch.score1 = 0;
+      currentEditMatch.score2 = 0;
+    }
+    
+    renderBracketView(currentEditCategoryKey);
+    closeEditModal();
+    saveData();
+    
+    showNotification('✅ Match updated successfully!');
+  };
+
+  // Scoreboard Functions
+  window.openScoreboard = function(categoryKey, roundIndex, matchIndex) {
     const data = categories[categoryKey];
     if (!data || !data.bracket) {
       alert('❌ Bracket not found!');
@@ -1197,7 +1527,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     
     renderScoreboard();
     showView('scoreboard');
-  }
+  };
 
   function renderScoreboard() {
     if (!currentMatch) return;
@@ -1220,7 +1550,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       </div>
       
       <div class="scoreboard-players">
-        <div class="scoreboard-player ${match.current ? 'active' : ''} ${match.winner === p1.id ? 'winner' : ''}">
+        <div class="scoreboard-player ${match.current ? 'active' : ''} ${match.winner === p1?.id ? 'winner' : ''}">
           <div class="player-name">${p1.name}</div>
           <div class="player-team">${p1.team || 'No Team'} | Rank #${p1.rank}</div>
           <div class="player-score" id="score1">${match.score1}</div>
@@ -1228,13 +1558,14 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
             <button class="score-btn score-btn-1" onclick="window.addScore(1, 1)">+1</button>
             <button class="score-btn score-btn-2" onclick="window.addScore(1, 2)">+2</button>
             <button class="score-btn score-btn-3" onclick="window.addScore(1, 3)">+3</button>
-            <button class="score-btn score-btn-win" onclick="window.declareWinner(1)"> Declare Winner</button>
+            <button class="score-btn score-btn-4" onclick="window.addScore(1, 4)">+4</button>
           </div>
+          <button class="score-btn score-btn-win" onclick="window.declareWinner(1)">🏆 Declare Winner</button>
         </div>
         
         <div class="vs-divider">VS</div>
         
-        <div class="scoreboard-player ${match.current ? 'active' : ''} ${match.winner === p2.id ? 'winner' : ''}">
+        <div class="scoreboard-player ${match.current ? 'active' : ''} ${match.winner === p2?.id ? 'winner' : ''}">
           <div class="player-name">${p2.name}</div>
           <div class="player-team">${p2.team || 'No Team'} | Rank #${p2.rank}</div>
           <div class="player-score" id="score2">${match.score2}</div>
@@ -1242,22 +1573,23 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
             <button class="score-btn score-btn-1" onclick="window.addScore(2, 1)">+1</button>
             <button class="score-btn score-btn-2" onclick="window.addScore(2, 2)">+2</button>
             <button class="score-btn score-btn-3" onclick="window.addScore(2, 3)">+3</button>
-            <button class="score-btn score-btn-win" onclick="window.declareWinner(2)"> Declare Winner</button>
+            <button class="score-btn score-btn-4" onclick="window.addScore(2, 4)">+4</button>
           </div>
+          <button class="score-btn score-btn-win" onclick="window.declareWinner(2)">🏆 Declare Winner</button>
         </div>
       </div>
       
       <div class="scoreboard-actions">
         <button class="btn btn-warning" onclick="window.resetScores()">🔄 Reset Scores</button>
-        <button class="btn btn-secondary" onclick="window.undoLastScore()">↩️ Undo Last</button>
-        <button class="btn btn-info" onclick="window.toggleTimer()">⏱️ ${window.timerRunning ? 'Pause' : 'Start'} Timer</button>
+        <button class="btn btn-secondary" onclick="window.undoLastScore()">↩️ Undo</button>
+        <button class="btn btn-info" onclick="window.toggleTimer()">⏱️ ${timerRunning ? 'Pause' : 'Start'} Timer</button>
       </div>
     `;
     
     container.innerHTML = html;
   }
 
-  // Score functions - made global
+  // Score Functions
   window.addScore = function(playerNum, points) {
     if (!currentMatch) return;
     
@@ -1294,7 +1626,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     match.status = 'completed';
     match.current = false;
     
-    // Update next round
     if (currentMatch.roundIndex < data.bracket.rounds.length - 1) {
       const winnerPlayer = match.winner === match.player1.id ? match.player1 : match.player2;
       const nextRoundIndex = currentMatch.roundIndex + 1;
@@ -1308,21 +1639,21 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         nextMatch.player2 = winnerPlayer;
       }
       
-      // Mark next match as current if both players are ready
       if (nextMatch.player1 && nextMatch.player2) {
-        // Clear other current flags in next round
         data.bracket.rounds[nextRoundIndex].forEach(m => m.current = false);
         nextMatch.current = true;
       }
     }
     
-    alert(`🏆 Winner: ${playerNum === 1 ? match.player1.name : match.player2.name}!`);
+    showNotification(`🏆 Winner: ${playerNum === 1 ? match.player1.name : match.player2.name}!`);
     
     renderBracketView(currentMatch.categoryKey);
     showView('bracket');
     saveData();
     
     currentMatch = null;
+    timerRunning = false;
+    if (timerInterval) clearInterval(timerInterval);
   };
 
   window.resetScores = function() {
@@ -1343,17 +1674,12 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     saveData();
   };
 
-  // Timer
-  window.timerRunning = false;
-  let timerInterval = null;
-  let timerSeconds = 0;
-
   window.toggleTimer = function() {
-    if (window.timerRunning) {
+    if (timerRunning) {
       clearInterval(timerInterval);
-      window.timerRunning = false;
+      timerRunning = false;
     } else {
-      window.timerRunning = true;
+      timerRunning = true;
       timerInterval = setInterval(() => {
         timerSeconds++;
         const mins = Math.floor(timerSeconds / 60).toString().padStart(2, '0');
@@ -1365,13 +1691,13 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     renderScoreboard();
   };
 
+  // Queue Functions
   function renderQueue() {
     const container = document.getElementById('tab-queue');
     if (!container) return;
     
     let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">⏳ Match Queue</h3>';
     
-    // Collect all matches from all brackets
     const allMatches = [];
     Object.keys(categories).forEach(key => {
       const cat = categories[key];
@@ -1395,7 +1721,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     if (allMatches.length === 0) {
       html += '<p style="color: #8899aa;">No matches scheduled yet. Create brackets first.</p>';
     } else {
-      // Sort: current first, then by round
       allMatches.sort((a, b) => {
         if (a.match.current && !b.match.current) return -1;
         if (!a.match.current && b.match.current) return 1;
@@ -1411,15 +1736,14 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         
         if (item.match.current) {
           statusClass = 'current';
-          statusText = '🔴 LIVE';
+          statusText = ' LIVE';
           itemClass = 'match-queue-item current';
         } else if (item.match.status === 'completed') {
           statusClass = 'completed';
           statusText = '✅ Completed';
-          itemClass = 'match-queue-item';
         } else if (item.match.round === 1) {
           statusClass = 'next';
-          statusText = '️ Next';
+          statusText = '⏭️ Next';
           itemClass = 'match-queue-item next';
         }
         
@@ -1437,7 +1761,8 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         html += `<span class="match-status status-${statusClass}">${statusText}</span>`;
         
         if (item.match.status === 'pending' && item.match.player1 && item.match.player2) {
-          html += `<button class="btn btn-sm btn-primary" onclick="window.openQueueMatch('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">▶ Open</button>`;
+          html += `<button class="btn btn-sm btn-primary" onclick="openScoreboard('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">▶ Play</button>`;
+          html += `<button class="btn btn-sm btn-warning" onclick="openEditMatch('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">️ Edit</button>`;
         }
         
         html += `</div>`;
@@ -1447,17 +1772,13 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     container.innerHTML = html;
   }
 
-  window.openQueueMatch = function(categoryKey, roundIndex, matchIndex) {
-    openScoreboard(categoryKey, roundIndex, matchIndex);
-  };
-
+  // Call-Up Functions
   function renderCallUp() {
     const container = document.getElementById('tab-callup');
     if (!container) return;
     
-    let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📢 Call-Up System</h3>';
+    let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;"> Call-Up System</h3>';
     
-    // Find current and next matches
     const currentMatches = [];
     const nextMatches = [];
     
@@ -1483,7 +1804,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         html += `<div style="padding: 10px; background: #1a1f2e; border-radius: 6px; margin-bottom: 10px;">`;
         html += `<div style="font-size: 1.2rem; font-weight: bold; color: #fff;">${item.match.player1.name} vs ${item.match.player2.name}</div>`;
         html += `<div style="color: #8899aa;">${item.category.ageGroup} | ${item.category.gender} | ${item.category.weight}kg</div>`;
-        html += `<button class="btn btn-sm btn-primary" style="margin-top: 10px;" onclick="window.openQueueMatch('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">📋 Open Scoreboard</button>`;
+        html += `<button class="btn btn-sm btn-primary mt-2" onclick="openScoreboard('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">📋 Open Scoreboard</button>`;
         html += `</div>`;
       });
       html += '</div>';
@@ -1508,11 +1829,12 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     container.innerHTML = html;
   }
 
+  // Standings Functions
   function renderStandings() {
     const container = document.getElementById('tab-standings');
     if (!container) return;
     
-    let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;"> Standings</h3>';
+    let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">🏆 Standings</h3>';
     
     const completedMatches = [];
     Object.keys(categories).forEach(key => {
@@ -1550,6 +1872,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     container.innerHTML = html;
   }
 
+  // Utility Functions
   function clearMatFilters() {
     mats.forEach(mat => {
       mat.ageGroups = [];
@@ -1560,10 +1883,10 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     renderMats();
     renderCategories();
     saveData();
+    showNotification('✅ Mat filters cleared!');
   }
 
   window.openMatInNewTab = function(matId) {
-    // Save current state first
     saveData();
     
     const baseUrl = window.location.href.split('?')[0];
@@ -1587,6 +1910,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     });
   }
 
+  // Database Sync
   async function syncWithDatabase() {
     const indicator = document.getElementById('syncIndicator');
     if (indicator) {
@@ -1608,7 +1932,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         if (tResult.error) throw tResult.error;
         tournamentId = tResult.data.id;
         
-        // Update URL
         const newUrl = window.location.pathname + '?tournament_id=' + tournamentId;
         window.history.replaceState({}, '', newUrl);
       }
@@ -1631,9 +1954,9 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
           .upsert(playersToSync, { onConflict: 'id' });
         
         if (result.error) throw result.error;
-        alert('✅ Synced ' + players.length + ' players to database!');
+        showNotification('✅ Synced ' + players.length + ' players to database!');
       } else {
-        alert('No players to sync');
+        showNotification('⚠️ No players to sync');
       }
       
       console.log('✅ Sync complete');
@@ -1643,6 +1966,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     }
   }
 
+  // Data Management
   function saveData() {
     const key = getStorageKey();
     localStorage.setItem(key, JSON.stringify({
@@ -1652,18 +1976,18 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       currentMat: currentMat,
       savedAt: new Date().toISOString()
     }));
-    console.log('✅ Data saved to localStorage with key:', key);
+    console.log('✅ Data saved to localStorage');
   }
 
   function clearAll() {
-    if (confirm('⚠️ Clear all data?')) {
+    if (confirm('⚠️ Clear all data? This cannot be undone!')) {
       players = [];
       mats = [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
       categories = {};
       const key = getStorageKey();
       localStorage.removeItem(key);
       renderPlayers();
-      alert('🗑️ All data cleared!');
+      showNotification('🗑️ All data cleared!');
     }
   }
 
@@ -1673,17 +1997,29 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     content.innerHTML = '<p style="color: #8899aa;">Fight time settings would be loaded from database here.</p>';
   }
 
+  function showNotification(message) {
+    const notif = document.createElement('div');
+    notif.className = 'notification';
+    notif.textContent = message;
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+      notif.style.animation = 'slideOut 0.3s ease';
+      setTimeout(() => notif.remove(), 300);
+    }, 3000);
+  }
+
+  // Event Listeners
   function setupEventListeners() {
     document.getElementById('btnPlayers').addEventListener('click', function() { showView('players'); });
     document.getElementById('btnMats').addEventListener('click', function() { showView('mats'); });
     document.getElementById('btnSettings').addEventListener('click', function() { showView('settings'); });
     document.getElementById('btnSync').addEventListener('click', syncWithDatabase);
-    document.getElementById('btnSaveLocal').addEventListener('click', saveData);
+    document.getElementById('btnSaveLocal').addEventListener('click', function() { saveData(); showNotification('✅ Data saved!'); });
     document.getElementById('btnClear').addEventListener('click', clearAll);
     
     document.getElementById('btnAddPlayer').addEventListener('click', addPlayer);
     document.getElementById('btnAdd10').addEventListener('click', function() { addPlayers(10); });
-    document.getElementById('btnAdd50').addEventListener('click', function() { addPlayers(50); });
     
     document.getElementById('btnImportCSV').addEventListener('click', function() {
       document.getElementById('csvImport').click();
@@ -1715,6 +2051,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     document.getElementById('tabStandings').addEventListener('click', function() { switchTab('standings'); });
   }
 
+  // Initialization
   async function init() {
     console.log(' Page loaded successfully!');
     
@@ -1731,7 +2068,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     
     await loadDropdownData();
     
-    // Load tournament-specific data
     const key = getStorageKey();
     const saved = localStorage.getItem(key);
     if (saved) {
@@ -1743,7 +2079,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         currentMat = data.currentMat || currentMat;
         console.log('✅ Loaded', players.length, 'players from storage');
       } catch(e) {
-        console.error(' Error loading data:', e);
+        console.error('❌ Error loading data:', e);
       }
     }
     
@@ -1755,12 +2091,10 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       }, 500);
     }
     
-    console.log(' System ready!');
+    console.log('✅ System ready!');
     console.log('- Tournament ID:', tournamentId || 'default');
     console.log('- Players loaded:', players.length);
     console.log('- Mats configured:', mats.length);
-    console.log('- Age groups:', ageGroupsData.length);
-    console.log('- Belt levels:', beltLevelsData.length);
     
     setInterval(saveData, 30000);
   }
