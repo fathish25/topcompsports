@@ -595,7 +595,7 @@ input:focus, select:focus, textarea:focus {
       <button class="btn btn-info" id="btnPlayers">👥 Players</button>
       <button class="btn btn-purple" id="btnMats">🥋 Mats</button>
       <button class="btn btn-warning" id="btnSettings">⚙️ Settings</button>
-      <button class="btn btn-secondary" id="btnSync">🔄 Sync</button>
+      <button class="btn btn-secondary" id="btnSync"> Sync</button>
       <button class="btn btn-secondary" id="btnSaveLocal">💾 Save</button>
       <button class="btn btn-danger" id="btnClear">🗑️ Clear</button>
     </div>
@@ -608,7 +608,7 @@ input:focus, select:focus, textarea:focus {
       <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
         <button class="btn btn-primary" id="btnAddPlayer">➕ Add Player</button>
         <button class="btn btn-secondary" id="btnAdd10">➕ Add 10</button>
-        <button class="btn btn-info" id="btnImportCSV">📥 Import CSV</button>
+        <button class="btn btn-info" id="btnImportCSV"> Import CSV</button>
         <input type="file" id="csvImport" accept=".csv" style="display:none">
         <button class="btn btn-info" id="btnExportCSV">📤 Export CSV</button>
         <button class="btn btn-warning" id="btnSyncDB">🔄 Sync with DB</button>
@@ -626,7 +626,7 @@ input:focus, select:focus, textarea:focus {
   <!-- Mats View -->
   <div id="view-mats" class="view">
     <div class="section">
-      <div class="section-title"> Mats Setup</div>
+      <div class="section-title">🥋 Mats Setup</div>
       <div style="margin-bottom: 15px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 8px;">
         <label style="font-weight: bold; color: #f1c40f;">Number of Mats: </label>
         <select id="matsCount" style="width: auto; display: inline-block;">
@@ -636,14 +636,14 @@ input:focus, select:focus, textarea:focus {
         <button class="btn btn-info btn-sm" style="margin-left: 15px;" id="btnOpenAllMats">🪟 Open All Mats</button>
       </div>
       <div id="matsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;"></div>
-      <button class="btn btn-primary btn-block mt-2" id="btnOpenDashboard">🏆 Open Mat Dashboard →</button>
+      <button class="btn btn-primary btn-block mt-2" id="btnOpenDashboard"> Open Mat Dashboard →</button>
     </div>
   </div>
 
   <!-- Settings View -->
   <div id="view-settings" class="view">
     <div class="section">
-      <div class="section-title">️ Fight Time Settings</div>
+      <div class="section-title">⚙️ Fight Time Settings</div>
       <div id="settingsContent">Loading settings...</div>
       <button class="btn btn-secondary mt-2" id="btnBackPlayers">← Back to Players</button>
     </div>
@@ -654,8 +654,8 @@ input:focus, select:focus, textarea:focus {
     <div class="section">
       <div class="section-title">📊 Mat Dashboard</div>
       <div class="tabs">
-        <button class="tab active" id="tabCategories"> Categories</button>
-        <button class="tab" id="tabQueue">⏳ Queue</button>
+        <button class="tab active" id="tabCategories">📋 Categories</button>
+        <button class="tab" id="tabQueue"> Queue</button>
         <button class="tab" id="tabCallup">📢 Call-Up</button>
         <button class="tab" id="tabStandings">🏆 Standings</button>
       </div>
@@ -694,7 +694,7 @@ input:focus, select:focus, textarea:focus {
   <div class="modal-content">
     <div class="modal-header">
       <div class="modal-title">⚙️ Edit Match</div>
-      <button class="modal-close" onclick="closeEditModal()">&times;</button>
+      <button class="modal-close" onclick="window.closeEditModal()">&times;</button>
     </div>
     <div class="form-group">
       <label class="form-label">Red Player:</label>
@@ -705,11 +705,11 @@ input:focus, select:focus, textarea:focus {
       <select class="form-select" id="editBluePlayer"></select>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-warning btn-block" onclick="swapPlayers()">🔄 Swap Players</button>
+      <button class="btn btn-warning btn-block" onclick="window.swapPlayers()">🔄 Swap Players</button>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-primary" onclick="saveMatchEdit()">💾 Save</button>
-      <button class="btn btn-secondary" onclick="closeEditModal()">❌ Cancel</button>
+      <button class="btn btn-primary" onclick="window.saveMatchEdit()">💾 Save</button>
+      <button class="btn btn-secondary" onclick="window.closeEditModal()">❌ Cancel</button>
     </div>
   </div>
 </div>
@@ -909,7 +909,6 @@ input:focus, select:focus, textarea:focus {
       tbody.appendChild(tr);
     });
     
-    // Event listeners
     document.querySelectorAll('.player-input').forEach(input => {
       input.addEventListener('change', function() {
         const index = parseInt(this.dataset.index);
@@ -1028,7 +1027,7 @@ input:focus, select:focus, textarea:focus {
       ).join('') || '<span style="color: #556; font-size: 0.8rem;">No genders</span>';
       
       const weightTags = mat.weights.map((w, i) => 
-        `<span class="tag">${w} <span class="tag-remove" data-mat="${mat.id}" data-type="weights" data-index="${i}"></span></span>`
+        `<span class="tag">${w} <span class="tag-remove" data-mat="${mat.id}" data-type="weights" data-index="${i}">✕</span></span>`
       ).join('') || '<span style="color: #556; font-size: 0.8rem;">No weights</span>';
       
       const beltTags = mat.belts.map((b, i) => 
@@ -1070,15 +1069,14 @@ input:focus, select:focus, textarea:focus {
           </select>
         </div>
         <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
-          <button class="btn btn-info mat-dashboard-btn" style="flex: 1;" data-mat="${mat.id}">📋 Dashboard</button>
-          <button class="btn btn-purple mat-newtab-btn" style="flex: 1;" data-mat="${mat.id}">🪟 New Tab</button>
+          <button class="btn btn-info mat-dashboard-btn" style="flex: 1;" data-mat="${mat.id}"> Dashboard</button>
+          <button class="btn btn-purple mat-newtab-btn" style="flex: 1;" data-mat="${mat.id}"> New Tab</button>
         </div>
       `;
       
       grid.appendChild(div);
     });
     
-    // Event listeners
     document.querySelectorAll('.tag-remove').forEach(btn => {
       btn.addEventListener('click', function() {
         const matId = parseInt(this.dataset.mat);
@@ -1216,7 +1214,7 @@ input:focus, select:focus, textarea:focus {
       
       html += '<div class="category-card ' + (isReady ? 'ready' : 'not-ready') + '">';
       html += '<div class="category-header">';
-      html += '<div class="category-title"> Category</div>';
+      html += '<div class="category-title">🏷️ Category</div>';
       html += '<div class="category-count">' + playerCount + ' Players</div>';
       html += '</div>';
       
@@ -1232,7 +1230,8 @@ input:focus, select:focus, textarea:focus {
       html += '</div>';
       
       if (isReady) {
-        html += '<button class="btn btn-primary btn-block" data-key="' + key + '" onclick="createBracket(\'' + key + '\')">🏆 Create Bracket</button>';
+        // ✅ FIX: استخدام data-key بدلاً من onclick مباشرة
+        html += '<button class="btn btn-primary btn-block create-bracket-btn" data-key="' + key + '">🏆 Create Bracket</button>';
       } else {
         html += '<button class="btn btn-secondary btn-block" disabled>️ Need ' + (2 - playerCount) + ' more player(s)</button>';
       }
@@ -1242,9 +1241,20 @@ input:focus, select:focus, textarea:focus {
     
     html += '</div>';
     container.innerHTML = html;
+    
+    // ✅ FIX: استخدام Event Delegation بدلاً من onclick
+    document.querySelectorAll('.create-bracket-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const key = this.dataset.key;
+        createBracket(key);
+      });
+    });
   }
 
+  // ✅ FIX: جعل الدالة متاحة عالمياً
   function createBracket(categoryKey) {
+    console.log('🏆 Creating bracket for:', categoryKey);
+    
     const parts = categoryKey.split('|');
     const category = {
       ageGroup: parts[0],
@@ -1279,11 +1289,15 @@ input:focus, select:focus, textarea:focus {
     showView('bracket');
     saveData();
     
+    showNotification('✅ Bracket created successfully!');
     console.log('✅ Bracket created for:', categoryKey);
   }
+  
+  // ✅ FIX: جعل الدالة متاحة على window
+  window.createBracket = createBracket;
 
-  function generateBracket(players) {
-    const numPlayers = players.length;
+  function generateBracket(playersList) {
+    const numPlayers = playersList.length;
     
     let bracketSize = 1;
     while (bracketSize < numPlayers) {
@@ -1294,8 +1308,8 @@ input:focus, select:focus, textarea:focus {
     const firstRound = [];
     
     for (let i = 0; i < bracketSize / 2; i++) {
-      const player1 = players[i] || null;
-      const player2 = players[bracketSize - 1 - i] || null;
+      const player1 = playersList[i] || null;
+      const player2 = playersList[bracketSize - 1 - i] || null;
       
       let status = 'pending';
       let winner = null;
@@ -1397,16 +1411,16 @@ input:focus, select:focus, textarea:focus {
         
         if (match.status === 'pending' && match.player1 && match.player2) {
           html += '<div class="bracket-match-actions">';
-          html += `<button class="btn btn-sm btn-primary" onclick="openScoreboard('${categoryKey}', ${roundIndex}, ${matchIndex})">▶ Play</button>`;
-          html += `<button class="btn btn-sm btn-warning" onclick="openEditMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">⚙️ Edit</button>`;
+          html += `<button class="btn btn-sm btn-primary" onclick="window.openScoreboard('${categoryKey}', ${roundIndex}, ${matchIndex})">▶ Play</button>`;
+          html += `<button class="btn btn-sm btn-warning" onclick="window.openEditMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">⚙️ Edit</button>`;
           html += '</div>';
         } else if (match.status === 'completed') {
           html += `<div style="text-align: center; margin-top: 8px; color: #27ae60; font-size: 0.85rem;">✅ Completed</div>`;
-          html += `<button class="btn btn-sm btn-warning btn-block" style="margin-top: 5px;" onclick="openEditMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">⚙️ Edit</button>`;
+          html += `<button class="btn btn-sm btn-warning btn-block" style="margin-top: 5px;" onclick="window.openEditMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">⚙️ Edit</button>`;
         } else if (!match.player1 || !match.player2) {
           html += `<div style="text-align: center; margin-top: 8px; color: #8899aa; font-size: 0.85rem;">⏳ Waiting</div>`;
           if (match.player1 || match.player2) {
-            html += `<button class="btn btn-sm btn-warning btn-block" style="margin-top: 5px;" onclick="openEditMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">⚙️ Edit</button>`;
+            html += `<button class="btn btn-sm btn-warning btn-block" style="margin-top: 5px;" onclick="window.openEditMatch('${categoryKey}', ${roundIndex}, ${matchIndex})">⚙️ Edit</button>`;
           }
         }
         
@@ -1488,7 +1502,7 @@ input:focus, select:focus, textarea:focus {
     currentEditMatch.player1 = redPlayer || null;
     currentEditMatch.player2 = bluePlayer || null;
     
-    if (redPlayerId !== oldPlayer1Id || bluePlayerId !== oldPlayer2Id) {
+    if (redPlayerId != oldPlayer1Id || bluePlayerId != oldPlayer2Id) {
       currentEditMatch.winner = null;
       currentEditMatch.status = 'pending';
       currentEditMatch.score1 = 0;
@@ -1537,7 +1551,7 @@ input:focus, select:focus, textarea:focus {
     const container = document.getElementById('scoreboardContent');
     
     document.getElementById('scoreboardTitle').innerHTML = 
-      ` ${data.gender} - ${data.ageGroup} - ${data.weight}kg - ${data.belt} Belt`;
+      `🥊 ${data.gender} - ${data.ageGroup} - ${data.weight}kg - ${data.belt} Belt`;
     
     const p1 = match.player1;
     const p2 = match.player2;
@@ -1736,14 +1750,14 @@ input:focus, select:focus, textarea:focus {
         
         if (item.match.current) {
           statusClass = 'current';
-          statusText = ' LIVE';
+          statusText = '🔴 LIVE';
           itemClass = 'match-queue-item current';
         } else if (item.match.status === 'completed') {
           statusClass = 'completed';
           statusText = '✅ Completed';
         } else if (item.match.round === 1) {
           statusClass = 'next';
-          statusText = '⏭️ Next';
+          statusText = '️ Next';
           itemClass = 'match-queue-item next';
         }
         
@@ -1761,8 +1775,8 @@ input:focus, select:focus, textarea:focus {
         html += `<span class="match-status status-${statusClass}">${statusText}</span>`;
         
         if (item.match.status === 'pending' && item.match.player1 && item.match.player2) {
-          html += `<button class="btn btn-sm btn-primary" onclick="openScoreboard('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">▶ Play</button>`;
-          html += `<button class="btn btn-sm btn-warning" onclick="openEditMatch('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">️ Edit</button>`;
+          html += `<button class="btn btn-sm btn-primary" onclick="window.openScoreboard('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">▶ Play</button>`;
+          html += `<button class="btn btn-sm btn-warning" onclick="window.openEditMatch('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">⚙️ Edit</button>`;
         }
         
         html += `</div>`;
@@ -1777,7 +1791,7 @@ input:focus, select:focus, textarea:focus {
     const container = document.getElementById('tab-callup');
     if (!container) return;
     
-    let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;"> Call-Up System</h3>';
+    let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📢 Call-Up System</h3>';
     
     const currentMatches = [];
     const nextMatches = [];
@@ -1804,7 +1818,7 @@ input:focus, select:focus, textarea:focus {
         html += `<div style="padding: 10px; background: #1a1f2e; border-radius: 6px; margin-bottom: 10px;">`;
         html += `<div style="font-size: 1.2rem; font-weight: bold; color: #fff;">${item.match.player1.name} vs ${item.match.player2.name}</div>`;
         html += `<div style="color: #8899aa;">${item.category.ageGroup} | ${item.category.gender} | ${item.category.weight}kg</div>`;
-        html += `<button class="btn btn-sm btn-primary mt-2" onclick="openScoreboard('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">📋 Open Scoreboard</button>`;
+        html += `<button class="btn btn-sm btn-primary mt-2" onclick="window.openScoreboard('${item.categoryKey}', ${item.roundIndex}, ${item.matchIndex})">📋 Open Scoreboard</button>`;
         html += `</div>`;
       });
       html += '</div>';
@@ -1987,7 +2001,7 @@ input:focus, select:focus, textarea:focus {
       const key = getStorageKey();
       localStorage.removeItem(key);
       renderPlayers();
-      showNotification('🗑️ All data cleared!');
+      showNotification('️ All data cleared!');
     }
   }
 
@@ -2053,7 +2067,7 @@ input:focus, select:focus, textarea:focus {
 
   // Initialization
   async function init() {
-    console.log(' Page loaded successfully!');
+    console.log('🚀 Page loaded successfully!');
     
     setupEventListeners();
     
