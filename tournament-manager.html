@@ -40,6 +40,8 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 @media (max-width: 768px) {
   .header { flex-direction: column; text-align: center; }
   .btn { margin: 2px; padding: 8px 12px; font-size: 0.85rem; }
+  table { font-size: 0.75rem; }
+  th, td { padding: 4px; }
 }
 </style>
 </head>
@@ -50,31 +52,82 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 <div class="container">
   <div class="header">
     <div>
-      <h1>🏆 TopCompSports</h1>
-      <div style="color: #8899aa; font-size: 0.85rem;" id="subtitle">Players Registration</div>
+      <h1>🏆 TopCompSports Tournament System</h1>
+      <div style="color: #8899aa; font-size: 0.85rem;" id="subtitle">Step 1: Players Registration</div>
     </div>
-    <div>
+    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
       <button class="btn btn-info" onclick="showView('players')">👥 Players</button>
+      <button class="btn btn-purple" onclick="showView('mats')">🥋 Mats</button>
+      <button class="btn btn-warning" onclick="showView('settings')">⚙️ Settings</button>
       <button class="btn btn-secondary" onclick="syncWithDatabase()">🔄 Sync</button>
+      <button class="btn btn-secondary" onclick="saveData()">💾 Save Local</button>
       <button class="btn btn-danger" onclick="clearAll()">🗑️ Clear</button>
     </div>
   </div>
 
+  <!-- PLAYERS VIEW -->
   <div id="view-players" class="view active">
     <div class="section">
-      <div class="section-title">👥 Players Registration <span id="playerCount" style="color: #8899aa;">0 / 200</span></div>
+      <div class="section-title"> Players Registration <span id="playerCount" style="color: #8899aa;">0 / 200</span></div>
       <div style="margin-bottom: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
         <button class="btn btn-primary" onclick="addPlayer()">➕ Add Player</button>
         <button class="btn btn-secondary" onclick="addPlayers(10)">➕ Add 10</button>
         <button class="btn btn-info" onclick="addPlayers(50)">➕ Add 50</button>
-        <button class="btn btn-warning" onclick="syncWithDatabase()">🔄 Sync DB</button>
+        <button class="btn btn-info" onclick="document.getElementById('csvImport').click()">📥 Import CSV</button>
+        <input type="file" id="csvImport" accept=".csv" style="display:none" onchange="importCSV(event)">
+        <button class="btn btn-info" onclick="exportCSV()"> Export CSV</button>
+        <button class="btn btn-warning" onclick="syncWithDatabase()">🔄 Sync with DB</button>
       </div>
       <div style="overflow-x: auto;">
         <table>
-          <thead><tr><th>#</th><th>Name</th><th>Team</th><th>Age</th><th>Gender</th><th>Weight</th><th>Belt</th><th>Rank</th><th>Action</th></tr></thead>
+          <thead><tr><th>#</th><th>Name</th><th>Team</th><th>Age Group</th><th>Gender</th><th>Weight</th><th>Belt</th><th>Rank</th><th>Action</th></tr></thead>
           <tbody id="playersTable"></tbody>
         </table>
       </div>
+      <button class="btn btn-primary" style="width: 100%; margin-top: 15px; padding: 12px;" onclick="showView('mats')">🥋 Proceed to Mats →</button>
+    </div>
+  </div>
+
+  <!-- MATS VIEW -->
+  <div id="view-mats" class="view">
+    <div class="section">
+      <div class="section-title">🥋 Mats Setup</div>
+      <div style="margin-bottom: 15px;">
+        <label style="font-weight: bold; color: #f1c40f;">Number of Mats: </label>
+        <select id="matsCount" onchange="updateMats()" style="width: auto; display: inline-block;">
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+          <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+        </select>
+        <button class="btn btn-info btn-sm" style="margin-left: 15px;" onclick="openAllMatsInTabs()">🪟 Open All Mats</button>
+      </div>
+      <div id="matsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;"></div>
+      <button class="btn btn-primary" style="width: 100%; margin-top: 15px; padding: 12px;" onclick="showView('dashboard')">🏆 Open Mat Dashboard →</button>
+    </div>
+  </div>
+
+  <!-- SETTINGS VIEW -->
+  <div id="view-settings" class="view">
+    <div class="section">
+      <div class="section-title">️ Fight Time Settings</div>
+      <div id="settingsContent">Loading settings...</div>
+      <button class="btn btn-primary" style="margin-top: 15px;" onclick="showView('players')">← Back to Players</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD VIEW -->
+  <div id="view-dashboard" class="view">
+    <div class="section">
+      <div class="section-title">📊 Mat Dashboard</div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('categories')">📋 Categories</button>
+        <button class="tab" onclick="switchTab('queue')"> Queue</button>
+        <button class="tab" onclick="switchTab('callup')">📢 Call-Up</button>
+        <button class="tab" onclick="switchTab('standings')">🏆 Standings</button>
+      </div>
+      <div id="tab-categories" class="tab-content active"></div>
+      <div id="tab-queue" class="tab-content"></div>
+      <div id="tab-callup" class="tab-content"></div>
+      <div id="tab-standings" class="tab-content"></div>
     </div>
   </div>
 </div>
@@ -82,12 +135,101 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 <script>
 // Global Variables
 var players = [];
+var mats = [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
+var categories = {};
+var currentMat = 1;
 var tournamentId = null;
+var ageGroupsData = [];
+var beltLevelsData = [];
+var weightClassesData = [];
+
 var SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
 var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
 var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Make functions globally accessible
+// Load dropdown data from database
+window.loadDropdownData = async function() {
+  try {
+    // Load Age Groups
+    var ageResult = await supabase.from('age_groups').select('*').order('min_age');
+    if (!ageResult.error && ageResult.data) {
+      ageGroupsData = ageResult.data;
+      console.log('Loaded age groups:', ageGroupsData.length);
+    }
+    
+    // Load Belt Levels
+    var beltResult = await supabase.from('belt_levels').select('*').order('sort_order');
+    if (!beltResult.error && beltResult.data) {
+      beltLevelsData = beltResult.data;
+      console.log('Loaded belt levels:', beltLevelsData.length);
+    }
+    
+    // Load Weight Classes
+    var weightResult = await supabase.from('weight_classes').select('*').order('max_weight');
+    if (!weightResult.error && weightResult.data) {
+      weightClassesData = weightResult.data;
+      console.log('Loaded weight classes:', weightClassesData.length);
+    }
+  } catch (err) {
+    console.error('Error loading dropdown data:', err);
+  }
+};
+
+// Navigation
+window.showView = function(view) {
+  var views = document.querySelectorAll('.view');
+  for (var i = 0; i < views.length; i++) {
+    views[i].classList.remove('active');
+  }
+  var viewEl = document.getElementById('view-' + view);
+  if (viewEl) {
+    viewEl.classList.add('active');
+  }
+  
+  var subtitles = {
+    'players': 'Step 1: Players Registration',
+    'mats': 'Step 2: Mats Setup',
+    'settings': 'Step 3: Settings',
+    'dashboard': 'Mat Dashboard'
+  };
+  var subtitleEl = document.getElementById('subtitle');
+  if (subtitleEl) {
+    subtitleEl.innerText = subtitles[view] || '';
+  }
+  
+  if (view === 'mats') renderMats();
+  if (view === 'settings') renderSettings();
+  if (view === 'dashboard') { renderCategories(); renderQueue(); renderCallUp(); renderStandings(); }
+  
+  console.log('Switched to view:', view);
+};
+
+window.switchTab = function(tab) {
+  var tabs = document.querySelectorAll('.tab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].classList.remove('active');
+  }
+  var contents = document.querySelectorAll('.tab-content');
+  for (var i = 0; i < contents.length; i++) {
+    contents[i].classList.remove('active');
+  }
+  
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+  
+  var tabEl = document.getElementById('tab-' + tab);
+  if (tabEl) {
+    tabEl.classList.add('active');
+  }
+  
+  if (tab === 'categories') renderCategories();
+  if (tab === 'queue') renderQueue();
+  if (tab === 'callup') renderCallUp();
+  if (tab === 'standings') renderStandings();
+};
+
+// Player Management
 window.addPlayer = function() {
   if (players.length >= 200) { alert('Maximum 200 players!'); return; }
   players.push({ 
@@ -111,53 +253,9 @@ window.addPlayers = function(count) {
   }
 };
 
-window.showView = function(view) {
-  var views = document.querySelectorAll('.view');
-  for (var i = 0; i < views.length; i++) {
-    views[i].classList.remove('active');
-  }
-  var viewEl = document.getElementById('view-' + view);
-  if (viewEl) {
-    viewEl.classList.add('active');
-  }
-  console.log('Switched to view:', view);
-};
-
-window.syncWithDatabase = function() {
-  var indicator = document.getElementById('syncIndicator');
-  if (indicator) {
-    indicator.classList.add('active');
-    setTimeout(function() {
-      indicator.classList.remove('active');
-    }, 2000);
-  }
-  alert('Syncing with database... (Feature requires backend setup)');
-  console.log('Syncing...');
-};
-
-window.saveData = function() {
-  localStorage.setItem('tournamentData', JSON.stringify({
-    players: players,
-    savedAt: new Date().toISOString()
-  }));
-  console.log('Data saved to localStorage');
-};
-
-window.clearAll = function() {
-  if (confirm('Clear all data?')) {
-    players = [];
-    localStorage.removeItem('tournamentData');
-    renderPlayers();
-    alert('All data cleared!');
-  }
-};
-
 window.renderPlayers = function() {
   var tbody = document.getElementById('playersTable');
-  if (!tbody) {
-    console.error('playersTable not found!');
-    return;
-  }
+  if (!tbody) return;
   
   tbody.innerHTML = '';
   
@@ -165,22 +263,49 @@ window.renderPlayers = function() {
     var p = players[i];
     var tr = document.createElement('tr');
     
+    // Build age group options
+    var ageOptions = '<option value="">Select Age</option>';
+    if (ageGroupsData.length > 0) {
+      for (var j = 0; j < ageGroupsData.length; j++) {
+        var ag = ageGroupsData[j];
+        var selected = (p.ageGroup === ag.name) ? 'selected' : '';
+        ageOptions += '<option value="' + ag.name + '" ' + selected + '>' + ag.name + ' (' + ag.min_age + '-' + ag.max_age + ')</option>';
+      }
+    } else {
+      ageOptions += '<option ' + (p.ageGroup === 'Amateur/Professional' ? 'selected' : '') + '>Amateur/Professional</option>';
+      ageOptions += '<option ' + (p.ageGroup === 'Kids 1' ? 'selected' : '') + '>Kids 1</option>';
+    }
+    
+    // Build belt options
+    var beltOptions = '<option value="">Select Belt</option>';
+    if (beltLevelsData.length > 0) {
+      for (var j = 0; j < beltLevelsData.length; j++) {
+        var bl = beltLevelsData[j];
+        var selected = (p.belt === bl.name) ? 'selected' : '';
+        beltOptions += '<option value="' + bl.name + '" ' + selected + '>' + bl.name + '</option>';
+      }
+    } else {
+      beltOptions += '<option ' + (p.belt === 'White' ? 'selected' : '') + '>White</option>';
+      beltOptions += '<option ' + (p.belt === 'Blue' ? 'selected' : '') + '>Blue</option>';
+    }
+    
+    // Gender options based on age
+    var genderOptions = '';
+    if (p.ageGroup && p.ageGroup.includes('Kids')) {
+      genderOptions = '<option ' + (p.gender === 'Boys' ? 'selected' : '') + '>Boys</option>';
+      genderOptions += '<option ' + (p.gender === 'Girls' ? 'selected' : '') + '>Girls</option>';
+    } else {
+      genderOptions = '<option ' + (p.gender === 'Men' ? 'selected' : '') + '>Men</option>';
+      genderOptions += '<option ' + (p.gender === 'Women' ? 'selected' : '') + '>Women</option>';
+    }
+    
     tr.innerHTML = '<td>' + (i + 1) + '</td>' +
       '<td><input type="text" value="' + p.name + '" onchange="updatePlayer(' + i + ', \'name\', this.value)" placeholder="Name"></td>' +
       '<td><input type="text" value="' + p.team + '" onchange="updatePlayer(' + i + ', \'team\', this.value)" placeholder="Team"></td>' +
-      '<td><select onchange="updatePlayer(' + i + ', \'ageGroup\', this.value)">' +
-        '<option ' + (p.ageGroup === 'Kids 1' ? 'selected' : '') + '>Kids 1</option>' +
-        '<option ' + (p.ageGroup === 'Amateur/Professional' ? 'selected' : '') + '>Amateur/Professional</option>' +
-      '</select></td>' +
-      '<td><select onchange="updatePlayer(' + i + ', \'gender\', this.value)">' +
-        '<option ' + (p.gender === 'Men' ? 'selected' : '') + '>Men</option>' +
-        '<option ' + (p.gender === 'Women' ? 'selected' : '') + '>Women</option>' +
-      '</select></td>' +
+      '<td><select onchange="updatePlayer(' + i + ', \'ageGroup\', this.value)">' + ageOptions + '</select></td>' +
+      '<td><select onchange="updatePlayer(' + i + ', \'gender\', this.value)">' + genderOptions + '</select></td>' +
       '<td><input type="text" value="' + p.weight + '" onchange="updatePlayer(' + i + ', \'weight\', this.value)" placeholder="Weight"></td>' +
-      '<td><select onchange="updatePlayer(' + i + ', \'belt\', this.value)">' +
-        '<option ' + (p.belt === 'White' ? 'selected' : '') + '>White</option>' +
-        '<option ' + (p.belt === 'Blue' ? 'selected' : '') + '>Blue</option>' +
-      '</select></td>' +
+      '<td><select onchange="updatePlayer(' + i + ', \'belt\', this.value)">' + beltOptions + '</select></td>' +
       '<td><input type="number" value="' + p.rank + '" onchange="updatePlayer(' + i + ', \'rank\', this.value)" style="width: 60px;"></td>' +
       '<td><button class="btn btn-danger btn-sm" onclick="deletePlayer(' + i + ')">✕</button></td>';
     
@@ -206,9 +331,320 @@ window.deletePlayer = function(index) {
   }
 };
 
-// Initialize on page load
-window.onload = function() {
+window.importCSV = function(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var lines = e.target.result.split('\n').filter(function(l) { return l.trim(); });
+    for (var i = 1; i < lines.length && players.length < 200; i++) {
+      var vals = lines[i].split(',').map(function(v) { return v.trim().replace(/"/g, ''); });
+      if (vals.length >= 3) {
+        players.push({ 
+          id: Date.now() + i, 
+          name: vals[0] || '', 
+          team: vals[1] || '', 
+          ageGroup: vals[2] || 'Amateur/Professional', 
+          gender: 'Men', 
+          weight: vals[4] || '', 
+          belt: vals[5] || 'White', 
+          rank: parseInt(vals[6]) || players.length + 1 
+        });
+      }
+    }
+    renderPlayers();
+    saveData();
+    alert('Imported ' + (lines.length - 1) + ' players!');
+  };
+  reader.readAsText(file);
+};
+
+window.exportCSV = function() {
+  var csv = 'Name,Team,Age Group,Gender,Weight,Belt,Rank\n';
+  for (var i = 0; i < players.length; i++) {
+    var p = players[i];
+    csv += '"' + p.name + '","' + p.team + '","' + p.ageGroup + '","' + p.gender + '","' + p.weight + '","' + p.belt + '",' + p.rank + '\n';
+  }
+  var blob = new Blob([csv], { type: 'text/csv' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'players.csv';
+  a.click();
+};
+
+// Mats Management
+window.updateMats = function() {
+  var count = parseInt(document.getElementById('matsCount').value);
+  while (mats.length < count) {
+    mats.push({ id: mats.length + 1, weights: [], ageGroups: [], belts: [], genders: [] });
+  }
+  mats = mats.slice(0, count);
+  renderMats();
+  saveData();
+};
+
+window.renderMats = function() {
+  var grid = document.getElementById('matsGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  
+  var allWeights = [];
+  var allAges = [];
+  var allBelts = [];
+  var allGenders = [];
+  
+  for (var i = 0; i < players.length; i++) {
+    if (players[i].weight && allWeights.indexOf(players[i].weight) === -1) allWeights.push(players[i].weight);
+    if (players[i].ageGroup && allAges.indexOf(players[i].ageGroup) === -1) allAges.push(players[i].ageGroup);
+    if (players[i].belt && allBelts.indexOf(players[i].belt) === -1) allBelts.push(players[i].belt);
+    if (players[i].gender && allGenders.indexOf(players[i].gender) === -1) allGenders.push(players[i].gender);
+  }
+  
+  for (var i = 0; i < mats.length; i++) {
+    var mat = mats[i];
+    var div = document.createElement('div');
+    div.className = 'section';
+    div.style.padding = '15px';
+    
+    var ageTags = mat.ageGroups.map(function(a, idx) {
+      return '<span style="background:rgba(241,196,15,0.2);padding:2px 8px;border-radius:12px;font-size:0.8rem;margin:2px;display:inline-block;">' + a + ' <span style="cursor:pointer;color:#e74c3c;" onclick="removeMatCategory(' + mat.id + ', \'ageGroups\', ' + idx + ')">✕</span></span>';
+    }).join('') || '<span style="color:#556;font-size:0.8rem;">No age groups</span>';
+    
+    var genderTags = mat.genders.map(function(g, idx) {
+      return '<span style="background:rgba(241,196,15,0.2);padding:2px 8px;border-radius:12px;font-size:0.8rem;margin:2px;display:inline-block;">' + g + ' <span style="cursor:pointer;color:#e74c3c;" onclick="removeMatCategory(' + mat.id + ', \'genders\', ' + idx + ')">✕</span></span>';
+    }).join('') || '<span style="color:#556;font-size:0.8rem;">No genders</span>';
+    
+    var weightTags = mat.weights.map(function(w, idx) {
+      return '<span style="background:rgba(241,196,15,0.2);padding:2px 8px;border-radius:12px;font-size:0.8rem;margin:2px;display:inline-block;">' + w + ' <span style="cursor:pointer;color:#e74c3c;" onclick="removeMatCategory(' + mat.id + ', \'weights\', ' + idx + ')">✕</span></span>';
+    }).join('') || '<span style="color:#556;font-size:0.8rem;">No weights</span>';
+    
+    var beltTags = mat.belts.map(function(b, idx) {
+      return '<span style="background:rgba(241,196,15,0.2);padding:2px 8px;border-radius:12px;font-size:0.8rem;margin:2px;display:inline-block;">' + b + ' <span style="cursor:pointer;color:#e74c3c;" onclick="removeMatCategory(' + mat.id + ', \'belts\', ' + idx + ')">✕</span></span>';
+    }).join('') || '<span style="color:#556;font-size:0.8rem;">No belts</span>';
+    
+    var ageSelect = '<select onchange="if(this.value) addMatCategory(' + mat.id + ', \'ageGroups\', this.value)" style="margin-top:5px;"><option value="">-- Add Age --</option>';
+    for (var j = 0; j < allAges.length; j++) {
+      ageSelect += '<option>' + allAges[j] + '</option>';
+    }
+    ageSelect += '</select>';
+    
+    var genderSelect = '<select onchange="if(this.value) addMatCategory(' + mat.id + ', \'genders\', this.value)" style="margin-top:5px;"><option value="">-- Add Gender --</option>';
+    for (var j = 0; j < allGenders.length; j++) {
+      genderSelect += '<option>' + allGenders[j] + '</option>';
+    }
+    genderSelect += '</select>';
+    
+    var weightSelect = '<select onchange="if(this.value) addMatCategory(' + mat.id + ', \'weights\', this.value)" style="margin-top:5px;"><option value="">-- Add Weight --</option>';
+    for (var j = 0; j < allWeights.length; j++) {
+      weightSelect += '<option>' + allWeights[j] + '</option>';
+    }
+    weightSelect += '</select>';
+    
+    var beltSelect = '<select onchange="if(this.value) addMatCategory(' + mat.id + ', \'belts\', this.value)" style="margin-top:5px;"><option value="">-- Add Belt --</option>';
+    for (var j = 0; j < allBelts.length; j++) {
+      beltSelect += '<option>' + allBelts[j] + '</option>';
+    }
+    beltSelect += '</select>';
+    
+    div.innerHTML = '<h3 style="color:#f1c40f;margin-bottom:10px;">🥋 Mat ' + mat.id + '</h3>' +
+      '<div style="margin-bottom:10px;"><strong style="color:#8899aa;font-size:0.8rem;">AGE GROUPS</strong><div style="margin-top:5px;">' + ageTags + '</div>' + ageSelect + '</div>' +
+      '<div style="margin-bottom:10px;"><strong style="color:#8899aa;font-size:0.8rem;">GENDERS</strong><div style="margin-top:5px;">' + genderTags + '</div>' + genderSelect + '</div>' +
+      '<div style="margin-bottom:10px;"><strong style="color:#8899aa;font-size:0.8rem;">WEIGHTS</strong><div style="margin-top:5px;">' + weightTags + '</div>' + weightSelect + '</div>' +
+      '<div style="margin-bottom:10px;"><strong style="color:#8899aa;font-size:0.8rem;">BELTS</strong><div style="margin-top:5px;">' + beltTags + '</div>' + beltSelect + '</div>' +
+      '<div style="display:flex;gap:8px;margin-top:10px;">' +
+        '<button class="btn btn-info" style="flex:1;" onclick="currentMat=' + mat.id + ';showView(\'dashboard\')">📋 Open Dashboard</button>' +
+        '<button class="btn btn-purple" style="flex:1;" onclick="openMatInNewTab(' + mat.id + ')">🪟 New Tab</button>' +
+      '</div>';
+    
+    grid.appendChild(div);
+  }
+};
+
+window.addMatCategory = function(matId, type, value) {
+  var mat = null;
+  for (var i = 0; i < mats.length; i++) {
+    if (mats[i].id === matId) {
+      mat = mats[i];
+      break;
+    }
+  }
+  if (!mat) return;
+  if (mat[type].indexOf(value) === -1) {
+    mat[type].push(value);
+    renderMats();
+    saveData();
+  }
+};
+
+window.removeMatCategory = function(matId, type, index) {
+  var mat = null;
+  for (var i = 0; i < mats.length; i++) {
+    if (mats[i].id === matId) {
+      mat = mats[i];
+      break;
+    }
+  }
+  if (!mat) return;
+  mat[type].splice(index, 1);
+  renderMats();
+  saveData();
+};
+
+// Settings
+window.renderSettings = function() {
+  var content = document.getElementById('settingsContent');
+  if (!content) return;
+  content.innerHTML = '<p>Loading fight time settings...</p>';
+  // This would load from database in a full implementation
+  setTimeout(function() {
+    content.innerHTML = '<p style="color:#8899aa;">Fight time settings would be loaded from database here.</p>';
+  }, 500);
+};
+
+// Dashboard Functions
+window.renderCategories = function() {
+  var container = document.getElementById('tab-categories');
+  if (!container) return;
+  
+  var mat = null;
+  for (var i = 0; i < mats.length; i++) {
+    if (mats[i].id === currentMat) {
+      mat = mats[i];
+      break;
+    }
+  }
+  
+  if (!mat) {
+    container.innerHTML = '<p style="text-align:center;color:#8899aa;">No mat selected</p>';
+    return;
+  }
+  
+  var html = '<h3 style="color:#f1c40f;margin-bottom:15px;"> Categories - Mat ' + currentMat + '</h3>';
+  
+  // Simple category display
+  if (players.length === 0) {
+    html += '<p style="text-align:center;color:#8899aa;">No players registered yet.</p>';
+  } else {
+    html += '<p style="color:#8899aa;">Total Players: ' + players.length + '</p>';
+    html += '<p style="color:#8899aa;">Mat Filters: ' + mat.ageGroups.join(', ') + ' | ' + mat.genders.join(', ') + '</p>';
+  }
+  
+  container.innerHTML = html;
+};
+
+window.renderQueue = function() {
+  var container = document.getElementById('tab-queue');
+  if (!container) return;
+  container.innerHTML = '<h3 style="color:#f1c40f;margin-bottom:15px;">⏳ Match Queue</h3><p style="color:#8899aa;">No matches scheduled yet.</p>';
+};
+
+window.renderCallUp = function() {
+  var container = document.getElementById('tab-callup');
+  if (!container) return;
+  container.innerHTML = '<h3 style="color:#f1c40f;margin-bottom:15px;">📢 Call-Up System</h3><p style="color:#8899aa;">No matches to call.</p>';
+};
+
+window.renderStandings = function() {
+  var container = document.getElementById('tab-standings');
+  if (!container) return;
+  container.innerHTML = '<h3 style="color:#f1c40f;margin-bottom:15px;">🏆 Standings</h3><p style="color:#8899aa;">No results yet.</p>';
+};
+
+window.openMatInNewTab = function(matId) {
+  var url = window.location.href.split('?')[0] + '?mat=' + matId;
+  window.open(url, '_blank');
+};
+
+window.openAllMatsInTabs = function() {
+  for (var i = 0; i < mats.length; i++) {
+    setTimeout(function(mat) {
+      window.openMatInNewTab(mat.id);
+    }, i * 300, mats[i]);
+  }
+};
+
+// Database Sync
+window.syncWithDatabase = async function() {
+  var indicator = document.getElementById('syncIndicator');
+  if (indicator) {
+    indicator.classList.add('active');
+    setTimeout(function() {
+      indicator.classList.remove('active');
+    }, 2000);
+  }
+  
+  try {
+    // Get tournament_id from URL
+    var urlParams = new URLSearchParams(window.location.search);
+    tournamentId = urlParams.get('tournament_id');
+    
+    if (!tournamentId) {
+      // Create new tournament
+      var tResult = await supabase.from('tournaments').insert({ name: 'Tournament ' + new Date().toLocaleDateString() }).select().single();
+      if (tResult.error) throw tResult.error;
+      tournamentId = tResult.data.id;
+    }
+    
+    // Sync players to database
+    var playersToInsert = players.map(function(p) {
+      return {
+        tournament_id: tournamentId,
+        player_name: p.name,
+        team: p.team,
+        age_group: p.ageGroup,
+        gender: p.gender,
+        weight: parseFloat(p.weight) || null,
+        belt_level: p.belt,
+        ranking: p.rank
+      };
+    });
+    
+    if (playersToInsert.length > 0) {
+      var result = await supabase.from('tournament_participants').upsert(playersToInsert, { onConflict: 'id' });
+      if (result.error) throw result.error;
+      alert('✅ Synced ' + players.length + ' players to database!');
+    } else {
+      alert('No players to sync');
+    }
+    
+    console.log('Sync complete');
+  } catch (err) {
+    console.error('Sync error:', err);
+    alert('⚠️ Sync failed: ' + err.message);
+  }
+};
+
+window.saveData = function() {
+  localStorage.setItem('tournamentData', JSON.stringify({
+    players: players,
+    mats: mats,
+    categories: categories,
+    savedAt: new Date().toISOString()
+  }));
+  console.log('Data saved to localStorage');
+};
+
+window.clearAll = function() {
+  if (confirm('⚠️ Clear all data?')) {
+    players = [];
+    mats = [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
+    categories = {};
+    localStorage.removeItem('tournamentData');
+    renderPlayers();
+    alert('🗑️ All data cleared!');
+  }
+};
+
+// Initialize
+window.onload = async function() {
   console.log('Page loaded successfully!');
+  
+  // Get tournament_id from URL
+  var urlParams = new URLSearchParams(window.location.search);
+  tournamentId = urlParams.get('tournament_id');
+  
+  // Load dropdown data from database
+  await loadDropdownData();
   
   // Load saved data
   var saved = localStorage.getItem('tournamentData');
@@ -216,6 +652,8 @@ window.onload = function() {
     try {
       var data = JSON.parse(saved);
       players = data.players || [];
+      mats = data.mats || [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
+      categories = data.categories || {};
       console.log('Loaded', players.length, 'players from storage');
     } catch(e) {
       console.error('Error loading data:', e);
@@ -224,10 +662,14 @@ window.onload = function() {
   
   renderPlayers();
   
-  // Test that functions are accessible
-  console.log('addPlayer function:', typeof window.addPlayer);
-  console.log('addPlayers function:', typeof window.addPlayers);
-  console.log('showView function:', typeof window.showView);
+  // Verify functions are accessible
+  console.log('Functions check:');
+  console.log('- addPlayer:', typeof window.addPlayer);
+  console.log('- addPlayers:', typeof window.addPlayers);
+  console.log('- showView:', typeof window.showView);
+  console.log('- syncWithDatabase:', typeof window.syncWithDatabase);
+  console.log('- renderPlayers:', typeof window.renderPlayers);
+  console.log('- renderMats:', typeof window.renderMats);
 };
 </script>
 
