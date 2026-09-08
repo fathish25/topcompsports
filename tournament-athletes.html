@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athletes - Tournament Details - TopCompSports</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-blue: #0066CC;
+            --dark-blue: #003366;
+            --accent-yellow: #FFB800;
+            --black: #0A0A0A;
+            --dark-gray: #1A1A1A;
+            --medium-gray: #2A2A2A;
+            --light-gray: #3A3A3A;
+            --white: #FFFFFF;
+            --light-bg: #F5F7FA;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
+        img { max-width: 100%; height: auto; }
+
+        /* Header */
+        .header { background: var(--black); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-blue); position: sticky; top: 0; z-index: 1000; }
+        .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .logo-svg { width: 50px; height: 50px; }
+        .logo-text { font-size: 28px; font-weight: bold; color: var(--primary-blue); }
+        .nav { display: flex; gap: 30px; align-items: center; }
+        .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; transition: all 0.3s; font-weight: 600; }
+        .nav a:hover { color: var(--accent-yellow); }
+
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; text-decoration: none; display: inline-block; }
+        .btn-login { background: var(--primary-blue); color: var(--white); }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.4); }
+        .btn-logout { background: transparent; border: 2px solid var(--white); color: var(--white); }
+
+        .lang-switcher { display: flex; gap: 5px; background: var(--medium-gray); padding: 5px; border-radius: 8px; }
+        .lang-btn { padding: 8px 15px; border: none; background: transparent; color: var(--white); cursor: pointer; border-radius: 6px; font-weight: bold; }
+        .lang-btn.active { background: var(--primary-blue); }
+
+        /* Tournament Header */
+        .tournament-header { background: var(--dark-gray); padding: 20px 50px; border-bottom: 1px solid var(--medium-gray); }
+        .tournament-header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .tournament-info { display: flex; align-items: center; gap: 20px; }
+        .tournament-logo { width: 60px; height: 60px; border-radius: 10px; overflow: hidden; background: var(--medium-gray); }
+        .tournament-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .tournament-title h1 { color: var(--white); font-size: 1.5rem; font-weight: 700; margin-bottom: 5px; }
+        .tournament-title p { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+        .tournament-actions { display: flex; gap: 15px; align-items: center; }
+        .btn-register { background: var(--accent-yellow); color: var(--black); padding: 10px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .btn-register:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,184,0,0.4); }
+
+        /* Tabs */
+        .tabs-container { background: var(--dark-gray); border-bottom: 1px solid var(--medium-gray); position: sticky; top: 73px; z-index: 999; }
+        .tabs { max-width: 1400px; margin: 0 auto; display: flex; gap: 5px; padding: 0 50px; overflow-x: auto; }
+        .tab { padding: 15px 25px; color: rgba(255,255,255,0.6); text-decoration: none; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.3s; white-space: nowrap; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .tab:hover { color: var(--white); }
+        .tab.active { color: var(--white); border-bottom-color: var(--accent-yellow); }
+
+        /* Main Content */
+        .main-content { max-width: 1400px; margin: 0 auto; padding: 40px 50px; }
+
+        /* Athletes Header */
+        .athletes-header { margin-bottom: 30px; }
+        .athletes-header h2 { font-size: 2rem; font-weight: 900; color: var(--white); margin-bottom: 20px; }
+        
+        .filters { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 30px; }
+        .filter-btn { padding: 8px 16px; background: var(--medium-gray); color: var(--white); border: 1px solid var(--light-gray); border-radius: 6px; cursor: pointer; transition: all 0.3s; font-size: 0.9rem; }
+        .filter-btn:hover { background: var(--light-gray); }
+        .filter-btn.active { background: var(--primary-blue); border-color: var(--primary-blue); }
+
+        .search-bar { display: flex; gap: 15px; margin-bottom: 30px; }
+        .search-input { flex: 1; padding: 12px 20px; background: var(--medium-gray); border: 1px solid var(--light-gray); border-radius: 8px; color: var(--white); font-size: 1rem; }
+        .search-input:focus { outline: none; border-color: var(--primary-blue); }
+        .search-input::placeholder { color: rgba(255,255,255,0.4); }
+
+        /* Division Groups */
+        .division-group { margin-bottom: 40px; }
+        .division-title { font-size: 1.3rem; font-weight: 700; color: var(--white); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--primary-blue); }
+        .division-title span { color: var(--accent-yellow); }
+
+        /* Athletes Table */
+        .athletes-table { width: 100%; border-collapse: collapse; background: var(--dark-gray); border-radius: 10px; overflow: hidden; }
+        .athletes-table thead { background: var(--medium-gray); }
+        .athletes-table th { padding: 15px 20px; text-align: left; color: rgba(255,255,255,0.7); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
+        .athletes-table td { padding: 15px 20px; border-bottom: 1px solid var(--medium-gray); color: var(--white); }
+        .athletes-table tr:hover { background: var(--light-gray); }
+        .athletes-table tr:last-child td { border-bottom: none; }
+
+        .athlete-info { display: flex; align-items: center; gap: 15px; }
+        .athlete-avatar { width: 45px; height: 45px; border-radius: 50%; overflow: hidden; background: var(--medium-gray); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .athlete-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .athlete-details { display: flex; flex-direction: column; gap: 3px; }
+        .athlete-name { font-weight: 700; color: var(--white); font-size: 1rem; }
+        .athlete-country { display: flex; align-items: center; gap: 5px; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+        .athlete-country img { width: 20px; height: 14px; border-radius: 2px; }
+
+        .academy-link { color: var(--primary-blue); text-decoration: none; font-size: 0.9rem; }
+        .academy-link:hover { text-decoration: underline; }
+
+        .gender-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+        .gender-badge.male { background: rgba(0,102,204,0.2); color: var(--primary-blue); }
+        .gender-badge.female { background: rgba(255,105,180,0.2); color: #FF69B4; }
+
+        .approved-count { color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-top: 10px; }
+
+        /* Loading & Empty */
+        .loading { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); font-size: 1.2rem; }
+        .empty-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); }
+        .empty-state .icon { font-size: 5rem; margin-bottom: 20px; opacity: 0.5; }
+
+        /* Footer */
+        .footer { background: var(--black); padding: 30px 50px; color: rgba(255,255,255,0.6); text-align: center; border-top: 1px solid var(--medium-gray); margin-top: 60px; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .header { padding: 15px 30px; }
+            .tournament-header { padding: 20px 30px; }
+            .tabs { padding: 0 30px; }
+            .main-content { padding: 30px 30px; }
+        }
+
+        @media (max-width: 768px) {
+            .header { padding: 12px 20px; flex-direction: column; gap: 15px; }
+            .nav { flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .tournament-header { padding: 15px 20px; }
+            .tournament-info { flex-direction: column; align-items: flex-start; }
+            .tournament-title h1 { font-size: 1.2rem; }
+            .tabs { padding: 0 20px; overflow-x: auto; }
+            .main-content { padding: 20px 20px; }
+            .athletes-header h2 { font-size: 1.5rem; }
+            .athletes-table { font-size: 0.85rem; }
+            .athletes-table th, .athletes-table td { padding: 10px 12px; }
+            .athlete-avatar { width: 35px; height: 35px; }
+        }
+
+        @media (max-width: 480px) {
+            .header { padding: 10px 15px; }
+            .logo-text { font-size: 22px; }
+            .tournament-header { padding: 15px; }
+            .tournament-actions { flex-direction: column; width: 100%; }
+            .tournament-actions .btn { width: 100%; text-align: center; }
+            .tabs { padding: 0 15px; }
+            .main-content { padding: 15px 15px; }
+            .athletes-table { display: block; overflow-x: auto; }
+            .athletes-table th, .athletes-table td { padding: 8px 10px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo" onclick="window.location.href='index.html'">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0066CC;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#003366;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <circle cx="50" cy="50" r="45" fill="url(#logoGrad)" stroke="#FFB800" stroke-width="3"/>
+                <text x="50" y="65" font-family="Arial Black, sans-serif" font-size="45" font-weight="900" fill="#FFB800" text-anchor="middle">T</text>
+            </svg>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        
+        <nav class="nav">
+            <a href="index.html">Home</a>
+            <a href="tournaments.html">Tournaments</a>
+            
+            <div id="userSection" class="user-section" style="display: none;">
+                <a href="my-profile.html" style="color: var(--accent-yellow); text-decoration: none;">My Profile</a>
+                <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
+            </div>
+            
+            <a href="login.html" id="loginBtn" class="btn btn-login">Login</a>
+            
+            <div class="lang-switcher">
+                <button class="lang-btn" onclick="changeLanguage('ar')" id="btn-ar">عربي</button>
+                <button class="lang-btn active" onclick="changeLanguage('en')" id="btn-en">English</button>
+            </div>
+        </nav>
+    </header>
+
+    <div id="tournamentContent">
+        <div class="loading">Loading tournament details...</div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 TopCompSports - All rights reserved</p>
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentLang = localStorage.getItem('lang') || 'en';
+        let tournamentId = null;
+        let allAthletes = [];
+        let currentFilter = 'all';
+
+        window.onload = async function() {
+            checkUserStatus();
+            const urlParams = new URLSearchParams(window.location.search);
+            tournamentId = urlParams.get('tournament_id');
+            
+            if (!tournamentId) {
+                document.getElementById('tournamentContent').innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">❌</div>
+                        <p>Tournament not found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            await loadTournamentAndAthletes();
+        };
+
+        function checkUserStatus() {
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                try {
+                    const userData = JSON.parse(storedUser);
+                    document.getElementById('userSection').style.display = 'flex';
+                    document.getElementById('loginBtn').style.display = 'none';
+                } catch (e) {
+                    showLoginButton();
+                }
+            } else {
+                showLoginButton();
+            }
+        }
+
+        function showLoginButton() {
+            document.getElementById('userSection').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'inline-block';
+        }
+
+        function changeLanguage(lang) {
+            localStorage.setItem('lang', lang);
+            currentLang = lang;
+            document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            loadTournamentAndAthletes();
+        }
+
+        async function loadTournamentAndAthletes() {
+            try {
+                // جلب بيانات البطولة
+                const { data: tournament, error: tournamentError } = await dbClient
+                    .from('tournaments')
+                    .select('*')
+                    .eq('id', tournamentId)
+                    .single();
+                
+                if (tournamentError || !tournament) {
+                    document.getElementById('tournamentContent').innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">❌</div>
+                            <p>Tournament not found</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // جلب جميع اللاعبين المعتمدين
+                const { data: athletes, error: athletesError } = await dbClient
+                    .from('tournament_participants')
+                    .select('*')
+                    .eq('tournament_id', tournamentId)
+                    .eq('status', 'approved')
+                    .order('age_group', { ascending: true });
+
+                if (athletesError) throw athletesError;
+
+                allAthletes = athletes || [];
+                renderTournament(tournament);
+                renderAthletes();
+            } catch (error) {
+                console.error('Error loading tournament:', error);
+                document.getElementById('tournamentContent').innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">❌</div>
+                        <p>Error loading tournament details</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderTournament(tournament) {
+            const storedUser = localStorage.getItem('currentUser');
+            const isLoggedIn = !!storedUser;
+            
+            const startDate = tournament.event_start_date || tournament.tournament_date || tournament.event_date;
+            const bannerImage = tournament.image_url || '';
+
+            const registerButton = isLoggedIn
+                ? `<button class="btn-register" onclick="window.location.href='player-registration.html?tournament_id=${tournamentId}'">Register</button>`
+                : `<button class="btn btn-login" onclick="window.location.href='login.html?redirect=tournament-details.html?tournament_id=${tournamentId}'">Login to Register</button>`;
+
+            document.getElementById('tournamentContent').innerHTML = `
+                <!-- Tournament Header -->
+                <div class="tournament-header">
+                    <div class="tournament-header-content">
+                        <div class="tournament-info">
+                            <div class="tournament-logo">
+                                ${bannerImage ? `<img src="${bannerImage}" alt="${tournament.name}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:1.5rem;">🏆</div>'}
+                            </div>
+                            <div class="tournament-title">
+                                <h1>${tournament.name}</h1>
+                                <p>📅 ${startDate ? new Date(startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'TBD'}</p>
+                            </div>
+                        </div>
+                        <div class="tournament-actions">
+                            ${registerButton}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs-container">
+                    <div class="tabs">
+                        <a href="tournament-details.html?tournament_id=${tournamentId}" class="tab"><span>📋</span> Information</a>
+                        <a href="tournament-athletes.html?tournament_id=${tournamentId}" class="tab active"><span>👥</span> Athletes <span style="background:var(--accent-yellow);color:var(--black);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${allAthletes.length}</span></a>
+                        <a href="#" class="tab"><span>🏆</span> Brackets</a>
+                        <a href="#" class="tab"><span>⚔️</span> Matches</a>
+                        <a href="#" class="tab"><span>📅</span> Schedule</a>
+                        <a href="#" class="tab"><span>📊</span> Results</a>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="main-content">
+                    <div class="athletes-header">
+                        <h2>Athletes</h2>
+                        
+                        <div class="filters">
+                            <button class="filter-btn active" onclick="filterAthletes('all')">All Athletes</button>
+                            <button class="filter-btn" onclick="filterAthletes('Gi')">Gi</button>
+                            <button class="filter-btn" onclick="filterAthletes('No-Gi')">No-Gi</button>
+                        </div>
+
+                        <div class="search-bar">
+                            <input type="text" class="search-input" id="searchInput" placeholder="Search athlete or division..." oninput="searchAthletes()">
+                        </div>
+                    </div>
+
+                    <div id="athletesList"></div>
+                </div>
+            `;
+        }
+
+        function renderAthletes() {
+            const athletesList = document.getElementById('athletesList');
+            
+            if (allAthletes.length === 0) {
+                athletesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon"></div>
+                        <p>No athletes registered yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // تجميع اللاعبين حسب الفئة
+            const groupedAthletes = groupAthletesByDivision(allAthletes);
+            
+            let html = '';
+            for (const [divisionKey, athletes] of Object.entries(groupedAthletes)) {
+                const [ageGroup, gender, belt, weight] = divisionKey.split('|');
+                const divisionTitle = `${gender} / ${ageGroup} / ${belt} / ${weight}`;
+                
+                html += `
+                    <div class="division-group">
+                        <h3 class="division-title">${divisionTitle}</h3>
+                        <table class="athletes-table">
+                            <thead>
+                                <tr>
+                                    <th>Athlete</th>
+                                    <th>Academy & Affiliation</th>
+                                    <th>Registration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${athletes.map(athlete => `
+                                    <tr>
+                                        <td>
+                                            <div class="athlete-info">
+                                                <div class="athlete-avatar">
+                                                    ${athlete.profile_photo_url ? `<img src="${athlete.profile_photo_url}" alt="${athlete.player_name}">` : '👤'}
+                                                </div>
+                                                <div class="athlete-details">
+                                                    <div class="athlete-name">${athlete.player_name}</div>
+                                                    <div class="athlete-country">
+                                                        <span>${athlete.country || ''}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="#" class="academy-link">${athlete.team || 'Independent'}</a>
+                                        </td>
+                                        <td>
+                                            <span class="gender-badge ${athlete.gender.toLowerCase()}">${athlete.gender}</span>
+                                            <div style="margin-top: 5px; font-size: 0.85rem; color: rgba(255,255,255,0.6);">
+                                                ${athlete.age_group} • ${athlete.weight}kg • ${athlete.belt_level}
+                                            </div>
+                                            ${athlete.gi_type ? `<div style="font-size: 0.8rem; color: var(--primary-blue); margin-top: 3px;">${athlete.gi_type}</div>` : ''}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        <div class="approved-count">Approved registrations: ${athletes.length}</div>
+                    </div>
+                `;
+            }
+            
+            athletesList.innerHTML = html;
+        }
+
+        function groupAthletesByDivision(athletes) {
+            const grouped = {};
+            
+            athletes.forEach(athlete => {
+                const key = `${athlete.age_group}|${athlete.gender}|${athlete.belt_level}|${athlete.weight}kg`;
+                if (!grouped[key]) {
+                    grouped[key] = [];
+                }
+                grouped[key].push(athlete);
+            });
+            
+            return grouped;
+        }
+
+        function filterAthletes(filter) {
+            currentFilter = filter;
+            
+            // تحديث الأزرار النشطة
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // تصفية اللاعبين
+            let filteredAthletes = allAthletes;
+            if (filter !== 'all') {
+                filteredAthletes = allAthletes.filter(a => a.gi_type === filter);
+            }
+            
+            // إعادة التجميع والعرض
+            const groupedAthletes = groupAthletesByDivision(filteredAthletes);
+            renderGroupedAthletes(groupedAthletes);
+        }
+
+        function searchAthletes() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!searchTerm) {
+                renderAthletes();
+                return;
+            }
+            
+            const filteredAthletes = allAthletes.filter(athlete => 
+                athlete.player_name.toLowerCase().includes(searchTerm) ||
+                athlete.team?.toLowerCase().includes(searchTerm) ||
+                athlete.age_group.toLowerCase().includes(searchTerm) ||
+                athlete.belt_level.toLowerCase().includes(searchTerm)
+            );
+            
+            const groupedAthletes = groupAthletesByDivision(filteredAthletes);
+            renderGroupedAthletes(groupedAthletes);
+        }
+
+        function renderGroupedAthletes(groupedAthletes) {
+            const athletesList = document.getElementById('athletesList');
+            
+            if (Object.keys(groupedAthletes).length === 0) {
+                athletesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔍</div>
+                        <p>No athletes found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            for (const [divisionKey, athletes] of Object.entries(groupedAthletes)) {
+                const [ageGroup, gender, belt, weight] = divisionKey.split('|');
+                const divisionTitle = `${gender} / ${ageGroup} / ${belt} / ${weight}`;
+                
+                html += `
+                    <div class="division-group">
+                        <h3 class="division-title">${divisionTitle}</h3>
+                        <table class="athletes-table">
+                            <thead>
+                                <tr>
+                                    <th>Athlete</th>
+                                    <th>Academy & Affiliation</th>
+                                    <th>Registration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${athletes.map(athlete => `
+                                    <tr>
+                                        <td>
+                                            <div class="athlete-info">
+                                                <div class="athlete-avatar">
+                                                    ${athlete.profile_photo_url ? `<img src="${athlete.profile_photo_url}" alt="${athlete.player_name}">` : '👤'}
+                                                </div>
+                                                <div class="athlete-details">
+                                                    <div class="athlete-name">${athlete.player_name}</div>
+                                                    <div class="athlete-country">
+                                                        <span>${athlete.country || '🌍'}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="#" class="academy-link">${athlete.team || 'Independent'}</a>
+                                        </td>
+                                        <td>
+                                            <span class="gender-badge ${athlete.gender.toLowerCase()}">${athlete.gender}</span>
+                                            <div style="margin-top: 5px; font-size: 0.85rem; color: rgba(255,255,255,0.6);">
+                                                ${athlete.age_group} • ${athlete.weight}kg • ${athlete.belt_level}
+                                            </div>
+                                            ${athlete.gi_type ? `<div style="font-size: 0.8rem; color: var(--primary-blue); margin-top: 3px;">${athlete.gi_type}</div>` : ''}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        <div class="approved-count">Approved registrations: ${athletes.length}</div>
+                    </div>
+                `;
+            }
+            
+            athletesList.innerHTML = html;
+        }
+
+        async function handleLogout() {
+            await dbClient.auth.signOut();
+            localStorage.removeItem('currentUser');
+            showLoginButton();
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
