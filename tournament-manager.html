@@ -141,7 +141,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 .podium-rank { font-size: 0.8rem; color: #f1c40f; margin-top: 5px; }
 .logo-input { display: none; }
 
-/* Mobile Responsive Improvements */
 @media (max-width: 900px) {
   .sb-controls-area { grid-template-columns: 1fr; }
   .sb-controls-area > div:first-child { border-right: none; border-bottom: 2px solid #2a3548; }
@@ -187,11 +186,10 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     </div>
     <div>
       <button class="btn btn-sm btn-secondary" onclick="showView('dashboard')">📋 Open Dashboard</button>
-      <button class="btn btn-sm btn-info" onclick="openAllMatsInTabs()">🪟 Open All Mats</button>
+      <button class="btn btn-sm btn-info" onclick="openAllMatsInTabs()"> Open All Mats</button>
     </div>
   </div>
 
-  <!-- Views -->
   <div id="view-settings" class="view">
     <div class="section">
       <div class="section-title">⚙️ Fight Time Settings</div>
@@ -214,7 +212,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         <button class="btn btn-primary" onclick="addPlayer()">➕ Add Player</button>
         <button class="btn btn-success" onclick="addTestPlayers()">➕ Add 2 Test Players (Same Category)</button>
         <button class="btn btn-secondary" onclick="addPlayers(10)">➕ Add 10</button>
-        <button class="btn btn-info" onclick="document.getElementById('csvImport').click()">📥 Import CSV</button>
+        <button class="btn btn-info" onclick="document.getElementById('csvImport').click()"> Import CSV</button>
         <input type="file" id="csvImport" accept=".csv" style="display:none" onchange="importCSV(event)">
         <button class="btn btn-info" onclick="exportCSV()">📤 Export CSV</button>
         <button class="btn btn-warning" onclick="syncWithDatabase()">🔄 Sync with DB</button>
@@ -369,7 +367,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
           </div>
           <div class="sb-action-row">
             <button class="btn-adv" onclick="addAdvantage('blue')"><span class="icon">⭐</span><span>Advantage</span></button>
-            <button class="btn-pen" onclick="addPenalty('blue')"><span class="icon">🟥</span><span>Penalty</span></button>
+            <button class="btn-pen" onclick="addPenalty('blue')"><span class="icon"></span><span>Penalty</span></button>
           </div>
           <button class="sb-undo-btn" onclick="undoAction('blue')">↩️ Undo</button>
         </div>
@@ -388,8 +386,8 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
         <button class="btn btn-primary" onclick="startTimer()">▶ Start</button>
         <button class="btn btn-warning" onclick="stopTimer()">⏸ Pause</button>
         <button class="btn btn-danger" onclick="finishMatch()">🏁 Finish</button>
-        <button class="btn btn-dark" onclick="swapPlayers()">🔄 Swap</button>
-        <button class="btn btn-secondary" onclick="resetScoreboard()">🔄 Reset</button>
+        <button class="btn btn-dark" onclick="swapPlayers()"> Swap</button>
+        <button class="btn btn-secondary" onclick="resetScoreboard()"> Reset</button>
       </div>
     </div>
   </div>
@@ -407,23 +405,16 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 
 <div class="modal" id="editMatchModal">
   <div class="modal-content">
-    <h2 style="color: #f1c40f; text-align: center; margin-bottom: 20px;">⚙️ Edit Match</h2>
+    <h2 style="color: #f1c40f; text-align: center; margin-bottom: 20px;">️ Edit Match</h2>
     <div id="editMatchContent"></div>
   </div>
 </div>
 
 <script>
-// ==========================================
-// 1. SUPABASE INITIALIZATION
-// ==========================================
 const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
 
 let supabaseClient;
-
-// ==========================================
-// 2. DATA & STATE
-// ==========================================
 let players = [];
 let mats = [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
 let currentMat = 1;
@@ -440,9 +431,6 @@ let categories = {};
 let isStandaloneTab = false;
 let tournamentId = null;
 
-// ==========================================
-// 3. CONSTANTS - Load from Database
-// ==========================================
 let AGE_GROUPS = {};
 let WEIGHT_CLASSES = {};
 let BELT_LEVELS = [];
@@ -490,9 +478,6 @@ const FALLBACK_BELTS = {
   'Professional': ['Purple', 'Brown', 'Black']
 };
 
-// ==========================================
-// 4. HELPER FUNCTIONS - IMPROVED
-// ==========================================
 function updateDBStatus(message, type) {
   const statusEl = document.getElementById('dbStatus');
   if (statusEl) {
@@ -508,9 +493,9 @@ async function loadReferenceData() {
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     console.log('✅ Supabase client initialized');
   } catch(e) {
-    console.error('⚠️ Supabase init error:', e);
+    console.error('️ Supabase init error:', e);
     loadFallbackData();
-    updateDBStatus('⚠️ Using Local Data (DB Init Failed)', 'warning');
+    updateDBStatus('️ Using Local Data (DB Init Failed)', 'warning');
     return;
   }
   
@@ -519,7 +504,6 @@ async function loadReferenceData() {
     updateDBStatus('🔄 Loading from DB...', 'warning');
     let hasError = false;
     
-    // Load age groups
     const { data: ageData, error: ageError } = await supabaseClient.from('age_groups').select('*').order('min_age');
     if (!ageError && ageData && ageData.length > 0) {
       AGE_GROUPS = {};
@@ -528,7 +512,6 @@ async function loadReferenceData() {
       });
     } else { hasError = true; }
     
-    // Load weight classes
     const { data: weightData, error: weightError } = await supabaseClient.from('weight_classes').select('*').order('sort_order');
     if (!weightError && weightData && weightData.length > 0) {
       WEIGHT_CLASSES = {};
@@ -541,13 +524,11 @@ async function loadReferenceData() {
       });
     } else { hasError = true; }
     
-    // Load belt levels
     const { data: beltData, error: beltError } = await supabaseClient.from('belt_levels').select('*').order('sort_order');
     if (!beltError && beltData && beltData.length > 0) {
       BELT_LEVELS = [...new Set(beltData.map(b => b.name))];
     } else { hasError = true; }
     
-    // Load genders
     const { data: genderData, error: genderError } = await supabaseClient.from('genders').select('*').order('sort_order');
     if (!genderError && genderData && genderData.length > 0) {
       GENDERS = genderData.map(g => g.name);
@@ -618,9 +599,6 @@ function showSyncIndicator() {
   }
 }
 
-// ==========================================
-// 5. NAVIGATION & VIEWS
-// ==========================================
 function showView(view) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const viewEl = document.getElementById('view-' + view);
@@ -659,9 +637,6 @@ function backToBracket() {
   else showView('dashboard');
 }
 
-// ==========================================
-// 6. SYNC FUNCTIONS
-// ==========================================
 async function syncWithDatabase() {
   if (!supabaseClient) { alert('⚠️ Database not connected'); return; }
   showSyncIndicator();
@@ -681,7 +656,7 @@ async function syncWithDatabase() {
     }
   } catch (err) {
     console.error('Sync error:', err);
-    alert('⚠️ Sync failed: ' + err.message);
+    alert('️ Sync failed: ' + err.message);
   }
 }
 
@@ -704,9 +679,6 @@ async function saveToDatabase() {
   } catch (err) { console.error('Save error:', err); }
 }
 
-// ==========================================
-// 7. PLAYERS MANAGEMENT
-// ==========================================
 function addPlayer() {
   if (players.length >= 200) { alert('Maximum 200 players!'); return; }
   players.push({ id: Date.now(), name: '', team: '', ageGroup: 'Amateur / Professional', gender: 'Men', weight: '', belt: 'White', rank: players.length + 1 });
@@ -717,7 +689,6 @@ function addPlayers(count) {
   for (let i = 0; i < count && players.length < 200; i++) addPlayer();
 }
 
-// ✅ NEW: Add Test Players Function
 function addTestPlayers() {
   players.push({ id: Date.now(), name: 'Ahmed Mohamed', team: 'Team A', ageGroup: 'Kids 1 (4-5 yrs)', gender: 'Boys', weight: '-16kg', belt: 'White', rank: players.length + 1 });
   players.push({ id: Date.now() + 1, name: 'Ali Hassan', team: 'Team B', ageGroup: 'Kids 1 (4-5 yrs)', gender: 'Boys', weight: '-16kg', belt: 'White', rank: players.length + 2 });
@@ -779,9 +750,6 @@ function exportCSV() {
   a.click();
 }
 
-// ==========================================
-// 8. MATS SETUP
-// ==========================================
 function updateMats() {
   const count = parseInt(document.getElementById('matsCount').value);
   while (mats.length < count) mats.push({ id: mats.length + 1, weights: [], ageGroups: [], belts: [], genders: [] });
@@ -839,15 +807,13 @@ function renderMats() {
       </div>
       <div style="display: flex; gap: 8px; margin-top: 10px;">
         <button class="btn btn-info" style="flex: 1;" onclick="currentMat=${mat.id};showView('dashboard')">📋 Open Dashboard</button>
-        <button class="btn btn-purple" style="flex: 1;" onclick="openMatInNewTab(${mat.id})">🪟 Open in New Tab</button>
+        <button class="btn btn-purple" style="flex: 1;" onclick="openMatInNewTab(${mat.id})"> Open in New Tab</button>
       </div>`;
     grid.appendChild(div);
   });
 }
 
-// ==========================================
-// 9. CATEGORIES & BRACKETS - IMPROVED DIAGNOSTICS
-// ==========================================
+// ✅ MODIFIED FUNCTION WITH WEIGHT NORMALIZATION
 function renderCategories() {
   const container = document.getElementById('tab-categories');
   if (!container) return;
@@ -857,9 +823,17 @@ function renderCategories() {
   const categoryList = [];
   const playerStats = {};
   
+  // Helper function to normalize weight for comparison
+  function normalizeWeight(w) {
+    if (!w || w === '' || w === 'No weight') return 'none';
+    return w.toString().toLowerCase().replace(/\s*kg\s*/gi, '').trim();
+  }
+  
   players.forEach(p => {
     if (!p.name) return;
-    const key = `${p.ageGroup}|${p.gender}|${p.weight || 'No weight'}|${p.belt}`;
+    const normWeight = normalizeWeight(p.weight);
+    const displayWeight = normWeight === 'none' ? 'No weight' : (p.weight || 'No weight');
+    const key = `${p.ageGroup}|${p.gender}|${displayWeight}|${p.belt}`;
     if (!playerStats[key]) playerStats[key] = { count: 0, players: [] };
     playerStats[key].count++;
     playerStats[key].players.push(p);
@@ -867,18 +841,30 @@ function renderCategories() {
   
   mat.ageGroups.forEach(age => {
     mat.genders.forEach(gender => {
-      mat.weights.forEach(weight => {
+      mat.weights.forEach(matWeight => {
         mat.belts.forEach(belt => {
-          const categoryPlayers = players.filter(p => p.ageGroup === age && p.gender === gender && (p.weight || 'No weight') === weight && p.belt === belt && p.name).sort((x, y) => x.rank - y.rank);
+          const categoryPlayers = players.filter(p => {
+            if (!p.name) return false;
+            if (p.ageGroup !== age) return false;
+            if (p.gender !== gender) return false;
+            if (p.belt !== belt) return false;
+            
+            // Normalize both weights for comparison
+            const playerWeightNorm = normalizeWeight(p.weight);
+            const matWeightNorm = normalizeWeight(matWeight);
+            
+            return playerWeightNorm === matWeightNorm;
+          }).sort((x, y) => x.rank - y.rank);
+          
           if (categoryPlayers.length >= 2) {
-            categoryList.push({ age, gender, weight, belt, players: categoryPlayers });
+            categoryList.push({ age, gender, weight: matWeight, belt, players: categoryPlayers });
           }
         });
       });
     });
   });
   
-  let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📋 Categories - Mat ' + currentMat + '</h3>';
+  let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;"> Categories - Mat ' + currentMat + '</h3>';
   
   if (categoryList.length === 0) {
     html += `
@@ -887,7 +873,7 @@ function renderCategories() {
         <h3 style="color: #f1c40f; text-align: center; margin-bottom: 20px;">No Categories Found</h3>
         
         <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-          <h4 style="color: #f39c12; margin-bottom: 15px;">📊 Current Statistics:</h4>
+          <h4 style="color: #f39c12; margin-bottom: 15px;"> Current Statistics:</h4>
           <p style="color: #8899aa; margin-bottom: 10px;"><strong>Total Players:</strong> ${players.length} | <strong>With Names:</strong> ${players.filter(p => p.name).length}</p>
           <h4 style="color: #f1c40f; margin: 15px 0 10px;">Mat ${currentMat} Configuration:</h4>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; color: #8899aa; font-size: 0.9rem;">
@@ -920,7 +906,7 @@ function renderCategories() {
         ` : ''}
         
         <div style="background: rgba(231,76,60,0.1); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-          <h4 style="color: #e74c3c; margin-bottom: 10px;">⚠️ Requirements:</h4>
+          <h4 style="color: #e74c3c; margin-bottom: 10px;">️ Requirements:</h4>
           <p style="color: #8899aa; font-size: 0.9rem;">You need at least <strong>2 players</strong> with the <strong>exact same</strong>:</p>
           <ul style="color: #8899aa; margin: 10px 0; padding-left: 20px;"><li>✓ Age Group</li><li>✓ Gender</li><li>✓ Weight</li><li>✓ Belt</li></ul>
         </div>
@@ -938,7 +924,7 @@ function renderCategories() {
       const fightTime = getFightTime(cat.age);
       html += `<div class="category-card" onclick="openCategoryBracket('${key}', '${cat.gender}', '${cat.age}', '${cat.weight}', '${cat.belt}')" style="animation: slideIn 0.3s ease;">
         <h3>👤 ${cat.gender} | 🎂 ${cat.age} | ⚖️ ${cat.weight} | 🎗️ ${cat.belt}</h3>
-        <div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 8px;">👥 ${cat.players.length} Players | ⏱️ ${fightTime} min | 🏆 Bracket System</div>
+        <div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 8px;"> ${cat.players.length} Players | ️ ${fightTime} min | 🏆 Bracket System</div>
         <div style="font-size: 0.85rem; color: #556;">Players: ${cat.players.map(p => p.name).join(', ')}</div>
       </div>`;
     });
@@ -946,10 +932,28 @@ function renderCategories() {
   container.innerHTML = html;
 }
 
+// ✅ MODIFIED FUNCTION WITH WEIGHT NORMALIZATION
 function openCategoryBracket(key, gender, age, weight, belt) {
   currentCategory = { key, gender, age, weight, belt };
   if (!categories[key]) {
-    const categoryPlayers = players.filter(p => p.ageGroup === age && p.gender === gender && p.weight === weight && p.belt === belt && p.name).sort((x, y) => x.rank - y.rank);
+    // Normalize weight for filtering
+    function normalizeWeight(w) {
+      if (!w || w === '' || w === 'No weight') return 'none';
+      return w.toString().toLowerCase().replace(/\s*kg\s*/gi, '').trim();
+    }
+    
+    const weightNorm = normalizeWeight(weight);
+    
+    const categoryPlayers = players.filter(p => {
+      if (!p.name) return false;
+      if (p.ageGroup !== age) return false;
+      if (p.gender !== gender) return false;
+      if (p.belt !== belt) return false;
+      
+      const playerWeightNorm = normalizeWeight(p.weight);
+      return playerWeightNorm === weightNorm;
+    }).sort((x, y) => x.rank - y.rank);
+    
     categories[key] = generateBracket(categoryPlayers, age, gender, weight, belt);
     saveData();
   }
@@ -1054,7 +1058,7 @@ function renderTreeBracket(container, cat) {
         <div class="bracket-player ${p2Class} ${p2Winner} ${byeClass}"><span>${p2Name}</span><span>${match.score2||''}</span></div>
         ${match.bye ? '<div class="bye-label">BYE</div>' : ''}
         ${isReady ? `<button class="play-btn" onclick="startBracketMatch(${rIdx}, ${mIdx})">▶ Play Match</button>` : ''}
-        ${!match.bye ? `<button class="edit-btn" style="margin-top:4px; width:100%;" onclick="editBracketMatch(${rIdx}, ${mIdx})">⚙️ Edit</button>` : ''}
+        ${!match.bye ? `<button class="edit-btn" style="margin-top:4px; width:100%;" onclick="editBracketMatch(${rIdx}, ${mIdx})">️ Edit</button>` : ''}
       </div>`;
     });
     html += '</div>';
@@ -1103,7 +1107,7 @@ function renderWinnersPodium() {
   section.style.display = 'block';
   let html = '<div class="podium-container">';
   if (winners[1]) html += `<div class="podium-place second"><div class="podium-medal">🥈</div><div class="podium-name">${winners[1].name}</div><div class="podium-team">${winners[1].team||'N/A'}</div><div class="podium-rank">2nd Place</div></div>`;
-  if (winners[0]) html += `<div class="podium-place first"><div class="podium-medal">🥇</div><div class="podium-name">${winners[0].name}</div><div class="podium-team">${winners[0].team||'N/A'}</div><div class="podium-rank">Champion</div></div>`;
+  if (winners[0]) html += `<div class="podium-place first"><div class="podium-medal"></div><div class="podium-name">${winners[0].name}</div><div class="podium-team">${winners[0].team||'N/A'}</div><div class="podium-rank">Champion</div></div>`;
   if (winners[2]) html += `<div class="podium-place third"><div class="podium-medal">🥉</div><div class="podium-name">${winners[2].name}</div><div class="podium-team">${winners[2].team||'N/A'}</div><div class="podium-rank">3rd Place</div></div>`;
   html += '</div>';
   content.innerHTML = html;
@@ -1167,9 +1171,6 @@ function saveBracketMatchEdit(rIdx, mIdx) {
 
 function closeEditMatch() { document.getElementById('editMatchModal').classList.remove('active'); }
 
-// ==========================================
-// 10. QUEUE, CALL-UP, STANDINGS
-// ==========================================
 function renderQueue() {
   const container = document.getElementById('tab-queue');
   if (!container) return;
@@ -1182,7 +1183,7 @@ function renderQueue() {
       round.forEach((m, mIdx) => { if (m.status !== 'completed' && !m.bye) allMatches.push({ ...m, categoryKey: key, roundIdx: rIdx, matchIdx: mIdx }); });
     });
   });
-  let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📋 Match Queue - Mat ' + currentMat + '</h3>';
+  let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;"> Match Queue - Mat ' + currentMat + '</h3>';
   html += '<div style="margin-bottom: 15px;"><button class="btn btn-primary" onclick="regenerateQueue()">🔄 Regenerate</button></div>';
   if (allMatches.length === 0) {
     html += '<p style="text-align: center; color: #8899aa; padding: 20px;">No pending matches. Open categories to generate brackets.</p>';
@@ -1287,9 +1288,6 @@ function renderStandings() {
   container.innerHTML = html;
 }
 
-// ==========================================
-// 11. SCOREBOARD
-// ==========================================
 function onScoreboardFieldChange() {}
 function onPlayerNameChange() {}
 
@@ -1334,7 +1332,7 @@ function addPenalty(player) {
   if (scoreboard[player].penalties >= 3) {
     scoreboard[player].isDQ = true;
     stopTimer();
-    alert('🟥 Disqualification! 3 penalties!');
+    alert(' Disqualification! 3 penalties!');
   }
   updateScoreboardDisplay();
 }
@@ -1481,7 +1479,7 @@ function declareWinner(winner) {
     const finalMatch = cat.rounds[cat.rounds.length - 1][0];
     if (finalMatch.winner) {
       const champion = finalMatch.winner === 'red' ? finalMatch.p1 : finalMatch.p2;
-      setTimeout(() => alert('🏆 Champion: ' + champion.name + '!'), 500);
+      setTimeout(() => alert(' Champion: ' + champion.name + '!'), 500);
     }
   }
   closeModal();
@@ -1492,9 +1490,6 @@ function declareWinner(winner) {
 
 function closeModal() { document.getElementById('winnerModal').classList.remove('active'); }
 
-// ==========================================
-// 12. DATA PERSISTENCE
-// ==========================================
 function saveDataLocal() {
   const data = { players, mats, categories, AGE_GROUPS, savedAt: new Date().toISOString() };
   localStorage.setItem('tournamentData', JSON.stringify(data));
@@ -1531,11 +1526,8 @@ function clearAll() {
   }
 }
 
-function renderSettings() {
-  // Placeholder for settings render
-}
+function renderSettings() {}
 
-// Helper functions
 function openMatInNewTab(matId) {
   const url = window.location.pathname + '?mat=' + matId + '&standalone=1';
   window.open(url, '_blank');
@@ -1547,9 +1539,6 @@ function openAllMatsInTabs() {
   mats.forEach((mat, i) => { setTimeout(() => { openMatInNewTab(mat.id); }, i * 500); });
 }
 
-// ==========================================
-// 13. INITIALIZATION
-// ==========================================
 window.onload = async function() {
   console.log('🚀 Page loaded. Initializing system...');
   
@@ -1575,10 +1564,8 @@ window.onload = async function() {
     if (header) header.style.display = 'none';
   }
   
-  // Load reference data from database first
   await loadReferenceData();
   
-  // Load data from localStorage
   const saved = localStorage.getItem('tournamentData');
   if (saved) {
     try {
@@ -1591,13 +1578,11 @@ window.onload = async function() {
     } catch(e) { console.error('❌ Load error:', e); }
   }
   
-  // Sync with database ONLY if tournament_id exists in URL
   if (tournamentId && supabaseClient) {
     console.log('🔄 Syncing with database for tournament:', tournamentId);
     await syncWithDatabase();
   }
   
-  // Populate division dropdown
   const divSelect = document.getElementById('sbDivision');
   if (divSelect) {
     divSelect.innerHTML = '';
