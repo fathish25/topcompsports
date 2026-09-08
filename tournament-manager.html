@@ -26,10 +26,10 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--dark-gray); color: var(--white); min-height: 100vh; }
 
         /* Header */
-        .header { background: var(--black); padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-blue); }
-        .logo { display: flex; align-items: center; gap: 15px; font-size: 1.8rem; font-weight: 900; color: var(--accent-yellow); }
+        .header { background: var(--black); padding: 15px 30px; border-bottom: 3px solid var(--primary-blue); }
+        .logo { display: flex; align-items: center; gap: 15px; font-size: 1.8rem; font-weight: 900; color: var(--accent-yellow); margin-bottom: 5px; }
         .logo-icon { font-size: 2rem; }
-        .header-info { color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-top: 5px; }
+        .header-info { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
         .status-badge { display: inline-block; padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; font-weight: 600; margin-top: 8px; }
         .status-badge.connected { background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid var(--success); }
         .status-badge.partial { background: rgba(245,158,11,0.2); color: var(--warning); border: 1px solid var(--warning); }
@@ -47,6 +47,8 @@
         .nav-btn.danger:hover { background: #DC2626; }
         .nav-btn.warning { background: var(--warning); color: var(--black); }
         .nav-btn.warning:hover { background: #D97706; }
+        .nav-btn.purple { background: #9333EA; color: var(--white); }
+        .nav-btn.purple:hover { background: #7C3AED; }
 
         /* Main Content */
         .main-content { padding: 30px; }
@@ -76,21 +78,7 @@
         .btn-secondary:hover { background: var(--light-gray); }
         .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
         .btn-group { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 25px; }
-
-        /* Stats */
-        .stats-box { background: var(--dark-gray); padding: 25px; border-radius: 12px; margin-bottom: 25px; border-left: 4px solid var(--accent-yellow); }
-        .stats-box h3 { color: var(--accent-yellow); margin-bottom: 18px; font-size: 1.2rem; }
-        .stats-box p { color: rgba(255,255,255,0.8); margin-bottom: 10px; font-size: 0.95rem; }
-        .stats-box .highlight { color: var(--accent-yellow); font-weight: 700; font-size: 1.1rem; }
-
-        /* Categories */
-        .category-card { background: var(--dark-gray); border: 2px solid var(--medium-gray); border-radius: 12px; padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; cursor: pointer; }
-        .category-card:hover { border-color: var(--primary-blue); transform: translateX(5px); background: rgba(0,102,204,0.1); }
-        .category-info { flex: 1; }
-        .category-name { font-weight: 700; color: var(--white); margin-bottom: 6px; font-size: 1.05rem; }
-        .category-details { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
-        .category-players { color: var(--accent-yellow); font-weight: 700; font-size: 1.1rem; margin-right: 15px; }
-        .category-actions { display: flex; gap: 10px; }
+        .btn-proceed { width: 100%; margin-top: 25px; padding: 15px; font-size: 1.1rem; justify-content: center; }
 
         /* Alert */
         .alert { padding: 15px 25px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; font-size: 0.95rem; }
@@ -110,7 +98,7 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .header { flex-direction: column; gap: 15px; padding: 15px; }
+            .header { padding: 15px; }
             .top-nav { padding: 10px; }
             .nav-btn { flex: 1; min-width: 120px; justify-content: center; font-size: 0.85rem; padding: 10px 15px; }
             .main-content { padding: 15px; }
@@ -120,8 +108,6 @@
             .data-table th, .data-table td { padding: 8px; }
             .btn-group { flex-direction: column; }
             .btn { width: 100%; justify-content: center; }
-            .category-card { flex-direction: column; align-items: stretch; gap: 10px; }
-            .category-actions { justify-content: flex-end; }
         }
 
         @media (max-width: 480px) {
@@ -134,8 +120,8 @@
     <header class="header">
         <div>
             <div class="logo"><span class="logo-icon">🏆</span> TopCompSports Tournament System</div>
-            <div class="header-info" id="tournamentName">Loading tournament...</div>
-            <div id="dbStatus" class="status-badge partial">⚠️ Connecting to DB...</div>
+            <div class="header-info">Step 1: Players Registration</div>
+            <div id="dbStatus" class="status-badge partial">⚠️ Partial DB Connection (Using Fallback)</div>
         </div>
         <div style="display: flex; gap: 10px;">
             <a href="organizer-dashboard.html" class="btn btn-secondary">← Back to Dashboard</a>
@@ -144,8 +130,9 @@
 
     <nav class="top-nav">
         <button class="nav-btn primary" onclick="showSection('players')">👥 Players</button>
-        <button class="nav-btn secondary" onclick="showSection('categories')">📋 Categories</button>
-        <button class="nav-btn warning" onclick="syncWithDB()">🔄 Sync with DB</button>
+        <button class="nav-btn purple" onclick="showSection('mats')">🥋 Mats</button>
+        <button class="nav-btn warning" onclick="showSection('settings')">⚙️ Settings</button>
+        <button class="nav-btn secondary" onclick="syncWithDB()">🔄 Sync</button>
         <button class="nav-btn success" onclick="saveToLocal()">💾 Save Local</button>
         <button class="nav-btn danger" onclick="clearAll()">🗑️ Clear</button>
     </nav>
@@ -155,15 +142,15 @@
 
         <!-- Players Section -->
         <section id="playersSection" class="section">
-            <h2 class="section-title"> Players Registration <span id="playerCount">0 / 0</span></h2>
+            <h2 class="section-title">👥 Players Registration <span id="playerCount">0 / 200</span></h2>
             
             <div class="btn-group">
                 <button class="btn btn-success" onclick="addPlayer()">➕ Add Player</button>
-                <button class="btn btn-success" onclick="addTestPlayers()">➕ Add 2 Test Players</button>
+                <button class="btn btn-success" onclick="addTestPlayers()">➕ Add 2 Test Players (Same Category)</button>
                 <button class="btn btn-secondary" onclick="addMultiplePlayers(10)">➕ Add 10</button>
                 <button class="btn btn-primary" onclick="importCSV()">📥 Import CSV</button>
-                <button class="btn btn-primary" onclick="exportCSV()">📤 Export CSV</button>
-                <button class="btn btn-warning" onclick="syncWithDB()">🔄 Sync with DB</button>
+                <button class="btn btn-primary" onclick="exportCSV()"> Export CSV</button>
+                <button class="btn btn-warning" onclick="syncWithDB()"> Sync with DB</button>
             </div>
 
             <div class="table-container">
@@ -175,7 +162,7 @@
                             <th>Team</th>
                             <th>Age Group</th>
                             <th>Gender</th>
-                            <th>Weight (kg)</th>
+                            <th>Weight</th>
                             <th>Belt</th>
                             <th>Rank</th>
                             <th>Action</th>
@@ -186,13 +173,35 @@
                     </tbody>
                 </table>
             </div>
+
+            <button class="btn btn-success btn-proceed" onclick="showSection('mats')">
+                🥋 Proceed to Mats →
+            </button>
         </section>
 
-        <!-- Categories Section -->
-        <section id="categoriesSection" class="section" style="display: none;">
-            <h2 class="section-title">📋 Categories <small style="font-size: 1rem; color: rgba(255,255,255,0.6);">(Click "View Brackets" to see bracket)</small></h2>
-            <div id="categoriesContent">
-                <div class="loading">Loading categories...</div>
+        <!-- Mats Section -->
+        <section id="matsSection" class="section" style="display: none;">
+            <h2 class="section-title">🥋 Mats Configuration</h2>
+            <div id="matsContent">
+                <div class="empty-state">
+                    <div class="icon">🥋</div>
+                    <h3>Mats Configuration</h3>
+                    <p>Configure mats and categories here</p>
+                    <button class="btn btn-primary" onclick="showSection('players')" style="margin-top: 20px;">← Back to Players</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settingsSection" class="section" style="display: none;">
+            <h2 class="section-title">⚙️ Tournament Settings</h2>
+            <div id="settingsContent">
+                <div class="empty-state">
+                    <div class="icon">⚙️</div>
+                    <h3>Tournament Settings</h3>
+                    <p>Configure tournament settings here</p>
+                    <button class="btn btn-primary" onclick="showSection('players')" style="margin-top: 20px;">← Back to Players</button>
+                </div>
             </div>
         </section>
     </main>
@@ -275,7 +284,7 @@
                 beltLevels = beltData || [];
                 console.log(`✅ Loaded ${beltLevels.length} belt levels`);
             } catch (error) {
-                console.error(' Error loading belt levels:', error);
+                console.error('❌ Error loading belt levels:', error);
                 loadFallbackBeltLevels();
             }
 
@@ -328,7 +337,6 @@
                     .single();
                 
                 if (tError) throw tError;
-                document.getElementById('tournamentName').textContent = tournament.name;
 
                 const savedPlayers = localStorage.getItem(`tournament_${tournamentId}_players`);
                 
@@ -388,7 +396,7 @@
                     </td>
                     <td>
                         <select onchange="updatePlayer(${index}, 'weight', this.value)">
-                            <option value="">Select...</option>
+                            <option value="">-- Select Weight --</option>
                             ${FIXED_WEIGHTS.map(w => `<option value="${w}" ${player.weight == w ? 'selected' : ''}>${w} kg</option>`).join('')}
                         </select>
                     </td>
@@ -456,77 +464,6 @@
             document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
             const section = document.getElementById(sectionName + 'Section');
             if (section) section.style.display = 'block';
-
-            if (sectionName === 'categories') renderCategories();
-        }
-
-        // ============================================
-        // Render Categories (with View Brackets button)
-        // ============================================
-        function renderCategories() {
-            const container = document.getElementById('categoriesContent');
-            categories = generateCategories();
-
-            if (categories.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">⚠️</div>
-                        <h3>No Categories Found</h3>
-                        <p>Add players with complete information (Age Group, Gender, Weight, Belt) to generate categories</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = categories.map((cat, index) => `
-                <div class="category-card">
-                    <div class="category-info">
-                        <div class="category-name">${cat.name}</div>
-                        <div class="category-details">
-                            ${cat.age_group} | ${cat.gender} | ${cat.weight}kg | ${cat.belt_level}
-                        </div>
-                    </div>
-                    <div class="category-players">${cat.players.length} players</div>
-                    <div class="category-actions">
-                        <button class="btn btn-primary btn-sm" onclick="openCategoryBrackets('${cat.name.replace(/'/g, "\\'")}')"> View Brackets</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function generateCategories() {
-            const categoryMap = {};
-            
-            players.forEach(player => {
-                if (!player.age_group || !player.gender || !player.weight || !player.belt_level) return;
-                
-                const key = `${player.age_group}|${player.gender}|${player.weight}|${player.belt_level}`;
-                
-                if (!categoryMap[key]) {
-                    categoryMap[key] = {
-                        name: `${player.age_group} | ${player.gender} | ${player.weight}kg | ${player.belt_level}`,
-                        age_group: player.age_group,
-                        gender: player.gender,
-                        weight: player.weight,
-                        belt_level: player.belt_level,
-                        players: []
-                    };
-                }
-                categoryMap[key].players.push(player);
-            });
-
-            return Object.values(categoryMap);
-        }
-
-        // ============================================
-        // Open Category Brackets (Navigate to new page)
-        // ============================================
-        function openCategoryBrackets(categoryName) {
-            // Save current data first
-            saveToLocal();
-            
-            // Navigate to the new brackets page
-            window.location.href = `tournament-brackets.html?tournament_id=${tournamentId}&category=${encodeURIComponent(categoryName)}`;
         }
 
         // ============================================
@@ -588,16 +525,13 @@
         // ============================================
         function saveToLocal() {
             localStorage.setItem(`tournament_${tournamentId}_players`, JSON.stringify(players));
-            localStorage.setItem(`tournament_${tournamentId}_categories`, JSON.stringify(categories));
             console.log('💾 Saved to local storage');
         }
 
         function clearAll() {
             if (confirm('Clear all data? This cannot be undone.')) {
                 players = [];
-                categories = [];
                 localStorage.removeItem(`tournament_${tournamentId}_players`);
-                localStorage.removeItem(`tournament_${tournamentId}_categories`);
                 renderPlayers();
                 showAlert('success', 'All data cleared');
             }
