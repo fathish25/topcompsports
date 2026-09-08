@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Sub-Admins - TopCompSports</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-blue: #0066CC;
+            --dark-blue: #003366;
+            --accent-yellow: #FFB800;
+            --black: #0A0A0A;
+            --dark-gray: #1A1A1A;
+            --medium-gray: #2A2A2A;
+            --white: #FFFFFF;
+            --light-bg: #F5F7FA;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); color: var(--black); min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar { 
+            width: 280px; 
+            background: var(--black); 
+            color: var(--white); 
+            position: fixed; 
+            right: 0; 
+            top: 0; 
+            height: 100vh; 
+            overflow-y: auto;
+            padding: 20px;
+            z-index: 1000;
+        }
+        .logo { display: flex; align-items: center; gap: 15px; padding: 20px; border-bottom: 2px solid var(--medium-gray); margin-bottom: 30px; }
+        .logo-icon { width: 50px; height: 50px; background: var(--accent-yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; color: var(--dark-blue); }
+        .logo-text { font-size: 1.5rem; font-weight: 900; color: var(--white); }
+        .nav-item { padding: 15px 20px; margin-bottom: 8px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--white); }
+        .nav-item:hover { background: var(--medium-gray); }
+        .nav-item.active { background: var(--gradient-blue); }
+        .nav-item .icon { font-size: 1.3rem; }
+        .role-badge { background: var(--accent-yellow); color: var(--black); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-top: 20px; display: inline-block; }
+
+        /* Main Content */
+        .main-content { margin-right: 280px; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 20px; background: var(--white); border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .page-title { font-size: 2rem; font-weight: 900; color: var(--black); }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--gradient-blue); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: bold; font-size: 1.2rem; }
+        .btn-logout { background: var(--danger); color: var(--white); padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        /* Buttons */
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: var(--primary-blue); color: var(--white); }
+        .btn-primary:hover { background: var(--dark-blue); transform: translateY(-2px); }
+        .btn-success { background: var(--success); color: var(--white); }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: var(--white); }
+        .btn-danger:hover { background: #DC2626; }
+        .btn-secondary { background: var(--white); color: var(--primary-blue); border: 2px solid var(--primary-blue); }
+        .btn-secondary:hover { background: var(--primary-blue); color: var(--white); }
+
+        /* Section */
+        .section { background: var(--white); border-radius: 15px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .section-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid var(--light-bg); display: flex; align-items: center; gap: 10px; }
+
+        /* Table */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { background: var(--light-bg); padding: 15px; text-align: right; font-weight: 700; color: var(--black); border-bottom: 2px solid var(--medium-gray); }
+        .data-table td { padding: 15px; border-bottom: 1px solid var(--light-bg); }
+        .data-table tr:hover { background: var(--light-bg); }
+        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .status-badge.super_admin { background: #FEF3C7; color: #92400E; }
+        .status-badge.admin { background: #D1FAE5; color: #065F46; }
+        .status-badge.sub_admin { background: #DBEAFE; color: #1E40AF; }
+
+        /* Modal */
+        .modal-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(0,0,0,0.7); 
+            z-index: 2000; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal { 
+            background: var(--white); 
+            border-radius: 15px; 
+            max-width: 700px; 
+            width: 100%; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            padding: 30px; 
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid var(--light-bg); }
+        .modal-header h2 { font-size: 1.5rem; font-weight: 900; }
+        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: rgba(0,0,0,0.5); }
+        .modal-close:hover { color: var(--danger); }
+
+        /* Form */
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--black); }
+        .form-input, .form-select { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid #E5E7EB; 
+            border-radius: 8px; 
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary-blue); }
+
+        /* Permissions Grid */
+        .permissions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .permission-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            padding: 12px; 
+            background: var(--light-bg); 
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .permission-item:hover { background: #E5E7EB; }
+        .permission-item input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary-blue); }
+        .permission-item label { cursor: pointer; font-weight: 600; flex: 1; }
+
+        /* Alert */
+        .alert { padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; }
+        .alert.show { display: block; }
+        .alert-success { background: #D1FAE5; color: #065F46; }
+        .alert-error { background: #FEE2E2; color: #991B1B; }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 60px 20px; color: rgba(0,0,0,0.5); }
+        .empty-state .icon { font-size: 4rem; margin-bottom: 15px; opacity: 0.5; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .main-content { margin-right: 0; padding: 20px; }
+            .data-table { font-size: 0.85rem; }
+            .data-table th, .data-table td { padding: 10px; }
+            .permissions-grid { grid-template-columns: 1fr; }
+            .modal { padding: 20px; margin: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        
+        <nav>
+            <a href="admin-dashboard.html" class="nav-item">
+                <span class="icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="admin-users.html" class="nav-item">
+                <span class="icon"></span>
+                <span>Users</span>
+            </a>
+            <a href="admin-tournaments.html" class="nav-item">
+                <span class="icon">🏆</span>
+                <span>Tournaments</span>
+            </a>
+            <a href="admin-organizations.html" class="nav-item">
+                <span class="icon">🏢</span>
+                <span>Organizations</span>
+            </a>
+            <a href="admin-registrations.html" class="nav-item">
+                <span class="icon"></span>
+                <span>Registrations</span>
+            </a>
+            <a href="admin-reports.html" class="nav-item">
+                <span class="icon">📈</span>
+                <span>Reports</span>
+            </a>
+            <a href="admin-settings.html" class="nav-item">
+                <span class="icon">⚙️</span>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div id="adminRole" class="role-badge">Loading...</div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <h1 class="page-title">Manage Sub-Admins</h1>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <span id="userName">Admin</span>
+                <button class="btn-logout" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <!-- Add Sub-Admin Button -->
+        <div style="margin-bottom: 30px;">
+            <button class="btn btn-primary" onclick="openModal()">
+                <span>➕</span> Add New Sub-Admin
+            </button>
+        </div>
+
+        <!-- Sub-Admins List -->
+        <div class="section">
+            <h2 class="section-title">
+                <span>👨‍💼</span>
+                Current Sub-Admins
+            </h2>
+            <div id="subAdminsList">
+                <div class="loading" style="text-align: center; padding: 60px; color: rgba(0,0,0,0.5);">Loading...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Sub-Admin</h2>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+
+            <div id="modalAlert" class="alert"></div>
+
+            <form id="subAdminForm" onsubmit="handleFormSubmit(event)">
+                <input type="hidden" id="adminId">
+
+                <div class="form-group">
+                    <label class="form-label">Full Name *</label>
+                    <input type="text" id="fullName" class="form-input" required placeholder="Enter full name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email *</label>
+                    <input type="email" id="email" class="form-input" required placeholder="admin@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Role *</label>
+                    <select id="role" class="form-select" required>
+                        <option value="sub_admin">Sub-Admin</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="passwordGroup">
+                    <label class="form-label">Password *</label>
+                    <input type="password" id="password" class="form-input" placeholder="Minimum 6 characters">
+                    <small style="color: rgba(0,0,0,0.6); margin-top: 5px; display: block;">Only required for new admins</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Permissions</label>
+                    <div class="permissions-grid">
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm_manage_users" checked>
+                            <label for="perm_manage_users">Manage Users</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm_manage_admins">
+                            <label for="perm_manage_admins">Manage Admins</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm_manage_tournaments" checked>
+                            <label for="perm_manage_tournaments">Manage Tournaments</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm_manage_organizations" checked>
+                            <label for="perm_manage_organizations">Manage Organizations</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm_manage_registrations" checked>
+                            <label for="perm_manage_registrations">Manage Registrations</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm_manage_matches" checked>
+                            <label for="perm_manage_matches">Manage Matches</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm_manage_brackets" checked>
+                            <label for="perm_manage_brackets">Manage Brackets</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm_manage_settings">
+                            <label for="perm_manage_settings">Manage Settings</label>
+                        </div>
+                        <div class="permission-item">
+                            <input type="checkbox" id="perm_view_reports" checked>
+                            <label for="perm_view_reports">View Reports</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="submit" class="btn btn-success" style="flex: 1;">
+                        <span>💾</span> Save
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()" style="flex: 1;">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentAdmin = null;
+        let editingId = null;
+
+        window.onload = async function() {
+            await checkAuth();
+            await loadSubAdmins();
+        };
+
+        async function checkAuth() {
+            const storedAdmin = localStorage.getItem('currentAdmin');
+            if (!storedAdmin) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+
+            try {
+                currentAdmin = JSON.parse(storedAdmin);
+                
+                // Only super_admin and admin can manage sub-admins
+                if (currentAdmin.role !== 'super_admin' && currentAdmin.role !== 'admin') {
+                    showAlert('Access denied. Only super admins can manage sub-admins.', 'error');
+                    setTimeout(() => window.location.href = 'admin-dashboard.html', 2000);
+                    return;
+                }
+
+                document.getElementById('userName').textContent = currentAdmin.full_name || 'Admin';
+                document.getElementById('userAvatar').textContent = (currentAdmin.full_name || 'A')[0].toUpperCase();
+                
+                const roleBadge = document.getElementById('adminRole');
+                const roleText = currentAdmin.role === 'super_admin' ? 'Super Admin' : 'Admin';
+                roleBadge.textContent = roleText;
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = 'admin-login.html';
+            }
+        }
+
+        async function loadSubAdmins() {
+            const { data: admins, error } = await dbClient
+                .from('admin_profiles')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            const container = document.getElementById('subAdminsList');
+
+            if (error) {
+                container.innerHTML = `<div class="empty-state"><div class="icon">❌</div><p>Error loading data</p></div>`;
+                return;
+            }
+
+            if (!admins || admins.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="icon">‍💼</div><p>No sub-admins yet</p></div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${admins.map(admin => `
+                            <tr>
+                                <td>${admin.full_name}</td>
+                                <td>${admin.email}</td>
+                                <td><span class="status-badge ${admin.role}">${admin.role.replace('_', ' ').toUpperCase()}</span></td>
+                                <td>${new Date(admin.created_at).toLocaleDateString()}</td>
+                                <td>
+                                    <button class="btn btn-secondary" onclick="editAdmin('${admin.id}')" style="padding: 8px 15px; font-size: 0.9rem;">
+                                        ️ Edit
+                                    </button>
+                                    <button class="btn btn-danger" onclick="deleteAdmin('${admin.id}', '${admin.full_name}')" style="padding: 8px 15px; font-size: 0.9rem;">
+                                        🗑️ Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function openModal(adminData = null) {
+            editingId = adminData?.id || null;
+            document.getElementById('modalTitle').textContent = adminData ? 'Edit Sub-Admin' : 'Add New Sub-Admin';
+            document.getElementById('modalOverlay').classList.add('show');
+            
+            if (adminData) {
+                document.getElementById('adminId').value = adminData.id;
+                document.getElementById('fullName').value = adminData.full_name;
+                document.getElementById('email').value = adminData.email;
+                document.getElementById('role').value = adminData.role;
+                document.getElementById('passwordGroup').style.display = 'none';
+                
+                // Load permissions
+                const perms = adminData.permissions || {};
+                document.getElementById('perm_manage_users').checked = perms.manage_users || false;
+                document.getElementById('perm_manage_admins').checked = perms.manage_admins || false;
+                document.getElementById('perm_manage_tournaments').checked = perms.manage_tournaments || false;
+                document.getElementById('perm_manage_organizations').checked = perms.manage_organizations || false;
+                document.getElementById('perm_manage_registrations').checked = perms.manage_registrations || false;
+                document.getElementById('perm_manage_matches').checked = perms.manage_matches || false;
+                document.getElementById('perm_manage_brackets').checked = perms.manage_brackets || false;
+                document.getElementById('perm_manage_settings').checked = perms.manage_settings || false;
+                document.getElementById('perm_view_reports').checked = perms.view_reports || false;
+            } else {
+                document.getElementById('subAdminForm').reset();
+                document.getElementById('passwordGroup').style.display = 'block';
+                
+                // Default permissions
+                document.getElementById('perm_manage_users').checked = true;
+                document.getElementById('perm_manage_tournaments').checked = true;
+                document.getElementById('perm_manage_organizations').checked = true;
+                document.getElementById('perm_manage_registrations').checked = true;
+                document.getElementById('perm_manage_matches').checked = true;
+                document.getElementById('perm_manage_brackets').checked = true;
+                document.getElementById('perm_view_reports').checked = true;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+            editingId = null;
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const role = document.getElementById('role').value;
+            const password = document.getElementById('password').value;
+            
+            const permissions = {
+                manage_users: document.getElementById('perm_manage_users').checked,
+                manage_admins: document.getElementById('perm_manage_admins').checked,
+                manage_tournaments: document.getElementById('perm_manage_tournaments').checked,
+                manage_organizations: document.getElementById('perm_manage_organizations').checked,
+                manage_registrations: document.getElementById('perm_manage_registrations').checked,
+                manage_matches: document.getElementById('perm_manage_matches').checked,
+                manage_brackets: document.getElementById('perm_manage_brackets').checked,
+                manage_settings: document.getElementById('perm_manage_settings').checked,
+                view_reports: document.getElementById('perm_view_reports').checked
+            };
+
+            try {
+                if (editingId) {
+                    // Update existing admin
+                    const { error } = await dbClient
+                        .from('admin_profiles')
+                        .update({
+                            full_name: fullName,
+                            email: email,
+                            role: role,
+                            permissions: permissions,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', editingId);
+
+                    if (error) throw error;
+                    showAlert('Sub-admin updated successfully!', 'success');
+                } else {
+                    // Create new admin
+                    if (!password || password.length < 6) {
+                        showAlert('Password must be at least 6 characters', 'error');
+                        return;
+                    }
+
+                    // Create auth user first
+                    const { data: authData, error: authError } = await dbClient.auth.admin.createUser({
+                        email: email,
+                        password: password,
+                        email_confirm: true
+                    });
+
+                    if (authError) throw authError;
+
+                    // Create admin profile
+                    const { error: profileError } = await dbClient
+                        .from('admin_profiles')
+                        .insert([{
+                            id: authData.user.id,
+                            full_name: fullName,
+                            email: email,
+                            role: role,
+                            permissions: permissions,
+                            created_by: currentAdmin.id,
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        }]);
+
+                    if (profileError) throw profileError;
+                    showAlert('Sub-admin created successfully!', 'success');
+                }
+
+                closeModal();
+                loadSubAdmins();
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        function editAdmin(adminId) {
+            // Find admin data from the list
+            dbClient.from('admin_profiles').select('*').eq('id', adminId).maybeSingle().then(({ data }) => {
+                if (data) openModal(data);
+            });
+        }
+
+        async function deleteAdmin(adminId, adminName) {
+            if (!confirm(`Are you sure you want to delete "${adminName}"?`)) return;
+            if (!confirm('This action cannot be undone. Continue?')) return;
+
+            try {
+                const { error } = await dbClient
+                    .from('admin_profiles')
+                    .delete()
+                    .eq('id', adminId);
+
+                if (error) throw error;
+                showAlert('Sub-admin deleted successfully!', 'success');
+                loadSubAdmins();
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        function showAlert(message, type, elementId = 'alert') {
+            const alert = document.getElementById(elementId);
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        async function handleLogout() {
+            await dbClient.auth.signOut();
+            localStorage.removeItem('currentAdmin');
+            window.location.href = 'admin-login.html';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
