@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,782 +16,812 @@
             --white: #FFFFFF;
             --light-bg: #F5F7FA;
             --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); color: var(--black); min-height: 100vh; }
+        img { max-width: 100%; height: auto; }
 
-        .header {
-            background: var(--black);
-            padding: 15px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid var(--primary-blue);
-        }
-
-        .logo { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            cursor: pointer;
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--primary-blue);
-        }
-        
-        .nav { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
-        .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; transition: all 0.3s; }
+        /* Header */
+        .header { background: var(--black); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-blue); position: sticky; top: 0; z-index: 1000; }
+        .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .logo-svg { width: 50px; height: 50px; }
+        .logo-text { font-size: 28px; font-weight: bold; color: var(--primary-blue); }
+        .nav { display: flex; gap: 30px; align-items: center; }
+        .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; transition: all 0.3s; font-weight: 600; }
         .nav a:hover { color: var(--accent-yellow); }
+
+        .user-section { display: flex; align-items: center; gap: 15px; }
+        .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid var(--accent-yellow); background: var(--medium-gray); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-name { font-weight: 600; color: var(--accent-yellow); }
         
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
         .btn-logout { background: transparent; border: 2px solid var(--white); color: var(--white); }
         .btn-logout:hover { background: var(--white); color: var(--black); }
+        .btn-login { background: var(--primary-blue); color: var(--white); }
         .btn-primary { background: var(--primary-blue); color: var(--white); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.4); }
+        .btn-primary:hover { background: var(--dark-blue); transform: translateY(-2px); }
+        .btn-success { background: var(--success); color: var(--white); }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: var(--danger); color: var(--white); }
+        .btn-danger:hover { background: #DC2626; }
+        .btn-warning { background: var(--warning); color: var(--black); }
         .btn-secondary { background: var(--white); color: var(--primary-blue); border: 2px solid var(--primary-blue); }
-        
+        .btn-secondary:hover { background: var(--primary-blue); color: var(--white); }
+
         .lang-switcher { display: flex; gap: 5px; background: var(--medium-gray); padding: 5px; border-radius: 8px; }
         .lang-btn { padding: 8px 15px; border: none; background: transparent; color: var(--white); cursor: pointer; border-radius: 6px; font-weight: bold; }
         .lang-btn.active { background: var(--primary-blue); }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 40px 50px; }
-        
-        .page-header {
-            background: var(--white);
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
+        /* Dashboard Header */
+        .dashboard-header { background: var(--white); padding: 25px 50px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .dashboard-title { display: flex; align-items: center; gap: 15px; }
+        .dashboard-title h1 { font-size: 2rem; font-weight: 900; color: var(--black); }
+        .dashboard-title .icon { font-size: 2.5rem; }
+        .dashboard-actions { display: flex; gap: 15px; }
 
-        .page-title {
-            font-size: 2rem;
-            font-weight: 900;
-            color: var(--primary-blue);
-        }
+        /* Container */
+        .container { max-width: 1400px; margin: 40px auto; padding: 0 50px; }
 
-        .page-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
+        /* Tournaments Grid */
         .tournaments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+        .tournament-card { background: var(--white); border-radius: 15px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s; border: 2px solid transparent; }
+        .tournament-card:hover { transform: translateY(-5px); box-shadow: 0 12px 35px rgba(0,102,204,0.15); border-color: var(--primary-blue); }
         
-        .tournament-card {
-            background: var(--white);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-
-        .tournament-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 35px rgba(0,102,204,0.25);
-            border-color: var(--primary-blue);
-        }
-
-        .tournament-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background: var(--gradient-blue);
-        }
-
-        .tournament-content { padding: 25px; }
+        .tournament-banner { height: 180px; background: var(--gradient-blue); position: relative; overflow: hidden; background-size: cover; background-position: center; }
+        .tournament-banner::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 5rem; opacity: 0.3; }
+        .tournament-badge { position: absolute; top: 15px; right: 15px; background: var(--accent-yellow); color: var(--black); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
         
-        .tournament-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 15px;
-        }
-
-        .tournament-name {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--black);
-            margin-bottom: 5px;
-        }
-
-        .tournament-status {
-            background: var(--accent-yellow);
-            color: var(--black);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        .tournament-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 20px;
-            color: rgba(0,0,0,0.7);
-        }
-
-        .tournament-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: var(--light-bg);
-            border-radius: 10px;
-        }
-
+        .tournament-content { padding: 20px; }
+        .tournament-content h3 { font-size: 1.3rem; font-weight: 700; color: var(--black); margin-bottom: 10px; }
+        .tournament-meta { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .tournament-meta-item { display: flex; align-items: center; gap: 8px; color: rgba(0,0,0,0.6); font-size: 0.9rem; }
+        
+        .tournament-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 15px; background: var(--light-bg); border-radius: 10px; margin-bottom: 15px; }
         .stat-item { text-align: center; }
-        .stat-value { font-size: 1.5rem; font-weight: bold; color: var(--primary-blue); }
-        .stat-label { font-size: 0.8rem; color: rgba(0,0,0,0.6); margin-top: 3px; }
+        .stat-value { font-size: 1.5rem; font-weight: 900; color: var(--primary-blue); }
+        .stat-label { font-size: 0.75rem; color: rgba(0,0,0,0.6); text-transform: uppercase; }
+        
+        .tournament-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .tournament-actions .btn { justify-content: center; padding: 10px; font-size: 0.9rem; }
 
-        .tournament-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .tournament-actions .btn { flex: 1; min-width: 100px; }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
         .modal-overlay.show { display: flex; }
+        .modal { background: var(--white); border-radius: 15px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 30px; position: relative; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid var(--light-bg); }
+        .modal-header h2 { font-size: 1.5rem; font-weight: 900; color: var(--black); }
+        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: rgba(0,0,0,0.5); padding: 5px 10px; }
+        .modal-close:hover { color: var(--danger); }
 
-        .modal {
-            background: var(--white);
-            border-radius: 20px;
-            padding: 35px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+        /* Divisions Management */
+        .division-form { background: var(--light-bg); padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .division-form h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; color: var(--black); }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-label { font-size: 0.85rem; font-weight: 600; color: rgba(0,0,0,0.7); }
+        .form-input, .form-select { padding: 10px 12px; border: 2px solid #E5E7EB; border-radius: 6px; font-size: 0.95rem; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary-blue); }
 
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--medium-gray);
-        }
+        /* Divisions List */
+        .divisions-list { margin-top: 20px; }
+        .division-item { background: var(--light-bg); border: 2px solid #E5E7EB; border-radius: 10px; padding: 15px; margin-bottom: 12px; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto auto; gap: 15px; align-items: center; transition: all 0.3s; }
+        .division-item:hover { border-color: var(--primary-blue); }
+        .division-item.disabled { opacity: 0.6; }
+        .division-name { font-weight: 700; color: var(--black); }
+        .division-type { font-size: 0.85rem; color: rgba(0,0,0,0.6); }
+        .division-price { font-weight: 700; color: var(--primary-blue); }
+        
+        .toggle-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .3s; border-radius: 26px; }
+        .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .toggle-slider { background-color: var(--success); }
+        input:checked + .toggle-slider:before { transform: translateX(24px); }
 
-        .modal-title { font-size: 1.5rem; font-weight: bold; color: var(--primary-blue); }
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 2rem;
-            cursor: pointer;
-            color: rgba(0,0,0,0.5);
-        }
-        .modal-close:hover { color: var(--black); }
+        .btn-icon { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 6px; transition: all 0.3s; font-size: 1.1rem; }
+        .btn-icon:hover { background: rgba(0,0,0,0.1); }
+        .btn-icon.edit { color: var(--primary-blue); }
+        .btn-icon.delete { color: var(--danger); }
 
-        .form-group { margin-bottom: 20px; }
-        .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--black); }
-        .form-input, .form-textarea {
-            width: 100%;
-            background: var(--white);
-            border: 2px solid var(--medium-gray);
-            color: var(--black);
-            padding: 12px 15px;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-        .form-input:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-        }
-        .form-textarea { min-height: 80px; resize: vertical; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        /* Payment Settings */
+        .payment-section { background: var(--light-bg); padding: 20px; border-radius: 10px; margin-top: 20px; }
+        .payment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .payment-header h3 { font-size: 1.1rem; font-weight: 700; }
 
-        /* ✅ Image Upload Styles */
-        .image-upload-container {
-            border: 2px dashed var(--primary-blue);
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 15px;
-        }
-
-        .image-upload-container:hover {
-            border-color: var(--accent-yellow);
-            background: rgba(255,184,0,0.05);
-        }
-
-        .image-upload-container input[type="file"] {
-            display: none;
-        }
-
-        .image-preview {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 8px;
-            margin-top: 10px;
-            display: none;
-        }
-
-        .image-preview.show {
-            display: block;
-        }
-
-        .image-placeholder {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            opacity: 0.5;
-        }
-
-        .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
+        /* Alert */
+        .alert { padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; display: none; font-weight: 600; }
         .alert.show { display: block; }
-        .alert-success { background: rgba(16,185,129,0.2); border: 2px solid #10b981; color: #10b981; }
-        .alert-error { background: rgba(239,68,68,0.2); border: 2px solid #ef4444; color: #ef4444; }
+        .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid var(--success); }
+        .alert-error { background: #FEE2E2; color: #991B1B; border: 1px solid var(--danger); }
 
-        .loading, .empty-state { text-align: center; padding: 60px 20px; }
+        /* Empty State */
+        .empty-state { text-align: center; padding: 80px 20px; color: rgba(0,0,0,0.5); }
         .empty-state .icon { font-size: 5rem; margin-bottom: 20px; opacity: 0.5; }
+        .empty-state h3 { font-size: 1.5rem; margin-bottom: 10px; }
+
+        /* Loading */
+        .loading { text-align: center; padding: 60px 20px; color: rgba(0,0,0,0.5); font-size: 1.2rem; }
+
+        /* Footer */
+        .footer { background: var(--black); padding: 30px 50px; color: rgba(255,255,255,0.6); text-align: center; border-top: 1px solid var(--medium-gray); margin-top: 60px; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .header, .dashboard-header { padding: 15px 30px; }
+            .container { padding: 0 30px; }
+        }
 
         @media (max-width: 768px) {
-            .header { padding: 15px 20px; flex-direction: column; gap: 15px; }
-            .container { padding: 20px; }
-            .page-header { flex-direction: column; align-items: stretch; }
+            .header { padding: 12px 20px; flex-direction: column; gap: 15px; }
+            .nav { flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .dashboard-header { padding: 20px; flex-direction: column; align-items: flex-start; }
+            .container { padding: 0 20px; }
             .tournaments-grid { grid-template-columns: 1fr; }
+            .division-item { grid-template-columns: 1fr; gap: 10px; }
             .form-row { grid-template-columns: 1fr; }
-            .stats-row { grid-template-columns: 1fr; }
-            .page-title { font-size: 1.5rem; }
-            .tournament-image { height: 150px; }
+            .tournament-actions { grid-template-columns: 1fr; }
+            .modal { padding: 20px; margin: 10px; }
+        }
+
+        @media (max-width: 480px) {
+            .header { padding: 10px 15px; }
+            .logo-text { font-size: 22px; }
+            .dashboard-title h1 { font-size: 1.5rem; }
+            .container { padding: 0 15px; }
         }
     </style>
 </head>
 <body>
     <header class="header">
         <div class="logo" onclick="window.location.href='index.html'">
-            TopCompSports
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0066CC;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#003366;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <circle cx="50" cy="50" r="45" fill="url(#logoGrad)" stroke="#FFB800" stroke-width="3"/>
+                <text x="50" y="65" font-family="Arial Black, sans-serif" font-size="45" font-weight="900" fill="#FFB800" text-anchor="middle">T</text>
+            </svg>
+            <div class="logo-text">TopCompSports</div>
         </div>
-        <div class="nav">
+        
+        <nav class="nav">
             <a href="index.html">Home</a>
-            <a href="my-profile.html">My Profile</a>
-            <div class="lang-switcher">
-                <button class="lang-btn" onclick="window.changeLang('ar')" id="btn-ar">عربي</button>
-                <button class="lang-btn active" onclick="window.changeLang('en')" id="btn-en">English</button>
+            <a href="tournaments.html">Tournaments</a>
+            <a href="organizer-dashboard.html" style="color: var(--accent-yellow);">Dashboard</a>
+            
+            <div id="userSection" class="user-section" style="display: none;">
+                <a href="my-profile.html" style="color: var(--accent-yellow); text-decoration: none;">My Profile</a>
+                <div class="user-info" onclick="window.location.href='my-profile.html'">
+                    <div class="user-avatar" id="userAvatar"><span>👤</span></div>
+                    <span class="user-name" id="userName">User</span>
+                </div>
+                <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
             </div>
-            <button class="btn btn-logout" onclick="window.logout()">Logout</button>
-        </div>
+            
+            <a href="login.html" id="loginBtn" class="btn btn-login">Login</a>
+            
+            <div class="lang-switcher">
+                <button class="lang-btn" onclick="changeLanguage('ar')" id="btn-ar">عربي</button>
+                <button class="lang-btn active" onclick="changeLanguage('en')" id="btn-en">English</button>
+            </div>
+        </nav>
     </header>
+
+    <div class="dashboard-header">
+        <div class="dashboard-title">
+            <span class="icon">🏆</span>
+            <div>
+                <h1>Organizer Dashboard</h1>
+                <p style="color: rgba(0,0,0,0.6); font-size: 0.95rem;">Manage your tournaments</p>
+            </div>
+        </div>
+        <div class="dashboard-actions">
+            <button class="btn btn-primary" onclick="window.location.href='create-tournament.html'">
+                <span>➕</span> Create Tournament
+            </button>
+            <button class="btn btn-secondary" onclick="loadTournaments()">
+                <span>🔄</span> Refresh
+            </button>
+        </div>
+    </div>
 
     <div class="container">
         <div id="alert" class="alert"></div>
-
-        <div class="page-header">
-            <h1 class="page-title" id="pageTitle">🏆 Organizer Dashboard</h1>
-            <div class="page-actions">
-                <button class="btn btn-primary" onclick="window.openCreateModal()" id="btnCreate">➕ Create Tournament</button>
-                <button class="btn btn-secondary" onclick="window.loadTournaments()" id="btnRefresh">🔄 Refresh</button>
-            </div>
-        </div>
-
-        <div id="tournamentsList">
+        <div id="tournamentsGrid" class="tournaments-grid">
             <div class="loading">Loading tournaments...</div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="tournamentModal">
+    <!-- Divisions Management Modal -->
+    <div id="divisionsModal" class="modal-overlay">
         <div class="modal">
             <div class="modal-header">
-                <h2 class="modal-title" id="modalTitle">Create New Tournament</h2>
-                <button class="modal-close" onclick="window.closeModal()">&times;</button>
+                <h2> Manage Divisions</h2>
+                <button class="modal-close" onclick="closeModal()">✕</button>
             </div>
-            <form id="tournamentForm" onsubmit="window.handleFormSubmit(event)">
-                <input type="hidden" id="editTournamentId">
-                
-                <div class="form-group">
-                    <label class="form-label">Tournament Name *</label>
-                    <input type="text" class="form-input" id="tournamentName" required placeholder="Enter tournament name">
+            
+            <div id="modalAlert" class="alert"></div>
+            
+            <!-- Add Division Form -->
+            <div class="division-form">
+                <h3>➕ Add New Division</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Division Name *</label>
+                        <input type="text" id="divName" class="form-input" placeholder="e.g., Gi Adult Male">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Type *</label>
+                        <select id="divType" class="form-select">
+                            <option value="Gi">Gi</option>
+                            <option value="No-Gi">No-Gi</option>
+                            <option value="Absolute">Absolute</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Age Group *</label>
+                        <select id="divAge" class="form-select">
+                            <option value="Kids">Kids</option>
+                            <option value="Youth">Youth</option>
+                            <option value="Adult">Adult</option>
+                            <option value="Master">Master</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Gender</label>
+                        <select id="divGender" class="form-select">
+                            <option value="">All</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Belt Level</label>
+                        <select id="divBelt" class="form-select">
+                            <option value="">All Levels</option>
+                            <option value="White">White</option>
+                            <option value="Blue">Blue</option>
+                            <option value="Purple">Purple</option>
+                            <option value="Brown">Brown</option>
+                            <option value="Black">Black</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Weight Class</label>
+                        <select id="divWeight" class="form-select">
+                            <option value="">All Weights</option>
+                            <option value="Rooster">Rooster</option>
+                            <option value="Light Feather">Light Feather</option>
+                            <option value="Feather">Feather</option>
+                            <option value="Light">Light</option>
+                            <option value="Middle">Middle</option>
+                            <option value="Light Heavy">Light Heavy</option>
+                            <option value="Heavy">Heavy</option>
+                            <option value="Super Heavy">Super Heavy</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Price (USD) *</label>
+                        <input type="number" id="divPrice" class="form-input" min="0" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Max Players</label>
+                        <input type="number" id="divMax" class="form-input" min="0" placeholder="Unlimited">
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea class="form-textarea" id="tournamentDesc" placeholder="Tournament description..."></textarea>
-                </div>
+                <button class="btn btn-success" onclick="addDivision()">
+                    <span>➕</span> Add Division
+                </button>
+            </div>
 
-                <!-- ✅ Tournament Image Upload -->
-                <div class="form-group">
-                    <label class="form-label"> Tournament Image (Optional)</label>
-                    <div class="image-upload-container" onclick="document.getElementById('tournamentImage').click()">
-                        <div class="image-placeholder">📷</div>
-                        <div>Click to upload image</div>
-                        <div style="font-size: 0.85rem; color: rgba(0,0,0,0.6); margin-top: 5px;">PNG, JPG up to 5MB</div>
-                        <input type="file" id="tournamentImage" accept="image/*" onchange="window.handleImagePreview(event)">
-                    </div>
-                    <img id="imagePreview" class="image-preview" alt="Preview">
+            <!-- Payment Settings -->
+            <div class="payment-section">
+                <div class="payment-header">
+                    <h3>💳 Payment Settings</h3>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="paymentEnabled" onchange="togglePayment()">
+                        <span class="toggle-slider"></span>
+                    </label>
                 </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label"> Event Start Date *</label>
-                        <input type="date" class="form-input" id="eventStartDate" required>
+                <div id="paymentOptions" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Payment Method</label>
+                            <select id="payMethod" class="form-select">
+                                <option value="cash">Cash Only</option>
+                                <option value="card">Credit/Debit Card</option>
+                                <option value="bank">Bank Transfer</option>
+                                <option value="both">Multiple Methods</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Currency</label>
+                            <select id="payCurrency" class="form-select">
+                                <option value="USD">USD ($)</option>
+                                <option value="EUR">EUR (€)</option>
+                                <option value="EGP">EGP (ج.م)</option>
+                                <option value="SAR">SAR (ر.س)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Early Bird Discount (%)</label>
+                            <input type="number" id="payEarlyBird" class="form-input" min="0" max="100" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Late Fee (%)</label>
+                            <input type="number" id="payLateFee" class="form-input" min="0" max="100" value="0">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">📅 Event End Date *</label>
-                        <input type="date" class="form-input" id="eventEndDate" required>
+                        <label class="form-label">Refund Policy</label>
+                        <textarea id="payRefund" class="form-input" rows="3" placeholder="Describe refund policy..."></textarea>
                     </div>
+                    <button class="btn btn-primary" onclick="savePaymentSettings()">
+                        <span>💾</span> Save Payment Settings
+                    </button>
                 </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">📝 Regular Reg. Start</label>
-                        <input type="date" class="form-input" id="regRegularStart">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">📝 Regular Reg. End</label>
-                        <input type="date" class="form-input" id="regRegularEnd">
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">⏰ Late Reg. Start</label>
-                        <input type="date" class="form-input" id="regLateStart">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">⏰ Late Reg. End</label>
-                        <input type="date" class="form-input" id="regLateEnd">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label"> Location</label>
-                    <input type="text" class="form-input" id="tournamentLocation" placeholder="Enter location">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Max Participants</label>
-                        <input type="number" class="form-input" id="maxParticipants" value="200" min="10">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Registration Fee</label>
-                        <input type="number" class="form-input" id="registrationFee" value="0" min="0">
-                    </div>
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: 25px;">
-                    <button type="submit" class="btn btn-primary" style="flex: 1;">💾 Save</button>
-                    <button type="button" class="btn btn-secondary" onclick="window.closeModal()">Cancel</button>
-                </div>
-            </form>
+            </div>
+
+            <!-- Divisions List -->
+            <div class="divisions-list">
+                <h3 style="margin-bottom: 15px; font-size: 1.1rem;">📋 Current Divisions</h3>
+                <div id="divisionsContainer"></div>
+            </div>
         </div>
     </div>
 
+    <footer class="footer">
+        <p>© 2026 TopCompSports - All rights reserved</p>
+    </footer>
+
     <script>
-        var dbClient = null;
-        var currentUser = null;
-        var currentLang = localStorage.getItem('lang') || 'en';
-        var selectedImageFile = null;
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        var translations = {
-            en: {
-                pageTitle: '🏆 Organizer Dashboard',
-                btnCreate: '➕ Create Tournament',
-                btnRefresh: '🔄 Refresh',
-                loading: 'Loading tournaments...',
-                modalTitleCreate: 'Create New Tournament',
-                modalTitleEdit: 'Edit Tournament',
-                noTournaments: 'No tournaments yet',
-                noTournamentsDesc: 'Click "Create Tournament" to start',
-                players: 'Players',
-                matches: 'Matches',
-                capacity: 'Capacity',
-                manage: '⚙️ Manage',
-                view: '👁️ View',
-                edit: '✏️ Edit',
-                delete: '🗑️ Delete',
-                location: 'Location',
-                successCreate: '✅ Tournament created successfully!',
-                successUpdate: '✅ Tournament updated successfully!',
-                successDelete: '✅ Tournament deleted!',
-                errorCreate: '❌ Error creating: ',
-                errorUpdate: '❌ Error updating: ',
-                errorDelete: '❌ Error deleting: ',
-                confirmDelete: 'Are you sure you want to delete this tournament?',
-                statusUpcoming: 'Upcoming',
-                statusToday: 'Today',
-                statusCompleted: 'Completed'
-            },
-            ar: {
-                pageTitle: ' لوحة تحكم المنظم',
-                btnCreate: '➕ إنشاء بطولة',
-                btnRefresh: ' تحديث',
-                loading: 'جاري التحميل...',
-                modalTitleCreate: 'إنشاء بطولة جديدة',
-                modalTitleEdit: 'تعديل البطولة',
-                noTournaments: 'لا توجد بطولات',
-                noTournamentsDesc: 'اضغط "إنشاء بطولة" للبدء',
-                players: 'لاعبين',
-                matches: 'مباريات',
-                capacity: 'السعة',
-                manage: '⚙️ إدارة',
-                view: '👁️ عرض',
-                edit: '✏️ تعديل',
-                delete: '🗑️ حذف',
-                location: 'الموقع',
-                successCreate: '✅ تم الإنشاء بنجاح!',
-                successUpdate: '✅ تم التحديث بنجاح!',
-                successDelete: '✅ تم الحذف!',
-                errorCreate: '❌ خطأ في الإنشاء: ',
-                errorUpdate: ' خطأ في التحديث: ',
-                errorDelete: '❌ خطأ في الحذف: ',
-                confirmDelete: 'هل أنت متأكد من الحذف؟',
-                statusUpcoming: 'قادمة',
-                statusToday: 'اليوم',
-                statusCompleted: 'منتهية'
+        let currentUser = null;
+        let currentTournamentId = null;
+        let currentDivisions = [];
+        let currentPaymentSettings = null;
+
+        window.onload = async function() {
+            await checkUserStatus();
+            if (currentUser) {
+                await loadTournaments();
             }
         };
 
-        function initSupabase() {
-            if (!dbClient) {
-                dbClient = window.supabase.createClient(
-                    'https://ngiclnkmbvzjhylwhzyn.supabase.co',
-                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w'
-                );
-            }
-            return dbClient;
-        }
-
-        // ===== Helper Functions =====
-        function parseExtraDates(description) {
-            try {
-                if (!description) return {};
-                var match = description.match(/<!--DATES-->([^<]+)<!--\/DATES-->/);
-                if (match) {
-                    return JSON.parse(match[1]);
+        async function checkUserStatus() {
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                try {
+                    currentUser = JSON.parse(storedUser);
+                    document.getElementById('userSection').style.display = 'flex';
+                    document.getElementById('loginBtn').style.display = 'none';
+                    document.getElementById('userName').textContent = currentUser.full_name || 'User';
+                    if (currentUser.profile_picture_url) {
+                        document.getElementById('userAvatar').innerHTML = `<img src="${currentUser.profile_picture_url}" alt="Profile">`;
+                    }
+                } catch (e) {
+                    showLoginButton();
                 }
-            } catch (e) {}
-            return {};
-        }
-
-        function buildDescription(baseDesc, extraDates) {
-            var cleanDesc = (baseDesc || '').replace(/<!--DATES-->[^<]+<!--\/DATES-->/g, '').trim();
-            var datesJson = JSON.stringify(extraDates);
-            return cleanDesc + (cleanDesc ? '\n' : '') + '<!--DATES-->' + datesJson + '<!--/DATES-->';
-        }
-
-        // ✅ Image Preview Handler
-        window.handleImagePreview = function(event) {
-            var file = event.target.files[0];
-            if (file) {
-                if (file.size > 5 * 1024 * 1024) {
-                    window.showAlert('error', 'Image size must be less than 5MB');
-                    return;
-                }
-                selectedImageFile = file;
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var preview = document.getElementById('imagePreview');
-                    preview.src = e.target.result;
-                    preview.classList.add('show');
-                };
-                reader.readAsDataURL(file);
+            } else {
+                showLoginButton();
             }
-        };
+        }
 
-        window.changeLang = function(lang) {
-            currentLang = lang;
+        function showLoginButton() {
+            document.getElementById('userSection').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'inline-block';
+            document.getElementById('tournamentsGrid').innerHTML = `
+                <div class="empty-state" style="grid-column: 1 / -1;">
+                    <div class="icon"></div>
+                    <h3>Please login to access your dashboard</h3>
+                    <button class="btn btn-primary" onclick="window.location.href='login.html'">Login</button>
+                </div>
+            `;
+        }
+
+        function changeLanguage(lang) {
             localStorage.setItem('lang', lang);
             document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
             document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            document.documentElement.lang = lang;
-            
-            var t = translations[lang];
-            document.getElementById('pageTitle').textContent = t.pageTitle;
-            document.getElementById('btnCreate').textContent = t.btnCreate;
-            document.getElementById('btnRefresh').textContent = t.btnRefresh;
-            
-            if (currentUser) window.loadTournaments();
-        };
+        }
 
-        async function checkAuth() {
+        function showAlert(message, type, elementId = 'alert') {
+            const alert = document.getElementById(elementId);
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        async function loadTournaments() {
+            const grid = document.getElementById('tournamentsGrid');
+            grid.innerHTML = '<div class="loading">Loading tournaments...</div>';
+
             try {
-                initSupabase();
-                var result = await dbClient.auth.getUser();
-                if (result.error || !result.data.user) {
-                    window.showAlert('error', 'Please login');
-                    setTimeout(() => window.location.href = 'login.html?redirect=organizer-dashboard.html', 2000);
-                    return false;
+                const { data: tournaments, error } = await dbClient
+                    .from('tournaments')
+                    .select('*')
+                    .eq('organizer_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!tournaments || tournaments.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state" style="grid-column: 1 / -1;">
+                            <div class="icon">🏆</div>
+                            <h3>No tournaments yet</h3>
+                            <p>Create your first tournament to get started</p>
+                            <button class="btn btn-primary" onclick="window.location.href='create-tournament.html'" style="margin-top: 20px;">
+                                <span>➕</span> Create Tournament
+                            </button>
+                        </div>
+                    `;
+                    return;
                 }
-                currentUser = result.data.user;
-                return true;
+
+                // جلب عدد المشاركين لكل بطولة
+                const tournamentsWithStats = await Promise.all(
+                    tournaments.map(async (t) => {
+                        const { count } = await dbClient
+                            .from('tournament_participants')
+                            .select('*', { count: 'exact', head: true })
+                            .eq('tournament_id', t.id);
+                        return { ...t, playerCount: count || 0 };
+                    })
+                );
+
+                grid.innerHTML = tournamentsWithStats.map(t => {
+                    const date = t.event_start_date || t.tournament_date || t.event_date;
+                    const formattedDate = date ? new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'TBD';
+                    const bannerImage = t.image_url || '';
+                    const bannerStyle = bannerImage ? `background-image: url('${bannerImage}');` : '';
+                    const status = t.status || 'upcoming';
+                    const statusColors = { upcoming: 'var(--accent-yellow)', published: 'var(--success)', completed: 'var(--primary-blue)', draft: '#999' };
+                    
+                    return `
+                        <div class="tournament-card">
+                            <div class="tournament-banner" style="${bannerStyle}">
+                                <span class="tournament-badge" style="background: ${statusColors[status] || 'var(--accent-yellow)'}">${status.toUpperCase()}</span>
+                            </div>
+                            <div class="tournament-content">
+                                <h3>${t.name}</h3>
+                                <div class="tournament-meta">
+                                    <div class="tournament-meta-item"><span>📅</span> ${formattedDate}</div>
+                                    <div class="tournament-meta-item"><span>📍</span> ${t.location || 'TBD'}</div>
+                                </div>
+                                <div class="tournament-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-value">${t.playerCount}</div>
+                                        <div class="stat-label">Players</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">-</div>
+                                        <div class="stat-label">Matches</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">${t.max_participants || ''}</div>
+                                        <div class="stat-label">Capacity</div>
+                                    </div>
+                                </div>
+                                <div class="tournament-actions">
+                                    <button class="btn btn-primary" onclick="openDivisionsModal('${t.id}')">
+                                        <span>⚙️</span> Manage
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="window.location.href='tournament-details.html?tournament_id=${t.id}'">
+                                        <span>👁️</span> View
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="window.location.href='create-tournament.html?edit=${t.id}'">
+                                        <span>✏️</span> Edit
+                                    </button>
+                                    <button class="btn btn-danger" onclick="deleteTournament('${t.id}', '${t.name}')">
+                                        <span>🗑️</span> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             } catch (error) {
-                window.showAlert('error', error.message);
-                return false;
+                console.error('Error loading tournaments:', error);
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1 / -1;">
+                        <div class="icon">❌</div>
+                        <h3>Error loading tournaments</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
             }
         }
 
-        window.openCreateModal = function() {
-            if (!currentUser) { window.showAlert('error', 'Please login first'); return; }
-            document.getElementById('tournamentForm').reset();
-            document.getElementById('editTournamentId').value = '';
-            document.getElementById('modalTitle').textContent = translations[currentLang].modalTitleCreate;
-            document.getElementById('imagePreview').classList.remove('show');
-            selectedImageFile = null;
-            document.getElementById('tournamentModal').classList.add('show');
-        };
-
-        window.openEditModal = async function(id) {
-            if (!currentUser) { window.showAlert('error', 'Please login first'); return; }
-            try {
-                var result = await dbClient.from('tournaments').select('*').eq('id', id).single();
-                if (result.error) throw result.error;
-                var data = result.data;
-
-                var extraDates = parseExtraDates(data.description);
-
-                document.getElementById('editTournamentId').value = data.id;
-                document.getElementById('tournamentName').value = data.name;
-                var cleanDesc = (data.description || '').replace(/<!--DATES-->[^<]+<!--\/DATES-->/g, '').trim();
-                document.getElementById('tournamentDesc').value = cleanDesc;
-                document.getElementById('eventStartDate').value = extraDates.event_start_date || data.event_date || data.tournament_date || '';
-                document.getElementById('eventEndDate').value = extraDates.event_end_date || data.tournament_date || data.event_date || '';
-                document.getElementById('regRegularStart').value = extraDates.reg_regular_start || '';
-                document.getElementById('regRegularEnd').value = extraDates.reg_regular_end || '';
-                document.getElementById('regLateStart').value = extraDates.reg_late_start || '';
-                document.getElementById('regLateEnd').value = extraDates.reg_late_end || '';
-                document.getElementById('tournamentLocation').value = data.location || '';
-                document.getElementById('maxParticipants').value = data.max_participants || 200;
-                document.getElementById('registrationFee').value = data.registration_fee || 0;
-                
-                // Show existing image if exists
-                if (data.image_url) {
-                    var preview = document.getElementById('imagePreview');
-                    preview.src = data.image_url;
-                    preview.classList.add('show');
-                }
-                
-                document.getElementById('modalTitle').textContent = translations[currentLang].modalTitleEdit;
-                document.getElementById('tournamentModal').classList.add('show');
-            } catch (error) {
-                window.showAlert('error', error.message);
+        async function openDivisionsModal(tournamentId) {
+            currentTournamentId = tournamentId;
+            document.getElementById('divisionsModal').classList.add('show');
+            
+            // جلب الفئات الحالية
+            const { data: divisions } = await dbClient
+                .from('tournament_divisions')
+                .select('*')
+                .eq('tournament_id', tournamentId)
+                .order('sort_order', { ascending: true });
+            
+            currentDivisions = divisions || [];
+            renderDivisions();
+            
+            // جلب إعدادات الدفع
+            const { data: payment } = await dbClient
+                .from('tournament_payment_settings')
+                .select('*')
+                .eq('tournament_id', tournamentId)
+                .single();
+            
+            currentPaymentSettings = payment;
+            if (payment) {
+                document.getElementById('paymentEnabled').checked = payment.payment_enabled || false;
+                document.getElementById('payMethod').value = payment.payment_method || 'cash';
+                document.getElementById('payCurrency').value = payment.currency || 'USD';
+                document.getElementById('payEarlyBird').value = payment.early_bird_discount || 0;
+                document.getElementById('payLateFee').value = payment.late_fee_percentage || 0;
+                document.getElementById('payRefund').value = payment.refund_policy || '';
+                togglePayment();
+            } else {
+                document.getElementById('paymentEnabled').checked = false;
+                togglePayment();
             }
-        };
+        }
 
-        window.closeModal = function() {
-            document.getElementById('tournamentModal').classList.remove('show');
-            selectedImageFile = null;
-            document.getElementById('imagePreview').classList.remove('show');
-        };
+        function closeModal() {
+            document.getElementById('divisionsModal').classList.remove('show');
+            currentTournamentId = null;
+            currentDivisions = [];
+        }
 
-        window.handleFormSubmit = async function(e) {
-            e.preventDefault();
-            if (!currentUser) { window.showAlert('error', 'Please login'); return; }
-            if (!dbClient) initSupabase();
+        function togglePayment() {
+            const enabled = document.getElementById('paymentEnabled').checked;
+            document.getElementById('paymentOptions').style.display = enabled ? 'block' : 'none';
+        }
+
+        function renderDivisions() {
+            const container = document.getElementById('divisionsContainer');
             
-            var editId = document.getElementById('editTournamentId').value;
-            var startDate = document.getElementById('eventStartDate').value;
-            var endDate = document.getElementById('eventEndDate').value;
-            
-            if (new Date(endDate) < new Date(startDate)) {
-                window.showAlert('error', 'End date cannot be before start date!');
+            if (currentDivisions.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: rgba(0,0,0,0.5);">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">📋</div>
+                        <p>No divisions yet. Add your first division above.</p>
+                    </div>
+                `;
                 return;
             }
             
-            var baseDesc = document.getElementById('tournamentDesc').value;
-            var extraDates = {
-                event_start_date: startDate,
-                event_end_date: endDate,
-                reg_regular_start: document.getElementById('regRegularStart').value || null,
-                reg_regular_end: document.getElementById('regRegularEnd').value || null,
-                reg_late_start: document.getElementById('regLateStart').value || null,
-                reg_late_end: document.getElementById('regLateEnd').value || null
+            container.innerHTML = currentDivisions.map((div, index) => `
+                <div class="division-item ${!div.is_active ? 'disabled' : ''}">
+                    <div>
+                        <div class="division-name">${div.division_name}</div>
+                        <div class="division-type">${div.gi_type} • ${div.age_group}${div.gender ? ' • ' + div.gender : ''}${div.belt_level ? ' • ' + div.belt_level : ''}${div.weight_class ? ' • ' + div.weight_class : ''}</div>
+                    </div>
+                    <div class="division-price">$${div.price || 0} USD</div>
+                    <div>
+                        <div style="font-size: 0.8rem; color: rgba(0,0,0,0.6); margin-bottom: 5px;">Active</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ${div.is_active ? 'checked' : ''} onchange="toggleDivisionActive('${div.id}', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.8rem; color: rgba(0,0,0,0.6); margin-bottom: 5px;">Visible</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ${div.is_visible ? 'checked' : ''} onchange="toggleDivisionVisible('${div.id}', this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <button class="btn-icon edit" onclick="editDivision('${div.id}')" title="Edit">✏️</button>
+                    <button class="btn-icon delete" onclick="deleteDivision('${div.id}')" title="Delete">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        async function addDivision() {
+            const name = document.getElementById('divName').value.trim();
+            const type = document.getElementById('divType').value;
+            const age = document.getElementById('divAge').value;
+            const gender = document.getElementById('divGender').value;
+            const belt = document.getElementById('divBelt').value;
+            const weight = document.getElementById('divWeight').value;
+            const price = parseFloat(document.getElementById('divPrice').value) || 0;
+            const maxPlayers = parseInt(document.getElementById('divMax').value) || null;
+            
+            if (!name) {
+                showAlert('Please enter a division name', 'error', 'modalAlert');
+                return;
+            }
+            
+            const newDivision = {
+                tournament_id: currentTournamentId,
+                division_name: name,
+                gi_type: type,
+                age_group: age,
+                gender: gender || null,
+                belt_level: belt || null,
+                weight_class: weight || null,
+                price: price,
+                max_participants: maxPlayers,
+                is_active: true,
+                is_visible: true,
+                sort_order: currentDivisions.length
             };
             
-            var tournamentData = {
-                organizer_id: currentUser.id,
-                name: document.getElementById('tournamentName').value,
-                description: buildDescription(baseDesc, extraDates),
-                event_date: startDate,
-                tournament_date: endDate,
-                location: document.getElementById('tournamentLocation').value,
-                max_participants: parseInt(document.getElementById('maxParticipants').value) || 200,
-                registration_fee: parseFloat(document.getElementById('registrationFee').value) || 0,
-                status: 'draft',
+            const { data, error } = await dbClient
+                .from('tournament_divisions')
+                .insert([newDivision])
+                .select()
+                .single();
+            
+            if (error) {
+                showAlert('Error: ' + error.message, 'error', 'modalAlert');
+                return;
+            }
+            
+            currentDivisions.push(data);
+            renderDivisions();
+            
+            // مسح الحقول
+            document.getElementById('divName').value = '';
+            document.getElementById('divPrice').value = '0';
+            document.getElementById('divMax').value = '';
+            
+            showAlert('Division added successfully!', 'success', 'modalAlert');
+        }
+
+        async function toggleDivisionActive(divisionId, isActive) {
+            const { error } = await dbClient
+                .from('tournament_divisions')
+                .update({ is_active: isActive, updated_at: new Date().toISOString() })
+                .eq('id', divisionId);
+            
+            if (error) {
+                showAlert('Error updating division', 'error', 'modalAlert');
+                return;
+            }
+            
+            const div = currentDivisions.find(d => d.id === divisionId);
+            if (div) div.is_active = isActive;
+            renderDivisions();
+        }
+
+        async function toggleDivisionVisible(divisionId, isVisible) {
+            const { error } = await dbClient
+                .from('tournament_divisions')
+                .update({ is_visible: isVisible, updated_at: new Date().toISOString() })
+                .eq('id', divisionId);
+            
+            if (error) {
+                showAlert('Error updating division', 'error', 'modalAlert');
+                return;
+            }
+            
+            const div = currentDivisions.find(d => d.id === divisionId);
+            if (div) div.is_visible = isVisible;
+        }
+
+        async function deleteDivision(divisionId) {
+            if (!confirm('Are you sure you want to delete this division?')) return;
+            
+            const { error } = await dbClient
+                .from('tournament_divisions')
+                .delete()
+                .eq('id', divisionId);
+            
+            if (error) {
+                showAlert('Error deleting division', 'error', 'modalAlert');
+                return;
+            }
+            
+            currentDivisions = currentDivisions.filter(d => d.id !== divisionId);
+            renderDivisions();
+            showAlert('Division deleted', 'success', 'modalAlert');
+        }
+
+        function editDivision(divisionId) {
+            const div = currentDivisions.find(d => d.id === divisionId);
+            if (!div) return;
+            
+            document.getElementById('divName').value = div.division_name;
+            document.getElementById('divType').value = div.gi_type;
+            document.getElementById('divAge').value = div.age_group;
+            document.getElementById('divGender').value = div.gender || '';
+            document.getElementById('divBelt').value = div.belt_level || '';
+            document.getElementById('divWeight').value = div.weight_class || '';
+            document.getElementById('divPrice').value = div.price || 0;
+            document.getElementById('divMax').value = div.max_participants || '';
+            
+            // حذف القديم وإضافة الجديد عند الحفظ
+            deleteDivision(divisionId);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function savePaymentSettings() {
+            const paymentData = {
+                tournament_id: currentTournamentId,
+                payment_enabled: document.getElementById('paymentEnabled').checked,
+                payment_method: document.getElementById('payMethod').value,
+                currency: document.getElementById('payCurrency').value,
+                early_bird_discount: parseFloat(document.getElementById('payEarlyBird').value) || 0,
+                late_fee_percentage: parseFloat(document.getElementById('payLateFee').value) || 0,
+                refund_policy: document.getElementById('payRefund').value || null,
                 updated_at: new Date().toISOString()
             };
-
-            // ✅ Upload image if selected
-            if (selectedImageFile) {
-                try {
-                    var fileExt = selectedImageFile.name.split('.').pop();
-                    var fileName = currentUser.id + '-' + Date.now() + '.' + fileExt;
-                    
-                    var { data: uploadData, error: uploadError } = await dbClient.storage
-                        .from('tournament_images')
-                        .upload(fileName, selectedImageFile, { upsert: true });
-                    
-                    if (uploadError) throw uploadError;
-                    
-                    var { data: { publicUrl } } = dbClient.storage
-                        .from('tournament_images')
-                        .getPublicUrl(fileName);
-                    
-                    tournamentData.image_url = publicUrl;
-                } catch (error) {
-                    console.error('Image upload error:', error);
-                    window.showAlert('error', 'Failed to upload image: ' + error.message);
-                    return;
-                }
+            
+            let error;
+            if (currentPaymentSettings) {
+                const result = await dbClient
+                    .from('tournament_payment_settings')
+                    .update(paymentData)
+                    .eq('tournament_id', currentTournamentId);
+                error = result.error;
+            } else {
+                const result = await dbClient
+                    .from('tournament_payment_settings')
+                    .insert([paymentData]);
+                error = result.error;
             }
-
-            try {
-                var result;
-                if (editId) {
-                    // Don't overwrite image_url if no new image selected
-                    if (!selectedImageFile) {
-                        delete tournamentData.image_url;
-                    }
-                    result = await dbClient.from('tournaments').update(tournamentData).eq('id', editId);
-                    if (result.error) throw result.error;
-                    window.showAlert('success', translations[currentLang].successUpdate);
-                } else {
-                    tournamentData.created_at = new Date().toISOString();
-                    result = await dbClient.from('tournaments').insert([tournamentData]);
-                    if (result.error) throw result.error;
-                    window.showAlert('success', translations[currentLang].successCreate);
-                }
-                window.closeModal();
-                await window.loadTournaments();
-            } catch (error) {
-                window.showAlert('error', error.message);
+            
+            if (error) {
+                showAlert('Error saving payment settings', 'error', 'modalAlert');
+                return;
             }
-        };
+            
+            currentPaymentSettings = paymentData;
+            showAlert('Payment settings saved!', 'success', 'modalAlert');
+        }
 
-        window.loadTournaments = async function() {
-            var container = document.getElementById('tournamentsList');
-            container.innerHTML = '<div class="loading">' + translations[currentLang].loading + '</div>';
-
+        async function deleteTournament(tournamentId, tournamentName) {
+            if (!confirm(`Are you sure you want to delete "${tournamentName}"?\n\nThis will delete the tournament and ALL its data (divisions, participants, payment settings).`)) return;
+            
+            if (!confirm('This action cannot be undone. Continue?')) return;
+            
             try {
-                if (!currentUser || !dbClient) { initSupabase(); return; }
-
-                var result = await dbClient.from('tournaments').select('*').eq('organizer_id', currentUser.id).order('created_at', { ascending: false });
-                if (result.error) throw result.error;
+                // حذف الفئات
+                await dbClient.from('tournament_divisions').delete().eq('tournament_id', tournamentId);
+                // حذف المشاركين
+                await dbClient.from('tournament_participants').delete().eq('tournament_id', tournamentId);
+                // حذف إعدادات الدفع
+                await dbClient.from('tournament_payment_settings').delete().eq('tournament_id', tournamentId);
+                // حذف البطولة
+                const { error } = await dbClient.from('tournaments').delete().eq('id', tournamentId);
                 
-                var data = result.data;
-                if (!data || data.length === 0) {
-                    var t = translations[currentLang];
-                    container.innerHTML = '<div class="empty-state"><div class="icon"></div><h3>' + t.noTournaments + '</h3><p>' + t.noTournamentsDesc + '</p></div>';
-                    return;
-                }
-
-                var today = new Date();
-                var html = '<div class="tournaments-grid">';
+                if (error) throw error;
                 
-                for (var i = 0; i < data.length; i++) {
-                    var t = data[i];
-                    var extraDates = parseExtraDates(t.description);
-                    
-                    var startDate = extraDates.event_start_date || t.event_date || t.tournament_date;
-                    var endDate = extraDates.event_end_date || t.tournament_date || t.event_date;
-                    
-                    var dateDisplay = '';
-                    if (startDate) {
-                        dateDisplay = new Date(startDate).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
-                        if (endDate && startDate !== endDate) {
-                            dateDisplay += ' - ' + new Date(endDate).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US');
-                        }
-                    } else {
-                        dateDisplay = 'TBD';
-                    }
-                    
-                    var statusText = translations[currentLang].statusUpcoming;
-                    if (endDate && new Date(endDate) < today) statusText = translations[currentLang].statusCompleted;
-                    else if (startDate && new Date(startDate) <= today && endDate && new Date(endDate) >= today) statusText = translations[currentLang].statusToday;
-
-                    // ✅ Display image if exists, otherwise show trophy icon
-                    var imageHtml = '';
-                    if (t.image_url) {
-                        imageHtml = '<img src="' + t.image_url + '" alt="' + t.name + '" class="tournament-image" onerror="this.style.display=\'none\'">';
-                    } else {
-                        imageHtml = '<div class="tournament-image" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0066CC 0%,#003366 100%)"><span style="font-size:4rem;opacity:0.3"></span></div>';
-                    }
-
-                    html += '<div class="tournament-card">' + imageHtml + '<div class="tournament-content"><div class="tournament-header"><div><div class="tournament-name">' + t.name + '</div></div><span class="tournament-status">' + statusText + '</span></div><div class="tournament-meta"><div class="tournament-meta-item"><span>📅</span><span>' + dateDisplay + '</span></div><div class="tournament-meta-item"><span>📍</span><span>' + (t.location || 'TBD') + '</span></div></div><div class="stats-row"><div class="stat-item"><div class="stat-value" id="regCount_' + t.id + '">-</div><div class="stat-label">' + translations[currentLang].players + '</div></div><div class="stat-item"><div class="stat-value" id="matchCount_' + t.id + '">-</div><div class="stat-label">' + translations[currentLang].matches + '</div></div><div class="stat-item"><div class="stat-value">' + (t.max_participants || 200) + '</div><div class="stat-label">' + translations[currentLang].capacity + '</div></div></div><div class="tournament-actions"><a href="tournament-manager.html?tournament_id=' + t.id + '" class="btn btn-primary">' + translations[currentLang].manage + '</a><a href="tournament-details.html?tournament_id=' + t.id + '" target="_blank" class="btn btn-secondary">' + translations[currentLang].view + '</a><button class="btn btn-secondary" onclick="window.openEditModal(\'' + t.id + '\')">' + translations[currentLang].edit + '</button><button class="btn" style="background:#ef4444;color:white" onclick="window.deleteTournament(\'' + t.id + '\')">' + translations[currentLang].delete + '</button></div></div></div>';
-                }
-                
-                html += '</div>';
-                container.innerHTML = html;
-                for (var j = 0; j < data.length; j++) window.loadTournamentStats(data[j].id);
+                showAlert('Tournament deleted successfully!', 'success');
+                await loadTournaments();
             } catch (error) {
-                container.innerHTML = '<div class="alert alert-error show"> ' + error.message + '</div>';
+                console.error('Error deleting tournament:', error);
+                showAlert('Error: ' + error.message, 'error');
             }
-        };
+        }
 
-        window.loadTournamentStats = async function(tournamentId) {
-            try {
-                if (!dbClient) return;
-                var regResult = await dbClient.from('tournament_participants').select('*', { count: 'exact', head: true }).eq('tournament_id', tournamentId);
-                var regElement = document.getElementById('regCount_' + tournamentId);
-                if (regElement) regElement.textContent = regResult.count || 0;
-            } catch (error) { console.error(error); }
-        };
-
-        window.deleteTournament = async function(tournamentId) {
-            if (!confirm(translations[currentLang].confirmDelete)) return;
-            try {
-                if (!dbClient) initSupabase();
-                var result = await dbClient.from('tournaments').delete().eq('id', tournamentId);
-                if (result.error) throw result.error;
-                window.showAlert('success', translations[currentLang].successDelete);
-                await window.loadTournaments();
-            } catch (error) {
-                window.showAlert('error', error.message);
-            }
-        };
-
-        window.logout = async function() {
-            if (!dbClient) initSupabase();
+        async function handleLogout() {
             await dbClient.auth.signOut();
-            window.location.href = 'index.html';
-        };
+            localStorage.removeItem('currentUser');
+            currentUser = null;
+            showLoginButton();
+        }
 
-        window.showAlert = function(type, message) {
-            var alert = document.getElementById('alert');
-            alert.className = 'alert alert-' + type + ' show';
-            alert.textContent = message;
-            setTimeout(() => alert.classList.remove('show'), 5000);
-        };
-
-        window.onclick = function(event) {
-            var modal = document.getElementById('tournamentModal');
-            if (event.target === modal) window.closeModal();
-        };
-
-        window.onload = async function() {
-            initSupabase();
-            var authOk = await checkAuth();
-            if (authOk) {
-                window.changeLang(currentLang);
-                await window.loadTournaments();
-            }
-        };
+        // إغلاق الـ modal عند الضغط خارجه
+        document.getElementById('divisionsModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
     </script>
 </body>
 </html>
