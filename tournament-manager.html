@@ -13,6 +13,7 @@
             --black: #0A0A0A;
             --dark-gray: #1A1A1A;
             --medium-gray: #2A2A2A;
+            --light-gray: #3A3A3A;
             --white: #FFFFFF;
             --light-bg: #F5F7FA;
             --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
@@ -25,95 +26,114 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--dark-gray); color: var(--white); min-height: 100vh; }
 
         /* Header */
-        .header { background: var(--black); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-blue); }
+        .header { background: var(--black); padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-blue); }
         .logo { display: flex; align-items: center; gap: 15px; font-size: 1.8rem; font-weight: 900; color: var(--accent-yellow); }
         .logo-icon { font-size: 2rem; }
-        .header-info { color: rgba(255,255,255,0.7); font-size: 0.9rem; }
-        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; margin-top: 5px; }
-        .status-badge.connected { background: rgba(16,185,129,0.2); color: var(--success); }
-        .status-badge.partial { background: rgba(245,158,11,0.2); color: var(--warning); }
+        .header-info { color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-top: 5px; }
+        .status-badge { display: inline-block; padding: 5px 12px; border-radius: 15px; font-size: 0.8rem; font-weight: 600; margin-top: 8px; }
+        .status-badge.connected { background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid var(--success); }
+        .status-badge.partial { background: rgba(245,158,11,0.2); color: var(--warning); border: 1px solid var(--warning); }
 
         /* Top Navigation */
         .top-nav { background: var(--dark-gray); padding: 15px 30px; display: flex; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--medium-gray); }
-        .nav-btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; }
+        .nav-btn { padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; font-size: 0.95rem; }
         .nav-btn.primary { background: var(--primary-blue); color: var(--white); }
-        .nav-btn.primary:hover { background: var(--dark-blue); }
+        .nav-btn.primary:hover { background: var(--dark-blue); transform: translateY(-2px); }
         .nav-btn.secondary { background: var(--medium-gray); color: var(--white); }
         .nav-btn.secondary:hover { background: var(--light-gray); }
         .nav-btn.success { background: var(--success); color: var(--white); }
+        .nav-btn.success:hover { background: #059669; }
         .nav-btn.danger { background: var(--danger); color: var(--white); }
+        .nav-btn.danger:hover { background: #DC2626; }
         .nav-btn.warning { background: var(--warning); color: var(--black); }
+        .nav-btn.warning:hover { background: #D97706; }
 
         /* Main Content */
         .main-content { padding: 30px; }
-        .section { background: var(--medium-gray); border-radius: 15px; padding: 25px; margin-bottom: 25px; border: 2px dashed var(--accent-yellow); }
-        .section-title { font-size: 1.5rem; font-weight: 900; color: var(--accent-yellow); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .section { background: var(--medium-gray); border-radius: 15px; padding: 30px; margin-bottom: 25px; border: 2px dashed var(--accent-yellow); }
+        .section-title { font-size: 1.8rem; font-weight: 900; color: var(--accent-yellow); margin-bottom: 25px; display: flex; align-items: center; gap: 12px; }
 
         /* Tables */
-        .data-table { width: 100%; border-collapse: collapse; background: var(--dark-gray); border-radius: 10px; overflow: hidden; }
-        .data-table th { background: var(--black); padding: 12px; text-align: left; color: var(--accent-yellow); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; }
-        .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--medium-gray); color: var(--white); }
+        .table-container { overflow-x: auto; border-radius: 10px; }
+        .data-table { width: 100%; border-collapse: collapse; background: var(--dark-gray); }
+        .data-table th { background: var(--black); padding: 15px 12px; text-align: left; color: var(--accent-yellow); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; border-bottom: 2px solid var(--primary-blue); }
+        .data-table td { padding: 12px; border-bottom: 1px solid var(--medium-gray); color: var(--white); }
         .data-table tr:hover { background: rgba(255,255,255,0.05); }
-        .data-table input, .data-table select { background: var(--dark-gray); color: var(--white); border: 1px solid var(--medium-gray); padding: 6px 10px; border-radius: 5px; font-size: 0.9rem; width: 100%; }
-        .data-table input:focus, .data-table select:focus { outline: none; border-color: var(--primary-blue); }
+        .data-table input, .data-table select { background: var(--dark-gray); color: var(--white); border: 1px solid var(--medium-gray); padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; width: 100%; }
+        .data-table input:focus, .data-table select:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 2px rgba(0,102,204,0.2); }
 
         /* Buttons */
-        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; }
         .btn-primary { background: var(--primary-blue); color: var(--white); }
-        .btn-primary:hover { background: var(--dark-blue); transform: translateY(-2px); }
+        .btn-primary:hover { background: var(--dark-blue); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.3); }
         .btn-success { background: var(--success); color: var(--white); }
-        .btn-success:hover { background: #059669; }
+        .btn-success:hover { background: #059669; transform: translateY(-2px); }
         .btn-danger { background: var(--danger); color: var(--white); }
-        .btn-danger:hover { background: #DC2626; }
+        .btn-danger:hover { background: #DC2626; transform: translateY(-2px); }
         .btn-warning { background: var(--warning); color: var(--black); }
-        .btn-warning:hover { background: #D97706; }
+        .btn-warning:hover { background: #D97706; transform: translateY(-2px); }
         .btn-secondary { background: var(--medium-gray); color: var(--white); border: 1px solid var(--light-gray); }
         .btn-secondary:hover { background: var(--light-gray); }
-        .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
+        .btn-sm { padding: 8px 16px; font-size: 0.85rem; }
+        .btn-group { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 25px; }
 
         /* Stats */
-        .stats-box { background: var(--dark-gray); padding: 20px; border-radius: 10px; margin-bottom: 20px; }
-        .stats-box h3 { color: var(--accent-yellow); margin-bottom: 15px; font-size: 1.1rem; }
-        .stats-box p { color: rgba(255,255,255,0.8); margin-bottom: 8px; }
-        .stats-box .highlight { color: var(--accent-yellow); font-weight: 700; }
+        .stats-box { background: var(--dark-gray); padding: 25px; border-radius: 12px; margin-bottom: 25px; border-left: 4px solid var(--accent-yellow); }
+        .stats-box h3 { color: var(--accent-yellow); margin-bottom: 18px; font-size: 1.2rem; }
+        .stats-box p { color: rgba(255,255,255,0.8); margin-bottom: 10px; font-size: 0.95rem; }
+        .stats-box .highlight { color: var(--accent-yellow); font-weight: 700; font-size: 1.1rem; }
 
         /* Categories */
-        .category-card { background: var(--dark-gray); border: 2px solid var(--medium-gray); border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .category-card:hover { border-color: var(--primary-blue); }
+        .category-card { background: var(--dark-gray); border: 2px solid var(--medium-gray); border-radius: 12px; padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; }
+        .category-card:hover { border-color: var(--primary-blue); transform: translateX(5px); }
         .category-info { flex: 1; }
-        .category-name { font-weight: 700; color: var(--white); margin-bottom: 5px; }
+        .category-name { font-weight: 700; color: var(--white); margin-bottom: 6px; font-size: 1.05rem; }
         .category-details { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
-        .category-players { color: var(--accent-yellow); font-weight: 700; }
+        .category-players { color: var(--accent-yellow); font-weight: 700; font-size: 1.1rem; }
 
         /* Alert */
-        .alert { padding: 12px 20px; border-radius: 8px; margin-bottom: 15px; display: none; font-weight: 600; }
-        .alert.show { display: block; }
-        .alert-success { background: rgba(16,185,129,0.2); color: var(--success); border: 1px solid var(--success); }
-        .alert-error { background: rgba(239,68,68,0.2); color: var(--danger); border: 1px solid var(--danger); }
-        .alert-warning { background: rgba(245,158,11,0.2); color: var(--warning); border: 1px solid var(--warning); }
+        .alert { padding: 15px 25px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; font-size: 0.95rem; }
+        .alert.show { display: block; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .alert-success { background: rgba(16,185,129,0.2); color: var(--success); border: 2px solid var(--success); }
+        .alert-error { background: rgba(239,68,68,0.2); color: var(--danger); border: 2px solid var(--danger); }
+        .alert-warning { background: rgba(245,158,11,0.2); color: var(--warning); border: 2px solid var(--warning); }
 
         /* Loading */
-        .loading { text-align: center; padding: 40px; color: rgba(255,255,255,0.6); }
+        .loading { text-align: center; padding: 50px; color: rgba(255,255,255,0.6); font-size: 1.1rem; }
 
         /* Empty State */
-        .empty-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); }
-        .empty-state .icon { font-size: 4rem; margin-bottom: 15px; }
+        .empty-state { text-align: center; padding: 80px 30px; color: rgba(255,255,255,0.5); }
+        .empty-state .icon { font-size: 5rem; margin-bottom: 20px; opacity: 0.6; }
+        .empty-state h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--accent-yellow); }
+
+        /* Team Logo in Scoreboard */
+        .team-logo-small { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; margin-right: 8px; vertical-align: middle; }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .header { flex-direction: column; gap: 10px; padding: 15px; }
+            .header { flex-direction: column; gap: 15px; padding: 15px; }
             .top-nav { padding: 10px; }
-            .nav-btn { flex: 1; min-width: 120px; justify-content: center; }
+            .nav-btn { flex: 1; min-width: 120px; justify-content: center; font-size: 0.85rem; padding: 10px 15px; }
             .main-content { padding: 15px; }
+            .section { padding: 20px; }
+            .section-title { font-size: 1.4rem; }
             .data-table { font-size: 0.85rem; }
             .data-table th, .data-table td { padding: 8px; }
+            .btn-group { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+        }
+
+        @media (max-width: 480px) {
+            .logo { font-size: 1.3rem; }
+            .nav-btn { font-size: 0.8rem; padding: 8px 12px; }
         }
     </style>
 </head>
 <body>
     <header class="header">
         <div>
-            <div class="logo"><span class="logo-icon"></span> TopCompSports Tournament System</div>
+            <div class="logo"><span class="logo-icon">🏆</span> TopCompSports Tournament System</div>
             <div class="header-info" id="tournamentName">Loading tournament...</div>
             <div id="dbStatus" class="status-badge partial">⚠️ Connecting to DB...</div>
         </div>
@@ -130,7 +150,7 @@
         <button class="nav-btn secondary" onclick="showSection('matches')">⚔️ Matches</button>
         <button class="nav-btn secondary" onclick="showSection('schedule')">📅 Schedule</button>
         <button class="nav-btn secondary" onclick="showSection('standings')">📊 Standings</button>
-        <button class="nav-btn warning" onclick="syncWithDB()"> Sync with DB</button>
+        <button class="nav-btn warning" onclick="syncWithDB()">🔄 Sync with DB</button>
         <button class="nav-btn success" onclick="saveToLocal()">💾 Save Local</button>
         <button class="nav-btn danger" onclick="clearAll()">🗑️ Clear</button>
     </nav>
@@ -140,10 +160,10 @@
 
         <!-- Players Section -->
         <section id="playersSection" class="section">
-            <h2 class="section-title">👥 Players Registration <span id="playerCount">0 / 0</span></h2>
+            <h2 class="section-title"> Players Registration <span id="playerCount">0 / 0</span></h2>
             
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
-                <button class="btn btn-success" onclick="addPlayer()">➕ Add Player</button>
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="addPlayer()"> Add Player</button>
                 <button class="btn btn-success" onclick="addTestPlayers()">➕ Add 2 Test Players</button>
                 <button class="btn btn-secondary" onclick="addMultiplePlayers(10)">➕ Add 10</button>
                 <button class="btn btn-primary" onclick="importCSV()">📥 Import CSV</button>
@@ -151,7 +171,7 @@
                 <button class="btn btn-warning" onclick="syncWithDB()">🔄 Sync with DB</button>
             </div>
 
-            <div style="overflow-x: auto;">
+            <div class="table-container">
                 <table class="data-table" id="playersTable">
                     <thead>
                         <tr>
@@ -175,7 +195,7 @@
 
         <!-- Mats Section -->
         <section id="matsSection" class="section" style="display: none;">
-            <h2 class="section-title"> Mat Dashboard</h2>
+            <h2 class="section-title">🥋 Mat Dashboard</h2>
             <div id="matsContent">
                 <div class="loading">Loading mats...</div>
             </div>
@@ -195,6 +215,7 @@
             <div id="bracketsContent">
                 <div class="empty-state">
                     <div class="icon">🏆</div>
+                    <h3>No Brackets Yet</h3>
                     <p>Create categories first to generate brackets</p>
                 </div>
             </div>
@@ -202,10 +223,11 @@
 
         <!-- Matches Section -->
         <section id="matchesSection" class="section" style="display: none;">
-            <h2 class="section-title">️ Matches</h2>
+            <h2 class="section-title">⚔️ Matches</h2>
             <div id="matchesContent">
                 <div class="empty-state">
-                    <div class="icon">️</div>
+                    <div class="icon">⚔️</div>
+                    <h3>No Matches Yet</h3>
                     <p>Generate brackets first to create matches</p>
                 </div>
             </div>
@@ -213,10 +235,11 @@
 
         <!-- Schedule Section -->
         <section id="scheduleSection" class="section" style="display: none;">
-            <h2 class="section-title"> Schedule</h2>
+            <h2 class="section-title">📅 Schedule</h2>
             <div id="scheduleContent">
                 <div class="empty-state">
                     <div class="icon">📅</div>
+                    <h3>No Schedule Yet</h3>
                     <p>Schedule will be generated from matches</p>
                 </div>
             </div>
@@ -228,6 +251,7 @@
             <div id="standingsContent">
                 <div class="empty-state">
                     <div class="icon">📊</div>
+                    <h3>No Standings Yet</h3>
                     <p>Standings will be updated after matches</p>
                 </div>
             </div>
@@ -252,6 +276,7 @@
         let mats = [];
         let standings = [];
         let dbConnected = false;
+        let dataLoadedFromDB = false; // Flag to prevent duplicate loading
 
         // Reference data from DB
         let ageDivisions = [];
@@ -277,7 +302,7 @@
             // Load reference data from DB
             await loadReferenceData();
             
-            // Load tournament data
+            // Load tournament data (ONLY ONCE)
             await loadTournamentData();
             
             // Initial render
@@ -290,7 +315,7 @@
         // ============================================
         async function loadReferenceData() {
             try {
-                console.log('📊 Loading reference data from database...');
+                console.log(' Loading reference data from database...');
                 
                 // Load age divisions
                 const { data: ageData, error: ageError } = await dbClient
@@ -335,7 +360,7 @@
                 dbConnected = true;
                 updateDBStatus();
             } catch (error) {
-                console.error(' Error loading reference data:', error);
+                console.error('❌ Error loading reference data:', error);
                 showAlert('warning', 'Some tables missing in DB, using fallback');
                 loadFallbackData();
             }
@@ -381,9 +406,15 @@
         }
 
         // ============================================
-        // Load Tournament Data
+        // Load Tournament Data (ONLY ONCE)
         // ============================================
         async function loadTournamentData() {
+            // Prevent duplicate loading
+            if (dataLoadedFromDB) {
+                console.log('⚠️ Data already loaded, skipping...');
+                return;
+            }
+
             try {
                 // Load tournament info
                 const { data: tournament, error: tError } = await dbClient
@@ -395,28 +426,33 @@
                 if (tError) throw tError;
                 document.getElementById('tournamentName').textContent = tournament.name;
 
-                // Load players
-                const { data: playersData, error: pError } = await dbClient
-                    .from('tournament_participants')
-                    .select('*')
-                    .eq('tournament_id', tournamentId)
-                    .order('created_at');
+                // Load players from DB ONLY IF local storage is empty
+                const savedPlayers = localStorage.getItem(`tournament_${tournamentId}_players`);
                 
-                if (pError) throw pError;
-                players = playersData || [];
-                console.log(`✅ Loaded ${players.length} players`);
-
-                // Load categories
-                const { data: catData, error: cError } = await dbClient
-                    .from('categories')
-                    .select('*')
-                    .eq('tournament_id', tournamentId);
-                
-                if (!cError && catData) {
-                    categories = catData;
-                    console.log(`✅ Loaded ${categories.length} categories`);
+                if (!savedPlayers || savedPlayers === '[]') {
+                    // First time loading - get from DB
+                    const { data: playersData, error: pError } = await dbClient
+                        .from('tournament_participants')
+                        .select('*')
+                        .eq('tournament_id', tournamentId)
+                        .order('created_at');
+                    
+                    if (pError) throw pError;
+                    players = playersData || [];
+                    console.log(`✅ Loaded ${players.length} players from DB`);
+                } else {
+                    // Load from local storage (prevent duplication)
+                    players = JSON.parse(savedPlayers);
+                    console.log(`✅ Loaded ${players.length} players from local storage`);
                 }
 
+                // Load categories from local storage
+                const savedCategories = localStorage.getItem(`tournament_${tournamentId}_categories`);
+                if (savedCategories && savedCategories !== '[]') {
+                    categories = JSON.parse(savedCategories);
+                }
+
+                dataLoadedFromDB = true; // Mark as loaded
                 updatePlayerCount();
             } catch (error) {
                 console.error('❌ Error loading tournament data:', error);
@@ -431,14 +467,14 @@
             const tbody = document.getElementById('playersBody');
             
             if (players.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><div class="icon"></div><p>No players yet. Click "Add Player" to start.</p></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><div class="icon">👥</div><h3>No players yet</h3><p>Click "Add Player" to start.</p></td></tr>';
                 return;
             }
 
             tbody.innerHTML = players.map((player, index) => `
                 <tr>
                     <td>${index + 1}</td>
-                    <td><input type="text" value="${player.player_name || ''}" onchange="updatePlayer(${index}, 'player_name', this.value)"></td>
+                    <td><input type="text" value="${player.player_name || ''}" onchange="updatePlayer(${index}, 'player_name', this.value)" placeholder="Player name"></td>
                     <td><input type="text" value="${player.team || ''}" onchange="updatePlayer(${index}, 'team', this.value)" placeholder="Team name"></td>
                     <td>
                         <select onchange="updatePlayer(${index}, 'age_group', this.value)">
@@ -464,10 +500,10 @@
                     <td>
                         <select onchange="updatePlayer(${index}, 'belt_level', this.value)">
                             <option value="">Select...</option>
-                            ${beltLevels.map(b => `<option value="${b.name}" ${player.belt_level === b.name ? 'selected' : ''}>${b.name}</option>`).join('')}
+                            ${beltLevels.filter(b => b.category === 'kids' || b.category === 'adult').map(b => `<option value="${b.name}" ${player.belt_level === b.name ? 'selected' : ''}>${b.name}</option>`).join('')}
                         </select>
                     </td>
-                    <td><input type="number" value="${player.ranking || ''}" onchange="updatePlayer(${index}, 'ranking', this.value)" min="1"></td>
+                    <td><input type="number" value="${player.ranking || ''}" onchange="updatePlayer(${index}, 'ranking', this.value)" min="1" placeholder="Rank"></td>
                     <td><button class="btn btn-danger btn-sm" onclick="removePlayer(${index})">✕</button></td>
                 </tr>
             `).join('');
@@ -496,6 +532,7 @@
                 ranking: players.length + 1
             });
             renderPlayers();
+            saveToLocal();
         }
 
         function addTestPlayers() {
@@ -518,7 +555,7 @@
         }
 
         function updatePlayerCount() {
-            const maxPlayers = 200; // Can be loaded from tournament
+            const maxPlayers = 200;
             document.getElementById('playerCount').textContent = `${players.length} / ${maxPlayers}`;
         }
 
@@ -536,6 +573,8 @@
             // Render section content
             if (sectionName === 'mats') renderMats();
             if (sectionName === 'categories') renderCategories();
+            if (sectionName === 'brackets') renderBrackets();
+            if (sectionName === 'matches') renderMatches();
         }
 
         // ============================================
@@ -553,7 +592,7 @@
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="icon">⚠️</div>
-                        <h3 style="color: var(--accent-yellow);">No Categories Found</h3>
+                        <h3>No Categories Found</h3>
                         <p>Add players with complete information to generate categories</p>
                     </div>
                     <div class="stats-box">
@@ -624,14 +663,14 @@
                     <p><strong>Belts:</strong> <span style="color: var(--danger);">${categories.length > 0 ? [...new Set(categories.map(c => c.belt_level))].join(', ') : 'None'}</span></p>
                 </div>
                 <div class="stats-box">
-                    <h3>📈 Player Distribution:</h3>
+                    <h3> Player Distribution:</h3>
                     ${categories.map(cat => `
-                        <div style="background: var(--dark-gray); padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-                            <strong>${cat.name}</strong> - <span style="color: var(--accent-yellow);">${cat.players ? cat.players.length : 0} players</span>
+                        <div style="background: var(--dark-gray); padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid var(--primary-blue);">
+                            <strong>${cat.name}</strong> - <span style="color: var(--accent-yellow); font-weight: 700;">${cat.players ? cat.players.length : 0} players</span>
                         </div>
                     `).join('')}
                 </div>
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <div class="btn-group" style="margin-top: 25px;">
                     <button class="btn btn-success" onclick="showSection('players')"> Add/Edit Players</button>
                     <button class="btn btn-primary" onclick="generateBrackets()">🏆 Generate Brackets</button>
                 </div>
@@ -639,7 +678,7 @@
         }
 
         // ============================================
-        // Sync with DB
+        // Sync with DB (FIXED - Prevents Duplication)
         // ============================================
         async function syncWithDB() {
             if (!tournamentId) {
@@ -647,13 +686,23 @@
                 return;
             }
 
+            if (!confirm('This will DELETE all existing players in the database and replace them with current data. Continue?')) {
+                return;
+            }
+
             try {
                 showAlert('warning', 'Syncing with database...');
                 
-                // Delete existing players for this tournament
-                await dbClient.from('tournament_participants').delete().eq('tournament_id', tournamentId);
+                // Step 1: Delete ALL existing players for this tournament
+                const { error: deleteError } = await dbClient
+                    .from('tournament_participants')
+                    .delete()
+                    .eq('tournament_id', tournamentId);
                 
-                // Insert updated players
+                if (deleteError) throw deleteError;
+                console.log('✅ Deleted existing players from DB');
+                
+                // Step 2: Insert updated players
                 if (players.length > 0) {
                     const playersToInsert = players.map(p => ({
                         tournament_id: tournamentId,
@@ -668,12 +717,18 @@
                         registered_at: new Date().toISOString()
                     }));
                     
-                    const { error } = await dbClient.from('tournament_participants').insert(playersToInsert);
-                    if (error) throw error;
+                    const { error: insertError } = await dbClient
+                        .from('tournament_participants')
+                        .insert(playersToInsert);
+                    
+                    if (insertError) throw insertError;
+                    console.log(`✅ Inserted ${players.length} players to DB`);
                 }
 
                 showAlert('success', `✅ Synced ${players.length} players to database`);
-                console.log('✅ Saved to database');
+                
+                // Mark as loaded from DB
+                dataLoadedFromDB = true;
             } catch (error) {
                 console.error('❌ Sync error:', error);
                 showAlert('error', 'Sync failed: ' + error.message);
@@ -687,14 +742,6 @@
             localStorage.setItem(`tournament_${tournamentId}_players`, JSON.stringify(players));
             localStorage.setItem(`tournament_${tournamentId}_categories`, JSON.stringify(categories));
             console.log('💾 Saved to local storage');
-        }
-
-        function loadFromLocal() {
-            const savedPlayers = localStorage.getItem(`tournament_${tournamentId}_players`);
-            const savedCategories = localStorage.getItem(`tournament_${tournamentId}_categories`);
-            
-            if (savedPlayers) players = JSON.parse(savedPlayers);
-            if (savedCategories) categories = JSON.parse(savedCategories);
         }
 
         function clearAll() {
@@ -759,6 +806,7 @@
                         }
                     }
                     renderPlayers();
+                    saveToLocal();
                     showAlert('success', `Imported ${lines.length - 1} players`);
                 };
                 reader.readAsText(file);
@@ -801,11 +849,11 @@
             renderMatches();
         }
 
-        function renderMatches() {
-            const container = document.getElementById('matchesContent');
+        function renderBrackets() {
+            const container = document.getElementById('bracketsContent');
             
             if (matches.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="icon">⚔️</div><p>No matches yet</p></div>';
+                container.innerHTML = '<div class="empty-state"><div class="icon">🏆</div><h3>No Brackets Yet</h3><p>Generate brackets from categories</p></div>';
                 return;
             }
 
@@ -818,6 +866,28 @@
                         </div>
                     </div>
                     <button class="btn btn-primary btn-sm" onclick="recordMatchResult(${index})">Record Result</button>
+                </div>
+            `).join('');
+        }
+
+        function renderMatches() {
+            const container = document.getElementById('matchesContent');
+            
+            if (matches.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="icon">⚔️</div><h3>No Matches Yet</h3><p>Generate brackets first</p></div>';
+                return;
+            }
+
+            container.innerHTML = matches.map((match, index) => `
+                <div class="category-card">
+                    <div class="category-info">
+                        <div class="category-name">Match ${index + 1}: ${match.category}</div>
+                        <div class="category-details">
+                            ${match.player1?.player_name || 'TBD'} vs ${match.player2?.player_name || 'TBD'}
+                            ${match.winner ? `<br><strong style="color: var(--success);">Winner: ${match.winner.player_name}</strong>` : ''}
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="recordMatchResult(${index})">${match.winner ? 'Change Result' : 'Record Result'}</button>
                 </div>
             `).join('');
         }
