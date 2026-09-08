@@ -89,19 +89,8 @@
         .category-info { flex: 1; }
         .category-name { font-weight: 700; color: var(--white); margin-bottom: 6px; font-size: 1.05rem; }
         .category-details { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
-        .category-players { color: var(--accent-yellow); font-weight: 700; font-size: 1.1rem; }
-
-        /* Brackets */
-        .bracket-round { margin-bottom: 30px; }
-        .bracket-round-title { font-size: 1.3rem; font-weight: 700; color: var(--accent-yellow); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--primary-blue); }
-        .bracket-match { background: var(--dark-gray); border: 2px solid var(--medium-gray); border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .bracket-match:hover { border-color: var(--primary-blue); }
-        .bracket-players { flex: 1; }
-        .bracket-player { padding: 8px 12px; margin: 5px 0; background: var(--medium-gray); border-radius: 6px; cursor: pointer; transition: all 0.3s; }
-        .bracket-player:hover { background: var(--primary-blue); }
-        .bracket-player.winner { background: var(--success); color: var(--white); font-weight: 700; }
-        .bracket-player.loser { opacity: 0.5; text-decoration: line-through; }
-        .bracket-vs { text-align: center; color: var(--accent-yellow); font-weight: 700; padding: 5px; }
+        .category-players { color: var(--accent-yellow); font-weight: 700; font-size: 1.1rem; margin-right: 15px; }
+        .category-actions { display: flex; gap: 10px; }
 
         /* Alert */
         .alert { padding: 15px 25px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; font-size: 0.95rem; }
@@ -131,6 +120,8 @@
             .data-table th, .data-table td { padding: 8px; }
             .btn-group { flex-direction: column; }
             .btn { width: 100%; justify-content: center; }
+            .category-card { flex-direction: column; align-items: stretch; gap: 10px; }
+            .category-actions { justify-content: flex-end; }
         }
 
         @media (max-width: 480px) {
@@ -154,9 +145,6 @@
     <nav class="top-nav">
         <button class="nav-btn primary" onclick="showSection('players')">👥 Players</button>
         <button class="nav-btn secondary" onclick="showSection('categories')">📋 Categories</button>
-        <button class="nav-btn secondary" onclick="showSection('brackets')">🏆 Brackets</button>
-        <button class="nav-btn secondary" onclick="showSection('matches')">⚔️ Matches</button>
-        <button class="nav-btn secondary" onclick="showSection('standings')">📊 Standings</button>
         <button class="nav-btn warning" onclick="syncWithDB()">🔄 Sync with DB</button>
         <button class="nav-btn success" onclick="saveToLocal()">💾 Save Local</button>
         <button class="nav-btn danger" onclick="clearAll()">🗑️ Clear</button>
@@ -167,13 +155,13 @@
 
         <!-- Players Section -->
         <section id="playersSection" class="section">
-            <h2 class="section-title">👥 Players Registration <span id="playerCount">0 / 0</span></h2>
+            <h2 class="section-title"> Players Registration <span id="playerCount">0 / 0</span></h2>
             
             <div class="btn-group">
                 <button class="btn btn-success" onclick="addPlayer()">➕ Add Player</button>
                 <button class="btn btn-success" onclick="addTestPlayers()">➕ Add 2 Test Players</button>
                 <button class="btn btn-secondary" onclick="addMultiplePlayers(10)">➕ Add 10</button>
-                <button class="btn btn-primary" onclick="importCSV()"> Import CSV</button>
+                <button class="btn btn-primary" onclick="importCSV()">📥 Import CSV</button>
                 <button class="btn btn-primary" onclick="exportCSV()">📤 Export CSV</button>
                 <button class="btn btn-warning" onclick="syncWithDB()">🔄 Sync with DB</button>
             </div>
@@ -202,45 +190,9 @@
 
         <!-- Categories Section -->
         <section id="categoriesSection" class="section" style="display: none;">
-            <h2 class="section-title">📋 Categories <small style="font-size: 1rem; color: rgba(255,255,255,0.6);">(Click on category to view brackets)</small></h2>
+            <h2 class="section-title">📋 Categories <small style="font-size: 1rem; color: rgba(255,255,255,0.6);">(Click "View Brackets" to see bracket)</small></h2>
             <div id="categoriesContent">
                 <div class="loading">Loading categories...</div>
-            </div>
-        </section>
-
-        <!-- Brackets Section -->
-        <section id="bracketsSection" class="section" style="display: none;">
-            <h2 class="section-title">🏆 Brackets</h2>
-            <div id="bracketsContent">
-                <div class="empty-state">
-                    <div class="icon">🏆</div>
-                    <h3>No Brackets Yet</h3>
-                    <p>Click on a category to generate brackets</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Matches Section -->
-        <section id="matchesSection" class="section" style="display: none;">
-            <h2 class="section-title">⚔️ Matches</h2>
-            <div id="matchesContent">
-                <div class="empty-state">
-                    <div class="icon">⚔️</div>
-                    <h3>No Matches Yet</h3>
-                    <p>Generate brackets first to create matches</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Standings Section -->
-        <section id="standingsSection" class="section" style="display: none;">
-            <h2 class="section-title">📊 Standings</h2>
-            <div id="standingsContent">
-                <div class="empty-state">
-                    <div class="icon">📊</div>
-                    <h3>No Standings Yet</h3>
-                    <p>Standings will be updated after matches</p>
-                </div>
             </div>
         </section>
     </main>
@@ -264,8 +216,6 @@
         let tournamentId = null;
         let players = [];
         let categories = [];
-        let brackets = {}; // { categoryName: { rounds: [...], matches: [...] } }
-        let currentCategory = null;
         let dbConnected = false;
         let dataLoadedFromDB = false;
 
@@ -325,7 +275,7 @@
                 beltLevels = beltData || [];
                 console.log(`✅ Loaded ${beltLevels.length} belt levels`);
             } catch (error) {
-                console.error('❌ Error loading belt levels:', error);
+                console.error(' Error loading belt levels:', error);
                 loadFallbackBeltLevels();
             }
 
@@ -395,16 +345,6 @@
                 } else {
                     players = JSON.parse(savedPlayers);
                     console.log(`✅ Loaded ${players.length} players from local storage`);
-                }
-
-                const savedCategories = localStorage.getItem(`tournament_${tournamentId}_categories`);
-                if (savedCategories && savedCategories !== '[]') {
-                    categories = JSON.parse(savedCategories);
-                }
-
-                const savedBrackets = localStorage.getItem(`tournament_${tournamentId}_brackets`);
-                if (savedBrackets && savedBrackets !== '{}') {
-                    brackets = JSON.parse(savedBrackets);
                 }
 
                 dataLoadedFromDB = true;
@@ -518,13 +458,10 @@
             if (section) section.style.display = 'block';
 
             if (sectionName === 'categories') renderCategories();
-            if (sectionName === 'brackets') renderBrackets();
-            if (sectionName === 'matches') renderMatches();
-            if (sectionName === 'standings') renderStandings();
         }
 
         // ============================================
-        // Render Categories (Click to go to Brackets)
+        // Render Categories (with View Brackets button)
         // ============================================
         function renderCategories() {
             const container = document.getElementById('categoriesContent');
@@ -542,14 +479,17 @@
             }
 
             container.innerHTML = categories.map((cat, index) => `
-                <div class="category-card" onclick="openCategoryBrackets('${cat.name.replace(/'/g, "\\'")}')">
+                <div class="category-card">
                     <div class="category-info">
                         <div class="category-name">${cat.name}</div>
                         <div class="category-details">
                             ${cat.age_group} | ${cat.gender} | ${cat.weight}kg | ${cat.belt_level}
                         </div>
                     </div>
-                    <div class="category-players">${cat.players.length} players →</div>
+                    <div class="category-players">${cat.players.length} players</div>
+                    <div class="category-actions">
+                        <button class="btn btn-primary btn-sm" onclick="openCategoryBrackets('${cat.name.replace(/'/g, "\\'")}')"> View Brackets</button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -579,264 +519,14 @@
         }
 
         // ============================================
-        // Open Category Brackets (Single Elimination)
+        // Open Category Brackets (Navigate to new page)
         // ============================================
         function openCategoryBrackets(categoryName) {
-            currentCategory = categoryName;
-            const category = categories.find(c => c.name === categoryName);
-            
-            if (!category) {
-                showAlert('error', 'Category not found');
-                return;
-            }
-
-            // Generate brackets if not exists
-            if (!brackets[categoryName]) {
-                brackets[categoryName] = generateSingleElimination(category.players);
-            }
-
-            showSection('brackets');
-            renderBrackets();
-        }
-
-        function generateSingleElimination(playersList) {
-            const numPlayers = playersList.length;
-            
-            // Find next power of 2
-            let bracketSize = 1;
-            while (bracketSize < numPlayers) bracketSize *= 2;
-            
-            const numRounds = Math.log2(bracketSize);
-            const rounds = [];
-            const matches = [];
-
-            // Create first round matches
-            const firstRoundMatches = [];
-            for (let i = 0; i < bracketSize / 2; i++) {
-                const player1 = playersList[i * 2] || null;
-                const player2 = playersList[i * 2 + 1] || null;
-                
-                const match = {
-                    id: `R1_M${i + 1}`,
-                    round: 1,
-                    player1: player1,
-                    player2: player2,
-                    winner: null,
-                    nextMatchId: i < bracketSize / 4 ? `R2_M${Math.floor(i / 2) + 1}` : null
-                };
-                
-                firstRoundMatches.push(match);
-                matches.push(match);
-            }
-            rounds.push(firstRoundMatches);
-
-            // Create subsequent rounds
-            let matchCount = bracketSize / 2;
-            for (let round = 2; round <= numRounds; round++) {
-                const roundMatches = [];
-                matchCount /= 2;
-                
-                for (let i = 0; i < matchCount; i++) {
-                    const match = {
-                        id: `R${round}_M${i + 1}`,
-                        round: round,
-                        player1: null,
-                        player2: null,
-                        winner: null,
-                        nextMatchId: i < matchCount / 2 ? `R${round + 1}_M${Math.floor(i / 2) + 1}` : null
-                    };
-                    roundMatches.push(match);
-                    matches.push(match);
-                }
-                rounds.push(roundMatches);
-            }
-
-            return { rounds, matches, bracketSize, numRounds };
-        }
-
-        // ============================================
-        // Render Brackets
-        // ============================================
-        function renderBrackets() {
-            const container = document.getElementById('bracketsContent');
-            
-            if (!currentCategory || !brackets[currentCategory]) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon"></div>
-                        <h3>No Brackets Selected</h3>
-                        <p>Go to Categories and click on a category to view brackets</p>
-                        <button class="btn btn-primary" onclick="showSection('categories')" style="margin-top: 20px;">📋 Go to Categories</button>
-                    </div>
-                `;
-                return;
-            }
-
-            const bracketData = brackets[currentCategory];
-            const roundNames = getRoundNames(bracketData.numRounds);
-
-            let html = `<h3 style="color: var(--accent-yellow); margin-bottom: 20px; font-size: 1.3rem;">${currentCategory}</h3>`;
-
-            bracketData.rounds.forEach((round, roundIndex) => {
-                const roundName = roundNames[roundIndex] || `Round ${roundIndex + 1}`;
-                html += `<div class="bracket-round">`;
-                html += `<div class="bracket-round-title">${roundName}</div>`;
-                
-                round.forEach(match => {
-                    html += renderBracketMatch(match);
-                });
-                
-                html += `</div>`;
-            });
-
-            container.innerHTML = html;
-        }
-
-        function getRoundNames(numRounds) {
-            const names = [];
-            for (let i = numRounds; i >= 1; i--) {
-                if (i === 1) names.unshift('Final');
-                else if (i === 2) names.unshift('Semi-Finals');
-                else if (i === 3) names.unshift('Quarter-Finals');
-                else names.unshift(`Round of ${Math.pow(2, i)}`);
-            }
-            return names;
-        }
-
-        function renderBracketMatch(match) {
-            const player1Name = match.player1 ? match.player1.player_name : 'TBD';
-            const player2Name = match.player2 ? match.player2.player_name : 'TBD';
-            const player1Winner = match.winner && match.winner.id === match.player1?.id;
-            const player2Winner = match.winner && match.winner.id === match.player2?.id;
-
-            return `
-                <div class="bracket-match">
-                    <div class="bracket-players">
-                        <div class="bracket-player ${player1Winner ? 'winner' : ''} ${player2Winner ? 'loser' : ''}" 
-                             onclick="selectWinner('${match.id}', 'player1')">
-                            ${player1Name} ${player1Winner ? '🏆' : ''}
-                        </div>
-                        <div class="bracket-vs">VS</div>
-                        <div class="bracket-player ${player2Winner ? 'winner' : ''} ${player1Winner ? 'loser' : ''}" 
-                             onclick="selectWinner('${match.id}', 'player2')">
-                            ${player2Name} ${player2Winner ? '🏆' : ''}
-                        </div>
-                    </div>
-                    <div>
-                        ${match.winner ? `<span style="color: var(--success); font-weight: 700;">Winner: ${match.winner.player_name}</span>` : '<span style="color: var(--warning);">Pending</span>'}
-                    </div>
-                </div>
-            `;
-        }
-
-        function selectWinner(matchId, playerKey) {
-            if (!currentCategory || !brackets[currentCategory]) return;
-
-            const bracketData = brackets[currentCategory];
-            const match = bracketData.matches.find(m => m.id === matchId);
-            
-            if (!match || !match.player1 || !match.player2) {
-                showAlert('error', 'Both players must be present');
-                return;
-            }
-
-            const winner = playerKey === 'player1' ? match.player1 : match.player2;
-            match.winner = winner;
-
-            // Advance winner to next match
-            if (match.nextMatchId) {
-                const nextMatch = bracketData.matches.find(m => m.id === match.nextMatchId);
-                if (nextMatch) {
-                    if (!nextMatch.player1) nextMatch.player1 = winner;
-                    else if (!nextMatch.player2) nextMatch.player2 = winner;
-                }
-            }
-
+            // Save current data first
             saveToLocal();
-            renderBrackets();
-            showAlert('success', `Winner: ${winner.player_name}`);
-
-            // Check if tournament is complete
-            const finalMatch = bracketData.matches[bracketData.matches.length - 1];
-            if (finalMatch && finalMatch.winner) {
-                showAlert('success', `🏆 Tournament Champion: ${finalMatch.winner.player_name}!`);
-            }
-        }
-
-        // ============================================
-        // Render Matches
-        // ============================================
-        function renderMatches() {
-            const container = document.getElementById('matchesContent');
             
-            const allMatches = [];
-            Object.keys(brackets).forEach(catName => {
-                if (brackets[catName]) {
-                    brackets[catName].matches.forEach(m => {
-                        if (m.player1 && m.player2) {
-                            allMatches.push({ ...m, categoryName: catName });
-                        }
-                    });
-                }
-            });
-
-            if (allMatches.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="icon">⚔️</div><h3>No Matches Yet</h3><p>Generate brackets from categories</p></div>';
-                return;
-            }
-
-            container.innerHTML = allMatches.map((match, index) => `
-                <div class="bracket-match">
-                    <div class="bracket-players">
-                        <div class="category-details" style="margin-bottom: 10px; color: var(--accent-yellow);">${match.categoryName}</div>
-                        <div class="bracket-player ${match.winner?.id === match.player1?.id ? 'winner' : ''}">
-                            ${match.player1?.player_name || 'TBD'}
-                        </div>
-                        <div class="bracket-vs">VS</div>
-                        <div class="bracket-player ${match.winner?.id === match.player2?.id ? 'winner' : ''}">
-                            ${match.player2?.player_name || 'TBD'}
-                        </div>
-                    </div>
-                    <div>
-                        ${match.winner ? `<span style="color: var(--success); font-weight: 700;">Winner: ${match.winner.player_name}</span>` : '<button class="btn btn-primary btn-sm" onclick="openCategoryBrackets(\'' + match.categoryName.replace(/'/g, "\\'") + '\')">Set Result</button>'}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // ============================================
-        // Render Standings
-        // ============================================
-        function renderStandings() {
-            const container = document.getElementById('standingsContent');
-            
-            const champions = [];
-            Object.keys(brackets).forEach(catName => {
-                if (brackets[catName]) {
-                    const finalMatch = brackets[catName].matches[brackets[catName].matches.length - 1];
-                    if (finalMatch && finalMatch.winner) {
-                        champions.push({ category: catName, winner: finalMatch.winner });
-                    }
-                }
-            });
-
-            if (champions.length === 0) {
-                container.innerHTML = '<div class="empty-state"><div class="icon">📊</div><h3>No Standings Yet</h3><p>Complete matches to see standings</p></div>';
-                return;
-            }
-
-            container.innerHTML = `
-                <div class="stats-box">
-                    <h3>🏆 Category Champions</h3>
-                    ${champions.map(c => `
-                        <div style="background: var(--dark-gray); padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--accent-yellow);">
-                            <strong style="color: var(--accent-yellow);">${c.category}</strong><br>
-                            <span style="font-size: 1.2rem; font-weight: 700;">🥇 ${c.winner.player_name}</span>
-                            ${c.winner.team ? `<span style="color: rgba(255,255,255,0.6);"> - ${c.winner.team}</span>` : ''}
-                        </div>
-                    `).join('')}
-                </div>
-            `;
+            // Navigate to the new brackets page
+            window.location.href = `tournament-brackets.html?tournament_id=${tournamentId}&category=${encodeURIComponent(categoryName)}`;
         }
 
         // ============================================
@@ -899,7 +589,6 @@
         function saveToLocal() {
             localStorage.setItem(`tournament_${tournamentId}_players`, JSON.stringify(players));
             localStorage.setItem(`tournament_${tournamentId}_categories`, JSON.stringify(categories));
-            localStorage.setItem(`tournament_${tournamentId}_brackets`, JSON.stringify(brackets));
             console.log('💾 Saved to local storage');
         }
 
@@ -907,11 +596,8 @@
             if (confirm('Clear all data? This cannot be undone.')) {
                 players = [];
                 categories = [];
-                brackets = {};
-                currentCategory = null;
                 localStorage.removeItem(`tournament_${tournamentId}_players`);
                 localStorage.removeItem(`tournament_${tournamentId}_categories`);
-                localStorage.removeItem(`tournament_${tournamentId}_brackets`);
                 renderPlayers();
                 showAlert('success', 'All data cleared');
             }
