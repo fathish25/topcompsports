@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Organizers - TopCompSports</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-blue: #0066CC;
+            --dark-blue: #003366;
+            --accent-yellow: #FFB800;
+            --black: #0A0A0A;
+            --dark-gray: #1A1A1A;
+            --medium-gray: #2A2A2A;
+            --white: #FFFFFF;
+            --light-bg: #F5F7FA;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); color: var(--black); min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar { 
+            width: 280px; 
+            background: var(--black); 
+            color: var(--white); 
+            position: fixed; 
+            right: 0; 
+            top: 0; 
+            height: 100vh; 
+            overflow-y: auto;
+            padding: 20px;
+            z-index: 1000;
+        }
+        .logo { display: flex; align-items: center; gap: 15px; padding: 20px; border-bottom: 2px solid var(--medium-gray); margin-bottom: 30px; }
+        .logo-icon { width: 50px; height: 50px; background: var(--accent-yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; color: var(--dark-blue); }
+        .logo-text { font-size: 1.5rem; font-weight: 900; color: var(--white); }
+        .nav-item { padding: 15px 20px; margin-bottom: 8px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--white); }
+        .nav-item:hover { background: var(--medium-gray); }
+        .nav-item.active { background: var(--gradient-blue); }
+        .nav-item .icon { font-size: 1.3rem; }
+        .role-badge { background: var(--accent-yellow); color: var(--black); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-top: 20px; display: inline-block; }
+
+        /* Main Content */
+        .main-content { margin-right: 280px; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 20px; background: var(--white); border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .page-title { font-size: 2rem; font-weight: 900; color: var(--black); }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--gradient-blue); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: bold; font-size: 1.2rem; }
+        .btn-logout { background: var(--danger); color: var(--white); padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        /* Filter Tabs */
+        .filter-tabs { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+        .filter-tab { 
+            padding: 12px 25px; 
+            background: var(--white); 
+            border: 2px solid var(--light-bg); 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            transition: all 0.3s;
+        }
+        .filter-tab:hover { border-color: var(--primary-blue); }
+        .filter-tab.active { background: var(--primary-blue); color: var(--white); border-color: var(--primary-blue); }
+        .filter-tab .count { 
+            background: var(--accent-yellow); 
+            color: var(--black); 
+            padding: 2px 8px; 
+            border-radius: 12px; 
+            font-size: 0.8rem; 
+            margin-right: 8px;
+        }
+
+        /* Section */
+        .section { background: var(--white); border-radius: 15px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        .section-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid var(--light-bg); display: flex; align-items: center; gap: 10px; }
+
+        /* Organizer Cards */
+        .organizers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+        .organizer-card { 
+            background: var(--white); 
+            border-radius: 15px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .organizer-card:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.15); border-color: var(--primary-blue); }
+        
+        .organizer-header { 
+            background: var(--gradient-blue); 
+            padding: 25px; 
+            color: var(--white);
+            position: relative;
+        }
+        .organizer-avatar { 
+            width: 80px; 
+            height: 80px; 
+            border-radius: 50%; 
+            background: var(--accent-yellow); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 2rem; 
+            font-weight: bold; 
+            color: var(--dark-blue);
+            margin-bottom: 15px;
+            border: 4px solid var(--white);
+        }
+        .organizer-name { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
+        .organizer-email { font-size: 0.9rem; opacity: 0.9; }
+        .status-badge { 
+            position: absolute; 
+            top: 15px; 
+            left: 15px; 
+            padding: 6px 15px; 
+            border-radius: 20px; 
+            font-size: 0.8rem; 
+            font-weight: 700;
+        }
+        .status-badge.pending { background: var(--warning); color: var(--black); }
+        .status-badge.approved { background: var(--success); color: var(--white); }
+        .status-badge.rejected { background: var(--danger); color: var(--white); }
+
+        .organizer-body { padding: 25px; }
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--light-bg); }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: rgba(0,0,0,0.6); font-size: 0.9rem; }
+        .info-value { font-weight: 600; color: var(--black); }
+
+        .organizer-actions { 
+            padding: 20px 25px; 
+            background: var(--light-bg); 
+            display: flex; 
+            gap: 10px;
+        }
+        .btn { padding: 12px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; flex: 1; text-align: center; }
+        .btn-approve { background: var(--success); color: var(--white); }
+        .btn-approve:hover { background: #059669; transform: translateY(-2px); }
+        .btn-reject { background: var(--danger); color: var(--white); }
+        .btn-reject:hover { background: #DC2626; transform: translateY(-2px); }
+        .btn-view { background: var(--primary-blue); color: var(--white); }
+        .btn-view:hover { background: var(--dark-blue); transform: translateY(-2px); }
+
+        /* Modal */
+        .modal-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; right: 0; bottom: 0; 
+            background: rgba(0,0,0,0.7); 
+            z-index: 2000; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal { 
+            background: var(--white); 
+            border-radius: 15px; 
+            max-width: 800px; 
+            width: 100%; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            padding: 30px; 
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid var(--light-bg); }
+        .modal-header h2 { font-size: 1.5rem; font-weight: 900; }
+        .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: rgba(0,0,0,0.5); }
+        .modal-close:hover { color: var(--danger); }
+
+        .detail-section { margin-bottom: 25px; }
+        .detail-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; color: var(--primary-blue); }
+        .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .detail-item { padding: 15px; background: var(--light-bg); border-radius: 8px; }
+        .detail-label { font-size: 0.85rem; color: rgba(0,0,0,0.6); margin-bottom: 5px; }
+        .detail-value { font-weight: 600; color: var(--black); }
+
+        .document-preview { 
+            width: 100%; 
+            height: 300px; 
+            background: var(--light-bg); 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        .document-preview img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+        /* Alert */
+        .alert { padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; }
+        .alert.show { display: block; }
+        .alert-success { background: #D1FAE5; color: #065F46; }
+        .alert-error { background: #FEE2E2; color: #991B1B; }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 80px 20px; color: rgba(0,0,0,0.5); }
+        .empty-state .icon { font-size: 5rem; margin-bottom: 20px; opacity: 0.5; }
+        .empty-state h3 { font-size: 1.5rem; margin-bottom: 10px; }
+
+        /* Loading */
+        .loading { text-align: center; padding: 60px; color: rgba(0,0,0,0.5); font-size: 1.2rem; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .main-content { margin-right: 0; padding: 20px; }
+            .organizers-grid { grid-template-columns: 1fr; }
+            .filter-tabs { flex-direction: column; }
+            .modal { padding: 20px; margin: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        
+        <nav>
+            <a href="admin-dashboard.html" class="nav-item">
+                <span class="icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="admin-users.html" class="nav-item">
+                <span class="icon"></span>
+                <span>Users</span>
+            </a>
+            <a href="admin-tournaments.html" class="nav-item">
+                <span class="icon">🏆</span>
+                <span>Tournaments</span>
+            </a>
+            <a href="admin-organizations.html" class="nav-item">
+                <span class="icon">🏢</span>
+                <span>Organizations</span>
+            </a>
+            <a href="admin-registrations.html" class="nav-item">
+                <span class="icon"></span>
+                <span>Registrations</span>
+            </a>
+            <a href="admin-reports.html" class="nav-item">
+                <span class="icon">📈</span>
+                <span>Reports</span>
+            </a>
+            <a href="admin-settings.html" class="nav-item">
+                <span class="icon">⚙️</span>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div id="adminRole" class="role-badge">Loading...</div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <h1 class="page-title">Verify Organizers</h1>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <span id="userName">Admin</span>
+                <button class="btn-logout" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <div class="filter-tab active" onclick="filterOrganizers('pending')">
+                <span class="count" id="pendingCount">0</span>
+                Pending
+            </div>
+            <div class="filter-tab" onclick="filterOrganizers('approved')">
+                <span class="count" id="approvedCount">0</span>
+                Approved
+            </div>
+            <div class="filter-tab" onclick="filterOrganizers('rejected')">
+                <span class="count" id="rejectedCount">0</span>
+                Rejected
+            </div>
+            <div class="filter-tab" onclick="filterOrganizers('all')">
+                All
+            </div>
+        </div>
+
+        <!-- Organizers List -->
+        <div id="organizersList">
+            <div class="loading">Loading...</div>
+        </div>
+    </main>
+
+    <!-- Details Modal -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Organizer Details</h2>
+                <button class="modal-close" onclick="closeModal()"></button>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentAdmin = null;
+        let currentFilter = 'pending';
+        let allOrganizers = [];
+
+        window.onload = async function() {
+            await checkAuth();
+            await loadOrganizers();
+        };
+
+        async function checkAuth() {
+            const storedAdmin = localStorage.getItem('currentAdmin');
+            if (!storedAdmin) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
+
+            try {
+                currentAdmin = JSON.parse(storedAdmin);
+                
+                if (currentAdmin.role !== 'super_admin' && currentAdmin.role !== 'admin') {
+                    showAlert('Access denied.', 'error');
+                    setTimeout(() => window.location.href = 'admin-dashboard.html', 2000);
+                    return;
+                }
+
+                document.getElementById('userName').textContent = currentAdmin.full_name || 'Admin';
+                document.getElementById('userAvatar').textContent = (currentAdmin.full_name || 'A')[0].toUpperCase();
+                
+                const roleBadge = document.getElementById('adminRole');
+                roleBadge.textContent = currentAdmin.role === 'super_admin' ? 'Super Admin' : 'Admin';
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = 'admin-login.html';
+            }
+        }
+
+        async function loadOrganizers() {
+            const { data: organizers, error } = await dbClient
+                .from('organizers')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                document.getElementById('organizersList').innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">❌</div>
+                        <h3>Error loading data</h3>
+                    </div>
+                `;
+                return;
+            }
+
+            allOrganizers = organizers || [];
+            updateCounts();
+            renderOrganizers();
+        }
+
+        function updateCounts() {
+            const pending = allOrganizers.filter(o => o.verification_status === 'pending').length;
+            const approved = allOrganizers.filter(o => o.verification_status === 'approved').length;
+            const rejected = allOrganizers.filter(o => o.verification_status === 'rejected').length;
+
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('approvedCount').textContent = approved;
+            document.getElementById('rejectedCount').textContent = rejected;
+        }
+
+        function filterOrganizers(status) {
+            currentFilter = status;
+            
+            // Update active tab
+            document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            renderOrganizers();
+        }
+
+        function renderOrganizers() {
+            const container = document.getElementById('organizersList');
+            
+            let filtered = allOrganizers;
+            if (currentFilter !== 'all') {
+                filtered = allOrganizers.filter(o => o.verification_status === currentFilter);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📋</div>
+                        <h3>No organizers found</h3>
+                        <p>No ${currentFilter} organizers at the moment</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="organizers-grid">
+                    ${filtered.map(org => `
+                        <div class="organizer-card">
+                            <div class="organizer-header">
+                                <div class="status-badge ${org.verification_status}">${org.verification_status.toUpperCase()}</div>
+                                <div class="organizer-avatar">${(org.full_name || 'O')[0].toUpperCase()}</div>
+                                <div class="organizer-name">${org.full_name}</div>
+                                <div class="organizer-email">${org.email}</div>
+                            </div>
+                            <div class="organizer-body">
+                                <div class="info-row">
+                                    <span class="info-label">Organization</span>
+                                    <span class="info-value">${org.organization_name || 'N/A'}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Country</span>
+                                    <span class="info-value">${org.country || 'N/A'}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Phone</span>
+                                    <span class="info-value">${org.phone || 'N/A'}</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Submitted</span>
+                                    <span class="info-value">${new Date(org.created_at).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                            <div class="organizer-actions">
+                                <button class="btn btn-view" onclick="viewOrganizer('${org.id}')">View Details</button>
+                                ${org.verification_status === 'pending' ? `
+                                    <button class="btn btn-approve" onclick="approveOrganizer('${org.id}')">Approve</button>
+                                    <button class="btn btn-reject" onclick="rejectOrganizer('${org.id}')">Reject</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function viewOrganizer(organizerId) {
+            const org = allOrganizers.find(o => o.id === organizerId);
+            if (!org) return;
+
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="detail-section">
+                    <h3>👤 Personal Information</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Full Name</div>
+                            <div class="detail-value">${org.full_name}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Email</div>
+                            <div class="detail-value">${org.email}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Phone</div>
+                            <div class="detail-value">${org.phone || 'N/A'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">WhatsApp</div>
+                            <div class="detail-value">${org.whatsapp || 'N/A'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Country</div>
+                            <div class="detail-value">${org.country || 'N/A'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">City</div>
+                            <div class="detail-value">${org.city || 'N/A'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3> Organization Information</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Organization Name</div>
+                            <div class="detail-value">${org.organization_name || 'N/A'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Organization Type</div>
+                            <div class="detail-value">${org.organization_type || 'N/A'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Address</div>
+                            <div class="detail-value">${org.organization_address || 'N/A'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Website</div>
+                            <div class="detail-value">${org.website ? `<a href="${org.website}" target="_blank">${org.website}</a>` : 'N/A'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>📱 Social Media</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Facebook</div>
+                            <div class="detail-value">${org.social_media_facebook || 'N/A'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Instagram</div>
+                            <div class="detail-value">${org.social_media_instagram || 'N/A'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Twitter</div>
+                            <div class="detail-value">${org.social_media_twitter || 'N/A'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>📄 Documents</h3>
+                    ${org.id_document_url ? `
+                        <div class="detail-item">
+                            <div class="detail-label">ID Document</div>
+                            <div class="document-preview">
+                                <img src="${org.id_document_url}" alt="ID Document" onerror="this.parentElement.innerHTML='<p>Document preview not available</p>'">
+                            </div>
+                        </div>
+                    ` : '<p>No documents uploaded</p>'}
+                </div>
+
+                <div class="detail-section">
+                    <h3>📝 Additional Information</h3>
+                    <div class="detail-item">
+                        <div class="detail-label">Bio</div>
+                        <div class="detail-value">${org.bio || 'N/A'}</div>
+                    </div>
+                </div>
+
+                ${org.verification_status === 'pending' ? `
+                    <div style="display: flex; gap: 15px; margin-top: 30px;">
+                        <button class="btn btn-approve" onclick="approveOrganizer('${org.id}'); closeModal();">
+                            ✅ Approve Organizer
+                        </button>
+                        <button class="btn btn-reject" onclick="rejectOrganizer('${org.id}'); closeModal();">
+                            ❌ Reject Organizer
+                        </button>
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('modalOverlay').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+        }
+
+        async function approveOrganizer(organizerId) {
+            if (!confirm('Are you sure you want to approve this organizer?')) return;
+
+            const { error } = await dbClient
+                .from('organizers')
+                .update({ 
+                    verification_status: 'approved',
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', organizerId);
+
+            if (error) {
+                showAlert('Error approving organizer: ' + error.message, 'error');
+                return;
+            }
+
+            showAlert('Organizer approved successfully!', 'success');
+            await loadOrganizers();
+        }
+
+        async function rejectOrganizer(organizerId) {
+            if (!confirm('Are you sure you want to reject this organizer?')) return;
+
+            const { error } = await dbClient
+                .from('organizers')
+                .update({ 
+                    verification_status: 'rejected',
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', organizerId);
+
+            if (error) {
+                showAlert('Error rejecting organizer: ' + error.message, 'error');
+                return;
+            }
+
+            showAlert('Organizer rejected', 'success');
+            await loadOrganizers();
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        async function handleLogout() {
+            await dbClient.auth.signOut();
+            localStorage.removeItem('currentAdmin');
+            window.location.href = 'admin-login.html';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
