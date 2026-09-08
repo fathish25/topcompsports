@@ -7,135 +7,750 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --primary-blue: #0066CC; --dark-blue: #003366; --accent-yellow: #FFB800;
-            --black: #0A0A0A; --dark-gray: #1A1A1A; --medium-gray: #2A2A2A; --white: #FFFFFF;
+            --primary-blue: #0066CC;
+            --dark-blue: #003366;
+            --accent-yellow: #FFB800;
+            --black: #0A0A0A;
+            --dark-gray: #1A1A1A;
+            --medium-gray: #2A2A2A;
+            --light-gray: #3A3A3A;
+            --white: #FFFFFF;
+            --light-bg: #F5F7FA;
             --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
-        
-        .header { background: rgba(10,10,10,0.98); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-blue); position: sticky; top: 0; z-index: 1000; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); color: var(--black); min-height: 100vh; }
+        img { max-width: 100%; height: auto; }
+
+        /* Header */
+        .header { background: var(--black); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-blue); position: sticky; top: 0; z-index: 1000; }
         .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; }
-        .logo-text { font-size: 24px; font-weight: bold; color: var(--accent-yellow); }
-        .nav { display: flex; gap: 20px; align-items: center; }
-        .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; }
-        .nav a:hover { color: var(--primary-blue); }
-        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.3s; }
-        .btn-primary { background: var(--primary-blue); color: var(--white); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.4); }
-        .btn-secondary { background: transparent; color: var(--white); border: 2px solid var(--white); }
+        .logo-svg { width: 50px; height: 50px; }
+        .logo-text { font-size: 28px; font-weight: bold; color: var(--primary-blue); }
+        .nav { display: flex; gap: 30px; align-items: center; }
+        .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; transition: all 0.3s; font-weight: 600; }
+        .nav a:hover { color: var(--accent-yellow); }
+
+        .user-section { display: flex; align-items: center; gap: 15px; }
+        .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; border: 2px solid var(--accent-yellow); background: var(--medium-gray); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .user-name { font-weight: 600; color: var(--accent-yellow); }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; text-decoration: none; display: inline-block; }
+        .btn-logout { background: transparent; border: 2px solid var(--white); color: var(--white); }
+        .btn-logout:hover { background: var(--white); color: var(--black); }
+        .btn-login { background: var(--primary-blue); color: var(--white); }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.4); }
+        .btn-register { background: var(--accent-yellow); color: var(--black); padding: 12px 30px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem; }
+        .btn-register:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,184,0,0.4); }
+        .btn-secondary { background: transparent; color: var(--white); border: 2px solid var(--white); padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
         .btn-secondary:hover { background: var(--white); color: var(--black); }
 
-        .hero { padding: 60px 50px; background: var(--gradient-blue); }
-        .hero-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr; gap: 40px; align-items: center; }
-        .hero-text h1 { font-size: 3rem; margin-bottom: 15px; }
-        .hero-text p { font-size: 1.1rem; color: rgba(255,255,255,0.9); margin-bottom: 10px; }
-        .hero-card { background: rgba(0,0,0,0.3); padding: 30px; border-radius: 15px; border: 2px solid var(--accent-yellow); text-align: center; }
-        .hero-card h3 { color: var(--accent-yellow); margin-bottom: 15px; }
-        
-        .container { max-width: 1200px; margin: 0 auto; padding: 40px 50px; }
-        .section { background: var(--dark-gray); border-radius: 15px; padding: 30px; margin-bottom: 30px; border: 1px solid var(--medium-gray); }
-        .section-title { font-size: 1.5rem; color: var(--accent-yellow); margin-bottom: 20px; border-bottom: 2px solid var(--medium-gray); padding-bottom: 10px; }
+        .lang-switcher { display: flex; gap: 5px; background: var(--medium-gray); padding: 5px; border-radius: 8px; }
+        .lang-btn { padding: 8px 15px; border: none; background: transparent; color: var(--white); cursor: pointer; border-radius: 6px; font-weight: bold; }
+        .lang-btn.active { background: var(--primary-blue); }
 
-        .loading { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.6); }
-        .empty-state { text-align: center; padding: 40px 20px; color: rgba(255,255,255,0.6); }
+        /* Tournament Header */
+        .tournament-header { background: var(--black); padding: 30px 50px; border-bottom: 3px solid var(--primary-blue); }
+        .tournament-header-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .tournament-title-section { display: flex; align-items: center; gap: 20px; }
+        .tournament-logo { width: 80px; height: 80px; border-radius: 12px; overflow: hidden; background: var(--medium-gray); }
+        .tournament-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .tournament-title h1 { color: var(--white); font-size: 2rem; font-weight: 900; margin-bottom: 5px; }
+        .tournament-title p { color: rgba(255,255,255,0.7); font-size: 1rem; }
+        .tournament-actions { display: flex; gap: 15px; align-items: center; }
+
+        /* Tabs */
+        .tabs-container { background: var(--dark-gray); border-bottom: 1px solid var(--medium-gray); position: sticky; top: 73px; z-index: 999; }
+        .tabs { max-width: 1200px; margin: 0 auto; display: flex; gap: 5px; padding: 0 50px; overflow-x: auto; }
+        .tab { padding: 15px 25px; color: rgba(255,255,255,0.7); text-decoration: none; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.3s; white-space: nowrap; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .tab:hover { color: var(--white); }
+        .tab.active { color: var(--white); border-bottom-color: var(--accent-yellow); }
+        .tab-icon { font-size: 1.2rem; }
+
+        /* Banner */
+        .banner { max-width: 1200px; margin: 40px auto; padding: 0 50px; }
+        .banner-image { width: 100%; height: 400px; border-radius: 15px; overflow: hidden; background: var(--gradient-blue); position: relative; }
+        .banner-image img { width: 100%; height: 100%; object-fit: cover; }
+        .banner-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.7)); display: flex; align-items: flex-end; padding: 30px; }
+        .banner-text { color: var(--white); }
+        .banner-text h2 { font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; }
+
+        /* Main Content */
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 0 50px 60px; display: grid; grid-template-columns: 2fr 1fr; gap: 40px; }
+
+        /* Info Section */
+        .info-section { background: var(--white); border-radius: 15px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .info-section h2 { font-size: 1.8rem; font-weight: 900; color: var(--black); margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--primary-blue); }
+        .info-section h3 { font-size: 1.3rem; font-weight: 700; color: var(--black); margin: 25px 0 15px; }
+        .info-section p { color: rgba(0,0,0,0.8); line-height: 1.8; margin-bottom: 15px; }
+        .info-section ul { margin: 15px 0; padding-left: 25px; }
+        .info-section li { color: rgba(0,0,0,0.8); line-height: 1.8; margin-bottom: 10px; }
+        .info-section a { color: var(--primary-blue); text-decoration: none; font-weight: 600; }
+        .info-section a:hover { text-decoration: underline; }
+        .info-meta { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+        .info-meta-item { display: flex; align-items: center; gap: 12px; color: rgba(0,0,0,0.7); font-size: 1rem; }
+        .info-meta-item strong { color: var(--black); }
+
+        .divisions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 20px 0; }
+        .division-card { background: var(--light-bg); padding: 20px; border-radius: 10px; border-left: 4px solid var(--primary-blue); }
+        .division-card h4 { color: var(--black); margin-bottom: 10px; font-size: 1.1rem; }
+        .division-card p { color: rgba(0,0,0,0.7); font-size: 0.9rem; margin: 5px 0; }
+
+        /* Sidebar */
+        .sidebar { display: flex; flex-direction: column; gap: 25px; }
+        .sidebar-card { background: var(--white); border-radius: 15px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .sidebar-card h3 { font-size: 1.2rem; font-weight: 700; color: var(--black); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--light-bg); }
+        .sidebar-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--light-bg); }
+        .sidebar-item:last-child { border-bottom: none; }
+        .sidebar-item-label { color: rgba(0,0,0,0.6); font-size: 0.9rem; }
+        .sidebar-item-value { color: var(--black); font-weight: 700; font-size: 1rem; }
+        .sidebar-item-value.highlight { color: var(--primary-blue); }
+
+        .registration-dates { display: flex; flex-direction: column; gap: 15px; }
+        .reg-date-item { padding: 15px; background: var(--light-bg); border-radius: 10px; border-left: 4px solid var(--primary-blue); }
+        .reg-date-item.late { border-left-color: var(--accent-yellow); }
+        .reg-date-item h4 { font-size: 0.9rem; color: rgba(0,0,0,0.6); margin-bottom: 5px; }
+        .reg-date-item p { font-size: 1rem; color: var(--black); font-weight: 700; }
+
+        .entries-list { display: flex; flex-direction: column; gap: 12px; }
+        .entry-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--light-bg); border-radius: 8px; }
+        .entry-name { font-weight: 600; color: var(--black); }
+        .entry-price { color: var(--primary-blue); font-weight: 700; }
+
+        .location-card { display: flex; flex-direction: column; gap: 10px; }
+        .location-address { color: rgba(0,0,0,0.8); line-height: 1.6; }
+        .location-map { width: 100%; height: 200px; background: var(--light-bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: rgba(0,0,0,0.5); cursor: pointer; transition: all 0.3s; }
+        .location-map:hover { background: var(--primary-blue); color: var(--white); }
+
+        .organizer-card { display: flex; flex-direction: column; gap: 12px; }
+        .organizer-name { font-weight: 700; color: var(--black); font-size: 1.1rem; }
+        .organizer-info { color: rgba(0,0,0,0.6); font-size: 0.9rem; }
+        .contact-links { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .contact-link { display: flex; align-items: center; gap: 10px; color: var(--primary-blue); text-decoration: none; padding: 10px; background: var(--light-bg); border-radius: 8px; transition: all 0.3s; }
+        .contact-link:hover { background: var(--primary-blue); color: var(--white); }
+
+        /* Loading & Empty States */
+        .loading { text-align: center; padding: 60px 20px; color: rgba(0,0,0,0.5); font-size: 1.2rem; }
+        .empty-state { text-align: center; padding: 60px 20px; color: rgba(0,0,0,0.5); }
+        .empty-state .icon { font-size: 5rem; margin-bottom: 20px; opacity: 0.5; }
+
+        /* Footer */
+        .footer { background: var(--black); padding: 30px 50px; color: rgba(255,255,255,0.6); text-align: center; border-top: 1px solid var(--medium-gray); margin-top: 60px; }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .header { padding: 15px 30px; }
+            .tournament-header { padding: 30px 30px; }
+            .tabs { padding: 0 30px; }
+            .banner { padding: 0 30px; }
+            .main-content { padding: 0 30px 60px; grid-template-columns: 1fr; }
+        }
 
         @media (max-width: 768px) {
-            .header { padding: 15px 20px; flex-direction: column; gap: 15px; }
-            .hero-content { grid-template-columns: 1fr; }
-            .container { padding: 20px; }
+            .header { padding: 12px 20px; flex-direction: column; gap: 15px; }
+            .nav { flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .nav a { padding: 6px 10px; font-size: 0.9rem; }
+            .tournament-header { padding: 20px; }
+            .tournament-title-section { flex-direction: column; align-items: flex-start; }
+            .tournament-title h1 { font-size: 1.5rem; }
+            .tabs { padding: 0 20px; overflow-x: auto; }
+            .tab { padding: 12px 15px; font-size: 0.9rem; }
+            .banner { padding: 0 20px; }
+            .banner-image { height: 250px; }
+            .banner-text h2 { font-size: 1.8rem; }
+            .main-content { padding: 0 20px 40px; }
+            .info-section { padding: 25px; }
+            .info-section h2 { font-size: 1.5rem; }
+            .divisions-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .header { padding: 10px 15px; }
+            .logo-text { font-size: 22px; }
+            .tournament-header { padding: 15px; }
+            .tournament-title h1 { font-size: 1.3rem; }
+            .tournament-actions { flex-direction: column; width: 100%; }
+            .tournament-actions .btn { width: 100%; text-align: center; }
+            .tabs { padding: 0 15px; }
+            .tab { padding: 10px 12px; font-size: 0.85rem; }
+            .banner { padding: 0 15px; }
+            .banner-image { height: 200px; }
+            .banner-text h2 { font-size: 1.5rem; }
+            .main-content { padding: 0 15px 30px; }
+            .info-section { padding: 20px; }
+            .sidebar-card { padding: 20px; }
         }
     </style>
 </head>
 <body>
     <header class="header">
         <div class="logo" onclick="window.location.href='index.html'">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0066CC;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#003366;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <circle cx="50" cy="50" r="45" fill="url(#logoGrad)" stroke="#FFB800" stroke-width="3"/>
+                <text x="50" y="65" font-family="Arial Black, sans-serif" font-size="45" font-weight="900" fill="#FFB800" text-anchor="middle">T</text>
+                <path d="M 20 75 Q 50 85 80 75" stroke="#FFB800" stroke-width="2" fill="none"/>
+            </svg>
             <div class="logo-text">TopCompSports</div>
         </div>
+        
         <nav class="nav">
             <a href="index.html">Home</a>
-            <a href="index.html#tournaments">Tournaments</a>
-            <a href="login.html" id="navLogin">Login</a>
+            <a href="tournaments.html">Tournaments</a>
+            
+            <div id="userSection" class="user-section" style="display: none;">
+                <a href="my-profile.html" style="color: var(--accent-yellow); text-decoration: none;">My Profile</a>
+                <div class="user-info" onclick="window.location.href='my-profile.html'">
+                    <div class="user-avatar" id="userAvatar"><span>👤</span></div>
+                    <span class="user-name" id="userName">User</span>
+                </div>
+                <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
+            </div>
+            
+            <a href="login.html" id="loginBtn" class="btn btn-login">Login</a>
+            
+            <div class="lang-switcher">
+                <button class="lang-btn" onclick="changeLanguage('ar')" id="btn-ar">عربي</button>
+                <button class="lang-btn active" onclick="changeLanguage('en')" id="btn-en">English</button>
+            </div>
         </nav>
     </header>
 
-    <section class="hero">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1 id="tournamentName">Loading...</h1>
-                <p id="tournamentDesc"></p>
-                <p>📍 <span id="tournamentLocation">-</span></p>
-                <p>📅 <span id="tournamentDate">-</span></p>
-            </div>
-            <div class="hero-card">
-                <h3>Registration</h3>
-                <p style="margin-bottom: 20px; color: rgba(255,255,255,0.8);">Secure your spot in this tournament</p>
-                <!-- هنا سيتم وضع زر التسجيل أو زر تسجيل الدخول ديناميكياً -->
-                <div id="registerAction"></div>
-            </div>
-        </div>
-    </section>
-
-    <div class="container">
-        <div class="section">
-            <div class="section-title">📋 Tournament Information</div>
-            <p id="tournamentFullDesc" style="color: rgba(255,255,255,0.8); line-height: 1.8;">Loading details...</p>
-        </div>
+    <div id="tournamentContent">
+        <div class="loading">Loading tournament details...</div>
     </div>
+
+    <footer class="footer">
+        <p>© 2026 TopCompSports - All rights reserved</p>
+    </footer>
 
     <script>
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentLang = localStorage.getItem('lang') || 'en';
         let tournamentId = null;
 
-        window.onload = async () => {
+        window.onload = async function() {
+            checkUserStatus();
             const urlParams = new URLSearchParams(window.location.search);
             tournamentId = urlParams.get('tournament_id');
             
             if (!tournamentId) {
-                document.getElementById('tournamentName').textContent = 'Tournament not found';
+                document.getElementById('tournamentContent').innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon"></div>
+                        <p>Tournament not found</p>
+                    </div>
+                `;
                 return;
             }
+            
+            await loadTournamentDetails();
+        };
 
-            // 1. التحقق من حالة تسجيل الدخول لعرض الزر المناسب
+        function checkUserStatus() {
             const storedUser = localStorage.getItem('currentUser');
-            const registerActionDiv = document.getElementById('registerAction');
-            const navLogin = document.getElementById('navLogin');
-
             if (storedUser) {
-                const userData = JSON.parse(storedUser);
-                // المستخدم مسجل دخول: إظهار زر التسجيل
-                registerActionDiv.innerHTML = `<a href="player-registration.html?tournament_id=${tournamentId}" class="btn btn-primary" style="width: 100%; text-align: center;">📝 Register Now</a>`;
-                navLogin.textContent = userData.full_name || 'My Profile';
-                navLogin.href = 'my-profile.html';
+                try {
+                    const userData = JSON.parse(storedUser);
+                    document.getElementById('userSection').style.display = 'flex';
+                    document.getElementById('loginBtn').style.display = 'none';
+                    document.getElementById('userName').textContent = userData.full_name || 'User';
+                    if (userData.profile_picture_url) {
+                        document.getElementById('userAvatar').innerHTML = `<img src="${userData.profile_picture_url}" alt="Profile">`;
+                    }
+                } catch (e) {
+                    showLoginButton();
+                }
             } else {
-                // المستخدم غير مسجل: إظهار زر يطلب منه تسجيل الدخول
-                const redirectUrl = encodeURIComponent(`tournament-details.html?tournament_id=${tournamentId}`);
-                registerActionDiv.innerHTML = `<a href="login.html?redirect=${redirectUrl}" class="btn btn-secondary" style="width: 100%; text-align: center;">🔒 Please Login to Register</a>`;
+                showLoginButton();
             }
+        }
 
-            // 2. تحميل بيانات البطولة
+        function showLoginButton() {
+            document.getElementById('userSection').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'inline-block';
+        }
+
+        function changeLanguage(lang) {
+            localStorage.setItem('lang', lang);
+            currentLang = lang;
+            document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            loadTournamentDetails();
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return currentLang === 'ar' ? 'غير محدد' : 'TBD';
+            const date = new Date(dateStr);
+            if (isNaN(date.getTime())) return currentLang === 'ar' ? 'غير محدد' : 'TBD';
+            return date.toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        async function loadTournamentDetails() {
             try {
-                const { data: tournament, error } = await dbClient.from('tournaments').select('*').eq('id', tournamentId).single();
-                if (error || !tournament) {
-                    document.getElementById('tournamentName').textContent = 'Tournament not found';
+                // جلب بيانات البطولة
+                const { data: tournament, error: tournamentError } = await dbClient
+                    .from('tournaments')
+                    .select('*')
+                    .eq('id', tournamentId)
+                    .single();
+                
+                if (tournamentError || !tournament) {
+                    document.getElementById('tournamentContent').innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon"></div>
+                            <p>Tournament not found</p>
+                        </div>
+                    `;
                     return;
                 }
 
-                document.getElementById('tournamentName').textContent = tournament.name;
-                document.getElementById('tournamentDesc').textContent = tournament.description || 'No description available.';
-                document.getElementById('tournamentFullDesc').textContent = tournament.description || 'No description available.';
-                document.getElementById('tournamentLocation').textContent = tournament.location || 'To be announced';
-                
-                const date = new Date(tournament.date);
-                document.getElementById('tournamentDate').textContent = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                // جلب عدد المشاركين
+                const { count: participantCount } = await dbClient
+                    .from('tournament_participants')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('tournament_id', tournamentId);
 
+                // جلب معلومات المنظم
+                let organizer = null;
+                if (tournament.organizer_id) {
+                    const { data: orgData } = await dbClient
+                        .from('organizers')
+                        .select('*')
+                        .eq('user_id', tournament.organizer_id)
+                        .single();
+                    organizer = orgData;
+                }
+
+                // جلب فئات الأوزان المتاحة
+                const { data: weightClasses } = await dbClient
+                    .from('weight_classes')
+                    .select('*, age_divisions(name, min_age, max_age)')
+                    .order('name');
+
+                renderTournament(tournament, organizer, participantCount || 0, weightClasses || []);
             } catch (error) {
                 console.error('Error loading tournament:', error);
-                document.getElementById('tournamentName').textContent = 'Error loading details';
+                document.getElementById('tournamentContent').innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">❌</div>
+                        <p>Error loading tournament details</p>
+                    </div>
+                `;
             }
-        };
+        }
+
+        function renderTournament(tournament, organizer, participantCount, weightClasses) {
+            const storedUser = localStorage.getItem('currentUser');
+            const isLoggedIn = !!storedUser;
+            
+            const startDate = tournament.event_start_date || tournament.tournament_date || tournament.event_date;
+            const endDate = tournament.event_end_date;
+            const location = tournament.location || (currentLang === 'ar' ? 'سيتم الإعلان عنه' : 'To be announced');
+            
+            let dateDisplay = formatDate(startDate);
+            if (endDate && endDate !== startDate) {
+                dateDisplay = `${formatDate(startDate)} - ${formatDate(endDate)}`;
+            }
+
+            const bannerImage = tournament.image_url || '';
+            const bannerHtml = bannerImage 
+                ? `<img src="${bannerImage}" alt="${tournament.name}">`
+                : '';
+
+            const registerButton = isLoggedIn
+                ? `<button class="btn btn-register" onclick="window.location.href='player-registration.html?tournament_id=${tournamentId}'">Register Now</button>`
+                : `<button class="btn btn-secondary" onclick="window.location.href='login.html?redirect=tournament-details.html?tournament_id=${tournamentId}'">Login to Register</button>`;
+
+            // تنظيم فئات الوزن
+            const weightClassesHtml = weightClasses.length > 0 
+                ? weightClasses.map(wc => {
+                    const ageDiv = wc.age_divisions;
+                    const weightRange = wc.min_weight && wc.max_weight 
+                        ? `${wc.min_weight} - ${wc.max_weight} kg`
+                        : 'Open Weight';
+                    
+                    return `
+                        <div class="division-card">
+                            <h4>${wc.name}</h4>
+                            <p><strong>Gender:</strong> ${wc.gender}</p>
+                            <p><strong>Weight:</strong> ${weightRange}</p>
+                            ${ageDiv ? `<p><strong>Age:</strong> ${ageDiv.name} (${ageDiv.min_age}-${ageDiv.max_age} yrs)</p>` : ''}
+                        </div>
+                    `;
+                }).join('')
+                : `<p style="color: rgba(0,0,0,0.6);">${currentLang === 'ar' ? 'سيتم الإعلان عن الفئات قريباً' : 'Divisions will be announced soon'}</p>`;
+
+            document.getElementById('tournamentContent').innerHTML = `
+                <!-- Tournament Header -->
+                <div class="tournament-header">
+                    <div class="tournament-header-content">
+                        <div class="tournament-title-section">
+                            <div class="tournament-logo">
+                                ${bannerImage ? `<img src="${bannerImage}" alt="${tournament.name}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;">🏆</div>'}
+                            </div>
+                            <div class="tournament-title">
+                                <h1>${tournament.name}</h1>
+                                <p>📅 ${dateDisplay}</p>
+                            </div>
+                        </div>
+                        <div class="tournament-actions">
+                            ${registerButton}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs-container">
+                    <div class="tabs">
+                        <a href="#information" class="tab active" onclick="switchTab(event, 'information')"><span class="tab-icon">📋</span> Information</a>
+                        <a href="#divisions" class="tab" onclick="switchTab(event, 'divisions')"><span class="tab-icon">️</span> Divisions</a>
+                        <a href="#athletes" class="tab" onclick="switchTab(event, 'athletes')"><span class="tab-icon">👥</span> Athletes <span style="background:var(--accent-yellow);color:var(--black);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${participantCount}</span></a>
+                        <a href="#brackets" class="tab" onclick="switchTab(event, 'brackets')"><span class="tab-icon"></span> Brackets</a>
+                        <a href="#schedule" class="tab" onclick="switchTab(event, 'schedule')"><span class="tab-icon"></span> Schedule</a>
+                        <a href="#results" class="tab" onclick="switchTab(event, 'results')"><span class="tab-icon">📊</span> Results</a>
+                    </div>
+                </div>
+
+                <!-- Banner -->
+                ${bannerImage ? `
+                <div class="banner">
+                    <div class="banner-image">
+                        ${bannerHtml}
+                        <div class="banner-overlay">
+                            <div class="banner-text">
+                                <h2>${tournament.name}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- Main Content -->
+                <div class="main-content">
+                    <div class="info-section" id="information">
+                        <h2>Tournament Information</h2>
+                        
+                        <div class="info-meta">
+                            <div class="info-meta-item">
+                                <span>📅</span>
+                                <strong>Date:</strong>
+                                <span>${dateDisplay}</span>
+                            </div>
+                            <div class="info-meta-item">
+                                <span>📍</span>
+                                <strong>Location:</strong>
+                                <span>${location}</span>
+                            </div>
+                            <div class="info-meta-item">
+                                <span>👥</span>
+                                <strong>Participants:</strong>
+                                <span>${participantCount} / ${tournament.max_participants || 'Unlimited'}</span>
+                            </div>
+                            ${tournament.registration_fee > 0 ? `
+                            <div class="info-meta-item">
+                                <span>💰</span>
+                                <strong>Registration Fee:</strong>
+                                <span>$${tournament.registration_fee} USD</span>
+                            </div>
+                            ` : ''}
+                            ${tournament.sport_type ? `
+                            <div class="info-meta-item">
+                                <span>🏅</span>
+                                <strong>Sport:</strong>
+                                <span>${tournament.sport_type}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <h3>About This Tournament</h3>
+                        <p>${tournament.description || 'No description available.'}</p>
+
+                        <h3>Registration Information</h3>
+                        <p>This tournament is pre-registration only. We do not take registrations after the deadline or registrations at the event!</p>
+                        
+                        <ul>
+                            ${tournament.reg_regular_end ? `
+                            <li><strong>Normal Registration:</strong> Register before ${formatDate(tournament.reg_regular_end)} - $${tournament.registration_fee || 40} USD</li>
+                            ` : ''}
+                            ${tournament.reg_late_end ? `
+                            <li><strong>Late Registration:</strong> Register before ${formatDate(tournament.reg_late_end)} - $${(tournament.registration_fee || 40) + 15} USD</li>
+                            ` : ''}
+                            <li><strong>Per Absolute Division:</strong> $10 USD</li>
+                        </ul>
+
+                        <h3>Rules and Policies</h3>
+                        <p>By registering for this tournament, you confirm that you have thoroughly reviewed the event information and that you agree to comply with all rules and policies.</p>
+                        <p>For full rules and policies, please visit: <a href="https://www.grapplingindustries.com/rules" target="_blank">Tournament Rules</a></p>
+
+                        <h3>Format</h3>
+                        <p>The tournament offers every competitor multiple matches per division regardless of wins and losses. Competitors can get as many as 4 to 6 matches per division!</p>
+
+                        <h3>Weigh-Ins</h3>
+                        <p>Competitors can weigh in as soon as the event doors open on the day they are competing up until 60 minutes prior to their division start time. Competitors are NOT required to weigh in wearing uniform.</p>
+
+                        <h3>Brackets and Schedule</h3>
+                        <p>The tournament's brackets and schedule will be posted 48 hours prior to the event. They can be found on the tournament page 'Schedule' tab. Event schedules are dynamic and division start times may fluctuate.</p>
+
+                        <h3>Capacity</h3>
+                        <p>Each tournament has a set capacity limit and registration will close early if capacity is reached. We highly recommend that competitors register as early as possible.</p>
+
+                        <h3>Refund Policy</h3>
+                        <p>A full refund to your original payment method is available until the Normal Registration deadline. After this date, only a full coupon credit is offered up until the change deadline.</p>
+                    </div>
+
+                    <div class="info-section" id="divisions" style="display: none;">
+                        <h2>Weight Divisions</h2>
+                        <p>All available weight classes for this tournament:</p>
+                        <div class="divisions-grid">
+                            ${weightClassesHtml}
+                        </div>
+                    </div>
+
+                    <div class="info-section" id="athletes" style="display: none;">
+                        <h2>Registered Athletes</h2>
+                        <p>Total registered: <strong>${participantCount}</strong></p>
+                        <div id="athletesList" style="margin-top: 20px;">
+                            <div class="loading">Loading athletes...</div>
+                        </div>
+                    </div>
+
+                    <div class="info-section" id="brackets" style="display: none;">
+                        <h2>Brackets</h2>
+                        <p>Brackets will be posted 48 hours before the event.</p>
+                    </div>
+
+                    <div class="info-section" id="schedule" style="display: none;">
+                        <h2>Schedule</h2>
+                        <p>The schedule will be available 48 hours before the tournament.</p>
+                    </div>
+
+                    <div class="info-section" id="results" style="display: none;">
+                        <h2>Results</h2>
+                        <p>Results will be available after the tournament.</p>
+                    </div>
+
+                    <div class="sidebar">
+                        <!-- Registration Dates -->
+                        <div class="sidebar-card">
+                            <h3>Registration</h3>
+                            <div class="registration-dates">
+                                ${tournament.reg_regular_start && tournament.reg_regular_end ? `
+                                <div class="reg-date-item">
+                                    <h4>Normal Registration</h4>
+                                    <p>${formatDate(tournament.reg_regular_start)} - ${formatDate(tournament.reg_regular_end)}</p>
+                                </div>
+                                ` : ''}
+                                ${tournament.reg_late_start && tournament.reg_late_end ? `
+                                <div class="reg-date-item late">
+                                    <h4>Late Registration</h4>
+                                    <p>${formatDate(tournament.reg_late_start)} - ${formatDate(tournament.reg_late_end)}</p>
+                                </div>
+                                ` : ''}
+                                <div class="reg-date-item">
+                                    <h4>Event Starts</h4>
+                                    <p>${formatDate(startDate)}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Entries -->
+                        <div class="sidebar-card">
+                            <h3>Entries</h3>
+                            <div class="entries-list">
+                                <div class="entry-item">
+                                    <span class="entry-name">Gi Adult</span>
+                                    <span class="entry-price">$${tournament.registration_fee || 40} USD</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name">No Gi Adult</span>
+                                    <span class="entry-price">$${tournament.registration_fee || 40} USD</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name">Gi Kids</span>
+                                    <span class="entry-price">$${Math.floor((tournament.registration_fee || 40) * 0.75)} USD</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name">No Gi Kids</span>
+                                    <span class="entry-price">$${Math.floor((tournament.registration_fee || 40) * 0.75)} USD</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name">Absolute Gi</span>
+                                    <span class="entry-price">$10 USD</span>
+                                </div>
+                                <div class="entry-item">
+                                    <span class="entry-name">Absolute No Gi</span>
+                                    <span class="entry-price">$10 USD</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="sidebar-card">
+                            <h3>Location</h3>
+                            <div class="location-card">
+                                <p class="location-address">${location}</p>
+                                <div class="location-map" onclick="window.open('https://maps.google.com/?q=${encodeURIComponent(location)}', '_blank')">
+                                    <span>📍 View on Map</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Organizer -->
+                        ${organizer ? `
+                        <div class="sidebar-card">
+                            <h3>Organizer</h3>
+                            <div class="organizer-card">
+                                <div class="organizer-name">${organizer.full_name || organizer.organization_name || 'TopCompSports'}</div>
+                                <div class="organizer-info">${organizer.organization_type || 'Professional tournament management'}</div>
+                                <div class="contact-links">
+                                    ${organizer.email ? `
+                                    <a href="mailto:${organizer.email}" class="contact-link">
+                                        <span>✉️</span>
+                                        <span>Email</span>
+                                    </a>
+                                    ` : ''}
+                                    ${organizer.phone ? `
+                                    <a href="tel:${organizer.phone}" class="contact-link">
+                                        <span>📞</span>
+                                        <span>Phone</span>
+                                    </a>
+                                    ` : ''}
+                                    ${organizer.whatsapp ? `
+                                    <a href="https://wa.me/${organizer.whatsapp.replace(/[^0-9]/g, '')}" target="_blank" class="contact-link">
+                                        <span></span>
+                                        <span>WhatsApp</span>
+                                    </a>
+                                    ` : ''}
+                                    ${organizer.website ? `
+                                    <a href="${organizer.website}" target="_blank" class="contact-link">
+                                        <span>🌐</span>
+                                        <span>Website</span>
+                                    </a>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        <!-- Cancel/Refund Policy -->
+                        <div class="sidebar-card">
+                            <h3>Cancel/Refund Policy</h3>
+                            <div class="registration-dates">
+                                ${tournament.reg_regular_end ? `
+                                <div class="reg-date-item">
+                                    <h4>Last chance to cancel</h4>
+                                    <p>${formatDate(tournament.reg_regular_end)}</p>
+                                </div>
+                                <div class="reg-date-item">
+                                    <h4>Last chance for 100% refund</h4>
+                                    <p>${formatDate(tournament.reg_regular_end)}</p>
+                                </div>
+                                ` : ''}
+                                ${tournament.reg_late_end ? `
+                                <div class="reg-date-item">
+                                    <h4>Last chance to edit</h4>
+                                    <p>${formatDate(tournament.reg_late_end)}</p>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // جلب قائمة اللاعبين إذا تم الضغط على تب Athletes
+            if (participantCount > 0) {
+                loadAthletesList();
+            }
+        }
+
+        async function loadAthletesList() {
+            try {
+                const { data: athletes, error } = await dbClient
+                    .from('tournament_participants')
+                    .select('player_name, team, age_group, weight, belt_level, gi_type, status')
+                    .eq('tournament_id', tournamentId)
+                    .eq('status', 'approved')
+                    .order('player_name');
+
+                const athletesDiv = document.getElementById('athletesList');
+                if (!athletes || athletes.length === 0) {
+                    athletesDiv.innerHTML = `<p style="color: rgba(0,0,0,0.6); text-align: center; padding: 40px;">No athletes registered yet</p>`;
+                    return;
+                }
+
+                athletesDiv.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                        ${athletes.map(a => `
+                            <div style="background: var(--light-bg); padding: 15px; border-radius: 8px; border-left: 3px solid var(--primary-blue);">
+                                <div style="font-weight: 700; color: var(--black); margin-bottom: 5px;">${a.player_name}</div>
+                                ${a.team ? `<div style="font-size: 0.85rem; color: rgba(0,0,0,0.6);">${a.team}</div>` : ''}
+                                <div style="font-size: 0.85rem; color: rgba(0,0,0,0.7); margin-top: 5px;">
+                                    ${a.age_group} • ${a.weight}kg • ${a.belt_level}
+                                </div>
+                                ${a.gi_type ? `<div style="font-size: 0.8rem; color: var(--primary-blue); margin-top: 3px;">${a.gi_type}</div>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading athletes:', error);
+                document.getElementById('athletesList').innerHTML = `<p style="color: red; text-align: center;">Error loading athletes</p>`;
+            }
+        }
+
+        function switchTab(event, tabName) {
+            event.preventDefault();
+            
+            // إزالة active من جميع التبويبات
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            // إضافة active للتبويب المضغوط
+            event.currentTarget.classList.add('active');
+            
+            // إخفاء جميع الأقسام
+            document.querySelectorAll('.info-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // إظهار القسم المطلوب
+            const targetSection = document.getElementById(tabName);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+                
+                // إذا كان قسم اللاعبين، حمل القائمة
+                if (tabName === 'athletes' && document.getElementById('athletesList').innerHTML.includes('Loading')) {
+                    loadAthletesList();
+                }
+            }
+            
+            // التمرير إلى الأعلى
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function handleLogout() {
+            await dbClient.auth.signOut();
+            localStorage.removeItem('currentUser');
+            showLoginButton();
+            window.location.reload();
+        }
     </script>
 </body>
 </html>
