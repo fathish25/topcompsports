@@ -135,7 +135,7 @@
         .footer-links a:hover { color: var(--accent-yellow); }
         .footer-bottom { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--medium-gray); font-size: 0.9rem; }
 
-        /* Responsive Design - Mobile First Approach */
+        /* Responsive Design */
         @media (max-width: 1024px) {
             .header { padding: 15px 30px; }
             .hero { padding: 80px 30px; }
@@ -146,21 +146,20 @@
         }
 
         @media (max-width: 768px) {
-            .header { padding: 15px 20px; flex-direction: column; gap: 15px; }
-            .nav { flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; }
-            .nav a { padding: 8px 12px; font-size: 0.9rem; }
+            .header { padding: 12px 20px; flex-direction: column; gap: 15px; }
+            .nav { flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .nav a { padding: 6px 10px; font-size: 0.9rem; }
             .hero { padding: 60px 20px; min-height: auto; }
-            .hero-content { grid-template-columns: 1fr; gap: 40px; text-align: center; }
+            .hero-content { grid-template-columns: 1fr; gap: 40px; }
             .hero-text h1 { font-size: 2.5rem; }
             .hero-text p { font-size: 1.1rem; }
-            .hero-buttons { justify-content: center; }
             .hero-image { height: 300px; }
             .features { padding: 50px 20px; }
-            .features-grid { grid-template-columns: 1fr; gap: 20px; }
+            .features-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
             .feature-card { padding: 30px 20px; }
             .latest-tournaments { padding: 50px 20px; }
             .section-header h2 { font-size: 2rem; }
-            .tournaments-grid { grid-template-columns: 1fr; gap: 20px; }
+            .tournaments-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
             .contact-section { padding: 40px 20px; }
             .contact-header h2 { font-size: 2rem; }
             .contact-grid { grid-template-columns: 1fr; }
@@ -169,17 +168,31 @@
         @media (max-width: 480px) {
             .header { padding: 10px 15px; }
             .logo-text { font-size: 22px; }
-            .nav { gap: 5px; }
-            .nav a { padding: 6px 8px; font-size: 0.85rem; }
+            .nav { gap: 8px; }
+            .nav a { padding: 5px 8px; font-size: 0.85rem; }
             .hero { padding: 40px 15px; }
             .hero-text h1 { font-size: 2rem; }
             .hero-text p { font-size: 1rem; }
             .hero-buttons { flex-direction: column; width: 100%; }
             .hero-buttons .btn { width: 100%; text-align: center; }
             .hero-image { height: 250px; }
-            .features, .latest-tournaments, .contact-section { padding: 40px 15px; }
+            .features { padding: 40px 15px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .latest-tournaments { padding: 40px 15px; }
             .section-header h2 { font-size: 1.8rem; }
+            .tournaments-grid { grid-template-columns: 1fr; }
+            .contact-section { padding: 30px 15px; }
             .contact-header h2 { font-size: 1.8rem; }
+        }
+
+        @media (max-width: 374px) {
+            .header { padding: 8px 10px; }
+            .logo-text { font-size: 20px; }
+            .nav a { padding: 4px 6px; font-size: 0.8rem; }
+            .hero { padding: 30px 10px; }
+            .hero-text h1 { font-size: 1.8rem; }
+            .features, .latest-tournaments, .contact-section { padding: 30px 10px; }
+            .feature-card { padding: 25px 15px; }
         }
 
         @media (hover: none) and (pointer: coarse) {
@@ -205,7 +218,7 @@
         </div>
         
         <nav class="nav">
-            <a href="#tournaments" data-i18n="nav_tournaments">Tournaments</a>
+            <a href="tournaments.html" data-i18n="nav_tournaments">Tournaments</a>
             <a href="#features" data-i18n="nav_features">Features</a>
             <a href="organizer-dashboard.html" data-i18n="nav_organizer">Organizer</a>
             
@@ -261,7 +274,7 @@
                 <p data-i18n="feature3_desc">Automatic bracket creation</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">⏱️</div>
+                <div class="feature-icon">️</div>
                 <h3 data-i18n="feature4_title">Live Scoreboard</h3>
                 <p data-i18n="feature4_desc">Real-time score tracking</p>
             </div>
@@ -292,7 +305,7 @@
                     <a href="mailto:support@topcompsports.com">support@topcompsports.com</a>
                 </div>
                 <div class="contact-card">
-                    <div class="contact-icon">💬</div>
+                    <div class="contact-icon"></div>
                     <h3 data-i18n="contact_whatsapp_title">WhatsApp</h3>
                     <p data-i18n="contact_whatsapp_desc">Chat with us on WhatsApp</p>
                     <a href="https://wa.me/1234567890" target="_blank" data-i18n="contact_whatsapp_link">Start Chat</a>
@@ -458,14 +471,13 @@
         }
 
         // ==========================================
-        // 7. تحميل البطولات (المصحح والمحسن)
+        // 7. تحميل البطولات
         // ==========================================
         async function loadLatestTournaments() {
             const grid = document.getElementById('tournamentsGrid');
             const currentLang = localStorage.getItem('lang') || 'en';
             
             try {
-                // جلب البطولات المنشورة أو القادمة
                 const { data: tournaments, error } = await dbClient
                     .from('tournaments')
                     .select('*')
@@ -484,7 +496,6 @@
                     return;
                 }
                 
-                // جلب عدد اللاعبين لكل بطولة
                 const tournamentsWithStats = await Promise.all(
                     tournaments.map(async (t) => {
                         try {
@@ -506,16 +517,13 @@
                     })
                 );
                 
-                // عرض البطولات
                 grid.innerHTML = tournamentsWithStats.map(t => {
-                    // تحديد التاريخ المناسب والتحقق من صحته لتجنب "Invalid Date"
                     const date = t.event_start_date || t.event_date || t.tournament_date;
                     const endDate = t.event_end_date;
                     
                     let formattedDate;
                     if (date) {
                         const dateObj = new Date(date);
-                        // التحقق من أن التاريخ صالح (ليس Invalid Date)
                         if (!isNaN(dateObj.getTime())) {
                             const lang = currentLang === 'ar' ? 'ar-SA' : 'en-US';
                             const options = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -545,7 +553,6 @@
                     const viewText = currentLang === 'ar' ? 'التفاصيل ←' : 'View Details →';
                     const badgeText = currentLang === 'ar' ? 'قادم' : 'UPCOMING';
                     
-                    // صورة البانر مع fallback
                     const bannerImage = t.image_url || '';
                     const bannerStyle = bannerImage 
                         ? `background-image: url('${bannerImage}'); background-size: cover; background-position: center;`
