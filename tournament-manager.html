@@ -1329,7 +1329,7 @@ function addPenalty(player) {
   if (scoreboard[player].isDQ) return;
   scoreboard[player].history.push({ type: 'penalty' });
   scoreboard[player].penalties++;
-  if (scoreboard[player].penalties >= 3) {
+  if (scoreboard[player].penalties >= 4) {
     scoreboard[player].isDQ = true;
     stopTimer();
     alert(' Disqualification! 3 penalties!');
