@@ -3,113 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TopCompSports - Professional Jiu-Jitsu Tournament Management</title>
+<title>TopCompSports - Tournament Manager</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ============================================
-   GLOBAL RESET & BASE STYLES
+   GLOBAL STYLES
    ============================================ */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  line-height: 1.6;
-  color: #333;
-  overflow-x: hidden;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-ul {
-  list-style: none;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+  font-family: 'Segoe UI', Tahoma, sans-serif; 
+  background: #0a0e17; 
+  color: #fff; 
 }
 
 /* ============================================
-   HEADER / NAVIGATION
+   MAIN HEADER STYLES
    ============================================ */
 .main-header {
-  background: #000;
+  background: #0a0e17;
+  border-bottom: 2px solid #1e3a8a;
   padding: 15px 0;
   position: sticky;
   top: 0;
   z-index: 1000;
-  border-bottom: 1px solid #1a1a1a;
 }
 
 .header-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 30px;
+  padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 15px;
 }
 
 .logo-section {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
 }
 
 .logo-icon {
-  width: 45px;
-  height: 45px;
-  background: linear-gradient(135deg, #0066cc, #004499);
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   font-weight: bold;
-  color: #fff;
-  border: 2px solid #0066cc;
+  color: #fbbf24;
+  border: 2px solid #fbbf24;
 }
 
 .logo-text {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: bold;
-  color: #0066cc;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .nav-menu {
   display: flex;
-  gap: 35px;
+  gap: 30px;
   align-items: center;
 }
 
 .nav-link {
   color: #fff;
+  text-decoration: none;
   font-weight: 500;
-  font-size: 0.95rem;
-  padding: 8px 0;
-  position: relative;
-  transition: color 0.3s;
+  padding: 8px 15px;
+  border-radius: 5px;
+  transition: all 0.3s;
 }
 
 .nav-link:hover {
-  color: #0066cc;
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
 }
 
 .nav-link.active {
-  color: #FFD700;
-}
-
-.nav-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #FFD700;
+  color: #fbbf24;
 }
 
 .user-section {
@@ -122,28 +102,26 @@ ul {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 15px;
-  background: rgba(255, 215, 0, 0.1);
+  padding: 8px 15px;
+  background: rgba(251, 191, 36, 0.1);
   border-radius: 25px;
-  border: 1px solid #FFD700;
+  border: 1px solid #fbbf24;
 }
 
 .user-avatar {
-  width: 32px;
-  height: 32px;
-  background: #1a1a1a;
+  width: 35px;
+  height: 35px;
+  background: #1e293b;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #FFD700;
-  font-size: 1rem;
+  border: 2px solid #fbbf24;
 }
 
 .user-name {
-  color: #FFD700;
+  color: #fbbf24;
   font-weight: 600;
-  font-size: 0.9rem;
 }
 
 .btn-logout {
@@ -151,24 +129,23 @@ ul {
   background: transparent;
   border: 2px solid #fff;
   color: #fff;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s;
-  font-size: 0.9rem;
 }
 
 .btn-logout:hover {
   background: #fff;
-  color: #000;
+  color: #0a0e17;
 }
 
 .language-toggle {
   display: flex;
-  background: #1a1a1a;
-  border-radius: 6px;
-  padding: 3px;
-  gap: 3px;
+  background: #1e293b;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
 }
 
 .lang-btn {
@@ -176,474 +153,262 @@ ul {
   border: none;
   background: transparent;
   color: #fff;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
   transition: all 0.3s;
-  font-size: 0.85rem;
 }
 
 .lang-btn.active {
-  background: #0066cc;
+  background: #3b82f6;
   color: #fff;
-}
-
-.mobile-menu-btn {
-  display: none;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 1.5rem;
-  cursor: pointer;
 }
 
 /* ============================================
-   HERO SECTION
+   TOURNAMENT MANAGER STYLES
    ============================================ */
-.hero-section {
-  background: linear-gradient(135deg, #003B95 0%, #0055CC 50%, #0066CC 100%);
-  padding: 80px 30px;
-  min-height: 500px;
-  display: flex;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-container {
+.tournament-container {
   max-width: 1400px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 60px;
-  align-items: center;
-  width: 100%;
-}
-
-.hero-content h1 {
-  font-size: 4.5rem;
-  font-weight: 900;
-  color: #fff;
-  line-height: 1.1;
-  margin-bottom: 20px;
-  letter-spacing: -2px;
-}
-
-.hero-content h1 .focus-text {
-  color: rgba(255, 255, 255, 0.3);
-  display: block;
-}
-
-.hero-content p {
-  font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 35px;
-  max-width: 500px;
-}
-
-.hero-buttons {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.btn-primary {
-  padding: 14px 30px;
-  background: #fff;
-  color: #003B95;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.btn-secondary {
-  padding: 14px 30px;
-  background: transparent;
-  color: #fff;
-  border: 2px solid #fff;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-}
-
-.hero-image {
-  position: relative;
-  display: flex;
-  justify-content: center;
-}
-
-.hero-image img {
-  width: 100%;
-  max-width: 450px;
-  border-radius: 12px;
-  border: 3px solid #FFD700;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-}
-
-/* ============================================
-   FEATURES SECTION
-   ============================================ */
-.features-section {
-  background: #F5F7FA;
-  padding: 80px 30px;
-}
-
-.features-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 30px;
-}
-
-.feature-card {
-  background: #fff;
-  padding: 40px 30px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s;
-}
-
-.feature-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
-
-.feature-icon {
-  font-size: 3rem;
-  margin-bottom: 20px;
-}
-
-.feature-card h3 {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #000;
-  margin-bottom: 10px;
-}
-
-.feature-card p {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-/* ============================================
-   TOURNAMENTS SECTION
-   ============================================ */
-.tournaments-section {
-  background: #fff;
-  padding: 80px 30px;
-}
-
-.section-header {
-  text-align: center;
-  margin-bottom: 50px;
-}
-
-.section-header h2 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  color: #000;
-  margin-bottom: 10px;
-}
-
-.section-header h2 .highlight {
-  color: #0066cc;
-}
-
-.section-header p {
-  color: #666;
-  font-size: 1rem;
-}
-
-.tournaments-grid {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 25px;
-}
-
-.tournament-card {
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s;
-  border: 1px solid #eee;
-}
-
-.tournament-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.tournament-image {
-  background: linear-gradient(135deg, #003B95, #0055CC);
-  height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.tournament-image .trophy {
-  font-size: 4rem;
-  opacity: 0.3;
-}
-
-.upcoming-badge {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: #FFD700;
-  color: #000;
-  padding: 5px 12px;
-  border-radius: 15px;
-  font-size: 0.75rem;
-  font-weight: bold;
-}
-
-.tournament-info {
   padding: 20px;
 }
 
-.tournament-info h3 {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #000;
-  margin-bottom: 10px;
-}
-
-.tournament-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-bottom: 15px;
-  font-size: 0.85rem;
-  color: #666;
-}
-
-.tournament-meta span {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.tournament-footer {
+.tournament-header {
+  background: #151d2b;
+  padding: 20px 25px;
+  border-radius: 12px;
+  margin-bottom: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 15px;
-  border-top: 1px solid #eee;
+  flex-wrap: wrap;
+  gap: 15px;
+  border: 1px solid #2a3548;
 }
 
-.player-count {
-  font-size: 0.85rem;
-  color: #0066cc;
-  font-weight: 600;
+.tournament-title-section h1 {
+  color: #fbbf24;
+  font-size: 1.8rem;
+  margin-bottom: 5px;
 }
 
-.view-details {
-  color: #FFD700;
-  font-weight: bold;
-  font-size: 0.85rem;
-  transition: color 0.3s;
-}
-
-.view-details:hover {
-  color: #0066cc;
-}
-
-/* ============================================
-   CONTACT SECTION
-   ============================================ */
-.contact-section {
-  background: #000;
-  padding: 80px 30px;
-  color: #fff;
-}
-
-.contact-header {
-  text-align: center;
-  margin-bottom: 50px;
-}
-
-.contact-header h2 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.contact-header h2 .highlight {
-  color: #FFD700;
-}
-
-.contact-header p {
-  color: #999;
-  font-size: 1rem;
-}
-
-.contact-grid {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 25px;
-}
-
-.contact-card {
-  background: #1a1a1a;
-  padding: 35px 25px;
-  border-radius: 12px;
-  text-align: center;
-  transition: all 0.3s;
-  border: 1px solid #2a2a2a;
-}
-
-.contact-card:hover {
-  transform: translateY(-5px);
-  border-color: #0066cc;
-}
-
-.contact-card.featured {
-  border: 2px solid #0066cc;
-}
-
-.contact-icon {
-  font-size: 2.5rem;
-  margin-bottom: 15px;
-}
-
-.contact-card h3 {
-  font-size: 1.1rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #FFD700;
-}
-
-.contact-card p {
-  color: #999;
-  font-size: 0.9rem;
-  margin-bottom: 10px;
-}
-
-.contact-card a {
-  color: #0066cc;
-  font-weight: 600;
+.tournament-subtitle {
+  color: #8899aa;
   font-size: 0.9rem;
 }
 
-.social-links {
-  max-width: 1200px;
-  margin: 40px auto 0;
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
+.action-buttons {
   display: flex;
-  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-players { background: #3b82f6; color: #fff; }
+.btn-mats { background: #8b5cf6; color: #fff; }
+.btn-settings { background: #f59e0b; color: #000; }
+.btn-sync { background: #64748b; color: #fff; }
+.btn-save { background: #475569; color: #fff; }
+.btn-clear-local { background: #dc2626; color: #fff; }
+.btn-clear-db { background: #ea580c; color: #fff; }
+
+/* Players Section */
+.section {
+  background: #1a1f2e;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 20px;
+  border: 1px solid #2a3548;
+}
+
+.section-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #fbbf24;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 15px;
 }
 
-.social-icon {
-  width: 45px;
-  height: 45px;
-  background: #1a1a1a;
-  border-radius: 50%;
+.player-count {
+  color: #8899aa;
+  font-size: 1rem;
+}
+
+.button-group {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  transition: all 0.3s;
-  border: 1px solid #2a2a2a;
-}
-
-.social-icon:hover {
-  background: #0066cc;
-  transform: translateY(-3px);
-}
-
-/* ============================================
-   FOOTER
-   ============================================ */
-.footer {
-  background: #000;
-  border-top: 1px solid #1a1a1a;
-  padding: 30px;
-  text-align: center;
-  color: #666;
-}
-
-.footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
+  gap: 10px;
   margin-bottom: 20px;
   flex-wrap: wrap;
 }
 
-.footer-links a {
-  color: #999;
-  font-size: 0.9rem;
-  transition: color 0.3s;
+.btn-add { background: #22c55e; color: #fff; }
+.btn-add-10 { background: #475569; color: #fff; }
+.btn-import { background: #3b82f6; color: #fff; }
+.btn-export { background: #0ea5e9; color: #fff; }
+.btn-sync-db { background: #f59e0b; color: #000; }
+
+.table-container {
+  max-height: 600px;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid #2a3548;
 }
 
-.footer-links a:hover {
-  color: #fff;
+table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.footer p {
+thead {
+  position: sticky;
+  top: 0;
+  background: #151d2b;
+  z-index: 10;
+}
+
+th {
+  background: #151d2b;
+  color: #8899aa;
+  padding: 12px;
+  text-align: left;
   font-size: 0.85rem;
-  color: #666;
+  text-transform: uppercase;
+  border-bottom: 2px solid #2a3548;
 }
 
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
-@media (max-width: 1024px) {
-  .hero-container {
-    grid-template-columns: 1fr;
-    text-align: center;
+td {
+  padding: 10px;
+  border-bottom: 1px solid #2a3548;
+}
+
+tr:hover {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+input, select {
+  background: #0f1724;
+  border: 1px solid #2a3548;
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #fbbf24;
+}
+
+.btn-delete {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-delete:hover {
+  background: #b91c1c;
+}
+
+.btn-proceed {
+  width: 100%;
+  padding: 15px;
+  background: #22c55e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-proceed:hover {
+  background: #16a34a;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .header-container {
+    flex-direction: column;
   }
   
-  .hero-content p {
-    margin: 0 auto 35px;
-  }
-  
-  .hero-buttons {
+  .nav-menu {
+    flex-wrap: wrap;
     justify-content: center;
   }
   
-  .hero-image {
-    order: -1;
+  .tournament-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
   
-  .features-container,
-  .tournaments-grid,
-  .contact-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .action-buttons {
+    width: 100%;
+  }
+  
+  .btn {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+  }
+  
+  table {
+    font-size: 0.85rem;
+  }
+  
+  th, td {
+    padding: 8px 5px;
   }
 }
 
-@media (max-width: 768px) {
-  .nav-menu {
-    display: none;
+@media (max-width: 640px) {
+  .logo-text {
+    font-size: 1.3rem;
   }
   
-  .mobile-menu-btn {
-    display: block;
+  .nav-menu {
+    gap: 15px;
   }
   
   .user-section {
@@ -651,42 +416,12 @@ ul {
     justify-content: center;
   }
   
-  .hero-content h1 {
-    font-size: 3rem;
+  .table-container {
+    overflow-x: auto;
   }
   
-  .features-container,
-  .tournaments-grid,
-  .contact-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .section-header h2,
-  .contact-header h2 {
-    font-size: 2rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .header-container {
-    padding: 0 15px;
-  }
-  
-  .hero-section {
-    padding: 50px 15px;
-  }
-  
-  .hero-content h1 {
-    font-size: 2.2rem;
-  }
-  
-  .hero-buttons {
-    flex-direction: column;
-  }
-  
-  .btn-primary,
-  .btn-secondary {
-    width: 100%;
+  table {
+    min-width: 800px;
   }
 }
 </style>
@@ -694,7 +429,7 @@ ul {
 <body>
 
 <!-- ============================================
-     HEADER / NAVIGATION
+     MAIN HEADER
      ============================================ -->
 <header class="main-header">
   <div class="header-container">
@@ -704,9 +439,8 @@ ul {
     </div>
     
     <nav class="nav-menu">
+      <a href="#" class="nav-link">Home</a>
       <a href="#" class="nav-link">Tournaments</a>
-      <a href="#" class="nav-link">Features</a>
-      <a href="#" class="nav-link">Organizer</a>
       <a href="#" class="nav-link active">My Profile</a>
     </nav>
     
@@ -721,244 +455,217 @@ ul {
         <button class="lang-btn active">English</button>
       </div>
     </div>
-    
-    <button class="mobile-menu-btn">☰</button>
   </div>
 </header>
 
 <!-- ============================================
-     HERO SECTION
+     TOURNAMENT MANAGER CONTENT
      ============================================ -->
-<section class="hero-section">
-  <div class="hero-container">
-    <div class="hero-content">
-      <h1>
-        DISCIPLINE.
-        <span class="focus-text">FOCUS.</span>
-        STRENGTH.
-      </h1>
-      <p>Professional tournament management platform for Jiu-Jitsu competitions</p>
-      <div class="hero-buttons">
-        <button class="btn-primary">Browse Tournaments</button>
-        <button class="btn-secondary">Create Tournament</button>
+<div class="tournament-container">
+  <div class="tournament-header">
+    <div class="tournament-title-section">
+      <h1>🏆 Tournament 2026 OZ</h1>
+      <div class="tournament-subtitle">Step 1: Players Registration</div>
+      <div class="status-badge">
+        <span>✅</span>
+        <span>All players cleared</span>
       </div>
     </div>
-    <div class="hero-image">
-      <img src="https://images.unsplash.com/photo-1555597673-b21d5c935865?w=500&h=500&fit=crop" alt="Jiu-Jitsu Competition">
+    
+    <div class="action-buttons">
+      <button class="btn btn-players" onclick="showView('players')">👥 Players</button>
+      <button class="btn btn-mats" onclick="showView('mats')"> Mats</button>
+      <button class="btn btn-settings" onclick="showView('settings')">⚙️ Settings</button>
+      <button class="btn btn-sync"> Sync</button>
+      <button class="btn btn-save">💾 Save Local</button>
+      <button class="btn btn-clear-local">️ Clear Local</button>
+      <button class="btn btn-clear-db">⚠️ Clear DB Players</button>
     </div>
   </div>
-</section>
 
-<!-- ============================================
-     FEATURES SECTION
-     ============================================ -->
-<section class="features-section">
-  <div class="features-container">
-    <div class="feature-card">
-      <div class="feature-icon">📝</div>
-      <h3>Easy Registration</h3>
-      <p>Smart registration system</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🥋</div>
-      <h3>Mat Management</h3>
-      <p>Organize matches efficiently</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🏆</div>
-      <h3>Bracket System</h3>
-      <p>Automatic bracket creation</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">⏱️</div>
-      <h3>Live Scoreboard</h3>
-      <p>Real-time score tracking</p>
+  <!-- PLAYERS VIEW -->
+  <div id="view-players" class="view active">
+    <div class="section">
+      <div class="section-title">
+        <span>👥 Players Registration</span>
+        <span class="player-count">20 / 200</span>
+      </div>
+      
+      <div class="button-group">
+        <button class="btn btn-add">➕ Add Player</button>
+        <button class="btn btn-add-10">➕ Add 10</button>
+        <button class="btn btn-import">📥 Import CSV</button>
+        <button class="btn btn-export">📤 Export CSV</button>
+        <button class="btn btn-sync-db"> Sync with DB</button>
+      </div>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Team</th>
+              <th>Age Group</th>
+              <th>Gender</th>
+              <th>Weight</th>
+              <th>Belt</th>
+              <th>Rank</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>12</td>
+              <td><input type="text" value="fwf"></td>
+              <td><input type="text" value="TCS Player"></td>
+              <td>
+                <select>
+                  <option>Master 1</option>
+                  <option>Amateur / Professional</option>
+                </select>
+              </td>
+              <td>
+                <select>
+                  <option>Men</option>
+                  <option>Women</option>
+                </select>
+              </td>
+              <td>
+                <select>
+                  <option>82kg</option>
+                  <option>56kg</option>
+                </select>
+              </td>
+              <td>
+                <select>
+                  <option>White</option>
+                  <option>Blue</option>
+                </select>
+              </td>
+              <td><input type="number" value="12" style="width: 60px;"></td>
+              <td><button class="btn-delete">✕</button></td>
+            </tr>
+            <tr>
+              <td>13</td>
+              <td><input type="text" value="fewr"></td>
+              <td><input type="text" value="TCS Player"></td>
+              <td>
+                <select>
+                  <option>Master 1</option>
+                </select>
+              </td>
+              <td><select><option>Men</option></select></td>
+              <td><select><option>82kg</option></select></td>
+              <td><select><option>White</option></select></td>
+              <td><input type="number" value="13" style="width: 60px;"></td>
+              <td><button class="btn-delete">✕</button></td>
+            </tr>
+            <tr>
+              <td>14</td>
+              <td><input type="text" value="fewrwe"></td>
+              <td><input type="text" value="TCS Player"></td>
+              <td><select><option>Master 1</option></select></td>
+              <td><select><option>Men</option></select></td>
+              <td><select><option>82kg</option></select></td>
+              <td><select><option>White</option></select></td>
+              <td><input type="number" value="14" style="width: 60px;"></td>
+              <td><button class="btn-delete">✕</button></td>
+            </tr>
+            <tr>
+              <td>15</td>
+              <td><input type="text" value="iuoiu"></td>
+              <td><input type="text" value="TCS Player"></td>
+              <td><select><option>Master 1</option></select></td>
+              <td><select><option>Men</option></select></td>
+              <td><select><option>82kg</option></select></td>
+              <td><select><option>White</option></select></td>
+              <td><input type="number" value="15" style="width: 60px;"></td>
+              <td><button class="btn-delete"></button></td>
+            </tr>
+            <tr>
+              <td>16</td>
+              <td><input type="text" value="mmmK"></td>
+              <td><input type="text" value="TCS Player"></td>
+              <td><select><option>Master 1</option></select></td>
+              <td><select><option>Men</option></select></td>
+              <td><select><option>82kg</option></select></td>
+              <td><select><option>White</option></select></td>
+              <td><input type="number" value="16" style="width: 60px;"></td>
+              <td><button class="btn-delete">✕</button></td>
+            </tr>
+            <tr>
+              <td>17</td>
+              <td><input type="text" value="kkoko"></td>
+              <td><input type="text" value="TCS Player"></td>
+              <td><select><option>Amateur / Professional</option></select></td>
+              <td><select><option>Men</option></select></td>
+              <td><select><option>56kg</option></select></td>
+              <td><select><option>White</option></select></td>
+              <td><input type="number" value="17" style="width: 60px;"></td>
+              <td><button class="btn-delete"></button></td>
+            </tr>
+            <tr>
+              <td>18</td>
+              <td><input type="text" value="nmmnm"></td>
+              <td><input type="text" value="TCS Player"></td>
+              <td><select><option>Amateur / Professional</option></select></td>
+              <td><select><option>Men</option></select></td>
+              <td><select><option>56kg</option></select></td>
+              <td><select><option>White</option></select></td>
+              <td><input type="number" value="18" style="width: 60px;"></td>
+              <td><button class="btn-delete">✕</button></td>
+            </tr>
+            <tr>
+              <td>19</td>
+              <td><input type="text" value="ggrr"></td>
+              <td><input type="text" value="TCS Player"></td>
+              <td><select><option>Amateur / Professional</option></select></td>
+              <td><select><option>Men</option></select></td>
+              <td><select><option>56kg</option></select></td>
+              <td><select><option>White</option></select></td>
+              <td><input type="number" value="19" style="width: 60px;"></td>
+              <td><button class="btn-delete">✕</button></td>
+            </tr>
+            <tr>
+              <td>20</td>
+              <td><input type="text" value="rete"></td>
+              <td><input type="text" value="TCS Player"></td>
+              <td><select><option>Amateur / Professional</option></select></td>
+              <td><select><option>Men</option></select></td>
+              <td><select><option>56kg</option></select></td>
+              <td><select><option>White</option></select></td>
+              <td><input type="number" value="20" style="width: 60px;"></td>
+              <td><button class="btn-delete">✕</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <button class="btn-proceed">
+        <span>🥋</span>
+        <span>Proceed to Mats →</span>
+      </button>
     </div>
   </div>
-</section>
-
-<!-- ============================================
-     TOURNAMENTS SECTION
-     ============================================ -->
-<section class="tournaments-section">
-  <div class="section-header">
-    <h2>Latest <span class="highlight">Tournaments</span></h2>
-    <p>Discover upcoming competitions and register now</p>
-  </div>
-  
-  <div class="tournaments-grid">
-    <div class="tournament-card">
-      <div class="tournament-image">
-        <span class="trophy">🏆</span>
-        <span class="upcoming-badge">UPCOMING</span>
-      </div>
-      <div class="tournament-info">
-        <h3>ZAZA Tournament</h3>
-        <div class="tournament-meta">
-          <span>📅 Invalid Date</span>
-          <span>📍 cairoz</span>
-        </div>
-        <div class="tournament-footer">
-          <span class="player-count">24962 players registered</span>
-          <a href="#" class="view-details">View Details →</a>
-        </div>
-      </div>
-    </div>
-    
-    <div class="tournament-card">
-      <div class="tournament-image">
-        <span class="trophy"></span>
-        <span class="upcoming-badge">UPCOMING</span>
-      </div>
-      <div class="tournament-info">
-        <h3>Tournament MEZO</h3>
-        <div class="tournament-meta">
-          <span>📅 Invalid Date</span>
-          <span>📍 cairoz</span>
-        </div>
-        <div class="tournament-footer">
-          <span class="player-count">0 players registered</span>
-          <a href="#" class="view-details">View Details →</a>
-        </div>
-      </div>
-    </div>
-    
-    <div class="tournament-card">
-      <div class="tournament-image">
-        <span class="trophy">🏆</span>
-        <span class="upcoming-badge">UPCOMING</span>
-      </div>
-      <div class="tournament-info">
-        <h3>Tournament 2026 OZ</h3>
-        <div class="tournament-meta">
-          <span>📅 Invalid Date</span>
-          <span>📍 cairoz</span>
-        </div>
-        <div class="tournament-footer">
-          <span class="player-count">1920 players registered</span>
-          <a href="#" class="view-details">View Details →</a>
-        </div>
-      </div>
-    </div>
-    
-    <div class="tournament-card">
-      <div class="tournament-image">
-        <span class="trophy">🏆</span>
-        <span class="upcoming-badge">UPCOMING</span>
-      </div>
-      <div class="tournament-info">
-        <h3>Tournament KOL</h3>
-        <div class="tournament-meta">
-          <span>📅 Invalid Date</span>
-          <span>📍 cairoz</span>
-        </div>
-        <div class="tournament-footer">
-          <span class="player-count">0 players registered</span>
-          <a href="#" class="view-details">View Details →</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================
-     CONTACT SECTION
-     ============================================ -->
-<section class="contact-section">
-  <div class="contact-header">
-    <h2>Get in <span class="highlight">Touch</span></h2>
-    <p>We're here to help you with any questions</p>
-  </div>
-  
-  <div class="contact-grid">
-    <div class="contact-card">
-      <div class="contact-icon">️</div>
-      <h3>Email Us</h3>
-      <p>Send us an email anytime</p>
-      <a href="mailto:support@topcompsports.com">support@topcompsports.com</a>
-    </div>
-    
-    <div class="contact-card">
-      <div class="contact-icon">💬</div>
-      <h3>WhatsApp</h3>
-      <p>Chat with us on WhatsApp</p>
-      <a href="#">Start Chat</a>
-    </div>
-    
-    <div class="contact-card featured">
-      <div class="contact-icon">📱</div>
-      <h3>Call Us</h3>
-      <p>Mon-Fri from 9am to 6pm</p>
-      <a href="tel:+1234567890">+1 (234) 567-890</a>
-    </div>
-    
-    <div class="contact-card">
-      <div class="contact-icon">📍</div>
-      <h3>Location</h3>
-      <p>Visit our office</p>
-      <a href="#">Available Online Worldwide</a>
-    </div>
-  </div>
-  
-  <div class="social-links">
-    <a href="#" class="social-icon">📘</a>
-    <a href="#" class="social-icon">🐦</a>
-    <a href="#" class="social-icon">📷</a>
-    <a href="#" class="social-icon">📺</a>
-  </div>
-</section>
-
-<!-- ============================================
-     FOOTER
-     ============================================ -->
-<footer class="footer">
-  <div class="footer-links">
-    <a href="#">Agreements</a>
-    <a href="#">Privacy Policy</a>
-    <a href="#">About us</a>
-    <a href="#">Logo & Press Kit</a>
-  </div>
-  <p>© 2026 TopCompSports - All rights reserved</p>
-  <p>Professional tournament management for Jiu-Jitsu competitions</p>
-</footer>
+</div>
 
 <script>
-// Language toggle
-document.querySelectorAll('.lang-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    this.classList.add('active');
-  });
-});
-
-// Mobile menu toggle
-document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
-  const navMenu = document.querySelector('.nav-menu');
-  if (navMenu.style.display === 'flex') {
-    navMenu.style.display = 'none';
-  } else {
-    navMenu.style.display = 'flex';
-    navMenu.style.flexDirection = 'column';
-    navMenu.style.position = 'absolute';
-    navMenu.style.top = '70px';
-    navMenu.style.right = '20px';
-    navMenu.style.background = '#000';
-    navMenu.style.padding = '20px';
-    navMenu.style.borderRadius = '8px';
-    navMenu.style.border = '1px solid #1a1a1a';
+// Simple view toggle
+function showView(viewName) {
+  // Remove active class from all views
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  
+  // Add active class to selected view
+  const selectedView = document.getElementById('view-' + viewName);
+  if (selectedView) {
+    selectedView.classList.add('active');
   }
-});
-
-// Smooth scroll for anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-  anchor.addEventListener('click', function (e) {
-    e.preventDefault();
-    const target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
-    }
-  });
-});
+  
+  // Update nav links
+  document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+  event.target.classList.add('active');
+}
 </script>
 
 </body>
