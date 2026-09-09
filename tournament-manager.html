@@ -10,27 +10,11 @@
    CORE STYLES - Maintained from original design
    ============================================ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { 
-  font-family: 'Segoe UI', Tahoma, sans-serif; 
-  background: #0a0e17; 
-  color: #fff; 
-  padding: 10px; 
-}
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0a0e17; color: #fff; padding: 10px; }
 .container { max-width: 1600px; margin: 0 auto; }
 
 /* Buttons */
-.btn { 
-  padding: 10px 18px; 
-  border: none; 
-  border-radius: 8px; 
-  font-weight: bold; 
-  cursor: pointer; 
-  margin: 3px; 
-  transition: all 0.2s; 
-  display: inline-flex; 
-  align-items: center; 
-  gap: 6px; 
-}
+.btn { padding: 10px 18px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 3px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
 .btn:hover { transform: translateY(-2px); }
 .btn-primary { background: #27ae60; color: #fff; }
 .btn-secondary { background: #34495e; color: #fff; }
@@ -42,34 +26,11 @@ body {
 .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
 
 /* Sections */
-.section { 
-  background: #1a1f2e; 
-  border-radius: 12px; 
-  padding: 20px; 
-  margin-bottom: 15px; 
-  border: 1px solid #2a3548; 
-}
-.section-title { 
-  font-size: 1.3rem; 
-  font-weight: bold; 
-  color: #f1c40f; 
-  margin-bottom: 15px; 
-  border-bottom: 2px solid #2a3548; 
-  padding-bottom: 10px; 
-}
+.section { background: #1a1f2e; border-radius: 12px; padding: 20px; margin-bottom: 15px; border: 1px solid #2a3548; }
+.section-title { font-size: 1.3rem; font-weight: bold; color: #f1c40f; margin-bottom: 15px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; }
 
 /* Header */
-.header { 
-  background: #151d2b; 
-  padding: 15px 25px; 
-  border-radius: 12px; 
-  margin-bottom: 15px; 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  flex-wrap: wrap; 
-  gap: 10px; 
-}
+.header { background: #151d2b; padding: 15px 25px; border-radius: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 .header h1 { color: #f1c40f; font-size: 1.5rem; }
 
 /* Views */
@@ -83,15 +44,7 @@ th, td { padding: 8px; text-align: left; border-bottom: 1px solid #2a3548; }
 th { background: #151d2b; color: #8899aa; font-size: 0.8rem; text-transform: uppercase; }
 
 /* Inputs */
-input, select { 
-  background: #0f1724; 
-  border: 1px solid #2a3548; 
-  color: #fff; 
-  padding: 6px 10px; 
-  border-radius: 5px; 
-  font-size: 0.85rem; 
-  width: 100%; 
-}
+input, select { background: #0f1724; border: 1px solid #2a3548; color: #fff; padding: 6px 10px; border-radius: 5px; font-size: 0.85rem; width: 100%; }
 input:focus, select:focus { outline: none; border-color: #f1c40f; }
 
 /* Tabs */
@@ -102,39 +55,12 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 .tab-content.active { display: block; }
 
 /* Sync Indicator */
-.sync-indicator { 
-  position: fixed; 
-  top: 10px; 
-  right: 10px; 
-  padding: 8px 15px; 
-  background: #27ae60; 
-  color: #fff; 
-  border-radius: 20px; 
-  font-size: 0.85rem; 
-  font-weight: bold; 
-  z-index: 9999; 
-  display: none; 
-  box-shadow: 0 4px 15px rgba(39,174,96,0.4); 
-}
+.sync-indicator { position: fixed; top: 10px; right: 10px; padding: 8px 15px; background: #27ae60; color: #fff; border-radius: 20px; font-size: 0.85rem; font-weight: bold; z-index: 9999; display: none; box-shadow: 0 4px 15px rgba(39,174,96,0.4); }
 .sync-indicator.active { display: block; animation: syncPulse 1s ease-in-out; }
-@keyframes syncPulse { 
-  0% { transform: scale(0.8); opacity: 0; } 
-  50% { transform: scale(1.1); } 
-  100% { transform: scale(1); opacity: 1; } 
-}
+@keyframes syncPulse { 0% { transform: scale(0.8); opacity: 0; } 50% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
 
 /* Tab Info Bar */
-.tab-info-bar { 
-  background: linear-gradient(135deg, #8e44ad, #9b59b6); 
-  padding: 10px 20px; 
-  border-radius: 8px; 
-  margin-bottom: 15px; 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  flex-wrap: wrap; 
-  gap: 10px; 
-}
+.tab-info-bar { background: linear-gradient(135deg, #8e44ad, #9b59b6); padding: 10px 20px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
 .tab-info-bar .mat-badge { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 15px; font-weight: bold; }
 .tab-info-bar .sync-status { font-size: 0.85rem; }
 .tab-info-bar .sync-status.connected { color: #2ecc71; }
@@ -262,36 +188,20 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
    RESPONSIVE DESIGN - Mobile First
    ============================================ */
 @media (max-width: 900px) {
-  .header { 
-    flex-direction: column; 
-    align-items: stretch; 
-  }
-  .header > div { 
-    margin-bottom: 10px; 
-    width: 100%;
-  }
-  .header h1 { 
-    font-size: 1.2rem; 
-    text-align: center;
-  }
-  .header .btn { 
-    width: 100%; 
-    justify-content: center; 
-  }
-  
+  .header { flex-direction: column; align-items: stretch; }
+  .header > div { margin-bottom: 10px; width: 100%; }
+  .header h1 { font-size: 1.2rem; text-align: center; }
+  .header .btn { width: 100%; justify-content: center; }
   .sb-controls-area { grid-template-columns: 1fr; }
   .sb-controls-area > div:first-child { border-right: none; border-bottom: 2px solid #2a3548; }
   .sb-top-bar { grid-template-columns: repeat(2, 1fr); }
   .sb-player-name { font-size: 1.1rem; }
   .sb-score-box { width: 60px; height: 60px; font-size: 2rem; }
   .sb-timer { font-size: 1.8rem; padding: 0 15px; }
-  
   .bracket-tree { gap: 30px; }
   .bracket-round { min-width: 180px; }
-  
   table { font-size: 0.85rem; }
   th, td { padding: 6px 4px; }
-  
   .section { padding: 15px; }
   .section-title { font-size: 1.1rem; }
 }
@@ -299,13 +209,10 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 @media (max-width: 600px) {
   body { padding: 5px; }
   .container { padding: 0; }
-  
   .tabs { flex-direction: column; }
   .tab { width: 100%; text-align: center; }
-  
   .sb-top-bar { grid-template-columns: 1fr; }
   .sb-top-bar .field { margin-bottom: 10px; }
-  
   .podium-container { flex-direction: column; align-items: center; }
   .podium-place { transform: none !important; order: unset !important; }
 }
@@ -316,7 +223,6 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 <div class="sync-indicator" id="syncIndicator">🔄 Data Synced</div>
 
 <div class="container">
-  <!-- Header with Tournament Info -->
   <div class="header">
     <div>
       <h1 id="tournamentTitle">🏆 Tournament Manager</h1>
@@ -327,15 +233,14 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       <button class="btn btn-info" onclick="showView('players')">👥 Players</button>
       <button class="btn btn-purple" onclick="showView('mats')">🥋 Mats</button>
       <button class="btn btn-warning" onclick="showView('settings')">⚙️ Settings</button>
-      <button class="btn btn-secondary" onclick="syncWithDB()"> Sync</button>
-      <button class="btn btn-secondary" onclick="saveLocalData()"> Save Local</button>
-      <button class="btn btn-danger" onclick="clearLocalData()">️ Clear Local</button>
+      <button class="btn btn-secondary" onclick="syncWithDB()">🔄 Sync</button>
+      <button class="btn btn-secondary" onclick="saveLocalData()">💾 Save Local</button>
+      <button class="btn btn-danger" onclick="clearLocalData()">🗑️ Clear Local</button>
       <button class="btn btn-danger" style="background: #e74c3c;" onclick="clearTournamentPlayersDB()">⚠️ Clear DB Players</button>
       <button class="btn btn-danger" style="background: #c0392b;" onclick="deleteTournamentDB()" id="deleteTournamentBtn" title="Admin Only">🗑️ Delete Tournament</button>
     </div>
   </div>
 
-  <!-- Tab Info Bar (for standalone tabs) -->
   <div class="tab-info-bar" id="tabInfoBar" style="display:none;">
     <div>
       <span class="mat-badge" id="tabMatBadge">🥋 Mat 1</span>
@@ -350,10 +255,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   <!-- PLAYERS VIEW -->
   <div id="view-players" class="view active">
     <div class="section">
-      <div class="section-title">
-        👥 Players Registration 
-        <span id="playerCount" style="color: #8899aa; font-size: 0.9rem;">0 / 200</span>
-      </div>
+      <div class="section-title">👥 Players Registration <span id="playerCount" style="color: #8899aa; font-size: 0.9rem;">0 / 200</span></div>
       <div style="margin-bottom: 15px;">
         <button class="btn btn-primary" onclick="addPlayer()">➕ Add Player</button>
         <button class="btn btn-secondary" onclick="addPlayers(10)">➕ Add 10</button>
@@ -365,17 +267,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
       <div style="max-height: 500px; overflow-y: auto;">
         <table>
           <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Team</th>
-              <th>Age Group</th>
-              <th>Gender</th>
-              <th>Weight</th>
-              <th>Belt</th>
-              <th>Rank</th>
-              <th>Action</th>
-            </tr>
+            <tr><th>#</th><th>Name</th><th>Team</th><th>Age Group</th><th>Gender</th><th>Weight</th><th>Belt</th><th>Rank</th><th>Action</th></tr>
           </thead>
           <tbody id="playersTable"></tbody>
         </table>
@@ -405,7 +297,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   <!-- SETTINGS VIEW -->
   <div id="view-settings" class="view">
     <div class="section">
-      <div class="section-title">️ Fight Time Settings</div>
+      <div class="section-title">⚙️ Fight Time Settings</div>
       <div style="margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
         <h3 style="color: #f1c40f; margin-bottom: 10px;">Regular Fight Times (minutes)</h3>
         <div id="regularTimes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;"></div>
@@ -422,9 +314,8 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
   <!-- DASHBOARD VIEW -->
   <div id="view-dashboard" class="view">
     <div class="section">
-      <div class="section-title">
-        <span>🥋 Mat Dashboard</span>
-        <button class="btn btn-info" onclick="openCurrentMatInNewTab()"> Open in New Tab</button>
+      <div class="section-title"><span>🥋 Mat Dashboard</span>
+        <button class="btn btn-info" onclick="openCurrentMatInNewTab()">🪟 Open in New Tab</button>
         <button class="btn btn-purple btn-sm" onclick="openAllMatsInTabs()">🪟 Open All Mats</button>
       </div>
       <div class="tabs">
@@ -473,8 +364,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 
       <div class="sb-player-row red">
         <div class="sb-logo" onclick="document.getElementById('logoRed').click()">
-          <img id="logoDisplayRed" style="display:none;">
-          <span id="logoPlaceholderRed">Logo</span>
+          <img id="logoDisplayRed" style="display:none;"><span id="logoPlaceholderRed">Logo</span>
         </div>
         <input type="file" class="logo-input" id="logoRed" accept="image/*" onchange="handleLogoUpload('Red', this)">
         <div class="sb-player-info">
@@ -486,8 +376,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 
       <div class="sb-player-row blue">
         <div class="sb-logo" onclick="document.getElementById('logoBlue').click()">
-          <img id="logoDisplayBlue" style="display:none;">
-          <span id="logoPlaceholderBlue">Logo</span>
+          <img id="logoDisplayBlue" style="display:none;"><span id="logoPlaceholderBlue">Logo</span>
         </div>
         <input type="file" class="logo-input" id="logoBlue" accept="image/*" onchange="handleLogoUpload('Blue', this)">
         <div class="sb-player-info">
@@ -504,22 +393,18 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
 
       <div class="sb-controls-area">
         <div>
-          <div class="sb-panel-header red"> Red Player</div>
+          <div class="sb-panel-header red">🔴 Red Player</div>
           <div class="sb-counters">
             <div class="sb-counter adv"><div class="label">⭐ Advantage</div><div class="value" id="redAdv">0</div></div>
-            <div class="sb-counter pen"><div class="label"> Penalty</div><div class="value" id="redPen">0</div></div>
+            <div class="sb-counter pen"><div class="label">🟥 Penalty</div><div class="value" id="redPen">0</div></div>
           </div>
           <div class="sb-points-grid">
-            <button onclick="addScore('red', 1)">+1</button>
-            <button onclick="addScore('red', 2)">+2</button>
-            <button onclick="addScore('red', 3)">+3</button>
-            <button onclick="addScore('red', 4)">+4</button>
+            <button onclick="addScore('red', 1)">+1</button><button onclick="addScore('red', 2)">+2</button>
+            <button onclick="addScore('red', 3)">+3</button><button onclick="addScore('red', 4)">+4</button>
           </div>
           <div class="sb-minus-grid">
-            <button onclick="subtractScore('red', 1)">-1</button>
-            <button onclick="subtractScore('red', 2)">-2</button>
-            <button onclick="subtractScore('red', 3)">-3</button>
-            <button onclick="subtractScore('red', 4)">-4</button>
+            <button onclick="subtractScore('red', 1)">-1</button><button onclick="subtractScore('red', 2)">-2</button>
+            <button onclick="subtractScore('red', 3)">-3</button><button onclick="subtractScore('red', 4)">-4</button>
           </div>
           <div class="sb-action-row">
             <button class="btn-adv" onclick="addAdvantage('red')"><span class="icon">⭐</span><span>Advantage</span></button>
@@ -535,16 +420,12 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
             <div class="sb-counter pen"><div class="label">🟥 Penalty</div><div class="value" id="bluePen">0</div></div>
           </div>
           <div class="sb-points-grid">
-            <button onclick="addScore('blue', 1)">+1</button>
-            <button onclick="addScore('blue', 2)">+2</button>
-            <button onclick="addScore('blue', 3)">+3</button>
-            <button onclick="addScore('blue', 4)">+4</button>
+            <button onclick="addScore('blue', 1)">+1</button><button onclick="addScore('blue', 2)">+2</button>
+            <button onclick="addScore('blue', 3)">+3</button><button onclick="addScore('blue', 4)">+4</button>
           </div>
           <div class="sb-minus-grid">
-            <button onclick="subtractScore('blue', 1)">-1</button>
-            <button onclick="subtractScore('blue', 2)">-2</button>
-            <button onclick="subtractScore('blue', 3)">-3</button>
-            <button onclick="subtractScore('blue', 4)">-4</button>
+            <button onclick="subtractScore('blue', 1)">-1</button><button onclick="subtractScore('blue', 2)">-2</button>
+            <button onclick="subtractScore('blue', 3)">-3</button><button onclick="subtractScore('blue', 4)">-4</button>
           </div>
           <div class="sb-action-row">
             <button class="btn-adv" onclick="addAdvantage('blue')"><span class="icon">⭐</span><span>Advantage</span></button>
@@ -581,7 +462,7 @@ input:focus, select:focus { outline: none; border-color: #f1c40f; }
     <div id="matchInfo" style="text-align: center; margin-bottom: 20px; padding: 15px; background: rgba(241,196,15,0.1); border-radius: 8px;"></div>
     <button class="btn btn-danger" style="width: 100%; margin-bottom: 10px; padding: 15px;" onclick="declareWinner('red')">🔴 Red Wins</button>
     <button class="btn btn-info" style="width: 100%; margin-bottom: 10px; padding: 15px;" onclick="declareWinner('blue')">🔵 Blue Wins</button>
-    <button class="btn btn-secondary" style="width: 100%; padding: 15px;" onclick="closeModal()"> Cancel</button>
+    <button class="btn btn-secondary" style="width: 100%; padding: 15px;" onclick="closeModal()">❌ Cancel</button>
   </div>
 </div>
 
@@ -624,7 +505,7 @@ let isStandaloneTab = false;
 let dbConnected = false;
 
 // ============================================
-// 3. REFERENCE DATA - Dynamic from Database
+// 3. REFERENCE DATA
 // ============================================
 let AGE_GROUPS = {};
 let WEIGHTS = {};
@@ -632,7 +513,7 @@ let BELTS = {};
 let GENDERS = ['Boys', 'Girls', 'Men', 'Women'];
 
 // ============================================
-// 4. LOAD REFERENCE DATA FROM DATABASE
+// 4. LOAD REFERENCE DATA FROM DATABASE (FIXED)
 // ============================================
 async function loadReferenceData() {
   try {
@@ -658,24 +539,31 @@ async function loadReferenceData() {
       console.log(`✅ Loaded ${Object.keys(AGE_GROUPS).length} age divisions from DB`);
     }
     
-    // 2. Load Weight Classes from database
+    // 2. Load Weight Classes WITH JOIN to get age division name directly (CRITICAL FIX)
     const { data: weightData, error: weightError } = await dbClient
       .from('weight_classes')
-      .select('*')
+      .select(`
+        name,
+        gender,
+        min_weight,
+        max_weight,
+        age_divisions (
+          name
+        )
+      `)
       .order('min_weight');
     
     if (!weightError && weightData && weightData.length > 0) {
       WEIGHTS = {};
       weightData.forEach(wc => {
         const gender = wc.gender || 'Boys';
-        const ageDivId = wc.age_division_id;
-        const ageDiv = ageData?.find(ad => ad.id === ageDivId);
-        const ageGroup = ageDiv?.name || 'Amateur / Professional';
+        // Safely access the joined table name
+        const ageGroupName = wc.age_divisions ? wc.age_divisions.name : 'Amateur / Professional';
         
         if (!WEIGHTS[gender]) WEIGHTS[gender] = {};
-        if (!WEIGHTS[gender][ageGroup]) WEIGHTS[gender][ageGroup] = [];
+        if (!WEIGHTS[gender][ageGroupName]) WEIGHTS[gender][ageGroupName] = [];
         
-        WEIGHTS[gender][ageGroup].push(wc.name);
+        WEIGHTS[gender][ageGroupName].push(wc.name);
       });
       console.log('✅ Loaded weight classes from DB');
     }
@@ -709,47 +597,64 @@ async function loadReferenceData() {
 // ============================================
 function getGenderOptions(ageGroup) {
   const category = AGE_GROUPS[ageGroup]?.category;
-  if (category === 'under16') {
-    return ['Boys', 'Girls'];
-  }
-  return ['Men', 'Women'];
+  return (category === 'under16') ? ['Boys', 'Girls'] : ['Men', 'Women'];
 }
 
 function getWeightOptions(gender, ageGroup) {
   if (WEIGHTS[gender] && WEIGHTS[gender][ageGroup]) {
     return WEIGHTS[gender][ageGroup];
   }
-  return [];
+  // Fallback data matching the exact list provided
+  const fallbackWeights = {
+    'Boys': {
+      'Kids 1': ['16kg', '18kg', '21kg', '24kg', '28kg', '32kg', '+32kg'],
+      'Kids 2': ['18kg', '20kg', '23kg', '26kg', '30kg', '34kg', '+34kg'],
+      'Kids 3': ['21kg', '24kg', '27kg', '30kg', '34kg', '38kg', '+38kg'],
+      'Infant': ['24kg', '27kg', '30kg', '34kg', '38kg', '42kg', '+42kg'],
+      'Junior': ['34kg', '37kg', '41kg', '45kg', '50kg', '55kg', '+55kg'],
+      'Teen': ['38kg', '42kg', '46kg', '50kg', '54kg', '62kg', '+62kg'],
+      'Youth': ['44kg', '50kg', '55kg', '60kg', '67kg', '73kg', '81kg', '89kg', '94kg', '+94kg'],
+      'Amateur / Professional': ['56kg', '62kg', '67kg', '77kg', '82kg', '88kg', '94kg', '120kg', '+120kg'],
+      'Master 1': ['56kg', '62kg', '67kg', '77kg', '82kg', '88kg', '94kg', '120kg', '+120kg'],
+      'Master 2': ['56kg', '62kg', '67kg', '77kg', '82kg', '88kg', '94kg', '120kg', '+120kg'],
+      'Master 3': ['56kg', '62kg', '67kg', '77kg', '82kg', '88kg', '94kg', '120kg', '+120kg'],
+      'Master 4': ['56kg', '62kg', '67kg', '77kg', '82kg', '88kg', '94kg', '120kg', '+120kg']
+    },
+    'Girls': {
+      'Kids 1': ['16kg', '18kg', '21kg', '24kg', '26kg', '32kg', '+32kg'],
+      'Kids 2': ['17kg', '19kg', '22kg', '24kg', '27kg', '32kg', '+32kg'],
+      'Kids 3': ['20kg', '22kg', '25kg', '28kg', '32kg', '36kg', '+36kg'],
+      'Infant': ['22kg', '25kg', '28kg', '32kg', '36kg', '40kg', '+40kg'],
+      'Junior': ['32kg', '34kg', '40kg', '44kg', '48kg', '52kg', '+52kg'],
+      'Teen': ['38kg', '40kg', '44kg', '48kg', '53kg', '57kg', '+57kg'],
+      'Youth': ['40kg', '44kg', '48kg', '52kg', '57kg', '63kg', '70kg', '82kg', '+82kg'],
+      'Amateur / Professional': ['47kg', '55kg', '62kg', '70kg', '80kg', '90kg', '95kg', '+95kg'],
+      'Master 1': ['47kg', '55kg', '62kg', '70kg', '80kg', '90kg', '95kg', '+95kg'],
+      'Master 2': ['47kg', '55kg', '62kg', '70kg', '80kg', '90kg', '95kg', '+95kg'],
+      'Master 3': ['47kg', '55kg', '62kg', '70kg', '80kg', '90kg', '95kg', '+95kg'],
+      'Master 4': ['47kg', '55kg', '62kg', '70kg', '80kg', '90kg', '95kg', '+95kg']
+    }
+  };
+  
+  return (fallbackWeights[gender] && fallbackWeights[gender][ageGroup]) ? fallbackWeights[gender][ageGroup] : [];
 }
 
 function getBeltOptions(ageGroup) {
   const category = AGE_GROUPS[ageGroup]?.category;
-  
-  if (category === 'under16' && BELTS['kids']) {
-    return BELTS['kids'];
-  } else if (ageGroup === 'Youth' && BELTS['youth']) {
-    return BELTS['youth'];
-  } else if (BELTS['adult']) {
-    return BELTS['adult'];
-  }
-  
+  if (category === 'under16' && BELTS['kids']) return BELTS['kids'];
+  if (ageGroup === 'Youth' && BELTS['youth']) return BELTS['youth'];
+  if (BELTS['adult']) return BELTS['adult'];
   return ['White', 'Blue', 'Purple', 'Brown', 'Black'];
 }
 
-function getFightTime(ageGroup) { 
-  return AGE_GROUPS[ageGroup]?.time || 5; 
-}
-
-function getGoldenTime(ageGroup) { 
-  return AGE_GROUPS[ageGroup]?.goldenTime || 1; 
-}
+function getFightTime(ageGroup) { return AGE_GROUPS[ageGroup]?.time || 5; }
+function getGoldenTime(ageGroup) { return AGE_GROUPS[ageGroup]?.goldenTime || 1; }
 
 // ============================================
 // 6. INITIALIZATION
 // ============================================
 window.onload = async function() {
-  console.log(' Page loaded. Initializing...');
-  
+  console.log('🚀 Page loaded. Initializing...');
   const urlParams = new URLSearchParams(window.location.search);
   currentTournamentId = urlParams.get('tournament_id');
   
@@ -757,7 +662,6 @@ window.onload = async function() {
     showError('⚠️ No tournament_id in URL. Please open with ?tournament_id=YOUR_ID');
     return;
   }
-  
   await initializeApp();
 };
 
@@ -769,7 +673,6 @@ async function initializeApp() {
     await loadPlayersFromDB();
     loadLocalData();
     updateUI();
-    
     document.getElementById('dbStatus').innerHTML = '✅ Connected to Database';
     document.getElementById('dbStatus').style.color = '#2ecc71';
   } catch (error) {
@@ -780,21 +683,11 @@ async function initializeApp() {
 
 async function loadTournamentInfo() {
   try {
-    let { data: tData } = await dbClient
-      .from('tournaments')
-      .select('name, status, organizer_id')
-      .eq('id', currentTournamentId)
-      .single();
-    
+    let { data: tData } = await dbClient.from('tournaments').select('name, status, organizer_id').eq('id', currentTournamentId).single();
     if (!tData) {
-      const { data: eData } = await dbClient
-        .from('events')
-        .select('name, status')
-        .eq('id', currentTournamentId)
-        .single();
+      const { data: eData } = await dbClient.from('events').select('name, status').eq('id', currentTournamentId).single();
       tData = eData;
     }
-    
     if (tData && tData.name) {
       document.getElementById('tournamentTitle').innerText = `🏆 ${tData.name}`;
       document.getElementById('subtitle').innerText = `Tournament ID: ${currentTournamentId} | Status: ${tData.status || 'draft'}`;
@@ -810,28 +703,14 @@ async function loadTournamentInfo() {
 async function checkUserPermissions() {
   try {
     const { data: { user } } = await dbClient.auth.getUser();
-    
-    if (!user) {
-      currentUserRole = 'anon';
-      return;
-    }
-    
+    if (!user) { currentUserRole = 'anon'; return; }
     currentUser = user;
-    
-    const { data: profile } = await dbClient
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-    
+    const { data: profile } = await dbClient.from('profiles').select('role').eq('id', user.id).single();
     currentUserRole = profile?.role || 'authenticated';
-    console.log('User role:', currentUserRole);
     
     const isAdmin = currentUserRole === 'admin' || currentUserRole === 'super_admin';
     const deleteBtn = document.getElementById('deleteTournamentBtn');
-    if (deleteBtn) {
-      deleteBtn.style.display = isAdmin ? 'inline-flex' : 'none';
-    }
+    if (deleteBtn) deleteBtn.style.display = isAdmin ? 'inline-flex' : 'none';
   } catch (error) {
     console.error('Error checking permissions:', error);
     currentUserRole = 'authenticated';
@@ -840,27 +719,14 @@ async function checkUserPermissions() {
 
 async function loadPlayersFromDB() {
   if (!currentTournamentId) return;
-  
   try {
-    const { data, error } = await dbClient
-      .from('tournament_participants')
-      .select('*')
-      .eq('tournament_id', currentTournamentId)
-      .order('ranking', { ascending: true });
-
+    const { data, error } = await dbClient.from('tournament_participants').select('*').eq('tournament_id', currentTournamentId).order('ranking', { ascending: true });
     if (error) throw error;
-    
     players = (data || []).map(p => ({
-      id: p.id,
-      name: p.player_name || '',
-      team: p.team || '',
-      ageGroup: p.age_group || 'Amateur / Professional',
-      gender: p.gender || 'Men',
-      weight: p.weight || '',
-      belt: p.belt_level || 'White',
-      rank: p.ranking || 0
+      id: p.id, name: p.player_name || '', team: p.team || '',
+      ageGroup: p.age_group || 'Amateur / Professional', gender: p.gender || 'Men',
+      weight: p.weight || '', belt: p.belt_level || 'White', rank: p.ranking || 0
     }));
-    
     console.log(`✅ Loaded ${players.length} players from DB`);
     renderPlayers();
   } catch (error) {
@@ -876,32 +742,20 @@ function loadLocalData() {
       mats = data.mats || [{ id: 1, weights: [], ageGroups: [], belts: [], genders: [] }];
       categories = data.categories || {};
       if (data.AGE_GROUPS) Object.assign(AGE_GROUPS, data.AGE_GROUPS);
-      console.log('✅ Local data loaded');
-    } catch(e) { 
-      console.error('Load error:', e); 
-    }
+    } catch(e) { console.error('Load error:', e); }
   }
 }
 
 // ============================================
-// 7. NAVIGATION
+// 7. NAVIGATION & UI
 // ============================================
 function showView(view) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const viewEl = document.getElementById('view-' + view);
   if (viewEl) viewEl.classList.add('active');
-  
-  const subtitles = { 
-    players: 'Step 1: Players Registration', 
-    mats: 'Step 2: Mats Setup', 
-    settings: 'Step 3: Settings',
-    dashboard: 'Mat Dashboard - Mat ' + currentMat, 
-    scoreboard: 'Scoreboard',
-    bracket: 'Bracket View'
-  };
+  const subtitles = { players: 'Step 1: Players Registration', mats: 'Step 2: Mats Setup', settings: 'Step 3: Settings', dashboard: 'Mat Dashboard - Mat ' + currentMat, scoreboard: 'Scoreboard', bracket: 'Bracket View' };
   const subtitleEl = document.getElementById('subtitle');
   if (subtitleEl) subtitleEl.innerText = subtitles[view] || '';
-  
   if (view === 'mats') renderMats();
   if (view === 'dashboard') { renderCategories(); renderQueue(); renderCallUp(); renderStandings(); }
   if (view === 'settings') renderSettings();
@@ -919,60 +773,30 @@ function switchTab(tab) {
   if (tab === 'standings') renderStandings();
 }
 
-function backToBracket() {
-  if (currentCategory) showView('bracket');
-  else showView('dashboard');
-}
-
-function showError(msg) {
-  document.getElementById('dbStatus').innerHTML = `❌ ${msg}`;
-  document.getElementById('dbStatus').style.color = '#e74c3c';
-}
-
+function backToBracket() { if (currentCategory) showView('bracket'); else showView('dashboard'); }
+function showError(msg) { document.getElementById('dbStatus').innerHTML = `❌ ${msg}`; document.getElementById('dbStatus').style.color = '#e74c3c'; }
 function showSyncIndicator() {
   const indicator = document.getElementById('syncIndicator');
-  if (indicator) {
-    indicator.classList.add('active');
-    setTimeout(() => indicator.classList.remove('active'), 2000);
-  }
+  if (indicator) { indicator.classList.add('active'); setTimeout(() => indicator.classList.remove('active'), 2000); }
 }
-
 function updateUI() {
   const isAdmin = currentUserRole === 'admin' || currentUserRole === 'super_admin';
   const deleteBtn = document.getElementById('deleteTournamentBtn');
-  if (deleteBtn) {
-    deleteBtn.style.display = isAdmin ? 'inline-flex' : 'none';
-  }
+  if (deleteBtn) deleteBtn.style.display = isAdmin ? 'inline-flex' : 'none';
 }
 
 // ============================================
 // 8. DATABASE OPERATIONS
 // ============================================
 async function syncWithDB() {
-  if (!currentTournamentId) {
-    alert('⚠️ No tournament_id in URL!');
-    return;
-  }
-  
+  if (!currentTournamentId) { alert('⚠️ No tournament_id in URL!'); return; }
   showSyncIndicator();
-  
-  try {
-    await loadPlayersFromDB();
-    alert('✅ Synced with database!');
-  } catch (error) {
-    alert(' Sync failed: ' + error.message);
-  }
+  try { await loadPlayersFromDB(); alert('✅ Synced with database!'); } 
+  catch (error) { alert('❌ Sync failed: ' + error.message); }
 }
 
 function saveLocalData() {
-  const data = { 
-    players, 
-    mats, 
-    categories, 
-    AGE_GROUPS, 
-    savedAt: new Date().toISOString() 
-  };
-  localStorage.setItem('tournamentData', JSON.stringify(data));
+  localStorage.setItem('tournamentData', JSON.stringify({ players, mats, categories, AGE_GROUPS, savedAt: new Date().toISOString() }));
   alert('✅ Local data saved!');
 }
 
@@ -986,35 +810,15 @@ function clearLocalData() {
 }
 
 async function clearTournamentPlayersDB() {
-  if (!currentTournamentId) {
-    alert('️ No tournament_id in URL!');
-    return;
-  }
-  
-  if (players.length === 0) {
-    alert('ℹ️ No players to delete!');
-    return;
-  }
-  
-  if (!confirm(`⚠️ WARNING: This will DELETE ALL ${players.length} players from this tournament!\n\nThis cannot be undone. Continue?`)) {
-    return;
-  }
-  
-  if (!confirm('⚠️ FINAL CONFIRMATION: Delete all players?')) {
-    return;
-  }
+  if (!currentTournamentId || players.length === 0) { alert('ℹ️ No players to delete!'); return; }
+  if (!confirm(`⚠️ WARNING: This will DELETE ALL ${players.length} players from this tournament!\n\nContinue?`) || !confirm('⚠️ FINAL CONFIRMATION: Delete all players?')) return;
   
   try {
     document.getElementById('dbStatus').innerHTML = '🔄 Clearing players...';
-    
-    const { data, error } = await dbClient
-      .rpc('fn_clear_tournament_players', { p_tournament_id: currentTournamentId });
-    
+    const { data, error } = await dbClient.rpc('fn_clear_tournament_players', { p_tournament_id: currentTournamentId });
     if (error) throw error;
-    
     players = [];
     renderPlayers();
-    
     alert(`✅ Successfully deleted ${data || 0} players!`);
     document.getElementById('dbStatus').innerHTML = '✅ All players cleared';
     showSyncIndicator();
@@ -1025,31 +829,15 @@ async function clearTournamentPlayersDB() {
 }
 
 async function deleteTournamentDB() {
-  if (!currentTournamentId) {
-    alert('⚠️ No tournament_id in URL!');
-    return;
-  }
-  
-  if (!confirm('⚠️ CRITICAL WARNING:\n\nThis will DELETE the entire tournament and ALL associated data!\n\nThis CANNOT be undone!\n\nContinue?')) {
-    return;
-  }
-  
-  const confirmText = prompt('⚠️ Type "DELETE" to confirm:', '');
-  if (confirmText !== 'DELETE') {
-    alert(' Deletion cancelled!');
-    return;
-  }
+  if (!currentTournamentId) { alert('⚠️ No tournament_id in URL!'); return; }
+  if (!confirm('⚠️ CRITICAL WARNING:\n\nThis will DELETE the entire tournament and ALL associated data!\n\nContinue?')) return;
+  if (prompt('⚠️ Type "DELETE" to confirm:', '') !== 'DELETE') { alert('❌ Deletion cancelled!'); return; }
   
   try {
     document.getElementById('dbStatus').innerHTML = '🔄 Deleting tournament...';
-    
-    const { error } = await dbClient
-      .rpc('fn_delete_tournament_full', { p_tournament_id: currentTournamentId });
-    
+    const { error } = await dbClient.rpc('fn_delete_tournament_full', { p_tournament_id: currentTournamentId });
     if (error) throw error;
-    
     alert('✅ Tournament deleted successfully!');
-    
     window.location.href = 'admin-tournaments.html';
   } catch (error) {
     alert('❌ Error: ' + error.message);
@@ -1058,18 +846,11 @@ async function deleteTournamentDB() {
 }
 
 // ============================================
-// 9. PLAYER MANAGEMENT
+// 9. PLAYER MANAGEMENT (FIXED)
 // ============================================
 async function addPlayer() {
-  if (players.length >= 200) { 
-    alert('Maximum 200 players!'); 
-    return; 
-  }
-  
-  if (!currentTournamentId) {
-    alert('⚠️ No tournament_id! Cannot save to database.');
-    return;
-  }
+  if (players.length >= 200) { alert('Maximum 200 players!'); return; }
+  if (!currentTournamentId) { alert('⚠️ No tournament_id! Cannot save to database.'); return; }
   
   const newPlayerData = {
     tournament_id: currentTournamentId,
@@ -1077,31 +858,15 @@ async function addPlayer() {
     team: '',
     age_group: 'Amateur / Professional',
     gender: 'Men',
-    weight: null,
+    weight: null, // ✅ CRITICAL FIX: null instead of '' for numeric columns
     belt_level: 'White',
     ranking: players.length + 1
   };
   
   try {
-    const { data, error } = await dbClient
-      .from('tournament_participants')
-      .insert(newPlayerData)
-      .select()
-      .single();
-    
+    const { data, error } = await dbClient.from('tournament_participants').insert(newPlayerData).select().single();
     if (error) throw error;
-    
-    players.push({
-      id: data.id,
-      name: data.player_name,
-      team: data.team,
-      ageGroup: data.age_group,
-      gender: data.gender,
-      weight: data.weight || '',
-      belt: data.belt_level,
-      rank: data.ranking
-    });
-    
+    players.push({ id: data.id, name: data.player_name, team: data.team, ageGroup: data.age_group, gender: data.gender, weight: data.weight || '', belt: data.belt_level, rank: data.ranking });
     renderPlayers();
     showSyncIndicator();
   } catch (error) {
@@ -1111,16 +876,7 @@ async function addPlayer() {
 
 function addPlayers(count) {
   for (let i = 0; i < count && players.length < 200; i++) {
-    players.push({ 
-      id: 'temp-' + Date.now() + i, 
-      name: '', 
-      team: 'TCS Player', 
-      ageGroup: 'Amateur / Professional', 
-      gender: 'Men', 
-      weight: '', 
-      belt: 'White', 
-      rank: players.length + 1 
-    });
+    players.push({ id: 'temp-' + Date.now() + i, name: '', team: 'TCS Player', ageGroup: 'Amateur / Professional', gender: 'Men', weight: '', belt: 'White', rank: players.length + 1 });
   }
   renderPlayers();
 }
@@ -1130,42 +886,30 @@ async function updatePlayerField(index, field, value) {
   player[field] = value;
   
   if (player.id && !player.id.toString().startsWith('temp-')) {
-    const fieldMap = {
-      'name': 'player_name',
-      'ageGroup': 'age_group',
-      'belt': 'belt_level',
-      'rank': 'ranking'
-    };
+    const fieldMap = { 'name': 'player_name', 'ageGroup': 'age_group', 'belt': 'belt_level', 'rank': 'ranking', 'weight': 'weight' };
     const dbField = fieldMap[field] || field;
     
+    // ✅ CRITICAL FIX: Ensure empty weight is sent as null to avoid numeric conversion errors
+    let dbValue = value;
+    if (field === 'weight' && value === '') dbValue = null;
+
     try {
-      await dbClient
-        .from('tournament_participants')
-        .update({ [dbField]: value })
-        .eq('id', player.id);
+      await dbClient.from('tournament_participants').update({ [dbField]: dbValue }).eq('id', player.id);
     } catch (error) {
       console.error('Error updating player:', error);
     }
   }
-  
   renderPlayers();
 }
 
 async function deletePlayer(index) {
   if (!confirm('Delete this player?')) return;
-  
   const player = players[index];
-  
   try {
     if (player.id && !player.id.toString().startsWith('temp-')) {
-      const { error } = await dbClient
-        .from('tournament_participants')
-        .delete()
-        .eq('id', player.id);
-      
+      const { error } = await dbClient.from('tournament_participants').delete().eq('id', player.id);
       if (error) throw error;
     }
-    
     players.splice(index, 1);
     renderPlayers();
     showSyncIndicator();
@@ -1177,76 +921,40 @@ async function deletePlayer(index) {
 function renderPlayers() {
   const tbody = document.getElementById('playersTable');
   if (!tbody) return;
-  
   tbody.innerHTML = '';
   
   players.forEach((p, i) => {
-    const genderOptions = getGenderOptions(p.ageGroup).map(g => 
-      `<option ${p.gender===g?'selected':''}>${g}</option>`
-    ).join('');
-    
-    const weightOptions = getWeightOptions(p.gender, p.ageGroup).map(w => 
-      `<option ${p.weight===w?'selected':''}>${w}</option>`
-    ).join('');
-    
-    const beltOptions = getBeltOptions(p.ageGroup).map(b => 
-      `<option ${p.belt===b?'selected':''}>${b}</option>`
-    ).join('');
+    const genderOptions = getGenderOptions(p.ageGroup).map(g => `<option ${p.gender===g?'selected':''}>${g}</option>`).join('');
+    const weightOptions = getWeightOptions(p.gender, p.ageGroup).map(w => `<option ${p.weight===w?'selected':''}>${w}</option>`).join('');
+    const beltOptions = getBeltOptions(p.ageGroup).map(b => `<option ${p.belt===b?'selected':''}>${b}</option>`).join('');
     
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${i + 1}</td>
       <td><input type="text" value="${p.name}" onchange="updatePlayerField(${i}, 'name', this.value)" placeholder="Name"></td>
       <td><input type="text" value="${p.team}" onchange="updatePlayerField(${i}, 'team', this.value)" placeholder="Team"></td>
-      <td>
-        <select onchange="updatePlayerField(${i}, 'ageGroup', this.value); renderPlayers()">
-          ${Object.keys(AGE_GROUPS).map(a => `<option ${p.ageGroup===a?'selected':''}>${a}</option>`).join('')}
-        </select>
-      </td>
-      <td>
-        <select onchange="updatePlayerField(${i}, 'gender', this.value); renderPlayers()">
-          ${genderOptions}
-        </select>
-      </td>
-      <td>
-        <select onchange="updatePlayerField(${i}, 'weight', this.value)">
-          ${weightOptions || '<option value="">-- Select Weight --</option>'}
-        </select>
-      </td>
-      <td>
-        <select onchange="updatePlayerField(${i}, 'belt', this.value)">
-          ${beltOptions}
-        </select>
-      </td>
+      <td><select onchange="updatePlayerField(${i}, 'ageGroup', this.value); renderPlayers()">${Object.keys(AGE_GROUPS).map(a => `<option ${p.ageGroup===a?'selected':''}>${a}</option>`).join('')}</select></td>
+      <td><select onchange="updatePlayerField(${i}, 'gender', this.value); renderPlayers()">${genderOptions}</select></td>
+      <td><select onchange="updatePlayerField(${i}, 'weight', this.value)">${weightOptions || '<option value="">-- Select Weight --</option>'}</select></td>
+      <td><select onchange="updatePlayerField(${i}, 'belt', this.value)">${beltOptions}</select></td>
       <td><input type="number" value="${p.rank}" style="width:60px" onchange="updatePlayerField(${i}, 'rank', parseInt(this.value))"></td>
       <td><button class="btn btn-danger btn-sm" onclick="deletePlayer(${i})">✕</button></td>
     `;
     tbody.appendChild(tr);
   });
-  
   document.getElementById('playerCount').innerText = `${players.length} / 200`;
 }
 
 function importCSV(event) {
   const file = event.target.files[0];
   if (!file) return;
-  
   const reader = new FileReader();
   reader.onload = e => {
     const lines = e.target.result.split('\n').filter(l => l.trim());
     for (let i = 1; i < lines.length && players.length < 200; i++) {
       const vals = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
       if (vals.length >= 3) {
-        players.push({ 
-          id: 'temp-' + (Date.now() + i), 
-          name: vals[0] || '', 
-          team: vals[1] || '', 
-          ageGroup: vals[2] || 'Amateur / Professional', 
-          gender: getGenderOptions(vals[2] || 'Amateur / Professional')[0], 
-          weight: vals[4] || '', 
-          belt: vals[5] || 'White', 
-          rank: parseInt(vals[6]) || players.length + 1 
-        });
+        players.push({ id: 'temp-' + (Date.now() + i), name: vals[0] || '', team: vals[1] || '', ageGroup: vals[2] || 'Amateur / Professional', gender: getGenderOptions(vals[2] || 'Amateur / Professional')[0], weight: vals[4] || '', belt: vals[5] || 'White', rank: parseInt(vals[6]) || players.length + 1 });
       }
     }
     renderPlayers();
@@ -1257,14 +965,10 @@ function importCSV(event) {
 
 function exportCSV() {
   let csv = 'Name,Team,Age Group,Gender,Weight,Belt,Rank\n';
-  players.forEach(p => { 
-    csv += `"${p.name}","${p.team}","${p.ageGroup}","${p.gender}","${p.weight}","${p.belt}",${p.rank}\n`; 
-  });
-  
+  players.forEach(p => { csv += `"${p.name}","${p.team}","${p.ageGroup}","${p.gender}","${p.weight}","${p.belt}",${p.rank}\n`; });
   const blob = new Blob([csv], { type: 'text/csv' });
-  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
+  a.href = URL.createObjectURL(blob);
   a.download = `players_${currentTournamentId || 'export'}.csv`;
   a.click();
 }
@@ -1274,9 +978,7 @@ function exportCSV() {
 // ============================================
 function updateMats() {
   const count = parseInt(document.getElementById('matsCount').value);
-  while (mats.length < count) {
-    mats.push({ id: mats.length + 1, weights: [], ageGroups: [], belts: [], genders: [] });
-  }
+  while (mats.length < count) mats.push({ id: mats.length + 1, weights: [], ageGroups: [], belts: [], genders: [] });
   mats = mats.slice(0, count);
   renderMats();
   saveLocalData();
@@ -1285,18 +987,12 @@ function updateMats() {
 function addMatCategory(matId, type, value) {
   const mat = mats.find(m => m.id === matId);
   if (!mat) return;
-  
-  if (!mat[type].includes(value)) { 
-    mat[type].push(value); 
-    renderMats();
-    saveLocalData();
-  }
+  if (!mat[type].includes(value)) { mat[type].push(value); renderMats(); saveLocalData(); }
 }
 
 function removeMatCategory(matId, type, index) {
   const mat = mats.find(m => m.id === matId);
   if (!mat) return;
-  
   mat[type].splice(index, 1);
   renderMats();
   saveLocalData();
@@ -1305,7 +1001,6 @@ function removeMatCategory(matId, type, index) {
 function renderMats() {
   const grid = document.getElementById('matsGrid');
   if (!grid) return;
-  
   grid.innerHTML = '';
   const allWeights = [...new Set(players.map(p => p.weight).filter(w => w))];
   const allAges = [...new Set(players.map(p => p.ageGroup))];
@@ -1318,64 +1013,26 @@ function renderMats() {
     div.style.padding = '15px';
     div.innerHTML = `
       <h3 style="color: #f1c40f; margin-bottom: 10px;">🥋 Mat ${mat.id}</h3>
-      
-      <div style="margin-bottom: 10px;">
-        <strong style="color: #8899aa; font-size: 0.8rem;">AGE GROUPS</strong>
-        <div style="margin-top: 5px;">
-          ${mat.ageGroups.map((a, i) => 
-            `<span class="tag">${a} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'ageGroups', ${i})">✕</span></span>`
-          ).join('') || '<span style="color: #556; font-size: 0.8rem;">No age groups added</span>'}
-        </div>
-        <select onchange="if(this.value) addMatCategory(${mat.id}, 'ageGroups', this.value)" style="margin-top: 5px;">
-          <option value="">-- Add Age Group --</option>
-          ${allAges.map(a => `<option>${a}</option>`).join('')}
-        </select>
+      <div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">AGE GROUPS</strong>
+        <div style="margin-top: 5px;">${mat.ageGroups.map((a, i) => `<span class="tag">${a} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'ageGroups', ${i})">✕</span></span>`).join('') || '<span style="color: #556; font-size: 0.8rem;">No age groups added</span>'}</div>
+        <select onchange="if(this.value) addMatCategory(${mat.id}, 'ageGroups', this.value)" style="margin-top: 5px;"><option value="">-- Add Age Group --</option>${allAges.map(a => `<option>${a}</option>`).join('')}</select>
       </div>
-      
-      <div style="margin-bottom: 10px;">
-        <strong style="color: #8899aa; font-size: 0.8rem;">GENDERS</strong>
-        <div style="margin-top: 5px;">
-          ${mat.genders.map((g, i) => 
-            `<span class="tag">${g} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'genders', ${i})">✕</span></span>`
-          ).join('') || '<span style="color: #556; font-size: 0.8rem;">No genders added</span>'}
-        </div>
-        <select onchange="if(this.value) addMatCategory(${mat.id}, 'genders', this.value)" style="margin-top: 5px;">
-          <option value="">-- Add Gender --</option>
-          ${allGenders.map(g => `<option>${g}</option>`).join('')}
-        </select>
+      <div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">GENDERS</strong>
+        <div style="margin-top: 5px;">${mat.genders.map((g, i) => `<span class="tag">${g} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'genders', ${i})">✕</span></span>`).join('') || '<span style="color: #556; font-size: 0.8rem;">No genders added</span>'}</div>
+        <select onchange="if(this.value) addMatCategory(${mat.id}, 'genders', this.value)" style="margin-top: 5px;"><option value="">-- Add Gender --</option>${allGenders.map(g => `<option>${g}</option>`).join('')}</select>
       </div>
-      
-      <div style="margin-bottom: 10px;">
-        <strong style="color: #8899aa; font-size: 0.8rem;">WEIGHTS</strong>
-        <div style="margin-top: 5px;">
-          ${mat.weights.map((w, i) => 
-            `<span class="tag">${w} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'weights', ${i})">✕</span></span>`
-          ).join('') || '<span style="color: #556; font-size: 0.8rem;">No weights added</span>'}
-        </div>
-        <select onchange="if(this.value) addMatCategory(${mat.id}, 'weights', this.value)" style="margin-top: 5px;">
-          <option value="">-- Add Weight --</option>
-          ${allWeights.map(w => `<option>${w}</option>`).join('')}
-        </select>
+      <div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">WEIGHTS</strong>
+        <div style="margin-top: 5px;">${mat.weights.map((w, i) => `<span class="tag">${w} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'weights', ${i})">✕</span></span>`).join('') || '<span style="color: #556; font-size: 0.8rem;">No weights added</span>'}</div>
+        <select onchange="if(this.value) addMatCategory(${mat.id}, 'weights', this.value)" style="margin-top: 5px;"><option value="">-- Add Weight --</option>${allWeights.map(w => `<option>${w}</option>`).join('')}</select>
       </div>
-      
-      <div style="margin-bottom: 10px;">
-        <strong style="color: #8899aa; font-size: 0.8rem;">BELTS</strong>
-        <div style="margin-top: 5px;">
-          ${mat.belts.map((b, i) => 
-            `<span class="tag">${b} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'belts', ${i})"></span></span>`
-          ).join('') || '<span style="color: #556; font-size: 0.8rem;">No belts added</span>'}
-        </div>
-        <select onchange="if(this.value) addMatCategory(${mat.id}, 'belts', this.value)" style="margin-top: 5px;">
-          <option value="">-- Add Belt --</option>
-          ${allBelts.map(b => `<option>${b}</option>`).join('')}
-        </select>
+      <div style="margin-bottom: 10px;"><strong style="color: #8899aa; font-size: 0.8rem;">BELTS</strong>
+        <div style="margin-top: 5px;">${mat.belts.map((b, i) => `<span class="tag">${b} <span class="tag-remove" onclick="removeMatCategory(${mat.id}, 'belts', ${i})">✕</span></span>`).join('') || '<span style="color: #556; font-size: 0.8rem;">No belts added</span>'}</div>
+        <select onchange="if(this.value) addMatCategory(${mat.id}, 'belts', this.value)" style="margin-top: 5px;"><option value="">-- Add Belt --</option>${allBelts.map(b => `<option>${b}</option>`).join('')}</select>
       </div>
-      
       <div style="display: flex; gap: 8px; margin-top: 10px;">
         <button class="btn btn-info" style="flex: 1;" onclick="currentMat=${mat.id};showView('dashboard')">📊 Open Dashboard</button>
         <button class="btn btn-purple" style="flex: 1;" onclick="openMatInNewTab(${mat.id})">🪟 Open in New Tab</button>
-      </div>
-    `;
+      </div>`;
     grid.appendChild(div);
   });
 }
@@ -1386,53 +1043,32 @@ function renderMats() {
 function renderCategories() {
   const container = document.getElementById('tab-categories');
   if (!container) return;
-  
   const mat = mats.find(m => m.id === currentMat);
-  if (!mat) { 
-    container.innerHTML = '<p style="text-align: center; color: #8899aa;">No mat selected</p>'; 
-    return; 
-  }
+  if (!mat) { container.innerHTML = '<p style="text-align: center; color: #8899aa;">No mat selected</p>'; return; }
   
   const categoryList = [];
   mat.ageGroups.forEach(age => {
     mat.genders.forEach(gender => {
       mat.weights.forEach(weight => {
         mat.belts.forEach(belt => {
-          const categoryPlayers = players.filter(p => 
-            p.ageGroup === age && 
-            p.gender === gender && 
-            p.weight === weight && 
-            p.belt === belt && 
-            p.name
-          ).sort((x, y) => x.rank - y.rank);
-          
-          if (categoryPlayers.length >= 2) {
-            categoryList.push({ age, gender, weight, belt, players: categoryPlayers });
-          }
+          const categoryPlayers = players.filter(p => p.ageGroup === age && p.gender === gender && p.weight === weight && p.belt === belt && p.name).sort((x, y) => x.rank - y.rank);
+          if (categoryPlayers.length >= 2) categoryList.push({ age, gender, weight, belt, players: categoryPlayers });
         });
       });
     });
   });
   
   let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📋 Categories - Mat ' + currentMat + ' (Bracket System)</h3>';
-  
   if (categoryList.length === 0) {
     html += '<p style="text-align: center; color: #8899aa; padding: 30px;">No categories found. Add players with matching categories first.</p>';
   } else {
     categoryList.forEach(cat => {
       const key = `${cat.age}-${cat.gender}-${cat.weight}-${cat.belt}`;
-      const fightTime = getFightTime(cat.age);
-      html += `
-        <div class="category-card" onclick="openCategoryBracket('${key}', '${cat.gender}', '${cat.age}', '${cat.weight}', '${cat.belt}')">
-          <h3>🥋 ${cat.gender} |  ${cat.age} | ⚖️ ${cat.weight} | 🎗️ ${cat.belt}</h3>
-          <div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 8px;">
-            👥 ${cat.players.length} Players | ⏱️ ${fightTime} min | 🏆 Bracket System
-          </div>
-          <div style="font-size: 0.85rem; color: #556;">
-            Players: ${cat.players.map(p => p.name).join(', ')}
-          </div>
-        </div>
-      `;
+      html += `<div class="category-card" onclick="openCategoryBracket('${key}', '${cat.gender}', '${cat.age}', '${cat.weight}', '${cat.belt}')">
+        <h3>🥋 ${cat.gender} | 📅 ${cat.age} | ⚖️ ${cat.weight} | 🎗️ ${cat.belt}</h3>
+        <div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 8px;">👥 ${cat.players.length} Players | ⏱️ ${getFightTime(cat.age)} min | 🏆 Bracket System</div>
+        <div style="font-size: 0.85rem; color: #556;">Players: ${cat.players.map(p => p.name).join(', ')}</div>
+      </div>`;
     });
   }
   container.innerHTML = html;
@@ -1440,30 +1076,13 @@ function renderCategories() {
 
 function openCategoryBracket(key, gender, age, weight, belt) {
   currentCategory = { key, gender, age, weight, belt };
-  
   if (!categories[key]) {
-    const categoryPlayers = players.filter(p => 
-      p.ageGroup === age && 
-      p.gender === gender && 
-      p.weight === weight && 
-      p.belt === belt && 
-      p.name
-    ).sort((x, y) => x.rank - y.rank);
-    
+    const categoryPlayers = players.filter(p => p.ageGroup === age && p.gender === gender && p.weight === weight && p.belt === belt && p.name).sort((x, y) => x.rank - y.rank);
     categories[key] = generateBracket(categoryPlayers, age, gender, weight, belt);
     saveLocalData();
   }
-  
   const bracketTitle = document.getElementById('bracketTitle');
-  if (bracketTitle) {
-    bracketTitle.innerHTML = `
-      <span>🥋 Mat ${currentMat} - ${gender} - ${age} - ${weight} - ${belt}</span>
-      <span style="font-size: 0.9rem; color: #8899aa; margin-left: 10px;">
-        | ${categories[key].players.length} Players | Fight Time: ${getFightTime(age)} min
-      </span>
-    `;
-  }
-  
+  if (bracketTitle) bracketTitle.innerHTML = `<span>🥋 Mat ${currentMat} - ${gender} - ${age} - ${weight} - ${belt}</span><span style="font-size: 0.9rem; color: #8899aa; margin-left: 10px;">| ${categories[key].players.length} Players | Fight Time: ${getFightTime(age)} min</span>`;
   renderCategoryBracket();
   showView('bracket');
 }
@@ -1472,98 +1091,44 @@ function generateBracket(categoryPlayers, age, gender, weight, belt) {
   const n = categoryPlayers.length;
   let bracketSize = 2;
   while (bracketSize < n) bracketSize *= 2;
-  
   const rounds = [];
   const firstRound = [];
-  
   for (let i = 0; i < bracketSize / 2; i++) {
     const p1 = categoryPlayers[i] || null;
     const p2 = categoryPlayers[bracketSize - 1 - i] || null;
-    
-    let match = { 
-      id: 'R1_M' + (i+1), 
-      round: 1, 
-      p1, 
-      p2, 
-      winner: null, 
-      score1: 0, 
-      score2: 0, 
-      status: 'pending' 
-    };
-    
-    if (!p2 && p1) { 
-      match.winner = 'red'; 
-      match.status = 'completed'; 
-      match.bye = true; 
-    } else if (!p1 && p2) { 
-      match.winner = 'blue'; 
-      match.status = 'completed'; 
-      match.bye = true; 
-    }
-    
+    let match = { id: 'R1_M' + (i+1), round: 1, p1, p2, winner: null, score1: 0, score2: 0, status: 'pending' };
+    if (!p2 && p1) { match.winner = 'red'; match.status = 'completed'; match.bye = true; }
+    else if (!p1 && p2) { match.winner = 'blue'; match.status = 'completed'; match.bye = true; }
     firstRound.push(match);
   }
-  
   rounds.push(firstRound);
-  
   let currentRoundSize = firstRound.length;
   let roundNum = 2;
-  
   while (currentRoundSize > 1) {
     const nextRound = [];
-    for (let i = 0; i < currentRoundSize / 2; i++) {
-      nextRound.push({ 
-        id: 'R' + roundNum + '_M' + (i+1), 
-        round: roundNum, 
-        p1: null, 
-        p2: null, 
-        winner: null, 
-        score1: 0, 
-        score2: 0, 
-        status: 'pending' 
-      });
-    }
+    for (let i = 0; i < currentRoundSize / 2; i++) nextRound.push({ id: 'R' + roundNum + '_M' + (i+1), round: roundNum, p1: null, p2: null, winner: null, score1: 0, score2: 0, status: 'pending' });
     rounds.push(nextRound);
     currentRoundSize = nextRound.length;
     roundNum++;
   }
-  
   propagateBracketWinners(rounds);
-  
-  return { 
-    type: 'bracket', 
-    players: categoryPlayers, 
-    rounds, 
-    age, 
-    gender, 
-    weight, 
-    belt 
-  };
+  return { type: 'bracket', players: categoryPlayers, rounds, age, gender, weight, belt };
 }
 
 function propagateBracketWinners(rounds) {
   for (let r = 0; r < rounds.length - 1; r++) {
-    const currentRound = rounds[r];
-    const nextRound = rounds[r + 1];
-    
+    const currentRound = rounds[r], nextRound = rounds[r + 1];
     for (let i = 0; i < currentRound.length; i++) {
       const match = currentRound[i];
       const nextMatchIdx = Math.floor(i / 2);
       const isPlayer1Slot = i % 2 === 0;
-      
       if (match.winner) {
         const winnerPlayer = match.winner === 'red' ? match.p1 : match.p2;
-        if (isPlayer1Slot) {
-          nextRound[nextMatchIdx].p1 = winnerPlayer;
-        } else {
-          nextRound[nextMatchIdx].p2 = winnerPlayer;
-        }
+        if (isPlayer1Slot) nextRound[nextMatchIdx].p1 = winnerPlayer;
+        else nextRound[nextMatchIdx].p2 = winnerPlayer;
       } else {
-        if (isPlayer1Slot) {
-          nextRound[nextMatchIdx].p1 = null;
-        } else {
-          nextRound[nextMatchIdx].p2 = null;
-        }
+        if (isPlayer1Slot) nextRound[nextMatchIdx].p1 = null;
+        else nextRound[nextMatchIdx].p2 = null;
       }
     }
   }
@@ -1585,16 +1150,9 @@ function getRoundNames(totalRounds) {
 
 function renderCategoryBracket() {
   const container = document.getElementById('bracketContent');
-  if (!container) return;
-  
-  if (!currentCategory) { 
-    container.innerHTML = '<p>No category selected</p>'; 
-    return; 
-  }
-  
+  if (!container || !currentCategory) { if(container) container.innerHTML = '<p>No category selected</p>'; return; }
   const cat = categories[currentCategory.key];
   if (!cat) return;
-  
   renderTreeBracket(container, cat);
   renderMatchSchedule();
   renderWinnersPodium();
@@ -1603,11 +1161,8 @@ function renderCategoryBracket() {
 function renderTreeBracket(container, cat) {
   const roundNames = getRoundNames(cat.rounds.length);
   let html = '<div class="bracket-wrapper"><div class="bracket-tree">';
-  
   cat.rounds.forEach((round, rIdx) => {
-    html += '<div class="bracket-round">';
-    html += '<div class="round-title">' + roundNames[rIdx] + '</div>';
-    
+    html += '<div class="bracket-round"><div class="round-title">' + roundNames[rIdx] + '</div>';
     round.forEach((match, mIdx) => {
       const p1Name = match.p1 ? match.p1.name : 'TBD';
       const p2Name = match.p2 ? match.p2.name : 'TBD';
@@ -1617,23 +1172,14 @@ function renderTreeBracket(container, cat) {
       const p2Winner = match.winner === 'blue' ? 'winner' : '';
       const byeClass = match.bye ? 'bye-player' : '';
       const isReady = match.p1 && match.p2 && !match.winner;
-      
-      html += `
-        <div class="bracket-match ${match.status==='completed'?'completed':''} ${match.bye?'bye':''}">
-          <div class="match-id">${match.id}</div>
-          <div class="bracket-player ${p1Class} ${p1Winner} ${byeClass}">
-            <span>${p1Name}</span>
-            <span>${match.score1||''}</span>
-          </div>
-          <div class="bracket-player ${p2Class} ${p2Winner} ${byeClass}">
-            <span>${p2Name}</span>
-            <span>${match.score2||''}</span>
-          </div>
-          ${match.bye ? '<div class="bye-label">BYE</div>' : ''}
-          ${isReady ? `<button class="play-btn" onclick="startBracketMatch(${rIdx}, ${mIdx})">▶ Play Match</button>` : ''}
-          ${!match.bye ? `<button class="edit-btn" style="margin-top:4px; width:100%;" onclick="editBracketMatch(${rIdx}, ${mIdx})">⚙️ Edit</button>` : ''}
-        </div>
-      `;
+      html += `<div class="bracket-match ${match.status==='completed'?'completed':''} ${match.bye?'bye':''}">
+        <div class="match-id">${match.id}</div>
+        <div class="bracket-player ${p1Class} ${p1Winner} ${byeClass}"><span>${p1Name}</span><span>${match.score1||''}</span></div>
+        <div class="bracket-player ${p2Class} ${p2Winner} ${byeClass}"><span>${p2Name}</span><span>${match.score2||''}</span></div>
+        ${match.bye ? '<div class="bye-label">BYE</div>' : ''}
+        ${isReady ? `<button class="play-btn" onclick="startBracketMatch(${rIdx}, ${mIdx})">▶ Play Match</button>` : ''}
+        ${!match.bye ? `<button class="edit-btn" style="margin-top:4px; width:100%;" onclick="editBracketMatch(${rIdx}, ${mIdx})">⚙️ Edit</button>` : ''}
+      </div>`;
     });
     html += '</div>';
   });
@@ -1644,54 +1190,19 @@ function renderTreeBracket(container, cat) {
 function renderMatchSchedule() {
   const section = document.getElementById('scheduleSection');
   const content = document.getElementById('scheduleContent');
-  if (!section || !content) return;
-  
-  if (!currentCategory) { 
-    section.style.display = 'none'; 
-    return; 
-  }
-  
+  if (!section || !content || !currentCategory) { if(section) section.style.display = 'none'; return; }
   const cat = categories[currentCategory.key];
-  if (!cat) { 
-    section.style.display = 'none'; 
-    return; 
-  }
-  
+  if (!cat) { section.style.display = 'none'; return; }
   section.style.display = 'block';
-  let html = `
-    <table class="schedule-table">
-      <thead>
-        <tr>
-          <th>Match</th>
-          <th>Red Player</th>
-          <th>Blue Player</th>
-          <th>Status</th>
-          <th>Winner</th>
-          <th>Score</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-  
+  let html = '<table class="schedule-table"><thead><tr><th>Match</th><th>Red Player</th><th>Blue Player</th><th>Status</th><th>Winner</th><th>Score</th></tr></thead><tbody>';
   cat.rounds.forEach((round, rIdx) => {
     round.forEach((m, mIdx) => {
       const status = m.status === 'completed' ? 'completed' : 'pending';
       const statusText = m.bye ? '✅ BYE' : (m.status === 'completed' ? '✅ Completed' : '⏳ Pending');
       const winner = m.winner ? (m.winner === 'red' ? m.p1.name : m.p2.name) : '-';
-      
-      html += `
-        <tr class="${status}">
-          <td>${m.id}</td>
-          <td>${m.p1 ? m.p1.name : 'TBD'}</td>
-          <td>${m.p2 ? m.p2.name : 'TBD'}</td>
-          <td>${statusText}</td>
-          <td>${winner}</td>
-          <td>${m.score1||0} - ${m.score2||0}</td>
-        </tr>
-      `;
+      html += `<tr class="${status}"><td>${m.id}</td><td>${m.p1?m.p1.name:'TBD'}</td><td>${m.p2?m.p2.name:'TBD'}</td><td>${statusText}</td><td>${winner}</td><td>${m.score1||0} - ${m.score2||0}</td></tr>`;
     });
   });
-  
   html += '</tbody></table>';
   content.innerHTML = html;
 }
@@ -1699,73 +1210,23 @@ function renderMatchSchedule() {
 function renderWinnersPodium() {
   const section = document.getElementById('podiumSection');
   const content = document.getElementById('podiumContent');
-  if (!section || !content) return;
-  
-  if (!currentCategory) { 
-    section.style.display = 'none'; 
-    return; 
-  }
-  
+  if (!section || !content || !currentCategory) { if(section) section.style.display = 'none'; return; }
   const cat = categories[currentCategory.key];
-  if (!cat) { 
-    section.style.display = 'none'; 
-    return; 
-  }
-  
+  if (!cat) { section.style.display = 'none'; return; }
   let winners = [];
   const finalMatch = cat.rounds[cat.rounds.length - 1][0];
-  
   if (finalMatch.winner) {
     const champion = finalMatch.winner === 'red' ? finalMatch.p1 : finalMatch.p2;
     const semiFinals = cat.rounds[cat.rounds.length - 2];
-    const runnersUp = semiFinals.filter(m => 
-      m.winner && (m.winner === 'red' ? m.p1.id !== champion.id : m.p2.id !== champion.id)
-    ).map(m => m.winner === 'red' ? m.p1 : m.p2);
-    
+    const runnersUp = semiFinals.filter(m => m.winner && (m.winner === 'red' ? m.p1.id !== champion.id : m.p2.id !== champion.id)).map(m => m.winner === 'red' ? m.p1 : m.p2);
     winners = [champion, ...runnersUp.slice(0, 2)];
   }
-  
-  if (winners.length === 0) { 
-    section.style.display = 'none'; 
-    return; 
-  }
-  
+  if (winners.length === 0) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   let html = '<div class="podium-container">';
-  
-  if (winners[1]) {
-    html += `
-      <div class="podium-place second">
-        <div class="podium-medal">🥈</div>
-        <div class="podium-name">${winners[1].name}</div>
-        <div class="podium-team">${winners[1].team||'N/A'}</div>
-        <div class="podium-rank">2nd Place</div>
-      </div>
-    `;
-  }
-  
-  if (winners[0]) {
-    html += `
-      <div class="podium-place first">
-        <div class="podium-medal">🏆</div>
-        <div class="podium-name">${winners[0].name}</div>
-        <div class="podium-team">${winners[0].team||'N/A'}</div>
-        <div class="podium-rank">Champion</div>
-      </div>
-    `;
-  }
-  
-  if (winners[2]) {
-    html += `
-      <div class="podium-place third">
-        <div class="podium-medal">🥉</div>
-        <div class="podium-name">${winners[2].name}</div>
-        <div class="podium-team">${winners[2].team||'N/A'}</div>
-        <div class="podium-rank">3rd Place</div>
-      </div>
-    `;
-  }
-  
+  if (winners[1]) html += `<div class="podium-place second"><div class="podium-medal">🥈</div><div class="podium-name">${winners[1].name}</div><div class="podium-team">${winners[1].team||'N/A'}</div><div class="podium-rank">2nd Place</div></div>`;
+  if (winners[0]) html += `<div class="podium-place first"><div class="podium-medal">🏆</div><div class="podium-name">${winners[0].name}</div><div class="podium-team">${winners[0].team||'N/A'}</div><div class="podium-rank">Champion</div></div>`;
+  if (winners[2]) html += `<div class="podium-place third"><div class="podium-medal">🥉</div><div class="podium-name">${winners[2].name}</div><div class="podium-team">${winners[2].team||'N/A'}</div><div class="podium-rank">3rd Place</div></div>`;
   html += '</div>';
   content.innerHTML = html;
 }
@@ -1773,15 +1234,7 @@ function renderWinnersPodium() {
 function startBracketMatch(rIdx, mIdx) {
   const cat = categories[currentCategory.key];
   const match = cat.rounds[rIdx][mIdx];
-  
-  currentMatch = { 
-    ...match, 
-    categoryKey: currentCategory.key, 
-    matchType: 'bracket', 
-    roundIdx: rIdx, 
-    matchIdx: mIdx 
-  };
-  
+  currentMatch = { ...match, categoryKey: currentCategory.key, matchType: 'bracket', roundIdx: rIdx, matchIdx: mIdx };
   document.getElementById('redName').value = match.p1.name;
   document.getElementById('redTeam').value = match.p1.team || '';
   document.getElementById('blueName').value = match.p2.name;
@@ -1790,11 +1243,8 @@ function startBracketMatch(rIdx, mIdx) {
   document.getElementById('sbGender').value = cat.gender;
   document.getElementById('sbWeight').value = cat.weight;
   document.getElementById('sbBelt').value = cat.belt;
-  
-  const fightTime = getFightTime(cat.age);
   document.getElementById('goldenTimeInput').value = getGoldenTime(cat.age);
-  timeLeft = fightTime * 60;
-  
+  timeLeft = getFightTime(cat.age) * 60;
   resetScoreboardState();
   updateTimerDisplay();
   updateScoreboardDisplay();
@@ -1804,47 +1254,13 @@ function startBracketMatch(rIdx, mIdx) {
 function editBracketMatch(rIdx, mIdx) {
   const cat = categories[currentCategory.key];
   const match = cat.rounds[rIdx][mIdx];
-  const availablePlayers = cat.players.filter(p => 
-    (!match.p1 || p.id !== match.p1.id) && 
-    (!match.p2 || p.id !== match.p2.id)
-  );
-  
-  let html = `
-    <div style="margin-bottom:15px;">
-      <label style="display:block; margin-bottom:5px; color:#e74c3c;">Red Player:</label>
-      <select id="editRedPlayer">
-        ${[match.p1, ...availablePlayers].filter(Boolean).map(p => 
-          `<option value="${p.id}" ${match.p1 && p.id===match.p1.id?'selected':''}>
-            ${p.name} (Rank: ${p.rank})
-          </option>`
-        ).join('')}
-      </select>
-    </div>
-    <div style="margin-bottom:15px;">
-      <label style="display:block; margin-bottom:5px; color:#3498db;">Blue Player:</label>
-      <select id="editBluePlayer">
-        ${[match.p2, ...availablePlayers].filter(Boolean).map(p => 
-          `<option value="${p.id}" ${match.p2 && p.id===match.p2.id?'selected':''}>
-            ${p.name} (Rank: ${p.rank})
-          </option>`
-        ).join('')}
-      </select>
-    </div>
-    <div style="margin-bottom:15px;">
-      <button class="btn btn-warning" style="width:100%;" onclick="swapBracketPlayers(${rIdx}, ${mIdx})">
-         Swap Players
-      </button>
-    </div>
-    <div style="display:flex; gap:10px;">
-      <button class="btn btn-primary" style="flex:1;" onclick="saveBracketMatchEdit(${rIdx}, ${mIdx})">
-        💾 Save
-      </button>
-      <button class="btn btn-secondary" style="flex:1;" onclick="closeEditMatch()">
-        ❌ Cancel
-      </button>
-    </div>
-  `;
-  
+  const availablePlayers = cat.players.filter(p => (!match.p1 || p.id !== match.p1.id) && (!match.p2 || p.id !== match.p2.id));
+  let html = `<div style="margin-bottom:15px;"><label style="display:block; margin-bottom:5px; color:#e74c3c;">Red Player:</label>
+    <select id="editRedPlayer">${[match.p1, ...availablePlayers].filter(Boolean).map(p => `<option value="${p.id}" ${match.p1 && p.id===match.p1.id?'selected':''}>${p.name} (Rank: ${p.rank})</option>`).join('')}</select></div>
+    <div style="margin-bottom:15px;"><label style="display:block; margin-bottom:5px; color:#3498db;">Blue Player:</label>
+    <select id="editBluePlayer">${[match.p2, ...availablePlayers].filter(Boolean).map(p => `<option value="${p.id}" ${match.p2 && p.id===match.p2.id?'selected':''}>${p.name} (Rank: ${p.rank})</option>`).join('')}</select></div>
+    <div style="margin-bottom:15px;"><button class="btn btn-warning" style="width:100%;" onclick="swapBracketPlayers(${rIdx}, ${mIdx})">🔄 Swap Players</button></div>
+    <div style="display:flex; gap:10px;"><button class="btn btn-primary" style="flex:1;" onclick="saveBracketMatchEdit(${rIdx}, ${mIdx})">💾 Save</button><button class="btn btn-secondary" style="flex:1;" onclick="closeEditMatch()">❌ Cancel</button></div>`;
   document.getElementById('editMatchContent').innerHTML = html;
   document.getElementById('editMatchModal').classList.add('active');
 }
@@ -1852,28 +1268,19 @@ function editBracketMatch(rIdx, mIdx) {
 function swapBracketPlayers(rIdx, mIdx) {
   const cat = categories[currentCategory.key];
   const match = cat.rounds[rIdx][mIdx];
-  const temp = match.p1;
-  match.p1 = match.p2;
-  match.p2 = temp;
-  closeEditMatch();
-  editBracketMatch(rIdx, mIdx);
+  const temp = match.p1; match.p1 = match.p2; match.p2 = temp;
+  closeEditMatch(); editBracketMatch(rIdx, mIdx);
 }
 
 function saveBracketMatchEdit(rIdx, mIdx) {
   const redId = parseInt(document.getElementById('editRedPlayer').value);
   const blueId = parseInt(document.getElementById('editBluePlayer').value);
-  
-  if (redId === blueId) { 
-    alert('Cannot select the same player!'); 
-    return; 
-  }
-  
+  if (redId === blueId) { alert('Cannot select the same player!'); return; }
   const cat = categories[currentCategory.key];
   cat.rounds[rIdx][mIdx].p1 = cat.players.find(p => p.id === redId);
   cat.rounds[rIdx][mIdx].p2 = cat.players.find(p => p.id === blueId);
   cat.rounds[rIdx][mIdx].winner = null;
   cat.rounds[rIdx][mIdx].status = 'pending';
-  
   propagateBracketWinners(cat.rounds);
   closeEditMatch();
   renderCategoryBracket();
@@ -1881,9 +1288,7 @@ function saveBracketMatchEdit(rIdx, mIdx) {
   alert('✅ Match updated!');
 }
 
-function closeEditMatch() {
-  document.getElementById('editMatchModal').classList.remove('active');
-}
+function closeEditMatch() { document.getElementById('editMatchModal').classList.remove('active'); }
 
 // ============================================
 // 12. QUEUE, CALL-UP, STANDINGS
@@ -1891,101 +1296,57 @@ function closeEditMatch() {
 function renderQueue() {
   const container = document.getElementById('tab-queue');
   if (!container) return;
-  
   const mat = mats.find(m => m.id === currentMat);
-  if (!mat) { 
-    container.innerHTML = '<p style="text-align: center; color: #8899aa;">No mat selected</p>'; 
-    return; 
-  }
-  
+  if (!mat) { container.innerHTML = '<p style="text-align: center; color: #8899aa;">No mat selected</p>'; return; }
   const allMatches = [];
   Object.keys(categories).forEach(key => {
     const cat = categories[key];
     cat.rounds.forEach((round, rIdx) => {
-      round.forEach((m, mIdx) => { 
-        if (m.status !== 'completed' && !m.bye) {
-          allMatches.push({ ...m, categoryKey: key, roundIdx: rIdx, matchIdx: mIdx });
-        }
-      });
+      round.forEach((m, mIdx) => { if (m.status !== 'completed' && !m.bye) allMatches.push({ ...m, categoryKey: key, roundIdx: rIdx, matchIdx: mIdx }); });
     });
   });
-  
   let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📋 Match Queue - Mat ' + currentMat + '</h3>';
   html += '<div style="margin-bottom: 15px;"><button class="btn btn-primary" onclick="regenerateQueue()">🔄 Regenerate</button></div>';
-  
   if (allMatches.length === 0) {
     html += '<p style="text-align: center; color: #8899aa; padding: 20px;">No pending matches. Open categories to generate brackets.</p>';
   } else {
     allMatches.forEach((m, i) => {
       const cat = categories[m.categoryKey];
-      html += `
-        <div style="padding: 12px; margin-bottom: 8px; background: #151d2b; border-radius: 8px; border-left: 4px solid #f1c40f;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <strong>${m.p1?m.p1.name:'TBD'}</strong> vs <strong>${m.p2?m.p2.name:'TBD'}</strong>
-              <div style="font-size: 0.8rem; color: #8899aa; margin-top: 3px;">
-                ⚖️ ${cat.weight} | 📅 ${cat.age} | ${cat.gender} | 🎗️ ${cat.belt}
-              </div>
-            </div>
-            <button class="btn btn-primary btn-sm" onclick="startMatchFromQueue('${m.categoryKey}', ${m.roundIdx}, ${m.matchIdx})">
-              ▶ Start
-            </button>
+      html += `<div style="padding: 12px; margin-bottom: 8px; background: #151d2b; border-radius: 8px; border-left: 4px solid #f1c40f;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div><strong>${m.p1?m.p1.name:'TBD'}</strong> vs <strong>${m.p2?m.p2.name:'TBD'}</strong>
+            <div style="font-size: 0.8rem; color: #8899aa; margin-top: 3px;">⚖️ ${cat.weight} | 📅 ${cat.age} | ${cat.gender} | 🎗️ ${cat.belt}</div>
           </div>
+          <button class="btn btn-primary btn-sm" onclick="startMatchFromQueue('${m.categoryKey}', ${m.roundIdx}, ${m.matchIdx})">▶ Start</button>
         </div>
-      `;
+      </div>`;
     });
   }
   container.innerHTML = html;
 }
 
-function startMatchFromQueue(categoryKey, rIdx, mIdx) {
-  currentCategory = { key: categoryKey };
-  startBracketMatch(rIdx, mIdx);
-}
-
-function regenerateQueue() {
-  categories = {};
-  saveLocalData();
-  alert('✅ Queue regenerated! Go to Categories to open brackets.');
-  renderQueue();
-}
+function startMatchFromQueue(categoryKey, rIdx, mIdx) { currentCategory = { key: categoryKey }; startBracketMatch(rIdx, mIdx); }
+function regenerateQueue() { categories = {}; saveLocalData(); alert('✅ Queue regenerated! Go to Categories to open brackets.'); renderQueue(); }
 
 function renderCallUp() {
   const container = document.getElementById('tab-callup');
   if (!container) return;
-  
   let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">📢 Call-Up System</h3>';
   const pendingMatches = [];
-  
   Object.keys(categories).forEach(key => {
     const cat = categories[key];
-    cat.rounds.forEach(r => r.forEach(m => { 
-      if (m.status !== 'completed' && !m.bye) {
-        pendingMatches.push({ ...m, categoryKey: key });
-      }
-    }));
+    cat.rounds.forEach(r => r.forEach(m => { if (m.status !== 'completed' && !m.bye) pendingMatches.push({ ...m, categoryKey: key }); }));
   });
-  
   if (pendingMatches.length > 0) {
     const next = pendingMatches[0];
     const cat = categories[next.categoryKey];
-    html += `
-      <div style="background: linear-gradient(135deg, #1e2a3a, #253447); border: 2px solid #f1c40f; border-radius: 12px; padding: 20px; text-align: center;">
-        <div style="font-size: 0.9rem; color: #8899aa; margin-bottom: 10px;">NEXT MATCH</div>
-        <div style="font-size: 1.5rem; font-weight: bold; color: #f1c40f; margin: 10px 0;">
-          ${next.p1?next.p1.name:'TBD'} vs ${next.p2?next.p2.name:'TBD'}
-        </div>
-        <div style="color: #8899aa; margin-bottom: 15px;">
-          ⚖️ ${cat.weight} | 📅 ${cat.age} | ${cat.gender} | 🎗️ ${cat.belt}
-        </div>
-        <button class="btn btn-primary" onclick="callPlayer('${next.p1?next.p1.name:'Player 1'}')">
-          📢 Call ${next.p1?next.p1.name:'Player 1'}
-        </button>
-        <button class="btn btn-primary" style="margin-left: 10px;" onclick="callPlayer('${next.p2?next.p2.name:'Player 2'}')">
-          📢 Call ${next.p2?next.p2.name:'Player 2'}
-        </button>
-      </div>
-    `;
+    html += `<div style="background: linear-gradient(135deg, #1e2a3a, #253447); border: 2px solid #f1c40f; border-radius: 12px; padding: 20px; text-align: center;">
+      <div style="font-size: 0.9rem; color: #8899aa; margin-bottom: 10px;">NEXT MATCH</div>
+      <div style="font-size: 1.5rem; font-weight: bold; color: #f1c40f; margin: 10px 0;">${next.p1?next.p1.name:'TBD'} vs ${next.p2?next.p2.name:'TBD'}</div>
+      <div style="color: #8899aa; margin-bottom: 15px;">⚖️ ${cat.weight} | 📅 ${cat.age} | ${cat.gender} | 🎗️ ${cat.belt}</div>
+      <button class="btn btn-primary" onclick="callPlayer('${next.p1?next.p1.name:'Player 1'}')">📢 Call ${next.p1?next.p1.name:'Player 1'}</button>
+      <button class="btn btn-primary" style="margin-left: 10px;" onclick="callPlayer('${next.p2?next.p2.name:'Player 2'}')">📢 Call ${next.p2?next.p2.name:'Player 2'}</button>
+    </div>`;
   } else {
     html += '<p style="text-align: center; color: #8899aa; padding: 20px;">No pending matches.</p>';
   }
@@ -1997,116 +1358,43 @@ function callPlayer(playerName) {
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
-    oscillator.connect(gainNode); 
-    gainNode.connect(audioContext.destination);
-    oscillator.frequency.value = 800; 
-    oscillator.type = 'sine'; 
-    gainNode.gain.value = 0.3;
-    oscillator.start(); 
-    setTimeout(() => oscillator.stop(), 500);
+    oscillator.connect(gainNode); gainNode.connect(audioContext.destination);
+    oscillator.frequency.value = 800; oscillator.type = 'sine'; gainNode.gain.value = 0.3;
+    oscillator.start(); setTimeout(() => oscillator.stop(), 500);
   } catch(e) {}
-  
   alert(`📢 Calling: ${playerName}\n\nPlease proceed to the mat!`);
 }
 
 function renderStandings() {
   const container = document.getElementById('tab-standings');
   if (!container) return;
-  
   const allPlayers = {};
-  
   Object.keys(categories).forEach(key => {
     const cat = categories[key];
     cat.rounds.forEach(r => r.forEach(m => {
       if (m.p1) {
-        if (!allPlayers[m.p1.id]) {
-          allPlayers[m.p1.id] = { 
-            name: m.p1.name, 
-            team: m.p1.team, 
-            wins: 0, 
-            losses: 0, 
-            points: 0, 
-            categories: [] 
-          };
-        }
+        if (!allPlayers[m.p1.id]) allPlayers[m.p1.id] = { name: m.p1.name, team: m.p1.team, wins: 0, losses: 0, points: 0, categories: [] };
         const catLabel = `${cat.age} - ${cat.weight} - ${cat.belt}`;
-        if (!allPlayers[m.p1.id].categories.includes(catLabel)) {
-          allPlayers[m.p1.id].categories.push(catLabel);
-        }
-        if (m.winner === 'red') { 
-          allPlayers[m.p1.id].wins++; 
-          allPlayers[m.p1.id].points += 3; 
-        } else if (m.winner === 'blue') {
-          allPlayers[m.p1.id].losses++;
-        }
+        if (!allPlayers[m.p1.id].categories.includes(catLabel)) allPlayers[m.p1.id].categories.push(catLabel);
+        if (m.winner === 'red') { allPlayers[m.p1.id].wins++; allPlayers[m.p1.id].points += 3; } else allPlayers[m.p1.id].losses++;
       }
-      
       if (m.p2) {
-        if (!allPlayers[m.p2.id]) {
-          allPlayers[m.p2.id] = { 
-            name: m.p2.name, 
-            team: m.p2.team, 
-            wins: 0, 
-            losses: 0, 
-            points: 0, 
-            categories: [] 
-          };
-        }
+        if (!allPlayers[m.p2.id]) allPlayers[m.p2.id] = { name: m.p2.name, team: m.p2.team, wins: 0, losses: 0, points: 0, categories: [] };
         const catLabel = `${cat.age} - ${cat.weight} - ${cat.belt}`;
-        if (!allPlayers[m.p2.id].categories.includes(catLabel)) {
-          allPlayers[m.p2.id].categories.push(catLabel);
-        }
-        if (m.winner === 'blue') { 
-          allPlayers[m.p2.id].wins++; 
-          allPlayers[m.p2.id].points += 3; 
-        } else if (m.winner === 'red') {
-          allPlayers[m.p2.id].losses++;
-        }
+        if (!allPlayers[m.p2.id].categories.includes(catLabel)) allPlayers[m.p2.id].categories.push(catLabel);
+        if (m.winner === 'blue') { allPlayers[m.p2.id].wins++; allPlayers[m.p2.id].points += 3; } else allPlayers[m.p2.id].losses++;
       }
     }));
   });
-  
-  const sortedPlayers = Object.values(allPlayers).sort((a, b) => 
-    b.points - a.points || b.wins - a.wins || a.losses - b.losses
-  );
-  
+  const sortedPlayers = Object.values(allPlayers).sort((a, b) => b.points - a.points || b.wins - a.wins || a.losses - b.losses);
   let html = '<h3 style="color: #f1c40f; margin-bottom: 15px;">🏆 Final Standings</h3>';
-  
   if (sortedPlayers.length === 0) {
     html += '<p style="text-align: center; color: #8899aa; padding: 20px;">No results yet.</p>';
   } else {
-    html += `
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-          <tr style="background: #1a1f2e; color: #f1c40f;">
-            <th style="padding: 12px; text-align: center;">Rank</th>
-            <th style="padding: 12px; text-align: center;">Player</th>
-            <th style="padding: 12px; text-align: center;">Team</th>
-            <th style="padding: 12px; text-align: center;">Categories</th>
-            <th style="padding: 12px; text-align: center;">Wins</th>
-            <th style="padding: 12px; text-align: center;">Losses</th>
-            <th style="padding: 12px; text-align: center;">Points</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-    
+    html += `<table style="width: 100%; border-collapse: collapse;"><thead><tr style="background: #1a1f2e; color: #f1c40f;"><th style="padding: 12px; text-align: center;">Rank</th><th style="padding: 12px; text-align: center;">Player</th><th style="padding: 12px; text-align: center;">Team</th><th style="padding: 12px; text-align: center;">Categories</th><th style="padding: 12px; text-align: center;">Wins</th><th style="padding: 12px; text-align: center;">Losses</th><th style="padding: 12px; text-align: center;">Points</th></tr></thead><tbody>`;
     sortedPlayers.forEach((p, i) => {
-      html += `
-        <tr>
-          <td style="padding: 10px; text-align: center; font-weight: bold; font-size: 1.2rem;">
-            ${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}
-          </td>
-          <td style="padding: 10px; text-align: left;"><strong>${p.name}</strong></td>
-          <td style="padding: 10px;">${p.team||'N/A'}</td>
-          <td style="padding: 10px; font-size:0.85rem;">${p.categories.join(', ')}</td>
-          <td style="padding: 10px; color:#2ecc71; font-weight: bold;">${p.wins}</td>
-          <td style="padding: 10px; color:#e74c3c; font-weight: bold;">${p.losses}</td>
-          <td style="padding: 10px; color:#f1c40f; font-weight: bold;">${p.points}</td>
-        </tr>
-      `;
+      html += `<tr><td style="padding: 10px; text-align: center; font-weight: bold; font-size: 1.2rem;">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</td><td style="padding: 10px; text-align: left;"><strong>${p.name}</strong></td><td style="padding: 10px;">${p.team||'N/A'}</td><td style="padding: 10px; font-size:0.85rem;">${p.categories.join(', ')}</td><td style="padding: 10px; color:#2ecc71; font-weight: bold;">${p.wins}</td><td style="padding: 10px; color:#e74c3c; font-weight: bold;">${p.losses}</td><td style="padding: 10px; color:#f1c40f; font-weight: bold;">${p.points}</td></tr>`;
     });
-    
     html += '</tbody></table>';
   }
   container.innerHTML = html;
@@ -2117,7 +1405,6 @@ function renderStandings() {
 // ============================================
 function onScoreboardFieldChange() {}
 function onPlayerNameChange() {}
-
 function handleLogoUpload(player, input) {
   const file = input.files[0];
   if (file) {
@@ -2131,101 +1418,55 @@ function handleLogoUpload(player, input) {
   }
 }
 
-function addScore(player, points) {
-  if (scoreboard[player].isDQ) return;
-  scoreboard[player].history.push({ type: 'score', value: points });
-  scoreboard[player].score += points;
-  updateScoreboardDisplay();
-}
-
-function subtractScore(player, points) {
-  if (scoreboard[player].isDQ) return;
-  scoreboard[player].history.push({ type: 'subtract', value: points });
-  scoreboard[player].score = Math.max(0, scoreboard[player].score - points);
-  updateScoreboardDisplay();
-}
-
-function addAdvantage(player) {
-  if (scoreboard[player].isDQ) return;
-  scoreboard[player].history.push({ type: 'advantage' });
-  scoreboard[player].advantages++;
-  updateScoreboardDisplay();
-}
-
+function addScore(player, points) { if (scoreboard[player].isDQ) return; scoreboard[player].history.push({ type: 'score', value: points }); scoreboard[player].score += points; updateScoreboardDisplay(); }
+function subtractScore(player, points) { if (scoreboard[player].isDQ) return; scoreboard[player].history.push({ type: 'subtract', value: points }); scoreboard[player].score = Math.max(0, scoreboard[player].score - points); updateScoreboardDisplay(); }
+function addAdvantage(player) { if (scoreboard[player].isDQ) return; scoreboard[player].history.push({ type: 'advantage' }); scoreboard[player].advantages++; updateScoreboardDisplay(); }
 function addPenalty(player) {
   if (scoreboard[player].isDQ) return;
   scoreboard[player].history.push({ type: 'penalty' });
   scoreboard[player].penalties++;
-  
-  if (scoreboard[player].penalties >= 4) {
-    scoreboard[player].isDQ = true;
-    stopTimer();
-    alert('⚠️ Disqualification! 4 penalties!');
-  }
+  if (scoreboard[player].penalties >= 4) { scoreboard[player].isDQ = true; stopTimer(); alert('⚠️ Disqualification! 4 penalties!'); }
   updateScoreboardDisplay();
 }
 
 function undoAction(player) {
   const h = scoreboard[player].history;
   if (h.length === 0) return;
-  
   const last = h.pop();
-  if (last.type === 'score') {
-    scoreboard[player].score -= last.value;
-  } else if (last.type === 'subtract') {
-    scoreboard[player].score += last.value;
-  } else if (last.type === 'advantage') {
-    scoreboard[player].advantages--;
-  } else if (last.type === 'penalty') {
-    scoreboard[player].penalties--;
-    if (scoreboard[player].penalties < 3) {
-      scoreboard[player].isDQ = false;
-    }
-  }
+  if (last.type === 'score') scoreboard[player].score -= last.value;
+  else if (last.type === 'subtract') scoreboard[player].score += last.value;
+  else if (last.type === 'advantage') scoreboard[player].advantages--;
+  else if (last.type === 'penalty') { scoreboard[player].penalties--; if (scoreboard[player].penalties < 3) scoreboard[player].isDQ = false; }
   scoreboard[player].score = Math.max(0, scoreboard[player].score);
   updateScoreboardDisplay();
 }
 
 function updateScoreboardDisplay() {
-  const redScore = document.getElementById('redScore');
-  const blueScore = document.getElementById('blueScore');
-  if (redScore) redScore.innerText = scoreboard.red.score;
-  if (blueScore) blueScore.innerText = scoreboard.blue.score;
-  
-  const redAdv = document.getElementById('redAdv');
-  const blueAdv = document.getElementById('blueAdv');
-  if (redAdv) redAdv.innerText = scoreboard.red.advantages;
-  if (blueAdv) blueAdv.innerText = scoreboard.blue.advantages;
-  
-  const redPen = document.getElementById('redPen');
-  const bluePen = document.getElementById('bluePen');
-  if (redPen) redPen.innerText = scoreboard.red.penalties;
-  if (bluePen) bluePen.innerText = scoreboard.blue.penalties;
+  document.getElementById('redScore').innerText = scoreboard.red.score;
+  document.getElementById('blueScore').innerText = scoreboard.blue.score;
+  document.getElementById('redAdv').innerText = scoreboard.red.advantages;
+  document.getElementById('blueAdv').innerText = scoreboard.blue.advantages;
+  document.getElementById('redPen').innerText = scoreboard.red.penalties;
+  document.getElementById('bluePen').innerText = scoreboard.blue.penalties;
 }
 
 function updateTimerDisplay() {
   const mins = Math.floor(timeLeft / 60);
   const secs = timeLeft % 60;
-  const timerEl = document.getElementById('timer');
-  if (timerEl) {
-    timerEl.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  }
+  document.getElementById('timer').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
 function startTimer() {
   if (timerInterval) return;
-  
   timerInterval = setInterval(() => {
     timeLeft--;
     updateTimerDisplay();
-    
     if (timeLeft <= 0) {
       stopTimer();
       if (isGoldenTime) {
         alert('⚡ Golden Time ended!');
         isGoldenTime = false;
-        const statusEl = document.getElementById('goldenTimeStatus');
-        if (statusEl) statusEl.style.display = 'none';
+        document.getElementById('goldenTimeStatus').style.display = 'none';
       } else {
         alert('⏰ Time\'s up!');
       }
@@ -2233,46 +1474,30 @@ function startTimer() {
   }, 1000);
 }
 
-function stopTimer() { 
-  clearInterval(timerInterval); 
-  timerInterval = null; 
-}
+function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
 
 function resetScoreboardState() {
   stopTimer();
   isGoldenTime = false;
-  scoreboard = { 
-    red: { score: 0, advantages: 0, penalties: 0, history: [], isDQ: false }, 
-    blue: { score: 0, advantages: 0, penalties: 0, history: [], isDQ: false } 
-  };
-  const statusEl = document.getElementById('goldenTimeStatus');
-  if (statusEl) statusEl.style.display = 'none';
+  scoreboard = { red: { score: 0, advantages: 0, penalties: 0, history: [], isDQ: false }, blue: { score: 0, advantages: 0, penalties: 0, history: [], isDQ: false } };
+  document.getElementById('goldenTimeStatus').style.display = 'none';
 }
 
 function resetScoreboard() {
   resetScoreboardState();
-  if (currentCategory) {
-    const cat = categories[currentCategory.key];
-    timeLeft = getFightTime(cat.age) * 60;
-  } else {
-    timeLeft = 300;
-  }
+  timeLeft = currentCategory ? getFightTime(categories[currentCategory.key].age) * 60 : 300;
   updateTimerDisplay();
   updateScoreboardDisplay();
 }
 
 function activateGoldenTime() {
   const goldenMinutes = parseInt(document.getElementById('goldenTimeInput').value);
-  if (!goldenMinutes || goldenMinutes < 1) {
-    alert('Please enter a valid golden time (1-10 minutes)');
-    return;
-  }
+  if (!goldenMinutes || goldenMinutes < 1) { alert('Please enter a valid golden time (1-10 minutes)'); return; }
   timeLeft = goldenMinutes * 60;
   isGoldenTime = true;
-  const statusEl = document.getElementById('goldenTimeStatus');
-  if (statusEl) statusEl.style.display = 'inline';
+  document.getElementById('goldenTimeStatus').style.display = 'inline';
   updateTimerDisplay();
-  alert(` Golden Time Activated! ${goldenMinutes} minute(s)`);
+  alert(`⚡ Golden Time Activated! ${goldenMinutes} minute(s)`);
 }
 
 function swapPlayers() {
@@ -2306,14 +1531,8 @@ function finishMatch() {
   stopTimer();
   const redName = document.getElementById('redName').value || 'Red';
   const blueName = document.getElementById('blueName').value || 'Blue';
-  const redScore = scoreboard.red.score;
-  const blueScore = scoreboard.blue.score;
   const goldenText = isGoldenTime ? '<br><span style="color:#f1c40f;">(Golden Time)</span>' : '';
-  
-  document.getElementById('matchInfo').innerHTML = `
-    <strong>${redName}</strong> vs <strong>${blueName}</strong><br><br>
-    Score: ${redScore} - ${blueScore}${goldenText}
-  `;
+  document.getElementById('matchInfo').innerHTML = `<strong>${redName}</strong> vs <strong>${blueName}</strong><br><br>Score: ${scoreboard.red.score} - ${scoreboard.blue.score}${goldenText}`;
   document.getElementById('winnerModal').classList.add('active');
 }
 
@@ -2321,15 +1540,12 @@ function declareWinner(winner) {
   if (currentMatch && currentMatch.categoryKey) {
     const cat = categories[currentMatch.categoryKey];
     const match = cat.rounds[currentMatch.roundIdx][currentMatch.matchIdx];
-    
     match.winner = winner;
     match.score1 = scoreboard.red.score;
     match.score2 = scoreboard.blue.score;
     match.status = 'completed';
-    
     propagateBracketWinners(cat.rounds);
     saveLocalData();
-    
     const finalMatch = cat.rounds[cat.rounds.length - 1][0];
     if (finalMatch.winner) {
       const champion = finalMatch.winner === 'red' ? finalMatch.p1 : finalMatch.p2;
@@ -2342,47 +1558,32 @@ function declareWinner(winner) {
   if (currentCategory) renderCategoryBracket();
 }
 
-function closeModal() { 
-  document.getElementById('winnerModal').classList.remove('active'); 
-}
+function closeModal() { document.getElementById('winnerModal').classList.remove('active'); }
 
 // ============================================
 // 14. TAB MANAGEMENT
 // ============================================
 function openCurrentMatInNewTab() {
-  const baseUrl = window.location.href.split('#')[0].split('?')[0];
-  const url = baseUrl + '?mat=' + currentMat + '&standalone=1&tournament_id=' + currentTournamentId;
+  const url = window.location.href.split('#')[0].split('?')[0] + '?mat=' + currentMat + '&standalone=1&tournament_id=' + currentTournamentId;
   const newTab = window.open(url, '_blank', 'width=1400,height=900');
-  if (!newTab) {
-    alert('⚠️ Popup blocked! Please allow popups for this site.');
-  }
+  if (!newTab) alert('⚠️ Popup blocked! Please allow popups for this site.');
 }
 
 function openMatInNewTab(matId) {
-  const baseUrl = window.location.href.split('#')[0].split('?')[0];
-  const url = baseUrl + '?mat=' + matId + '&standalone=1&tournament_id=' + currentTournamentId;
+  const url = window.location.href.split('#')[0].split('?')[0] + '?mat=' + matId + '&standalone=1&tournament_id=' + currentTournamentId;
   const newTab = window.open(url, '_blank', 'width=1400,height=900');
-  if (!newTab) {
-    alert('⚠️ Popup blocked! Please allow popups.');
-  }
+  if (!newTab) alert('⚠️ Popup blocked! Please allow popups.');
 }
 
 function openAllMatsInTabs() {
-  if (mats.length === 0 || (mats.length === 1 && mats[0].ageGroups.length === 0)) {
-    alert('⚠️ No mats configured yet!');
-    return;
-  }
-  
+  if (mats.length === 0 || (mats.length === 1 && mats[0].ageGroups.length === 0)) { alert('⚠️ No mats configured yet!'); return; }
   if (!confirm('Open all ' + mats.length + ' mat(s) in separate tabs?')) return;
-  
   const baseUrl = window.location.href.split('#')[0].split('?')[0];
   mats.forEach((mat, idx) => {
     setTimeout(() => {
-      const url = baseUrl + '?mat=' + mat.id + '&standalone=1&tournament_id=' + currentTournamentId;
-      window.open(url, '_blank', 'width=1400,height=900');
+      window.open(baseUrl + '?mat=' + mat.id + '&standalone=1&tournament_id=' + currentTournamentId, '_blank', 'width=1400,height=900');
     }, idx * 300);
   });
-  
   alert('✅ Opening ' + mats.length + ' mat(s) in separate tabs...\n\nAll tabs share the same database. Changes sync automatically!');
 }
 
@@ -2393,30 +1594,17 @@ function renderSettings() {
   const regularContainer = document.getElementById('regularTimes');
   const goldenContainer = document.getElementById('goldenTimes');
   if (!regularContainer || !goldenContainer) return;
-  
   regularContainer.innerHTML = '';
   goldenContainer.innerHTML = '';
-  
   Object.keys(AGE_GROUPS).forEach(age => {
-    regularContainer.innerHTML += `
-      <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
-        <label style="display: block; font-size: 0.8rem; color: #8899aa; margin-bottom: 5px;">
-          ${age} (${AGE_GROUPS[age].age})
-        </label>
-        <input type="number" value="${AGE_GROUPS[age].time}" min="1" max="10" 
-          onchange="AGE_GROUPS['${age}'].time=parseInt(this.value);saveLocalData();alert('✅ ${age} time updated to '+this.value+' min')">
-      </div>
-    `;
-    
-    goldenContainer.innerHTML += `
-      <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
-        <label style="display: block; font-size: 0.8rem; color: #8899aa; margin-bottom: 5px;">
-          ⚡ ${age} Golden Time
-        </label>
-        <input type="number" value="${AGE_GROUPS[age].goldenTime}" min="1" max="5" 
-          onchange="AGE_GROUPS['${age}'].goldenTime=parseInt(this.value);saveLocalData();alert(' ${age} golden time updated to '+this.value+' min')">
-      </div>
-    `;
+    regularContainer.innerHTML += `<div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+      <label style="display: block; font-size: 0.8rem; color: #8899aa; margin-bottom: 5px;">${age} (${AGE_GROUPS[age].age})</label>
+      <input type="number" value="${AGE_GROUPS[age].time}" min="1" max="10" onchange="AGE_GROUPS['${age}'].time=parseInt(this.value);saveLocalData();alert('✅ ${age} time updated to '+this.value+' min')">
+    </div>`;
+    goldenContainer.innerHTML += `<div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
+      <label style="display: block; font-size: 0.8rem; color: #8899aa; margin-bottom: 5px;">⚡ ${age} Golden Time</label>
+      <input type="number" value="${AGE_GROUPS[age].goldenTime}" min="1" max="5" onchange="AGE_GROUPS['${age}'].goldenTime=parseInt(this.value);saveLocalData();alert('⚡ ${age} golden time updated to '+this.value+' min')">
+    </div>`;
   });
 }
 </script>
