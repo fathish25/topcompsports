@@ -646,13 +646,13 @@ input:focus, select:focus {
     </div>
     
     <div class="action-buttons">
-      <button class="btn btn-players" onclick="showView('players')">👥 Players</button>
+      <button class="btn btn-players" onclick="showView('players')"> Players</button>
       <button class="btn btn-matches" onclick="showView('registered')">📋 Registered Players</button>
       <button class="btn btn-schedule" onclick="showView('schedule')">📅 Match Schedule</button>
       <button class="btn btn-mats" onclick="showView('mats')"> Mats</button>
       <button class="btn btn-settings" onclick="showView('settings')">⚙️ Settings</button>
       <button class="btn btn-sync" onclick="syncWithDB()">🔄 Sync</button>
-      <button class="btn btn-export" onclick="exportToExcel()"> Export Excel</button>
+      <button class="btn btn-export" onclick="exportToExcel()">📊 Export Excel</button>
       <button class="btn btn-clear-db" onclick="clearTournamentPlayersDB()">⚠️ Clear DB Players</button>
     </div>
   </div>
@@ -710,7 +710,7 @@ input:focus, select:focus {
       </div>
       
       <div class="button-group">
-        <button class="btn btn-export" onclick="exportToExcel()"> Export Excel</button>
+        <button class="btn btn-export" onclick="exportToExcel()">📊 Export Excel</button>
         <button class="btn btn-sync-db" onclick="syncWithDB()">🔄 Refresh from DB</button>
         <button class="btn btn-players" onclick="showView('players')">➕ Add More Players</button>
       </div>
@@ -782,58 +782,134 @@ let currentTournamentId = null;
 let players = [];
 let dbConnected = false;
 
-// Reference data - من الجداول الموجودة مسبقاً
-let AGE_GROUPS = {
-  'Kids 1 (4-5 yrs)': { age: '4-5', time: 2, category: 'under16' },
-  'Kids 2 (6-7 yrs)': { age: '6-7', time: 2, category: 'under16' },
-  'Kids 3 (8-9 yrs)': { age: '8-9', time: 3, category: 'under16' },
-  'Infant (10-11 yrs)': { age: '10-11', time: 3, category: 'under16' },
-  'Junior (12-13 yrs)': { age: '12-13', time: 4, category: 'under16' },
-  'Teen (14-15 yrs)': { age: '14-15', time: 4, category: 'under16' },
-  'Youth (16-17 yrs)': { age: '16-17', time: 5, category: 'over16' },
-  'Amateur / Professional': { age: '18+', time: 5, category: 'over16' },
-  'Master 1 (30-35)': { age: '30-35', time: 5, category: 'over16' },
-  'Master 2 (36-40)': { age: '36-40', time: 5, category: 'over16' },
-  'Master 3 (41-45)': { age: '41-45', time: 5, category: 'over16' },
-  'Master 4 (46+)': { age: '46+', time: 5, category: 'over16' }
-};
+// Reference data - سيتم جلبها من قاعدة البيانات
+let AGE_GROUPS = {};
+let WEIGHTS = {};
+let BELTS = [];
 
-let WEIGHTS = {
-  'Boys': {
-    'Kids 1 (4-5 yrs)': ['16kg', '18kg', '21kg', '24kg', '28kg', '32kg', '+32kg'],
-    'Kids 2 (6-7 yrs)': ['18kg', '20kg', '23kg', '26kg', '30kg', '34kg', '+34kg'],
-    'Kids 3 (8-9 yrs)': ['21kg', '24kg', '27kg', '30kg', '34kg', '38kg', '+38kg'],
-    'Infant (10-11 yrs)': ['24kg', '27kg', '30kg', '34kg', '38kg', '42kg', '+42kg'],
-    'Junior (12-13 yrs)': ['34kg', '37kg', '41kg', '45kg', '50kg', '55kg', '+55kg'],
-    'Teen (14-15 yrs)': ['38kg', '42kg', '46kg', '50kg', '54kg', '62kg', '+62kg']
-  },
-  'Girls': {
-    'Kids 1 (4-5 yrs)': ['16kg', '18kg', '21kg', '24kg', '26kg', '32kg', '+32kg'],
-    'Kids 2 (6-7 yrs)': ['17kg', '19kg', '22kg', '24kg', '27kg', '32kg', '+32kg'],
-    'Kids 3 (8-9 yrs)': ['20kg', '22kg', '25kg', '28kg', '32kg', '36kg', '+36kg'],
-    'Infant (10-11 yrs)': ['22kg', '25kg', '28kg', '32kg', '36kg', '40kg', '+40kg'],
-    'Junior (12-13 yrs)': ['32kg', '34kg', '40kg', '44kg', '48kg', '52kg', '+52kg'],
-    'Teen (14-15 yrs)': ['38kg', '40kg', '44kg', '48kg', '53kg', '57kg', '+57kg']
-  },
-  'Men': {
-    'Youth (16-17 yrs)': ['44kg', '50kg', '55kg', '60kg', '67kg', '73kg', '81kg', '89kg', '94kg', '+94kg'],
-    'Amateur / Professional': ['56kg', '62kg', '67kg', '77kg', '82kg', '88kg', '94kg', '120kg', '+120kg'],
-    'Master 1 (30-35)': ['56kg', '62kg', '67kg', '77kg', '82kg', '88kg', '94kg', '120kg', '+120kg'],
-    'Master 2 (36-40)': ['56kg', '62kg', '67kg', '77kg', '82kg', '88kg', '94kg', '120kg', '+120kg'],
-    'Master 3 (41-45)': ['56kg', '62kg', '67kg', '77kg', '82kg', '88kg', '94kg', '120kg', '+120kg'],
-    'Master 4 (46+)': ['56kg', '62kg', '67kg', '77kg', '82kg', '88kg', '94kg', '120kg', '+120kg']
-  },
-  'Women': {
-    'Youth (16-17 yrs)': ['40kg', '44kg', '48kg', '52kg', '57kg', '63kg', '70kg', '82kg', '+82kg'],
-    'Amateur / Professional': ['47kg', '55kg', '62kg', '70kg', '80kg', '90kg', '95kg', '+95kg'],
-    'Master 1 (30-35)': ['47kg', '55kg', '62kg', '70kg', '80kg', '90kg', '95kg', '+95kg'],
-    'Master 2 (36-40)': ['47kg', '55kg', '62kg', '70kg', '80kg', '90kg', '95kg', '+95kg'],
-    'Master 3 (41-45)': ['47kg', '55kg', '62kg', '70kg', '80kg', '90kg', '95kg', '+95kg'],
-    'Master 4 (46+)': ['47kg', '55kg', '62kg', '70kg', '80kg', '90kg', '95kg', '+95kg']
+// ============================================
+// LOAD REFERENCE DATA FROM DATABASE
+// ============================================
+async function loadReferenceData() {
+  try {
+    console.log('🔄 Loading reference data from database...');
+    
+    // 1. Load Age Groups
+    const { data: ageData, error: ageError } = await dbClient
+      .from('age_divisions')
+      .select('*')
+      .order('min_age');
+    
+    if (ageError) throw ageError;
+    
+    AGE_GROUPS = {};
+    ageData.forEach(ag => {
+      AGE_GROUPS[ag.name] = {
+        age: `${ag.min_age}-${ag.max_age || '99'}`,
+        time: ag.fight_duration || 5,
+        goldenTime: ag.golden_score_duration || 1,
+        category: ag.category || (ag.min_age < 16 ? 'under16' : 'over16'),
+        min_age: ag.min_age,
+        max_age: ag.max_age
+      };
+    });
+    console.log(`✅ Loaded ${Object.keys(AGE_GROUPS).length} age divisions from DB`);
+    
+    // 2. Load Weights
+    const { data: weightData, error: weightError } = await dbClient
+      .from('weight_classes')
+      .select(`
+        name, 
+        gender, 
+        min_weight, 
+        max_weight, 
+        age_divisions (name)
+      `)
+      .order('min_weight');
+    
+    if (weightError) throw weightError;
+    
+    WEIGHTS = {};
+    weightData.forEach(wc => {
+      const gender = wc.gender || 'Boys';
+      const ageGroupName = wc.age_divisions ? wc.age_divisions.name : 'Amateur / Professional';
+      
+      if (!WEIGHTS[gender]) WEIGHTS[gender] = {};
+      if (!WEIGHTS[gender][ageGroupName]) WEIGHTS[gender][ageGroupName] = [];
+      
+      WEIGHTS[gender][ageGroupName].push(wc.name);
+    });
+    console.log('✅ Loaded weight classes from DB');
+    console.log('Available weights:', WEIGHTS);
+    
+    // 3. Load Belts
+    const { data: beltData, error: beltError } = await dbClient
+      .from('belt_levels')
+      .select('*')
+      .order('sort_order');
+    
+    if (beltError) throw beltError;
+    
+    BELTS = beltData.map(b => ({
+      name: b.name,
+      category: b.category,
+      sort_order: b.sort_order
+    }));
+    console.log('✅ Loaded belt levels from DB');
+    
+    dbConnected = true;
+  } catch (error) {
+    console.error('❌ Error loading reference data:', error);
   }
-};
+}
 
-let BELTS = ['White', 'Blue', 'Purple', 'Brown', 'Black'];
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+function getGenderOptions(ageGroup) {
+  // Return Boys/Girls for under 16, Men/Women for adults
+  const category = AGE_GROUPS[ageGroup]?.category;
+  if (category === 'under16' || ageGroup.includes('Kids') || ageGroup.includes('Junior') || ageGroup.includes('Teen')) {
+    return ['Boys', 'Girls'];
+  }
+  return ['Men', 'Women'];
+}
+
+function getWeightOptions(gender, ageGroup) {
+  if (WEIGHTS[gender] && WEIGHTS[gender][ageGroup]) {
+    return WEIGHTS[gender][ageGroup];
+  }
+  return [];
+}
+
+function getBeltOptions(ageGroup) {
+  const category = AGE_GROUPS[ageGroup]?.category;
+  
+  // Determine belt category based on age
+  let beltCategory = 'adult';
+  if (ageGroup.includes('Kids') || ageGroup.includes('Juvenile')) {
+    beltCategory = 'kids';
+  } else if (ageGroup.includes('Teen') || ageGroup.includes('Junior') || ageGroup.includes('Youth')) {
+    beltCategory = 'youth';
+  } else if (category === 'under16') {
+    beltCategory = 'kids';
+  } else if (category === 'over16') {
+    beltCategory = 'adult';
+  }
+  
+  // Filter belts by category (case-insensitive)
+  return BELTS
+    .filter(b => b.category.toLowerCase() === beltCategory.toLowerCase())
+    .map(b => b.name);
+}
+
+function getFightTime(ageGroup) { 
+  return AGE_GROUPS[ageGroup]?.time || 5; 
+}
+
+function getGoldenTime(ageGroup) { 
+  return AGE_GROUPS[ageGroup]?.goldenTime || 1; 
+}
 
 // ============================================
 // INITIALIZATION
@@ -846,12 +922,13 @@ window.onload = async function() {
 
 async function initializeApp() {
   try {
+    await loadReferenceData();
     await loadPlayersFromDB();
     dbConnected = true;
     updateDBStatus('✅ Connected to Database', '#22c55e');
   } catch (error) {
     console.error('Initialization error:', error);
-    updateDBStatus('❌ Connection Error', '#ef4444');
+    updateDBStatus(' Connection Error', '#ef4444');
   }
 }
 
@@ -905,13 +982,13 @@ async function addPlayer() {
   // ✅ جميع الحقول إلزامية مع قيم افتراضية صحيحة
   const newPlayerData = {
     tournament_id: currentTournamentId,
-    player_name: 'New Player',  // مطلوب
-    team: '',  // مطلوب لكن يمكن فارغ
-    age_group: 'Amateur / Professional',  // مطلوب
-    gender: 'Men',  // مطلوب
-    weight: 0,  // مطلوب - numeric
-    belt_level: 'White',  // مطلوب
-    ranking: players.length + 1,  // مطلوب
+    player_name: 'New Player',
+    team: 'Free Player',  // ✅ تغيير القيمة الافتراضية
+    age_group: 'Amateur / Professional',
+    gender: 'Men',
+    weight: 0,
+    belt_level: 'White',
+    ranking: players.length + 1,
     is_suspended: false
   };
   
@@ -927,7 +1004,7 @@ async function addPlayer() {
     players.push({
       id: data.id,
       name: data.player_name,
-      team: data.team || '',
+      team: data.team || 'Free Player',
       ageGroup: data.age_group,
       gender: data.gender,
       weight: data.weight || '',
@@ -950,13 +1027,13 @@ async function addPlayers(count) {
   for (let i = 0; i < count && players.length < 200; i++) {
     newPlayers.push({
       tournament_id: currentTournamentId,
-      player_name: `Player ${players.length + i + 1}`,  // مطلوب
-      team: '',  // مطلوب
-      age_group: 'Amateur / Professional',  // مطلوب
-      gender: 'Men',  // مطلوب
-      weight: 0,  // مطلوب - numeric
-      belt_level: 'White',  // مطلوب
-      ranking: players.length + i + 1,  // مطلوب
+      player_name: `Player ${players.length + i + 1}`,
+      team: 'Free Player',  // ✅ تغيير القيمة الافتراضية
+      age_group: 'Amateur / Professional',
+      gender: 'Men',
+      weight: 0,
+      belt_level: 'White',
+      ranking: players.length + i + 1,
       is_suspended: false
     });
   }
@@ -975,7 +1052,7 @@ async function addPlayers(count) {
       players.push({
         id: p.id,
         name: p.player_name,
-        team: p.team || '',
+        team: p.team || 'Free Player',
         ageGroup: p.age_group,
         gender: p.gender,
         weight: p.weight || '',
@@ -1013,23 +1090,22 @@ async function updatePlayerField(index, field, value) {
     let dbValue = value;
     
     if (field === 'weight') {
-      // weight numeric - يجب أن يكون رقماً
       dbValue = value === '' || value === null ? 0 : parseFloat(value);
     }
     if (field === 'team' && value === '') {
-      dbValue = '';  // مسموح فارغ
+      dbValue = 'Free Player';  // ✅ تغيير القيمة الافتراضية
     }
     if (field === 'belt' && value === '') {
-      dbValue = 'White';  // قيمة افتراضية
+      dbValue = 'White';
     }
     if (field === 'ageGroup' && value === '') {
-      dbValue = 'Amateur / Professional';  // قيمة افتراضية
+      dbValue = 'Amateur / Professional';
     }
     if (field === 'gender' && value === '') {
-      dbValue = 'Men';  // قيمة افتراضية
+      dbValue = 'Men';
     }
     if (field === 'rank' && (value === '' || value === null)) {
-      dbValue = 1;  // قيمة افتراضية
+      dbValue = 1;
     }
     
     try {
@@ -1040,9 +1116,14 @@ async function updatePlayerField(index, field, value) {
       
       if (error) throw error;
     } catch (error) { 
-      console.error(' Error updating player:', error);
+      console.error('❌ Error updating player:', error);
       alert('❌ Error updating: ' + error.message);
     }
+  }
+  
+  // Re-render to update dependent dropdowns
+  if (field === 'ageGroup' || field === 'gender') {
+    renderPlayers();
   }
 }
 
@@ -1080,17 +1161,17 @@ function renderPlayers() {
       `<option ${p.ageGroup === a ? 'selected' : ''}>${a}</option>`
     ).join('');
     
-    const genderOptions = ['Men', 'Women', 'Boys', 'Girls'].map(g => 
+    const genderOptions = getGenderOptions(p.ageGroup).map(g => 
       `<option ${p.gender === g ? 'selected' : ''}>${g}</option>`
     ).join('');
     
-    const weightOptions = (WEIGHTS[p.gender] && WEIGHTS[p.gender][p.ageGroup]) 
-      ? WEIGHTS[p.gender][p.ageGroup].map(w => `<option ${p.weight == w ? 'selected' : ''}>${w}</option>`).join('')
-      : `<option value="">-- Select Weight --</option>`;
+    const weightOptions = getWeightOptions(p.gender, p.ageGroup)
+      .map(w => `<option ${p.weight == w ? 'selected' : ''}>${w}</option>`)
+      .join('');
     
-    const beltOptions = BELTS.map(b => 
-      `<option ${p.belt === b ? 'selected' : ''}>${b}</option>`
-    ).join('');
+    const beltOptions = getBeltOptions(p.ageGroup)
+      .map(b => `<option ${p.belt === b ? 'selected' : ''}>${b}</option>`)
+      .join('');
     
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -1099,7 +1180,7 @@ function renderPlayers() {
       <td><input type="text" value="${p.team}" onchange="updatePlayerField(${i}, 'team', this.value)"></td>
       <td><select onchange="updatePlayerField(${i}, 'ageGroup', this.value)" required>${ageOptions}</select></td>
       <td><select onchange="updatePlayerField(${i}, 'gender', this.value)" required>${genderOptions}</select></td>
-      <td><select onchange="updatePlayerField(${i}, 'weight', this.value)" required>${weightOptions}</select></td>
+      <td><select onchange="updatePlayerField(${i}, 'weight', this.value)" required>${weightOptions || '<option value="">-- Select Weight --</option>'}</select></td>
       <td><select onchange="updatePlayerField(${i}, 'belt', this.value)" required>${beltOptions}</select></td>
       <td><input type="number" value="${p.rank}" style="width: 60px" onchange="updatePlayerField(${i}, 'rank', parseInt(this.value))" min="1" required></td>
       <td><button class="btn-delete" onclick="deletePlayer(${i})">✕</button></td>
@@ -1181,13 +1262,13 @@ function importCSV(event) {
       if (vals.length >= 3) {
         newPlayers.push({
           tournament_id: currentTournamentId,
-          player_name: vals[0] || `Player ${players.length + newPlayers.length + 1}`,  // مطلوب
-          team: vals[1] || '',  // مطلوب
-          age_group: vals[2] || 'Amateur / Professional',  // مطلوب
-          gender: vals[3] || 'Men',  // مطلوب
-          weight: vals[4] ? parseFloat(vals[4]) : 0,  // مطلوب - numeric
-          belt_level: vals[5] || 'White',  // مطلوب
-          ranking: parseInt(vals[6]) || players.length + newPlayers.length + 1,  // مطلوب
+          player_name: vals[0] || `Player ${players.length + newPlayers.length + 1}`,
+          team: vals[1] || 'Free Player',  // ✅ تغيير القيمة الافتراضية
+          age_group: vals[2] || 'Amateur / Professional',
+          gender: vals[3] || 'Men',
+          weight: vals[4] ? parseFloat(vals[4]) : 0,
+          belt_level: vals[5] || 'White',
+          ranking: parseInt(vals[6]) || players.length + newPlayers.length + 1,
           is_suspended: false
         });
       }
@@ -1206,7 +1287,7 @@ function importCSV(event) {
           players.push({
             id: p.id,
             name: p.player_name,
-            team: p.team || '',
+            team: p.team || 'Free Player',
             ageGroup: p.age_group,
             gender: p.gender,
             weight: p.weight || '',
@@ -1238,7 +1319,6 @@ function showRegisteredPlayers() {
   
   if (countEl) countEl.innerText = `${players.length} Players`;
   
-  // Stats
   const activePlayers = players.filter(p => !p.is_suspended).length;
   const suspendedPlayers = players.filter(p => p.is_suspended).length;
   const ageGroups = [...new Set(players.map(p => p.ageGroup))].length;
@@ -1278,7 +1358,7 @@ function showRegisteredPlayers() {
           <div class="player-info">
             <div class="player-name">${i + 1}. ${p.name || 'No Name'}</div>
             <div class="player-details">
-              <span class="player-detail-item">👥 ${p.team || 'No Team'}</span>
+              <span class="player-detail-item">👥 ${p.team || 'Free Player'}</span>
               <span class="player-detail-item">📅 ${p.ageGroup}</span>
               <span class="player-detail-item">⚖️ ${p.weight || 'TBD'}</span>
               <span class="player-detail-item">🎗️ ${p.belt}</span>
@@ -1286,7 +1366,7 @@ function showRegisteredPlayers() {
             </div>
           </div>
           <div class="player-status ${p.is_suspended ? 'status-suspended' : 'status-active'}">
-            ${p.is_suspended ? ' Suspended' : '✅ Active'}
+            ${p.is_suspended ? '⛔ Suspended' : '✅ Active'}
           </div>
         </div>
       `).join('');
@@ -1303,7 +1383,6 @@ function generateSmartSchedule() {
     return;
   }
   
-  // Group players by category (age + gender + weight + belt)
   const categories = {};
   players.filter(p => !p.is_suspended && p.name && p.weight).forEach(p => {
     const key = `${p.ageGroup}|${p.gender}|${p.weight}|${p.belt}`;
@@ -1311,7 +1390,6 @@ function generateSmartSchedule() {
     categories[key].push(p);
   });
   
-  // Generate matches for each category (simple round-robin)
   const allMatches = [];
   Object.keys(categories).forEach(key => {
     const catPlayers = categories[key];
@@ -1337,10 +1415,7 @@ function generateSmartSchedule() {
     return;
   }
   
-  // Smart rotation: avoid same category/weight consecutively
   const scheduledMatches = smartRotateMatches(allMatches);
-  
-  // Display schedule
   displaySchedule(scheduledMatches);
   showNotification(`✅ Generated ${scheduledMatches.length} matches with smart rotation!`);
 }
@@ -1353,7 +1428,6 @@ function smartRotateMatches(matches) {
   let lastCategory = null;
   
   while (remaining.length > 0) {
-    // Find a match with different category than last
     let bestMatch = null;
     let bestIndex = -1;
     
@@ -1369,14 +1443,13 @@ function smartRotateMatches(matches) {
       }
     }
     
-    // If no different category found, take any match
     if (!bestMatch) {
       bestMatch = remaining[0];
       bestIndex = 0;
     }
     
     scheduled.push(bestMatch);
-    lastCategory = `${bestMatch.ageGroup}|${bestMatch.weight}`;
+    lastCategory = `${bestMatch.ageGroup}|${match.weight}`;
     remaining.splice(bestIndex, 1);
   }
   
@@ -1390,10 +1463,9 @@ function displaySchedule(matches) {
   
   if (statsCountEl) statsCountEl.innerText = `${matches.length} Matches`;
   
-  // Calculate stats
   const categories = [...new Set(matches.map(m => `${m.ageGroup}|${m.weight}`))].length;
   const playersInvolved = [...new Set(matches.flatMap(m => [m.player1.id, m.player2.id]))].length;
-  const estimatedTime = matches.length * 7; // ~7 min per match
+  const estimatedTime = matches.length * 7;
   
   if (statsEl) {
     statsEl.innerHTML = `
@@ -1478,7 +1550,6 @@ function showView(viewName) {
   
   if (viewName === 'registered') showRegisteredPlayers();
   if (viewName === 'schedule') {
-    // Auto-generate if not already generated
     if (!document.querySelector('.match-item')) {
       generateSmartSchedule();
     }
@@ -1509,7 +1580,6 @@ function showNotification(message) {
   }, 3000);
 }
 
-// Add animation styles
 const style = document.createElement('style');
 style.innerText = `
   @keyframes slideIn {
