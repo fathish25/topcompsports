@@ -646,7 +646,7 @@ input:focus, select:focus {
     </div>
     
     <div class="action-buttons">
-      <button class="btn btn-players" onclick="showView('players')"> Players</button>
+      <button class="btn btn-players" onclick="showView('players')">👥 Players</button>
       <button class="btn btn-matches" onclick="showView('registered')">📋 Registered Players</button>
       <button class="btn btn-schedule" onclick="showView('schedule')">📅 Match Schedule</button>
       <button class="btn btn-mats" onclick="showView('mats')"> Mats</button>
@@ -661,7 +661,7 @@ input:focus, select:focus {
   <div id="view-players" class="view active">
     <div class="section">
       <div class="section-title">
-        <span>👥 Players Registration <span style="color: #ef4444; font-size: 0.9rem;">(All fields required)</span></span>
+        <span> Players Registration <span style="color: #ef4444; font-size: 0.9rem;">(All fields required)</span></span>
         <span class="player-count" id="playerCount">0 / 200</span>
       </div>
       
@@ -760,7 +760,7 @@ input:focus, select:focus {
   <div id="view-settings" class="view">
     <div class="section">
       <div class="section-title">
-        <span>️ Settings</span>
+        <span>⚙️ Settings</span>
       </div>
       <p style="color: #8899aa; text-align: center; padding: 40px;">Settings coming soon...</p>
     </div>
@@ -792,7 +792,7 @@ let BELTS = [];
 // ============================================
 async function loadReferenceData() {
   try {
-    console.log('🔄 Loading reference data from database...');
+    console.log(' Loading reference data from database...');
     
     // 1. Load Age Groups
     const { data: ageData, error: ageError } = await dbClient
@@ -867,7 +867,6 @@ async function loadReferenceData() {
 // HELPER FUNCTIONS
 // ============================================
 function getGenderOptions(ageGroup) {
-  // Return Boys/Girls for under 16, Men/Women for adults
   const category = AGE_GROUPS[ageGroup]?.category;
   if (category === 'under16' || ageGroup.includes('Kids') || ageGroup.includes('Junior') || ageGroup.includes('Teen')) {
     return ['Boys', 'Girls'];
@@ -885,7 +884,6 @@ function getWeightOptions(gender, ageGroup) {
 function getBeltOptions(ageGroup) {
   const category = AGE_GROUPS[ageGroup]?.category;
   
-  // Determine belt category based on age
   let beltCategory = 'adult';
   if (ageGroup.includes('Kids') || ageGroup.includes('Juvenile')) {
     beltCategory = 'kids';
@@ -897,7 +895,6 @@ function getBeltOptions(ageGroup) {
     beltCategory = 'adult';
   }
   
-  // Filter belts by category (case-insensitive)
   return BELTS
     .filter(b => b.category.toLowerCase() === beltCategory.toLowerCase())
     .map(b => b.name);
@@ -928,7 +925,7 @@ async function initializeApp() {
     updateDBStatus('✅ Connected to Database', '#22c55e');
   } catch (error) {
     console.error('Initialization error:', error);
-    updateDBStatus(' Connection Error', '#ef4444');
+    updateDBStatus('❌ Connection Error', '#ef4444');
   }
 }
 
@@ -979,11 +976,10 @@ async function loadPlayersFromDB() {
 async function addPlayer() {
   if (players.length >= 200) { alert('Maximum 200 players!'); return; }
   
-  // ✅ جميع الحقول إلزامية مع قيم افتراضية صحيحة
   const newPlayerData = {
     tournament_id: currentTournamentId,
     player_name: 'New Player',
-    team: 'Free Player',  // ✅ تغيير القيمة الافتراضية
+    team: 'Free Player',
     age_group: 'Amateur / Professional',
     gender: 'Men',
     weight: 0,
@@ -1017,7 +1013,7 @@ async function addPlayer() {
     updatePlayerCount();
     showNotification('✅ Player added successfully!');
   } catch (error) {
-    console.error('❌ Error adding player:', error);
+    console.error(' Error adding player:', error);
     alert('❌ Error: ' + error.message);
   }
 }
@@ -1028,7 +1024,7 @@ async function addPlayers(count) {
     newPlayers.push({
       tournament_id: currentTournamentId,
       player_name: `Player ${players.length + i + 1}`,
-      team: 'Free Player',  // ✅ تغيير القيمة الافتراضية
+      team: 'Free Player',
       age_group: 'Amateur / Professional',
       gender: 'Men',
       weight: 0,
@@ -1086,14 +1082,13 @@ async function updatePlayerField(index, field, value) {
     };
     const dbField = fieldMap[field] || field;
     
-    // ✅ التحقق من القيم المطلوبة
     let dbValue = value;
     
     if (field === 'weight') {
       dbValue = value === '' || value === null ? 0 : parseFloat(value);
     }
     if (field === 'team' && value === '') {
-      dbValue = 'Free Player';  // ✅ تغيير القيمة الافتراضية
+      dbValue = 'Free Player';
     }
     if (field === 'belt' && value === '') {
       dbValue = 'White';
@@ -1121,7 +1116,6 @@ async function updatePlayerField(index, field, value) {
     }
   }
   
-  // Re-render to update dependent dropdowns
   if (field === 'ageGroup' || field === 'gender') {
     renderPlayers();
   }
@@ -1146,7 +1140,7 @@ async function deletePlayer(index) {
     updatePlayerCount();
     showNotification('✅ Player deleted!');
   } catch (error) {
-    console.error('❌ Error deleting player:', error);
+    console.error(' Error deleting player:', error);
     alert('❌ Error: ' + error.message);
   }
 }
@@ -1227,7 +1221,7 @@ async function clearTournamentPlayersDB() {
 
 function exportToExcel() {
   if (players.length === 0) {
-    alert('️ No players to export!');
+    alert('⚠️ No players to export!');
     return;
   }
   
@@ -1263,7 +1257,7 @@ function importCSV(event) {
         newPlayers.push({
           tournament_id: currentTournamentId,
           player_name: vals[0] || `Player ${players.length + newPlayers.length + 1}`,
-          team: vals[1] || 'Free Player',  // ✅ تغيير القيمة الافتراضية
+          team: vals[1] || 'Free Player',
           age_group: vals[2] || 'Amateur / Professional',
           gender: vals[3] || 'Men',
           weight: vals[4] ? parseFloat(vals[4]) : 0,
@@ -1358,9 +1352,9 @@ function showRegisteredPlayers() {
           <div class="player-info">
             <div class="player-name">${i + 1}. ${p.name || 'No Name'}</div>
             <div class="player-details">
-              <span class="player-detail-item">👥 ${p.team || 'Free Player'}</span>
+              <span class="player-detail-item"> ${p.team || 'Free Player'}</span>
               <span class="player-detail-item">📅 ${p.ageGroup}</span>
-              <span class="player-detail-item">⚖️ ${p.weight || 'TBD'}</span>
+              <span class="player-detail-item">️ ${p.weight || 'TBD'}</span>
               <span class="player-detail-item">🎗️ ${p.belt}</span>
               <span class="player-detail-item">🏆 Rank: ${p.rank}</span>
             </div>
@@ -1449,7 +1443,7 @@ function smartRotateMatches(matches) {
     }
     
     scheduled.push(bestMatch);
-    lastCategory = `${bestMatch.ageGroup}|${match.weight}`;
+    lastCategory = `${bestMatch.ageGroup}|${bestMatch.weight}`;
     remaining.splice(bestIndex, 1);
   }
   
@@ -1495,7 +1489,7 @@ function displaySchedule(matches) {
         <div class="match-info">
           <div class="match-players">${m.player1.name} vs ${m.player2.name}</div>
           <div class="match-category">
-            📅 ${m.ageGroup} | ⚖️ ${m.weight} | 🎗️ ${m.belt} | 👥 ${m.gender}
+            📅 ${m.ageGroup} | ⚖️ ${m.weight} | ️ ${m.belt} | 👥 ${m.gender}
           </div>
         </div>
         <div class="match-time">${(i + 1) * 7} min</div>
