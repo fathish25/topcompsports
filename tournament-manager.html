@@ -6,9 +6,6 @@
 <title>TopCompSports - Tournament Manager</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ============================================
-   الأنماط الأساسية - نفس تصميم الموقع
-   ============================================ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { 
   font-family: 'Segoe UI', Tahoma, sans-serif; 
@@ -17,7 +14,6 @@ body {
   min-height: 100vh;
 }
 
-/* الهيدر */
 .main-header {
   background: #0a0e17;
   border-bottom: 2px solid #1e3a8a;
@@ -118,7 +114,6 @@ body {
 
 .lang-btn.active { background: #3b82f6; color: #fff; }
 
-/* المحتوى الرئيسي */
 .tournament-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
 .tournament-header {
@@ -174,8 +169,8 @@ body {
 .btn-back { background: #6b7280; color: #fff; }
 .btn-info { background: #0ea5e9; color: #fff; }
 .btn-add { background: #22c55e; color: #fff; }
+.btn-new-tab { background: #8b5cf6; color: #fff; }
 
-/* الأقسام */
 .view { display: none; }
 .view.active { display: block; animation: fadeIn 0.3s; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -269,7 +264,6 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
 
 .btn-proceed:hover { background: #16a34a; }
 
-/* شبكة الأبساط */
 .mats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -295,7 +289,6 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
   margin: 3px;
 }
 
-/* شجرة البطولة */
 .bracket-container {
   background: #0d1117;
   border-radius: 12px;
@@ -340,8 +333,6 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
 
 .bracket-match:hover { border-color: #fbbf24; transform: translateY(-2px); }
 .bracket-match.completed { border-color: #22c55e; }
-
-/* 🆕 مباراة معلقة */
 .bracket-match.suspended {
   opacity: 0.5;
   border-color: #f59e0b;
@@ -392,7 +383,112 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
 
 .edit-btn:hover { background: #d97706; }
 
-/* لوحة النتائج */
+/* Match Queue Styles */
+.match-queue-item {
+  background: #151d2b;
+  border: 2px solid #2a3548;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.match-queue-item:hover {
+  border-color: #fbbf24;
+  transform: translateX(5px);
+}
+
+.match-queue-item.next-match {
+  border-color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.match-queue-info {
+  flex: 1;
+}
+
+.match-queue-players {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.match-queue-details {
+  font-size: 0.85rem;
+  color: #8899aa;
+}
+
+.match-queue-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Schedule Mode Toggle */
+.schedule-mode-toggle {
+  background: #151d2b;
+  border: 2px solid #2a3548;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.schedule-mode-toggle label {
+  color: #fbbf24;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #2a3548;
+  transition: .4s;
+  border-radius: 30px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: #22c55e;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(30px);
+}
+
 .scoreboard-container { background: #0d1117; border-radius: 12px; padding: 20px; }
 
 .sb-top-bar {
@@ -623,7 +719,6 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
   cursor: pointer;
 }
 
-/* نافذة اختيار الفائز */
 .winner-modal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -663,7 +758,6 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
 .winner-btn.draw { background: linear-gradient(135deg, #6b7280, #374151); }
 .winner-btn.cancel { background: transparent; color: #8899aa; border: 2px solid #6b7280; }
 
-/* متجاوب مع الموبايل */
 @media (max-width: 968px) {
   .header-container { flex-direction: column; }
   .nav-menu { flex-wrap: wrap; justify-content: center; }
@@ -692,7 +786,6 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
 </head>
 <body>
 
-<!-- الهيدر -->
 <header class="main-header">
   <div class="header-container">
     <div class="logo-section">
@@ -720,11 +813,10 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
   </div>
 </header>
 
-<!-- المحتوى -->
 <div class="tournament-container">
   <div class="tournament-header">
     <div class="tournament-title-section">
-      <h1>🏆 Tournament 2026 OZ</h1>
+      <h1> Tournament 2026 OZ</h1>
       <div class="tournament-subtitle" id="subtitle">Step 1: Players Registration</div>
       <div class="status-badge" id="dbStatus">
         <span>✅</span>
@@ -738,11 +830,10 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
       <button class="btn btn-settings" onclick="showView('settings')">⚙️ Settings</button>
       <button class="btn btn-sync" onclick="syncWithDB()">🔄 Sync</button>
       <button class="btn btn-export" onclick="exportToExcel()">📊 Export Excel</button>
-      <button class="btn btn-clear-db" onclick="clearTournamentPlayersDB()">️ Clear DB Players</button>
+      <button class="btn btn-clear-db" onclick="clearTournamentPlayersDB()">⚠️ Clear DB Players</button>
     </div>
   </div>
 
-  <!-- صفحة اللاعبين -->
   <div id="view-players" class="view active">
     <div class="section">
       <div class="section-title">
@@ -782,7 +873,6 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
     </div>
   </div>
 
-  <!-- صفحة الأبساط -->
   <div id="view-mats" class="view">
     <div class="section">
       <div class="section-title">
@@ -813,28 +903,45 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
     </div>
   </div>
 
-  <!-- لوحة التحكم -->
   <div id="view-dashboard" class="view">
     <div class="section">
       <div class="section-title">
         <span>📋 Mat Dashboard</span>
-        <button class="btn btn-back" onclick="showView('mats')">← Back to Mats</button>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-new-tab" onclick="openCurrentMatInNewTab()">🪟 Open Mat in New Tab</button>
+          <button class="btn btn-back" onclick="showView('mats')">← Back to Mats</button>
+        </div>
       </div>
       
       <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; flex-wrap: wrap;">
         <button class="btn btn-add active" onclick="switchDashboardTab('categories')" id="tab-categories-btn">📋 Categories</button>
         <button class="btn btn-sync" onclick="switchDashboardTab('queue')" id="tab-queue-btn">📋 Queue</button>
-        <button class="btn btn-players" onclick="switchDashboardTab('callup')" id="tab-callup-btn"> Call-Up</button>
-        <button class="btn btn-mats" onclick="switchDashboardTab('standings')" id="tab-standings-btn"> Standings</button>
+        <button class="btn btn-players" onclick="switchDashboardTab('callup')" id="tab-callup-btn">📢 Call-Up</button>
+        <button class="btn btn-mats" onclick="switchDashboardTab('standings')" id="tab-standings-btn">🏆 Standings</button>
       </div>
       
       <div id="dashboard-categories" class="dashboard-tab active">
-        <h3 style="color: #fbbf24; margin-bottom: 20px;">📋 Categories - Mat <span id="dashboardMatNumber">1</span></h3>
+        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Categories - Mat <span id="dashboardMatNumber">1</span></h3>
         <div id="categoriesContainer" style="display: grid; gap: 15px;"></div>
       </div>
       
       <div id="dashboard-queue" class="dashboard-tab" style="display: none;">
-        <h3 style="color: #fbbf24; margin-bottom: 20px;">📋 Match Queue</h3>
+        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Match Queue</h3>
+        
+        <!--  نظام إدارة المباريات -->
+        <div class="schedule-mode-toggle">
+          <div>
+            <label>🤖 Auto-Schedule Mode (Diverse Matches)</label>
+            <p style="color: #8899aa; font-size: 0.85rem; margin-top: 5px;">
+              Automatically selects matches to avoid consecutive fights for same player
+            </p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="autoScheduleToggle" onchange="toggleScheduleMode()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        
         <div id="queueContainer"></div>
       </div>
       
@@ -850,7 +957,6 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
     </div>
   </div>
 
-  <!-- شجرة البطولة -->
   <div id="view-bracket" class="view">
     <button class="btn btn-info" style="margin-bottom: 10px;" onclick="showView('dashboard')">← Back to Dashboard</button>
     <div class="section">
@@ -859,7 +965,6 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
     </div>
   </div>
 
-  <!-- لوحة النتائج -->
   <div id="view-scoreboard" class="view">
     <div class="scoreboard-container">
       <div class="sb-top-bar">
@@ -940,7 +1045,7 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
               <div class="value" id="redAdv">0</div>
             </div>
             <div class="sb-counter pen">
-              <div class="label"> Penalty</div>
+              <div class="label">🟥 Penalty</div>
               <div class="value" id="redPen">0</div>
             </div>
           </div>
@@ -964,7 +1069,7 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
         </div>
 
         <div>
-          <div class="sb-panel-header blue">🔵 Blue Player</div>
+          <div class="sb-panel-header blue"> Blue Player</div>
           <div class="sb-counters">
             <div class="sb-counter adv">
               <div class="label">⭐ Advantage</div>
@@ -1013,7 +1118,6 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
     </div>
   </div>
 
-  <!-- الإعدادات -->
   <div id="view-settings" class="view">
     <div class="section">
       <div class="section-title">
@@ -1026,16 +1130,10 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
 </div>
 
 <script>
-// ============================================
-// إعدادات Supabase
-// ============================================
 const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
 const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ============================================
-// المتغيرات العامة
-// ============================================
 let currentTournamentId = null;
 let players = [];
 let mats = [];
@@ -1059,10 +1157,8 @@ let scoreboard = {
 let timerInterval = null;
 let timeLeft = 120;
 let isGoldenTime = false;
+let autoScheduleMode = false; //  وضع الجدولة التلقائية
 
-// ============================================
-// التهيئة
-// ============================================
 window.onload = async function() {
   const urlParams = new URLSearchParams(window.location.search);
   currentTournamentId = urlParams.get('tournament_id') || 'db5ffa84-d0a4-4666-bbb2-7de0482a3d92';
@@ -1091,9 +1187,6 @@ function updateDBStatus(message, color) {
   }
 }
 
-// ============================================
-// تحميل البيانات المرجعية
-// ============================================
 async function loadReferenceData() {
   try {
     console.log('🔄 Loading reference data...');
@@ -1177,9 +1270,6 @@ async function loadReferenceData() {
   }
 }
 
-// ============================================
-// دوال مساعدة
-// ============================================
 function getGenderOptions(ageGroup) {
   const category = AGE_GROUPS[ageGroup]?.category;
   if (category === 'under16' || ageGroup.includes('Kids') || ageGroup.includes('Junior') || ageGroup.includes('Teen')) {
@@ -1202,9 +1292,6 @@ function getBeltOptions(ageGroup) {
 function getFightTime(ageGroup) { return AGE_GROUPS[ageGroup]?.time || 5; }
 function getGoldenTime(ageGroup) { return AGE_GROUPS[ageGroup]?.goldenTime || 1; }
 
-// ============================================
-// التنقل
-// ============================================
 function showView(viewName) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const selectedView = document.getElementById('view-' + viewName);
@@ -1239,9 +1326,6 @@ function switchDashboardTab(tabName) {
   if (tabName === 'standings') renderStandings();
 }
 
-// ============================================
-// إدارة اللاعبين
-// ============================================
 async function loadPlayersFromDB() {
   if (!currentTournamentId) return;
   try {
@@ -1389,7 +1473,7 @@ async function addPlayers(count) {
     showNotification(`✅ Added ${data.length} players!`);
   } catch (error) {
     console.error('❌ Error:', error);
-    alert(' Error: ' + error.message);
+    alert('❌ Error: ' + error.message);
   }
 }
 
@@ -1507,7 +1591,7 @@ async function clearTournamentPlayersDB() {
     updatePlayerCount();
     showNotification('✅ All players cleared!');
   } catch (error) {
-    alert(' Error: ' + error.message);
+    alert('❌ Error: ' + error.message);
   }
 }
 
@@ -1525,9 +1609,6 @@ function exportToExcel() {
   showNotification(`✅ Exported ${players.length} players!`);
 }
 
-// ============================================
-// إدارة الأبساط
-// ============================================
 async function loadMats() {
   try {
     const { data, error } = await dbClient
@@ -1698,15 +1779,26 @@ function renderMats() {
       
       <div style="display: flex; gap: 10px; margin-top: 20px;">
         <button class="btn btn-players" style="flex: 1;" onclick="currentMat='${mat.id}'; showView('dashboard')">📋 Open Dashboard</button>
+        <button class="btn btn-new-tab" style="flex: 1;" onclick="openMatInNewTab('${mat.id}')"> Open in New Tab</button>
       </div>
     `;
     grid.appendChild(div);
   });
 }
 
-// ============================================
-// لوحة التحكم والفئات
-// ============================================
+function openMatInNewTab(matId) {
+  const url = `${window.location.pathname}?tournament_id=${currentTournamentId}&mat=${matId}&standalone=1`;
+  window.open(url, '_blank');
+}
+
+function openCurrentMatInNewTab() {
+  if (!currentMat) {
+    alert('⚠️ No mat selected!');
+    return;
+  }
+  openMatInNewTab(currentMat);
+}
+
 function renderCategories() {
   const container = document.getElementById('categoriesContainer');
   if (!container) return;
@@ -1757,10 +1849,10 @@ function renderCategories() {
     return `
       <div onclick="openCategoryBracket('${cat.key}', '${cat.gender}', '${cat.ageGroup}', '${cat.weight}', '${cat.belt}')" style="background: #151d2b; border: 2px solid #2a3548; border-radius: 10px; padding: 20px; cursor: pointer; transition: all 0.3s;">
         <h3 style="color: #fbbf24; margin-bottom: 10px; font-size: 1.2rem;">
-          ${cat.gender} | 🏅 ${cat.ageGroup} | ️ ${cat.weight} | 🎗️ ${cat.belt}
+          ${cat.gender} | 🏅 ${cat.ageGroup} | ⚖️ ${cat.weight} | 🎗️ ${cat.belt}
         </h3>
         <div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 10px;">
-          👥 ${cat.players.length} Players | ⏱️ ${fightTime} min | 🏆 Bracket System
+          👥 ${cat.players.length} Players | ⏱️ ${fightTime} min |  Bracket System
         </div>
         <div style="font-size: 0.85rem; color: #556;">
           Players: ${cat.players.map(p => p.name).join(', ')}
@@ -1866,7 +1958,6 @@ function propagateBracketWinners(rounds) {
   }
 }
 
-// 🎯 دالة عرض الشجرة مع جدول المباريات
 function renderBracket() {
   const container = document.getElementById('bracketContent');
   const title = document.getElementById('bracketTitle');
@@ -1908,7 +1999,7 @@ function renderBracket() {
           ` : ''}
           ${!match.bye ? `
             <div style="display: flex; gap: 5px; margin-top: 5px;">
-              <button class="edit-btn" onclick="editMatch(${rIdx}, ${mIdx})" style="flex: 1;">️ Edit</button>
+              <button class="edit-btn" onclick="editMatch(${rIdx}, ${mIdx})" style="flex: 1;">✏️ Edit</button>
               <button class="edit-btn" onclick="toggleMatchSuspension(${rIdx}, ${mIdx})" style="flex: 1; background: ${match.suspended ? '#22c55e' : '#f59e0b'}; color: #fff;">
                 ${match.suspended ? '▶️ Resume' : '⏸️ Suspend'}
               </button>
@@ -1922,14 +2013,11 @@ function renderBracket() {
   });
   
   html += '</div>';
-  
-  // 🎯 إضافة جدول Match Schedule
   html += renderMatchSchedule(cat);
   
   container.innerHTML = html;
 }
 
-// 🎯 دالة عرض جدول المباريات
 function renderMatchSchedule(cat) {
   let html = `
     <div style="margin-top: 40px; padding: 20px; background: #151d2b; border-radius: 12px;">
@@ -1986,7 +2074,6 @@ function renderMatchSchedule(cat) {
   return html;
 }
 
-// 🎯 دالة تعديل المباراة (تغيير الخصم)
 function editMatch(rIdx, mIdx) {
   const cat = categories[currentCategory.key];
   const match = cat.rounds[rIdx][mIdx];
@@ -2059,7 +2146,6 @@ function saveMatchEdit(rIdx, mIdx) {
   showNotification('✅ Match updated!');
 }
 
-// 🎯 دالة تعليق/استئناف المباراة
 function toggleMatchSuspension(rIdx, mIdx) {
   const cat = categories[currentCategory.key];
   const match = cat.rounds[rIdx][mIdx];
@@ -2068,7 +2154,6 @@ function toggleMatchSuspension(rIdx, mIdx) {
   showNotification(match.suspended ? '⏸️ Match suspended!' : '▶️ Match resumed!');
 }
 
-//  دالة اختيار الفائز
 function showWinnerSelection(match) {
   const modal = document.createElement('div');
   modal.className = 'winner-modal';
@@ -2078,7 +2163,7 @@ function showWinnerSelection(match) {
   
   modal.innerHTML = `
     <div class="winner-modal-content">
-      <h2 style="color: #fbbf24; margin-bottom: 20px; font-size: 2rem;"> Select Winner</h2>
+      <h2 style="color: #fbbf24; margin-bottom: 20px; font-size: 2rem;">🏆 Select Winner</h2>
       
       <div style="background: #0f1724; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
         <div style="font-size: 1.3rem; font-weight: bold; color: #fff; margin-bottom: 10px;">
@@ -2150,6 +2235,13 @@ function startBracketMatch(rIdx, mIdx) {
   showView('scoreboard');
 }
 
+// 🎯 نظام إدارة المباريات المتقدم
+function toggleScheduleMode() {
+  autoScheduleMode = document.getElementById('autoScheduleToggle').checked;
+  renderQueue();
+  showNotification(autoScheduleMode ? '🤖 Auto-Schedule Mode ON' : '✋ Manual Mode ON');
+}
+
 function renderQueue() {
   const container = document.getElementById('queueContainer');
   if (!container) return;
@@ -2160,7 +2252,13 @@ function renderQueue() {
     cat.rounds.forEach((round, rIdx) => {
       round.forEach((m, mIdx) => {
         if (m.status !== 'completed' && !m.bye && !m.suspended) {
-          allMatches.push({ ...m, categoryKey: key, roundIdx: rIdx, matchIdx: mIdx });
+          allMatches.push({ 
+            ...m, 
+            categoryKey: key, 
+            roundIdx: rIdx, 
+            matchIdx: mIdx,
+            category: cat
+          });
         }
       });
     });
@@ -2171,17 +2269,25 @@ function renderQueue() {
     return;
   }
   
-  container.innerHTML = allMatches.map((m, i) => {
-    const cat = categories[m.categoryKey];
+  // 🎯 ترتيب المباريات حسب الوضع
+  let sortedMatches = allMatches;
+  if (autoScheduleMode) {
+    sortedMatches = sortMatchesForDiversity(allMatches);
+  }
+  
+  container.innerHTML = sortedMatches.map((m, i) => {
+    const cat = m.category;
     return `
-      <div style="padding: 15px; margin-bottom: 10px; background: #151d2b; border-radius: 8px; border-left: 4px solid #fbbf24;">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <strong>${m.p1 ? m.p1.name : 'TBD'}</strong> vs <strong>${m.p2 ? m.p2.name : 'TBD'}</strong>
-            <div style="font-size: 0.85rem; color: #8899aa; margin-top: 5px;">
-              ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt}
-            </div>
+      <div class="match-queue-item ${i === 0 ? 'next-match' : ''}">
+        <div class="match-queue-info">
+          <div class="match-queue-players">
+            ${m.p1 ? m.p1.name : 'TBD'} vs ${m.p2 ? m.p2.name : 'TBD'}
           </div>
+          <div class="match-queue-details">
+            ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt} | ${m.id}
+          </div>
+        </div>
+        <div class="match-queue-actions">
           <button class="btn btn-add" onclick="startMatchFromQueue('${m.categoryKey}', ${m.roundIdx}, ${m.matchIdx})">▶ Start</button>
         </div>
       </div>
@@ -2189,9 +2295,29 @@ function renderQueue() {
   }).join('');
 }
 
+// 🎯 خوارزمية تنويع المباريات
+function sortMatchesForDiversity(matches) {
+  const lastPlayer = window.lastPlayedPlayer || null;
+  const sorted = [...matches];
+  
+  // ترتيب بحيث لا يلعب نفس اللاعب مرتين متتاليتين
+  sorted.sort((a, b) => {
+    const aHasLastPlayer = (a.p1?.id === lastPlayer || a.p2?.id === lastPlayer) ? 1 : 0;
+    const bHasLastPlayer = (b.p1?.id === lastPlayer || b.p2?.id === lastPlayer) ? 1 : 0;
+    return aHasLastPlayer - bHasLastPlayer;
+  });
+  
+  return sorted;
+}
+
 function startMatchFromQueue(categoryKey, rIdx, mIdx) {
   currentCategory = { key: categoryKey };
   startBracketMatch(rIdx, mIdx);
+  
+  // حفظ آخر لاعب لعب
+  const cat = categories[categoryKey];
+  const match = cat.rounds[rIdx][mIdx];
+  if (match.p1) window.lastPlayedPlayer = match.p1.id;
 }
 
 function renderCallUp() {
@@ -2228,7 +2354,7 @@ function renderCallUp() {
         ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt}
       </div>
       <div style="display: flex; gap: 15px; justify-content: center;">
-        <button class="btn btn-add" onclick="callPlayer('${next.p1 ? next.p1.name : 'Player 1'}')">📢 Call ${next.p1 ? next.p1.name : 'Player 1'}</button>
+        <button class="btn btn-add" onclick="callPlayer('${next.p1 ? next.p1.name : 'Player 1'}')"> Call ${next.p1 ? next.p1.name : 'Player 1'}</button>
         <button class="btn btn-add" onclick="callPlayer('${next.p2 ? next.p2.name : 'Player 2'}')">📢 Call ${next.p2 ? next.p2.name : 'Player 2'}</button>
       </div>
     </div>
@@ -2281,7 +2407,7 @@ function renderStandings() {
   const sortedPlayers = Object.values(allPlayers).sort((a, b) => b.points - a.points || b.wins - a.wins || a.losses - b.losses);
   
   if (sortedPlayers.length === 0) {
-    container.innerHTML = '<p style="text-align: center; color: #8899aa; padding: 40px;">No results yet.</p>';
+    container.innerHTML = '<p style="text-align: center; color: #8899aa; padding: 40px;">No results yet. Complete some matches to see standings.</p>';
     return;
   }
   
@@ -2317,9 +2443,6 @@ function renderStandings() {
   `;
 }
 
-// ============================================
-// لوحة النتائج
-// ============================================
 function handleLogoUpload(player, input) {
   const file = input.files[0];
   if (file) {
@@ -2403,7 +2526,7 @@ function startTimer() {
     updateTimerDisplay();
     if (timeLeft <= 0) {
       stopTimer();
-      if (isGoldenTime) { showNotification(' Golden Time ended!'); isGoldenTime = false; }
+      if (isGoldenTime) { showNotification('⚡ Golden Time ended!'); isGoldenTime = false; }
       else showNotification("⏰ Time's up!");
     }
   }, 1000);
@@ -2458,7 +2581,6 @@ function swapPlayers() {
   updateScoreboardDisplay();
 }
 
-// 🎯 دالة إنهاء المباراة - تظهر نافذة اختيار الفائز
 function finishMatch() {
   stopTimer();
   
@@ -2474,7 +2596,6 @@ function finishMatch() {
     match.score1 = redScore;
     match.score2 = blueScore;
     
-    // 🎯 عرض نافذة اختيار الفائز
     showWinnerSelection(match);
   }
 }
