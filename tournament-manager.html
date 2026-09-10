@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TopCompSports - Tournament Manager</title>
+<title>TopCompSports - Tournament Manager (AJP)</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ============================================
@@ -649,10 +649,10 @@ input:focus, select:focus {
       <button class="btn btn-players" onclick="showView('players')">👥 Players</button>
       <button class="btn btn-matches" onclick="showView('registered')">📋 Registered Players</button>
       <button class="btn btn-schedule" onclick="showView('schedule')">📅 Match Schedule</button>
-      <button class="btn btn-mats" onclick="showView('mats')"> Mats</button>
+      <button class="btn btn-mats" onclick="showView('mats')">🥋 Mats</button>
       <button class="btn btn-settings" onclick="showView('settings')">⚙️ Settings</button>
-      <button class="btn btn-sync" onclick="syncWithDB()">🔄 Sync</button>
-      <button class="btn btn-export" onclick="exportToExcel()">📊 Export Excel</button>
+      <button class="btn btn-sync" onclick="syncWithDB()"> Sync</button>
+      <button class="btn btn-export" onclick="exportToExcel()"> Export Excel</button>
       <button class="btn btn-clear-db" onclick="clearTournamentPlayersDB()">⚠️ Clear DB Players</button>
     </div>
   </div>
@@ -661,7 +661,7 @@ input:focus, select:focus {
   <div id="view-players" class="view active">
     <div class="section">
       <div class="section-title">
-        <span> Players Registration <span style="color: #ef4444; font-size: 0.9rem;">(All fields required)</span></span>
+        <span>👥 Players Registration <span style="color: #ef4444; font-size: 0.9rem;">(All fields required)</span></span>
         <span class="player-count" id="playerCount">0 / 200</span>
       </div>
       
@@ -670,7 +670,7 @@ input:focus, select:focus {
         <button class="btn btn-add-10" onclick="addPlayers(10)">➕ Add 10</button>
         <button class="btn btn-import" onclick="document.getElementById('csvImport').click()">📥 Import CSV</button>
         <input type="file" id="csvImport" accept=".csv" style="display:none" onchange="importCSV(event)">
-        <button class="btn btn-export" onclick="exportCSV()">📤 Export CSV</button>
+        <button class="btn btn-export" onclick="exportCSV()"> Export CSV</button>
         <button class="btn btn-sync-db" onclick="syncWithDB()">🔄 Sync with DB</button>
       </div>
       
@@ -788,15 +788,15 @@ let WEIGHTS = {};
 let BELTS = [];
 
 // ============================================
-// LOAD REFERENCE DATA FROM DATABASE
+// LOAD REFERENCE DATA FROM DATABASE - محدّثة
 // ============================================
 async function loadReferenceData() {
   try {
-    console.log(' Loading reference data from database...');
+    console.log('🔄 Loading reference data from database...');
     
-    // 1. Load Age Groups
+    // 1. Load Age Groups من ajp_age_divisions
     const { data: ageData, error: ageError } = await dbClient
-      .from('age_divisions')
+      .from('ajp_age_divisions')
       .select('*')
       .order('min_age');
     
@@ -805,6 +805,7 @@ async function loadReferenceData() {
     AGE_GROUPS = {};
     ageData.forEach(ag => {
       AGE_GROUPS[ag.name] = {
+        id: ag.id,  // ✅ إضافة ID
         age: `${ag.min_age}-${ag.max_age || '99'}`,
         time: ag.fight_duration || 5,
         goldenTime: ag.golden_score_duration || 1,
@@ -815,15 +816,16 @@ async function loadReferenceData() {
     });
     console.log(`✅ Loaded ${Object.keys(AGE_GROUPS).length} age divisions from DB`);
     
-    // 2. Load Weights
+    // 2. Load Weights من ajp_weight_classes
     const { data: weightData, error: weightError } = await dbClient
-      .from('weight_classes')
+      .from('ajp_weight_classes')
       .select(`
+        id,
         name, 
         gender, 
         min_weight, 
-        max_weight, 
-        age_divisions (name)
+        max_weight,
+        age_division_id
       `)
       .order('min_weight');
     
@@ -832,25 +834,34 @@ async function loadReferenceData() {
     WEIGHTS = {};
     weightData.forEach(wc => {
       const gender = wc.gender || 'Boys';
-      const ageGroupName = wc.age_divisions ? wc.age_divisions.name : 'Amateur / Professional';
+      
+      // البحث عن اسم الفئة العمرية من الـ ID
+      const ageDiv = ageData.find(ad => ad.id === wc.age_division_id);
+      const ageGroupName = ageDiv ? ageDiv.name : 'Amateur / Professional';
       
       if (!WEIGHTS[gender]) WEIGHTS[gender] = {};
       if (!WEIGHTS[gender][ageGroupName]) WEIGHTS[gender][ageGroupName] = [];
       
-      WEIGHTS[gender][ageGroupName].push(wc.name);
+      WEIGHTS[gender][ageGroupName].push({
+        id: wc.id,  // ✅ إضافة ID
+        name: wc.name,
+        min_weight: wc.min_weight,
+        max_weight: wc.max_weight
+      });
     });
     console.log('✅ Loaded weight classes from DB');
     console.log('Available weights:', WEIGHTS);
     
-    // 3. Load Belts
+    // 3. Load Belts من ajp_belt_levels
     const { data: beltData, error: beltError } = await dbClient
-      .from('belt_levels')
+      .from('ajp_belt_levels')
       .select('*')
-      .order('sort_order');
+      .order('category, sort_order');
     
     if (beltError) throw beltError;
     
     BELTS = beltData.map(b => ({
+      id: b.id,  // ✅ إضافة ID
       name: b.name,
       category: b.category,
       sort_order: b.sort_order
@@ -945,7 +956,7 @@ async function loadPlayersFromDB() {
   if (!currentTournamentId) return;
   try {
     const { data, error } = await dbClient
-      .from('tournament_participants')
+      .from('ajp_tournament_participants')  // ✅ استخدام الجدول الجديد
       .select('*')
       .eq('tournament_id', currentTournamentId)
       .order('ranking', { ascending: true });
@@ -956,10 +967,13 @@ async function loadPlayersFromDB() {
       id: p.id,
       name: p.player_name || '',
       team: p.team || '',
-      ageGroup: p.age_group || 'Amateur / Professional',
+      ageGroup: p.age_group_id ? AGE_GROUPS[Object.keys(AGE_GROUPS).find(k => AGE_GROUPS[k].id === p.age_group_id)]?.name : 'Amateur / Professional',
+      age_group_id: p.age_group_id,
       gender: p.gender || 'Men',
-      weight: p.weight || '',
-      belt: p.belt_level || 'White',
+      weight_class_id: p.weight_class_id,
+      weight: p.weight_class_id ? (WEIGHTS[p.gender] && Object.values(WEIGHTS[p.gender]).flat().find(w => w.id === p.weight_class_id))?.name : '',
+      belt_level_id: p.belt_level_id,
+      belt: p.belt_level_id ? BELTS.find(b => b.id === p.belt_level_id)?.name : 'White',
       rank: p.ranking || 0,
       is_suspended: p.is_suspended || false
     }));
@@ -976,21 +990,30 @@ async function loadPlayersFromDB() {
 async function addPlayer() {
   if (players.length >= 200) { alert('Maximum 200 players!'); return; }
   
+  // الحصول على أول فئة عمرية وأول وزن وأول حزام
+  const firstAgeGroup = Object.keys(AGE_GROUPS)[0];
+  const ageGroupId = AGE_GROUPS[firstAgeGroup]?.id;
+  const gender = 'Men';
+  const firstWeight = WEIGHTS[gender]?.[firstAgeGroup]?.[0];
+  const weightClassId = firstWeight?.id;
+  const firstBelt = BELTS.find(b => b.category === 'adult');
+  const beltLevelId = firstBelt?.id;
+  
   const newPlayerData = {
     tournament_id: currentTournamentId,
     player_name: 'New Player',
     team: 'Free Player',
-    age_group: 'Amateur / Professional',
-    gender: 'Men',
-    weight: 0,
-    belt_level: 'White',
+    age_group_id: ageGroupId,
+    gender: gender,
+    weight_class_id: weightClassId,
+    belt_level_id: beltLevelId,
     ranking: players.length + 1,
     is_suspended: false
   };
   
   try {
     const { data, error } = await dbClient
-      .from('tournament_participants')
+      .from('ajp_tournament_participants')
       .insert(newPlayerData)
       .select()
       .single();
@@ -1001,10 +1024,13 @@ async function addPlayer() {
       id: data.id,
       name: data.player_name,
       team: data.team || 'Free Player',
-      ageGroup: data.age_group,
+      ageGroup: firstAgeGroup,
+      age_group_id: data.age_group_id,
       gender: data.gender,
-      weight: data.weight || '',
-      belt: data.belt_level,
+      weight_class_id: data.weight_class_id,
+      weight: firstWeight?.name || '',
+      belt_level_id: data.belt_level_id,
+      belt: firstBelt?.name || 'White',
       rank: data.ranking,
       is_suspended: data.is_suspended || false
     });
@@ -1013,22 +1039,30 @@ async function addPlayer() {
     updatePlayerCount();
     showNotification('✅ Player added successfully!');
   } catch (error) {
-    console.error(' Error adding player:', error);
+    console.error('❌ Error adding player:', error);
     alert('❌ Error: ' + error.message);
   }
 }
 
 async function addPlayers(count) {
   const newPlayers = [];
+  const firstAgeGroup = Object.keys(AGE_GROUPS)[0];
+  const ageGroupId = AGE_GROUPS[firstAgeGroup]?.id;
+  const gender = 'Men';
+  const firstWeight = WEIGHTS[gender]?.[firstAgeGroup]?.[0];
+  const weightClassId = firstWeight?.id;
+  const firstBelt = BELTS.find(b => b.category === 'adult');
+  const beltLevelId = firstBelt?.id;
+  
   for (let i = 0; i < count && players.length < 200; i++) {
     newPlayers.push({
       tournament_id: currentTournamentId,
       player_name: `Player ${players.length + i + 1}`,
       team: 'Free Player',
-      age_group: 'Amateur / Professional',
-      gender: 'Men',
-      weight: 0,
-      belt_level: 'White',
+      age_group_id: ageGroupId,
+      gender: gender,
+      weight_class_id: weightClassId,
+      belt_level_id: beltLevelId,
       ranking: players.length + i + 1,
       is_suspended: false
     });
@@ -1038,7 +1072,7 @@ async function addPlayers(count) {
   
   try {
     const { data, error } = await dbClient
-      .from('tournament_participants')
+      .from('ajp_tournament_participants')
       .insert(newPlayers)
       .select();
     
@@ -1049,10 +1083,13 @@ async function addPlayers(count) {
         id: p.id,
         name: p.player_name,
         team: p.team || 'Free Player',
-        ageGroup: p.age_group,
+        ageGroup: firstAgeGroup,
+        age_group_id: p.age_group_id,
         gender: p.gender,
-        weight: p.weight || '',
-        belt: p.belt_level,
+        weight_class_id: p.weight_class_id,
+        weight: firstWeight?.name || '',
+        belt_level_id: p.belt_level_id,
+        belt: firstBelt?.name || 'White',
         rank: p.ranking,
         is_suspended: p.is_suspended || false
       });
@@ -1074,30 +1111,29 @@ async function updatePlayerField(index, field, value) {
   if (player.id) {
     const fieldMap = { 
       'name': 'player_name', 
-      'ageGroup': 'age_group', 
-      'belt': 'belt_level', 
+      'ageGroup': 'age_group_id', 
+      'belt': 'belt_level_id', 
       'rank': 'ranking', 
-      'weight': 'weight', 
+      'weight': 'weight_class_id', 
       'gender': 'gender' 
     };
     const dbField = fieldMap[field] || field;
     
     let dbValue = value;
     
+    // تحويل القيمة إلى ID إذا لزم الأمر
+    if (field === 'ageGroup') {
+      dbValue = AGE_GROUPS[value]?.id;
+    }
     if (field === 'weight') {
-      dbValue = value === '' || value === null ? 0 : parseFloat(value);
+      dbValue = value; // القيمة هي ID بالفعل
+    }
+    if (field === 'belt') {
+      const beltObj = BELTS.find(b => b.name === value);
+      dbValue = beltObj?.id;
     }
     if (field === 'team' && value === '') {
       dbValue = 'Free Player';
-    }
-    if (field === 'belt' && value === '') {
-      dbValue = 'White';
-    }
-    if (field === 'ageGroup' && value === '') {
-      dbValue = 'Amateur / Professional';
-    }
-    if (field === 'gender' && value === '') {
-      dbValue = 'Men';
     }
     if (field === 'rank' && (value === '' || value === null)) {
       dbValue = 1;
@@ -1105,7 +1141,7 @@ async function updatePlayerField(index, field, value) {
     
     try {
       const { error } = await dbClient
-        .from('tournament_participants')
+        .from('ajp_tournament_participants')
         .update({ [dbField]: dbValue })
         .eq('id', player.id);
       
@@ -1116,6 +1152,7 @@ async function updatePlayerField(index, field, value) {
     }
   }
   
+  // Re-render to update dependent dropdowns
   if (field === 'ageGroup' || field === 'gender') {
     renderPlayers();
   }
@@ -1128,7 +1165,7 @@ async function deletePlayer(index) {
   try {
     if (player.id) {
       const { error } = await dbClient
-        .from('tournament_participants')
+        .from('ajp_tournament_participants')
         .delete()
         .eq('id', player.id);
       
@@ -1140,7 +1177,7 @@ async function deletePlayer(index) {
     updatePlayerCount();
     showNotification('✅ Player deleted!');
   } catch (error) {
-    console.error(' Error deleting player:', error);
+    console.error('❌ Error deleting player:', error);
     alert('❌ Error: ' + error.message);
   }
 }
@@ -1152,7 +1189,7 @@ function renderPlayers() {
   
   players.forEach((p, i) => {
     const ageOptions = Object.keys(AGE_GROUPS).map(a => 
-      `<option ${p.ageGroup === a ? 'selected' : ''}>${a}</option>`
+      `<option value="${a}" ${p.ageGroup === a ? 'selected' : ''}>${a}</option>`
     ).join('');
     
     const genderOptions = getGenderOptions(p.ageGroup).map(g => 
@@ -1160,7 +1197,7 @@ function renderPlayers() {
     ).join('');
     
     const weightOptions = getWeightOptions(p.gender, p.ageGroup)
-      .map(w => `<option ${p.weight == w ? 'selected' : ''}>${w}</option>`)
+      .map(w => `<option value="${w.id}" ${p.weight_class_id === w.id ? 'selected' : ''}>${w.name}</option>`)
       .join('');
     
     const beltOptions = getBeltOptions(p.ageGroup)
@@ -1204,7 +1241,7 @@ async function clearTournamentPlayersDB() {
   
   try {
     const { error } = await dbClient
-      .from('tournament_participants')
+      .from('ajp_tournament_participants')
       .delete()
       .eq('tournament_id', currentTournamentId);
     
@@ -1254,14 +1291,22 @@ function importCSV(event) {
     for (let i = 1; i < lines.length && players.length < 200; i++) {
       const vals = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
       if (vals.length >= 3) {
+        const firstAgeGroup = Object.keys(AGE_GROUPS)[0];
+        const ageGroupId = AGE_GROUPS[firstAgeGroup]?.id;
+        const gender = 'Men';
+        const firstWeight = WEIGHTS[gender]?.[firstAgeGroup]?.[0];
+        const weightClassId = firstWeight?.id;
+        const firstBelt = BELTS.find(b => b.category === 'adult');
+        const beltLevelId = firstBelt?.id;
+        
         newPlayers.push({
           tournament_id: currentTournamentId,
           player_name: vals[0] || `Player ${players.length + newPlayers.length + 1}`,
           team: vals[1] || 'Free Player',
-          age_group: vals[2] || 'Amateur / Professional',
-          gender: vals[3] || 'Men',
-          weight: vals[4] ? parseFloat(vals[4]) : 0,
-          belt_level: vals[5] || 'White',
+          age_group_id: ageGroupId,
+          gender: gender,
+          weight_class_id: weightClassId,
+          belt_level_id: beltLevelId,
           ranking: parseInt(vals[6]) || players.length + newPlayers.length + 1,
           is_suspended: false
         });
@@ -1271,7 +1316,7 @@ function importCSV(event) {
     if (newPlayers.length > 0) {
       try {
         const { data, error } = await dbClient
-          .from('tournament_participants')
+          .from('ajp_tournament_participants')
           .insert(newPlayers)
           .select();
         
@@ -1282,10 +1327,13 @@ function importCSV(event) {
             id: p.id,
             name: p.player_name,
             team: p.team || 'Free Player',
-            ageGroup: p.age_group,
+            ageGroup: firstAgeGroup,
+            age_group_id: p.age_group_id,
             gender: p.gender,
-            weight: p.weight || '',
-            belt: p.belt_level,
+            weight_class_id: p.weight_class_id,
+            weight: firstWeight?.name || '',
+            belt_level_id: p.belt_level_id,
+            belt: firstBelt?.name || 'White',
             rank: p.ranking,
             is_suspended: p.is_suspended || false
           });
@@ -1352,10 +1400,10 @@ function showRegisteredPlayers() {
           <div class="player-info">
             <div class="player-name">${i + 1}. ${p.name || 'No Name'}</div>
             <div class="player-details">
-              <span class="player-detail-item"> ${p.team || 'Free Player'}</span>
+              <span class="player-detail-item">👥 ${p.team || 'Free Player'}</span>
               <span class="player-detail-item">📅 ${p.ageGroup}</span>
-              <span class="player-detail-item">️ ${p.weight || 'TBD'}</span>
-              <span class="player-detail-item">🎗️ ${p.belt}</span>
+              <span class="player-detail-item">⚖️ ${p.weight || 'TBD'}</span>
+              <span class="player-detail-item">️ ${p.belt}</span>
               <span class="player-detail-item">🏆 Rank: ${p.rank}</span>
             </div>
           </div>
@@ -1489,7 +1537,7 @@ function displaySchedule(matches) {
         <div class="match-info">
           <div class="match-players">${m.player1.name} vs ${m.player2.name}</div>
           <div class="match-category">
-            📅 ${m.ageGroup} | ⚖️ ${m.weight} | ️ ${m.belt} | 👥 ${m.gender}
+            📅 ${m.ageGroup} | ⚖️ ${m.weight} | 🎗️ ${m.belt} | 👥 ${m.gender}
           </div>
         </div>
         <div class="match-time">${(i + 1) * 7} min</div>
