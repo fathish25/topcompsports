@@ -984,7 +984,7 @@ input:focus, select:focus {
 <div class="tournament-container">
   <div class="tournament-header">
     <div class="tournament-title-section">
-      <h1>🏆 Tournament 2026 OZ</h1>
+      <h1> Tournament 2026 OZ</h1>
       <div class="tournament-subtitle" id="subtitle">Step 1: Players Registration</div>
       <div class="status-badge" id="dbStatus">
         <span>✅</span>
@@ -998,7 +998,7 @@ input:focus, select:focus {
       <button class="btn btn-settings" onclick="showView('settings')">⚙️ Settings</button>
       <button class="btn btn-sync" onclick="syncWithDB()">🔄 Sync</button>
       <button class="btn btn-export" onclick="exportToExcel()">📊 Export Excel</button>
-      <button class="btn btn-clear-db" onclick="clearTournamentPlayersDB()">️ Clear DB Players</button>
+      <button class="btn btn-clear-db" onclick="clearTournamentPlayersDB()">⚠️ Clear DB Players</button>
     </div>
   </div>
 
@@ -1012,7 +1012,7 @@ input:focus, select:focus {
       
       <div class="button-group">
         <button class="btn btn-add" onclick="addPlayer()">➕ Add Player</button>
-        <button class="btn btn-add-10" onclick="addPlayers(10)"> Add 10</button>
+        <button class="btn btn-add-10" onclick="addPlayers(10)">➕ Add 10</button>
         <button class="btn btn-import" onclick="document.getElementById('csvImport').click()">📥 Import CSV</button>
         <input type="file" id="csvImport" accept=".csv" style="display:none" onchange="importCSV(event)">
         <button class="btn btn-export" onclick="exportCSV()">📤 Export CSV</button>
@@ -1050,7 +1050,7 @@ input:focus, select:focus {
   <div id="view-mats" class="view">
     <div class="section">
       <div class="section-title">
-        <span>🥋 Mats Setup</span>
+        <span> Mats Setup</span>
         <button class="btn btn-back" onclick="showView('players')">← Back to Players</button>
       </div>
       
@@ -1082,7 +1082,7 @@ input:focus, select:focus {
   <div id="view-dashboard" class="view">
     <div class="section">
       <div class="section-title">
-        <span>📋 Mat Dashboard</span>
+        <span> Mat Dashboard</span>
         <div style="display: flex; gap: 10px;">
           <button class="btn btn-info" onclick="openCurrentMatInNewTab()">🪟 Open in New Tab</button>
           <button class="btn btn-mats" onclick="openAllMatsInTabs()">🪟 Open All Mats</button>
@@ -1093,13 +1093,13 @@ input:focus, select:focus {
       <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; flex-wrap: wrap;">
         <button class="btn btn-add active" onclick="switchDashboardTab('categories')" id="tab-categories-btn">📋 Categories</button>
         <button class="btn btn-sync" onclick="switchDashboardTab('queue')" id="tab-queue-btn">📋 Queue</button>
-        <button class="btn btn-matches" onclick="switchDashboardTab('callup')" id="tab-callup-btn"> Call-Up</button>
-        <button class="btn btn-bracket" onclick="switchDashboardTab('standings')" id="tab-standings-btn"> Standings</button>
+        <button class="btn btn-matches" onclick="switchDashboardTab('callup')" id="tab-callup-btn">📢 Call-Up</button>
+        <button class="btn btn-bracket" onclick="switchDashboardTab('standings')" id="tab-standings-btn">🏆 Standings</button>
       </div>
       
       <!-- Categories Tab -->
       <div id="dashboard-categories" class="dashboard-tab active">
-        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Categories - Mat <span id="dashboardMatNumber">1</span></h3>
+        <h3 style="color: #fbbf24; margin-bottom: 20px;">📋 Categories - Mat <span id="dashboardMatNumber">1</span></h3>
         <div id="categoriesContainer" style="display: grid; gap: 15px;"></div>
       </div>
       
@@ -1111,13 +1111,13 @@ input:focus, select:focus {
       
       <!-- Call-Up Tab -->
       <div id="dashboard-callup" class="dashboard-tab" style="display: none;">
-        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Call-Up System</h3>
+        <h3 style="color: #fbbf24; margin-bottom: 20px;">📢 Call-Up System</h3>
         <div id="callupContainer"></div>
       </div>
       
       <!-- Standings Tab -->
       <div id="dashboard-standings" class="dashboard-tab" style="display: none;">
-        <h3 style="color: #fbbf24; margin-bottom: 20px;">🏆 Final Standings</h3>
+        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Final Standings</h3>
         <div id="standingsContainer"></div>
       </div>
     </div>
@@ -1209,7 +1209,7 @@ input:focus, select:focus {
 
       <div class="sb-controls-area">
         <div>
-          <div class="sb-panel-header red"> Red Player</div>
+          <div class="sb-panel-header red">🔴 Red Player</div>
           <div class="sb-counters">
             <div class="sb-counter adv">
               <div class="label">⭐ Advantage</div>
@@ -1249,7 +1249,7 @@ input:focus, select:focus {
         </div>
 
         <div>
-          <div class="sb-panel-header blue"> Blue Player</div>
+          <div class="sb-panel-header blue">🔵 Blue Player</div>
           <div class="sb-counters">
             <div class="sb-counter adv">
               <div class="label">⭐ Advantage</div>
@@ -1293,14 +1293,14 @@ input:focus, select:focus {
         <span>⚡ Golden Time:</span>
         <input type="number" id="goldenTimeInput" value="1" min="1" max="10">
         <span>minutes</span>
-        <button onclick="activateGoldenTime()"> Activate Golden Time</button>
+        <button onclick="activateGoldenTime()">⚡ Activate Golden Time</button>
       </div>
 
       <div class="sb-bottom-bar">
         <button class="btn btn-back" onclick="backToBracket()">← Back to Bracket</button>
         <button class="btn btn-add" onclick="startTimer()">▶ Start</button>
-        <button class="btn btn-settings" onclick="pauseTimer()"> Pause</button>
-        <button class="btn btn-matches" onclick="finishMatch()"> Finish</button>
+        <button class="btn btn-settings" onclick="pauseTimer()">⏸ Pause</button>
+        <button class="btn btn-matches" onclick="finishMatch()">🏁 Finish</button>
         <button class="btn btn-info" onclick="swapPlayers()">🔄 Swap</button>
         <button class="btn btn-sync" onclick="resetScoreboard()">🔄 Reset</button>
       </div>
@@ -1738,7 +1738,7 @@ async function updatePlayerField(index, field, value) {
       if (error) throw error;
     } catch (error) { 
       console.error('❌ Error updating player:', error);
-      alert('❌ Error updating: ' + error.message);
+      alert(' Error updating: ' + error.message);
     }
   }
   
@@ -1842,13 +1842,13 @@ async function clearTournamentPlayersDB() {
     updatePlayerCount();
     showNotification('✅ All players cleared!');
   } catch (error) {
-    alert(' Error: ' + error.message);
+    alert('❌ Error: ' + error.message);
   }
 }
 
 function exportToExcel() {
   if (players.length === 0) {
-    alert('️ No players to export!');
+    alert('⚠️ No players to export!');
     return;
   }
   
@@ -1954,46 +1954,53 @@ async function loadMats() {
       .eq('tournament_id', currentTournamentId)
       .order('mat_number');
     
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Error loading mats:', error);
+      // إنشاء بساط افتراضي في الذاكرة فقط
+      mats = [{
+        id: 'local-mat-1',
+        tournament_id: currentTournamentId,
+        mat_number: 1,
+        name: 'Mat 1',
+        status: 'active',
+        age_groups: [],
+        genders: [],
+        weights: [],
+        belts: []
+      }];
+      currentMat = mats[0].id;
+      document.getElementById('matsCount').value = '1';
+      renderMats();
+      return;
+    }
     
     mats = data || [];
     
     if (mats.length === 0) {
-      console.log(' No mats found, creating default mat...');
-      await createDefaultMat();
+      console.log('📝 No mats found, creating default mat in memory...');
+      mats = [{
+        id: 'local-mat-1',
+        tournament_id: currentTournamentId,
+        mat_number: 1,
+        name: 'Mat 1',
+        status: 'active',
+        age_groups: [],
+        genders: [],
+        weights: [],
+        belts: []
+      }];
+      currentMat = mats[0].id;
+      document.getElementById('matsCount').value = '1';
     } else {
       document.getElementById('matsCount').value = mats.length.toString();
       currentMat = mats[0].id;
     }
     
     renderMats();
-    console.log(`✅ Loaded ${mats.length} mats from DB`);
+    console.log(`✅ Loaded ${mats.length} mats`);
   } catch (error) {
     console.error('❌ Error loading mats:', error);
   }
-}
-
-async function createDefaultMat() {
-  const { data, error } = await dbClient
-    .from('ajp_mats')
-    .insert({
-      tournament_id: currentTournamentId,
-      mat_number: 1,
-      name: 'Mat 1',
-      status: 'active',
-      age_groups: [],
-      genders: [],
-      weights: [],
-      belts: []
-    })
-    .select()
-    .single();
-  
-  if (error) throw error;
-  
-  mats = [data];
-  currentMat = data.id;
-  document.getElementById('matsCount').value = '1';
 }
 
 async function updateMats() {
@@ -2001,32 +2008,24 @@ async function updateMats() {
   
   console.log('🔄 Updating mats count to:', count);
   
-  if (mats.length > count) {
-    const matsToDelete = mats.slice(count);
-    for (const mat of matsToDelete) {
-      await dbClient.from('ajp_mats').delete().eq('id', mat.id);
-    }
-    mats = mats.slice(0, count);
+  // إضافة أبساط جديدة في الذاكرة فقط
+  while (mats.length < count) {
+    mats.push({
+      id: 'local-mat-' + (mats.length + 1),
+      tournament_id: currentTournamentId,
+      mat_number: mats.length + 1,
+      name: `Mat ${mats.length + 1}`,
+      status: 'active',
+      age_groups: [],
+      genders: [],
+      weights: [],
+      belts: []
+    });
   }
   
-  while (mats.length < count) {
-    const { data, error } = await dbClient
-      .from('ajp_mats')
-      .insert({
-        tournament_id: currentTournamentId,
-        mat_number: mats.length + 1,
-        name: `Mat ${mats.length + 1}`,
-        status: 'active',
-        age_groups: [],
-        genders: [],
-        weights: [],
-        belts: []
-      })
-      .select()
-      .single();
-    
-    if (error) throw error;
-    mats.push(data);
+  // حذف الأبساط الزائدة
+  if (mats.length > count) {
+    mats = mats.slice(0, count);
   }
   
   if (!currentMat && mats.length > 0) {
@@ -2052,12 +2051,6 @@ async function addMatCategory(matId, type, value) {
   if (!currentList.includes(value)) {
     currentList.push(value);
     mat[type] = currentList;
-    
-    await dbClient
-      .from('ajp_mats')
-      .update({ [type]: currentList })
-      .eq('id', matId);
-    
     renderMats();
   }
 }
@@ -2076,12 +2069,6 @@ async function removeMatCategory(matId, type, index) {
   
   currentList.splice(index, 1);
   mat[type] = currentList;
-  
-  await dbClient
-    .from('ajp_mats')
-    .update({ [type]: currentList })
-    .eq('id', matId);
-  
   renderMats();
 }
 
@@ -2176,7 +2163,7 @@ function renderMats() {
       </div>
       
       <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button class="btn btn-players" style="flex: 1;" onclick="currentMat='${mat.id}'; showView('dashboard')">📋 Open Dashboard</button>
+        <button class="btn btn-players" style="flex: 1;" onclick="currentMat='${mat.id}'; showView('dashboard')"> Open Dashboard</button>
         <button class="btn btn-mats" style="flex: 1;" onclick="openMatInNewTab('${mat.id}')">🪟 Open in New Tab</button>
       </div>
     `;
@@ -2191,7 +2178,7 @@ function openMatInNewTab(matId) {
 
 function openAllMatsInTabs() {
   if (mats.length === 0) {
-    alert('⚠️ No mats configured yet!');
+    alert('️ No mats configured yet!');
     return;
   }
   
@@ -2273,7 +2260,7 @@ function renderCategories() {
     return `
       <div class="category-card" onclick="openCategoryBracket('${cat.key}', '${cat.gender}', '${cat.ageGroup}', '${cat.weight}', '${cat.belt}')" style="background: #151d2b; border: 2px solid #2a3548; border-radius: 10px; padding: 20px; cursor: pointer; transition: all 0.3s;">
         <h3 style="color: #fbbf24; margin-bottom: 10px; font-size: 1.2rem;">
-          ${cat.gender} |  ${cat.ageGroup} | ⚖️ ${cat.weight} | 🎗️ ${cat.belt}
+          ${cat.gender} | 🏅 ${cat.ageGroup} | ⚖️ ${cat.weight} | ️ ${cat.belt}
         </h3>
         <div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 10px;">
           👥 ${cat.players.length} Players | ⏱️ ${fightTime} min | 🏆 Bracket System
@@ -2567,11 +2554,11 @@ function renderCallUp() {
         ${next.p1 ? next.p1.name : 'TBD'} vs ${next.p2 ? next.p2.name : 'TBD'}
       </div>
       <div style="color: #8899aa; margin-bottom: 20px; font-size: 1.1rem;">
-        ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt}
+        ️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt}
       </div>
       <div style="display: flex; gap: 15px; justify-content: center;">
         <button class="btn btn-add" onclick="callPlayer('${next.p1 ? next.p1.name : 'Player 1'}')">📢 Call ${next.p1 ? next.p1.name : 'Player 1'}</button>
-        <button class="btn btn-add" onclick="callPlayer('${next.p2 ? next.p2.name : 'Player 2'}')"> Call ${next.p2 ? next.p2.name : 'Player 2'}</button>
+        <button class="btn btn-add" onclick="callPlayer('${next.p2 ? next.p2.name : 'Player 2'}')">📢 Call ${next.p2 ? next.p2.name : 'Player 2'}</button>
       </div>
     </div>
   `;
@@ -2809,7 +2796,7 @@ function startTimer() {
     if (timeLeft <= 0) {
       stopTimer();
       if (isGoldenTime) {
-        showNotification('⚡ Golden Time ended!');
+        showNotification(' Golden Time ended!');
         isGoldenTime = false;
       } else {
         showNotification('⏰ Time\'s up!');
