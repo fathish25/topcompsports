@@ -14,6 +14,7 @@ body {
   font-family: 'Segoe UI', Tahoma, sans-serif; 
   background: #0a0e17; 
   color: #fff; 
+  min-height: 100vh;
 }
 
 /* ============================================
@@ -911,6 +912,10 @@ input:focus, select:focus {
     font-size: 2rem;
     padding: 0 15px;
   }
+  
+  .mats-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -933,6 +938,10 @@ input:focus, select:focus {
   
   table {
     min-width: 800px;
+  }
+  
+  .sb-top-bar {
+    grid-template-columns: 1fr;
   }
 }
 </style>
@@ -985,11 +994,11 @@ input:focus, select:focus {
     
     <div class="action-buttons">
       <button class="btn btn-players" onclick="showView('players')">👥 Players</button>
-      <button class="btn btn-mats" onclick="showView('mats')"> Mats</button>
+      <button class="btn btn-mats" onclick="showView('mats')">🥋 Mats</button>
       <button class="btn btn-settings" onclick="showView('settings')">⚙️ Settings</button>
       <button class="btn btn-sync" onclick="syncWithDB()">🔄 Sync</button>
       <button class="btn btn-export" onclick="exportToExcel()">📊 Export Excel</button>
-      <button class="btn btn-clear-db" onclick="clearTournamentPlayersDB()">⚠️ Clear DB Players</button>
+      <button class="btn btn-clear-db" onclick="clearTournamentPlayersDB()">️ Clear DB Players</button>
     </div>
   </div>
 
@@ -1003,7 +1012,7 @@ input:focus, select:focus {
       
       <div class="button-group">
         <button class="btn btn-add" onclick="addPlayer()">➕ Add Player</button>
-        <button class="btn btn-add-10" onclick="addPlayers(10)">➕ Add 10</button>
+        <button class="btn btn-add-10" onclick="addPlayers(10)"> Add 10</button>
         <button class="btn btn-import" onclick="document.getElementById('csvImport').click()">📥 Import CSV</button>
         <input type="file" id="csvImport" accept=".csv" style="display:none" onchange="importCSV(event)">
         <button class="btn btn-export" onclick="exportCSV()">📤 Export CSV</button>
@@ -1031,8 +1040,8 @@ input:focus, select:focus {
       </div>
       
       <button class="btn-proceed" onclick="showView('mats')">
-        <span></span>
-        <span>Proceed to Mats →</span>
+        <span>🥋</span>
+        <span>Proceed to Mats Setup →</span>
       </button>
     </div>
   </div>
@@ -1082,15 +1091,15 @@ input:focus, select:focus {
       
       <!-- Tabs -->
       <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; flex-wrap: wrap;">
-        <button class="btn btn-add active" onclick="switchDashboardTab('categories')" id="tab-categories-btn"> Categories</button>
+        <button class="btn btn-add active" onclick="switchDashboardTab('categories')" id="tab-categories-btn">📋 Categories</button>
         <button class="btn btn-sync" onclick="switchDashboardTab('queue')" id="tab-queue-btn">📋 Queue</button>
-        <button class="btn btn-matches" onclick="switchDashboardTab('callup')" id="tab-callup-btn">📢 Call-Up</button>
-        <button class="btn btn-bracket" onclick="switchDashboardTab('standings')" id="tab-standings-btn">🏆 Standings</button>
+        <button class="btn btn-matches" onclick="switchDashboardTab('callup')" id="tab-callup-btn"> Call-Up</button>
+        <button class="btn btn-bracket" onclick="switchDashboardTab('standings')" id="tab-standings-btn"> Standings</button>
       </div>
       
       <!-- Categories Tab -->
       <div id="dashboard-categories" class="dashboard-tab active">
-        <h3 style="color: #fbbf24; margin-bottom: 20px;">📋 Categories - Mat <span id="dashboardMatNumber">1</span></h3>
+        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Categories - Mat <span id="dashboardMatNumber">1</span></h3>
         <div id="categoriesContainer" style="display: grid; gap: 15px;"></div>
       </div>
       
@@ -1102,7 +1111,7 @@ input:focus, select:focus {
       
       <!-- Call-Up Tab -->
       <div id="dashboard-callup" class="dashboard-tab" style="display: none;">
-        <h3 style="color: #fbbf24; margin-bottom: 20px;">📢 Call-Up System</h3>
+        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Call-Up System</h3>
         <div id="callupContainer"></div>
       </div>
       
@@ -1129,29 +1138,11 @@ input:focus, select:focus {
       <div class="sb-top-bar">
         <div>
           <label style="display: block; font-size: 0.75rem; color: #8899aa; margin-bottom: 5px;">Age Group</label>
-          <select id="sbAgeGroup" style="width: 100%;">
-            <option>Kids 1</option>
-            <option>Kids 2</option>
-            <option>Kids 3</option>
-            <option>Infant</option>
-            <option>Junior</option>
-            <option>Teen</option>
-            <option>Youth</option>
-            <option>Amateur/Professional</option>
-            <option>Master 1</option>
-            <option>Master 2</option>
-            <option>Master 3</option>
-            <option>Master 4</option>
-          </select>
+          <select id="sbAgeGroup" style="width: 100%;"></select>
         </div>
         <div>
           <label style="display: block; font-size: 0.75rem; color: #8899aa; margin-bottom: 5px;">Gender</label>
-          <select id="sbGender" style="width: 100%;">
-            <option>Boys</option>
-            <option>Girls</option>
-            <option>Men</option>
-            <option>Women</option>
-          </select>
+          <select id="sbGender" style="width: 100%;"></select>
         </div>
         <div>
           <label style="display: block; font-size: 0.75rem; color: #8899aa; margin-bottom: 5px;">Weight</label>
@@ -1159,17 +1150,7 @@ input:focus, select:focus {
         </div>
         <div>
           <label style="display: block; font-size: 0.75rem; color: #8899aa; margin-bottom: 5px;">Belt</label>
-          <select id="sbBelt" style="width: 100%;">
-            <option>White</option>
-            <option>Grey</option>
-            <option>Yellow</option>
-            <option>Orange</option>
-            <option>Green</option>
-            <option>Blue</option>
-            <option>Purple</option>
-            <option>Brown</option>
-            <option>Black</option>
-          </select>
+          <select id="sbBelt" style="width: 100%;"></select>
         </div>
         <div>
           <label style="display: block; font-size: 0.75rem; color: #8899aa; margin-bottom: 5px;">Level</label>
@@ -1228,7 +1209,7 @@ input:focus, select:focus {
 
       <div class="sb-controls-area">
         <div>
-          <div class="sb-panel-header red">🔴 Red Player</div>
+          <div class="sb-panel-header red"> Red Player</div>
           <div class="sb-counters">
             <div class="sb-counter adv">
               <div class="label">⭐ Advantage</div>
@@ -1268,7 +1249,7 @@ input:focus, select:focus {
         </div>
 
         <div>
-          <div class="sb-panel-header blue">🔵 Blue Player</div>
+          <div class="sb-panel-header blue"> Blue Player</div>
           <div class="sb-counters">
             <div class="sb-counter adv">
               <div class="label">⭐ Advantage</div>
@@ -1312,16 +1293,16 @@ input:focus, select:focus {
         <span>⚡ Golden Time:</span>
         <input type="number" id="goldenTimeInput" value="1" min="1" max="10">
         <span>minutes</span>
-        <button onclick="activateGoldenTime()">⚡ Activate Golden Time</button>
+        <button onclick="activateGoldenTime()"> Activate Golden Time</button>
       </div>
 
       <div class="sb-bottom-bar">
         <button class="btn btn-back" onclick="backToBracket()">← Back to Bracket</button>
         <button class="btn btn-add" onclick="startTimer()">▶ Start</button>
         <button class="btn btn-settings" onclick="pauseTimer()"> Pause</button>
-        <button class="btn btn-matches" onclick="finishMatch()">🏁 Finish</button>
+        <button class="btn btn-matches" onclick="finishMatch()"> Finish</button>
         <button class="btn btn-info" onclick="swapPlayers()">🔄 Swap</button>
-        <button class="btn btn-sync" onclick="resetScoreboard()"> Reset</button>
+        <button class="btn btn-sync" onclick="resetScoreboard()">🔄 Reset</button>
       </div>
     </div>
   </div>
@@ -1410,7 +1391,6 @@ async function loadReferenceData() {
   try {
     console.log('🔄 Loading reference data from database...');
     
-    // 1. Load Age Groups
     const { data: ageData, error: ageError } = await dbClient
       .from('ajp_age_divisions')
       .select('*')
@@ -1432,7 +1412,6 @@ async function loadReferenceData() {
     });
     console.log(`✅ Loaded ${Object.keys(AGE_GROUPS).length} age divisions from DB`);
     
-    // 2. Load Weights
     const { data: weightData, error: weightError } = await dbClient
       .from('ajp_weight_classes')
       .select('id, name, gender, min_weight, max_weight, age_division_id')
@@ -1458,7 +1437,6 @@ async function loadReferenceData() {
     });
     console.log('✅ Loaded weight classes from DB');
     
-    // 3. Load Belts
     const { data: beltData, error: beltError } = await dbClient
       .from('ajp_belt_levels')
       .select('*')
@@ -1476,7 +1454,7 @@ async function loadReferenceData() {
     
     dbConnected = true;
   } catch (error) {
-    console.error('❌ Error loading reference data:', error);
+    console.error(' Error loading reference data:', error);
   }
 }
 
@@ -1532,6 +1510,11 @@ function showView(viewName) {
   
   const subtitleEl = document.getElementById('subtitle');
   if (subtitleEl) subtitleEl.innerText = subtitles[viewName] || '';
+  
+  if (viewName === 'mats') renderMats();
+  if (viewName === 'dashboard') {
+    switchDashboardTab('categories');
+  }
 }
 
 function switchDashboardTab(tabName) {
@@ -1707,7 +1690,7 @@ async function addPlayers(count) {
     updatePlayerCount();
     showNotification(`✅ Added ${data.length} players!`);
   } catch (error) {
-    console.error(' Error adding players:', error);
+    console.error('❌ Error adding players:', error);
     alert('❌ Error: ' + error.message);
   }
 }
@@ -1859,7 +1842,7 @@ async function clearTournamentPlayersDB() {
     updatePlayerCount();
     showNotification('✅ All players cleared!');
   } catch (error) {
-    alert('❌ Error: ' + error.message);
+    alert(' Error: ' + error.message);
   }
 }
 
@@ -1950,7 +1933,7 @@ function importCSV(event) {
         updatePlayerCount();
         showNotification(`✅ Imported ${data.length} players!`);
       } catch (error) {
-        console.error(' Error importing:', error);
+        console.error('❌ Error importing:', error);
         alert('❌ Error: ' + error.message);
       }
     }
@@ -1963,8 +1946,10 @@ function importCSV(event) {
 // ============================================
 async function loadMats() {
   try {
+    console.log('🔄 Loading mats from database...');
+    
     const { data, error } = await dbClient
-      .from('mats')
+      .from('ajp_mats')
       .select('*')
       .eq('tournament_id', currentTournamentId)
       .order('mat_number');
@@ -1972,36 +1957,70 @@ async function loadMats() {
     if (error) throw error;
     
     mats = data || [];
-    if (mats.length > 0) {
+    
+    if (mats.length === 0) {
+      console.log(' No mats found, creating default mat...');
+      await createDefaultMat();
+    } else {
       document.getElementById('matsCount').value = mats.length.toString();
       currentMat = mats[0].id;
     }
     
     renderMats();
+    console.log(`✅ Loaded ${mats.length} mats from DB`);
   } catch (error) {
     console.error('❌ Error loading mats:', error);
   }
 }
 
+async function createDefaultMat() {
+  const { data, error } = await dbClient
+    .from('ajp_mats')
+    .insert({
+      tournament_id: currentTournamentId,
+      mat_number: 1,
+      name: 'Mat 1',
+      status: 'active',
+      age_groups: [],
+      genders: [],
+      weights: [],
+      belts: []
+    })
+    .select()
+    .single();
+  
+  if (error) throw error;
+  
+  mats = [data];
+  currentMat = data.id;
+  document.getElementById('matsCount').value = '1';
+}
+
 async function updateMats() {
   const count = parseInt(document.getElementById('matsCount').value);
+  
+  console.log('🔄 Updating mats count to:', count);
   
   if (mats.length > count) {
     const matsToDelete = mats.slice(count);
     for (const mat of matsToDelete) {
-      await dbClient.from('mats').delete().eq('id', mat.id);
+      await dbClient.from('ajp_mats').delete().eq('id', mat.id);
     }
     mats = mats.slice(0, count);
   }
   
   while (mats.length < count) {
     const { data, error } = await dbClient
-      .from('mats')
+      .from('ajp_mats')
       .insert({
         tournament_id: currentTournamentId,
         mat_number: mats.length + 1,
         name: `Mat ${mats.length + 1}`,
-        status: 'active'
+        status: 'active',
+        age_groups: [],
+        genders: [],
+        weights: [],
+        belts: []
       })
       .select()
       .single();
@@ -2015,19 +2034,28 @@ async function updateMats() {
   }
   
   renderMats();
+  showNotification(`✅ Updated to ${count} mat(s)`);
 }
 
 async function addMatCategory(matId, type, value) {
   const mat = mats.find(m => m.id === matId);
   if (!mat) return;
   
-  if (!mat[type]) mat[type] = [];
-  if (!mat[type].includes(value)) {
-    mat[type].push(value);
+  let currentList = mat[type];
+  if (typeof currentList === 'string') {
+    currentList = JSON.parse(currentList);
+  }
+  if (!Array.isArray(currentList)) {
+    currentList = [];
+  }
+  
+  if (!currentList.includes(value)) {
+    currentList.push(value);
+    mat[type] = currentList;
     
     await dbClient
-      .from('mats')
-      .update({ [type]: mat[type] })
+      .from('ajp_mats')
+      .update({ [type]: currentList })
       .eq('id', matId);
     
     renderMats();
@@ -2038,11 +2066,20 @@ async function removeMatCategory(matId, type, index) {
   const mat = mats.find(m => m.id === matId);
   if (!mat) return;
   
-  mat[type].splice(index, 1);
+  let currentList = mat[type];
+  if (typeof currentList === 'string') {
+    currentList = JSON.parse(currentList);
+  }
+  if (!Array.isArray(currentList)) {
+    currentList = [];
+  }
+  
+  currentList.splice(index, 1);
+  mat[type] = currentList;
   
   await dbClient
-    .from('mats')
-    .update({ [type]: mat[type] })
+    .from('ajp_mats')
+    .update({ [type]: currentList })
     .eq('id', matId);
   
   renderMats();
@@ -2053,12 +2090,22 @@ function renderMats() {
   if (!grid) return;
   grid.innerHTML = '';
   
+  if (mats.length === 0) {
+    grid.innerHTML = '<p style="text-align: center; color: #8899aa; padding: 40px;">No mats configured. Use the selector above to add mats.</p>';
+    return;
+  }
+  
   const ageGroups = [...new Set(players.map(p => p.ageGroup))];
   const genders = [...new Set(players.map(p => p.gender))];
   const weights = [...new Set(players.map(p => p.weight).filter(w => w))];
   const belts = [...new Set(players.map(p => p.belt))];
   
   mats.forEach(mat => {
+    const ageGroupsList = typeof mat.age_groups === 'string' ? JSON.parse(mat.age_groups) : (mat.age_groups || []);
+    const gendersList = typeof mat.genders === 'string' ? JSON.parse(mat.genders) : (mat.genders || []);
+    const weightsList = typeof mat.weights === 'string' ? JSON.parse(mat.weights) : (mat.weights || []);
+    const beltsList = typeof mat.belts === 'string' ? JSON.parse(mat.belts) : (mat.belts || []);
+    
     const div = document.createElement('div');
     div.className = 'mat-card';
     div.innerHTML = `
@@ -2067,7 +2114,7 @@ function renderMats() {
       <div style="margin-bottom: 15px;">
         <strong style="color: #8899aa; font-size: 0.85rem; display: block; margin-bottom: 8px;">AGE GROUPS</strong>
         <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px;">
-          ${(mat.age_groups || []).map((a, i) => `
+          ${ageGroupsList.map((a, i) => `
             <span class="category-tag">
               ${a}
               <span style="cursor: pointer; color: #ef4444;" onclick="removeMatCategory('${mat.id}', 'age_groups', ${i})">×</span>
@@ -2083,7 +2130,7 @@ function renderMats() {
       <div style="margin-bottom: 15px;">
         <strong style="color: #8899aa; font-size: 0.85rem; display: block; margin-bottom: 8px;">GENDERS</strong>
         <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px;">
-          ${(mat.genders || []).map((g, i) => `
+          ${gendersList.map((g, i) => `
             <span class="category-tag" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6;">
               ${g}
               <span style="cursor: pointer; color: #ef4444;" onclick="removeMatCategory('${mat.id}', 'genders', ${i})">×</span>
@@ -2099,7 +2146,7 @@ function renderMats() {
       <div style="margin-bottom: 15px;">
         <strong style="color: #8899aa; font-size: 0.85rem; display: block; margin-bottom: 8px;">WEIGHTS</strong>
         <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px;">
-          ${(mat.weights || []).map((w, i) => `
+          ${weightsList.map((w, i) => `
             <span class="category-tag" style="background: rgba(34, 197, 94, 0.2); color: #22c55e;">
               ${w}
               <span style="cursor: pointer; color: #ef4444;" onclick="removeMatCategory('${mat.id}', 'weights', ${i})">×</span>
@@ -2115,7 +2162,7 @@ function renderMats() {
       <div style="margin-bottom: 15px;">
         <strong style="color: #8899aa; font-size: 0.85rem; display: block; margin-bottom: 8px;">BELTS</strong>
         <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px;">
-          ${(mat.belts || []).map((b, i) => `
+          ${beltsList.map((b, i) => `
             <span class="category-tag" style="background: rgba(168, 85, 247, 0.2); color: #a855f7;">
               ${b}
               <span style="cursor: pointer; color: #ef4444;" onclick="removeMatCategory('${mat.id}', 'belts', ${i})">×</span>
@@ -2129,7 +2176,7 @@ function renderMats() {
       </div>
       
       <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button class="btn btn-players" style="flex: 1;" onclick="currentMat='${mat.id}'; showView('dashboard')"> Open Dashboard</button>
+        <button class="btn btn-players" style="flex: 1;" onclick="currentMat='${mat.id}'; showView('dashboard')">📋 Open Dashboard</button>
         <button class="btn btn-mats" style="flex: 1;" onclick="openMatInNewTab('${mat.id}')">🪟 Open in New Tab</button>
       </div>
     `;
@@ -2182,12 +2229,17 @@ function renderCategories() {
   
   document.getElementById('dashboardMatNumber').innerText = mat.mat_number || '1';
   
+  const matAgeGroups = typeof mat.age_groups === 'string' ? JSON.parse(mat.age_groups) : (mat.age_groups || []);
+  const matGenders = typeof mat.genders === 'string' ? JSON.parse(mat.genders) : (mat.genders || []);
+  const matWeights = typeof mat.weights === 'string' ? JSON.parse(mat.weights) : (mat.weights || []);
+  const matBelts = typeof mat.belts === 'string' ? JSON.parse(mat.belts) : (mat.belts || []);
+  
   const categoryList = [];
   
-  (mat.age_groups || []).forEach(ageGroup => {
-    (mat.genders || []).forEach(gender => {
-      (mat.weights || []).forEach(weight => {
-        (mat.belts || []).forEach(belt => {
+  matAgeGroups.forEach(ageGroup => {
+    matGenders.forEach(gender => {
+      matWeights.forEach(weight => {
+        matBelts.forEach(belt => {
           const catPlayers = players.filter(p => 
             p.ageGroup === ageGroup && 
             p.gender === gender && 
@@ -2221,7 +2273,7 @@ function renderCategories() {
     return `
       <div class="category-card" onclick="openCategoryBracket('${cat.key}', '${cat.gender}', '${cat.ageGroup}', '${cat.weight}', '${cat.belt}')" style="background: #151d2b; border: 2px solid #2a3548; border-radius: 10px; padding: 20px; cursor: pointer; transition: all 0.3s;">
         <h3 style="color: #fbbf24; margin-bottom: 10px; font-size: 1.2rem;">
-          ${cat.gender} | 🏅 ${cat.ageGroup} | ️ ${cat.weight} | 🎗️ ${cat.belt}
+          ${cat.gender} |  ${cat.ageGroup} | ⚖️ ${cat.weight} | 🎗️ ${cat.belt}
         </h3>
         <div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 10px;">
           👥 ${cat.players.length} Players | ⏱️ ${fightTime} min | 🏆 Bracket System
@@ -2389,7 +2441,6 @@ function renderBracket() {
             ${match.bye ? '<div class="bye-label">BYE</div>' : ''}
             ${match.status !== 'completed' && !match.bye ? `
               <button class="play-btn" onclick="startBracketMatch(${rIdx}, ${mIdx})">▶ Play Match</button>
-              <button class="edit-btn" onclick="editBracketMatch(${rIdx}, ${mIdx})">️ Edit</button>
             ` : ''}
           </div>
         `).join('')}
@@ -2397,7 +2448,7 @@ function renderBracket() {
     `;
   });
   
-  html += '</div></div>';
+  html += '</div>';
   container.innerHTML = html;
 }
 
@@ -2413,10 +2464,10 @@ function startBracketMatch(rIdx, mIdx) {
     matchIdx: mIdx
   };
   
-  document.getElementById('redName').value = match.p1.name;
-  document.getElementById('redTeam').value = match.p1.team || '';
-  document.getElementById('blueName').value = match.p2.name;
-  document.getElementById('blueTeam').value = match.p2.team || '';
+  document.getElementById('redName').value = match.p1 ? match.p1.name : '';
+  document.getElementById('redTeam').value = match.p1 ? (match.p1.team || '') : '';
+  document.getElementById('blueName').value = match.p2 ? match.p2.name : '';
+  document.getElementById('blueTeam').value = match.p2 ? (match.p2.team || '') : '';
   
   document.getElementById('sbAgeGroup').value = cat.ageGroup;
   document.getElementById('sbGender').value = cat.gender;
@@ -2432,11 +2483,6 @@ function startBracketMatch(rIdx, mIdx) {
   updateScoreboardDisplay();
   
   showView('scoreboard');
-}
-
-function editBracketMatch(rIdx, mIdx) {
-  // Implementation for editing match
-  alert('Edit match functionality - coming soon!');
 }
 
 function renderQueue() {
@@ -2521,11 +2567,11 @@ function renderCallUp() {
         ${next.p1 ? next.p1.name : 'TBD'} vs ${next.p2 ? next.p2.name : 'TBD'}
       </div>
       <div style="color: #8899aa; margin-bottom: 20px; font-size: 1.1rem;">
-        ️ ${cat.weight} |  ${cat.ageGroup} | ${cat.gender} | ️ ${cat.belt}
+        ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt}
       </div>
       <div style="display: flex; gap: 15px; justify-content: center;">
         <button class="btn btn-add" onclick="callPlayer('${next.p1 ? next.p1.name : 'Player 1'}')">📢 Call ${next.p1 ? next.p1.name : 'Player 1'}</button>
-        <button class="btn btn-add" onclick="callPlayer('${next.p2 ? next.p2.name : 'Player 2'}')">📢 Call ${next.p2 ? next.p2.name : 'Player 2'}</button>
+        <button class="btn btn-add" onclick="callPlayer('${next.p2 ? next.p2.name : 'Player 2'}')"> Call ${next.p2 ? next.p2.name : 'Player 2'}</button>
       </div>
     </div>
   `;
