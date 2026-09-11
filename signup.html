@@ -38,7 +38,7 @@
         /* ===== Header ===== */
         .main-header {
             background: var(--black);
-            padding: 15px 0;
+            padding: 12px 0;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -59,13 +59,13 @@
         .logo-section { 
             display: flex; 
             align-items: center; 
-            gap: 15px; 
+            gap: 12px; 
             text-decoration: none;
         }
 
         .logo-icon {
-            width: 45px; 
-            height: 45px;
+            width: 40px; 
+            height: 40px;
             border-radius: 50%;
             overflow: hidden;
             background: var(--white);
@@ -73,18 +73,23 @@
             align-items: center;
             justify-content: center;
             border: 2px solid var(--accent-yellow);
+            /* إزالة أي فراغات */
+            padding: 0;
+            line-height: 0;
         }
 
         .logo-icon img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover; /* تغطية كاملة بدون فراغات */
+            display: block; /* إزالة الفراغات */
         }
 
         .logo-text {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             color: var(--white);
+            white-space: nowrap;
         }
 
         .nav-menu { 
@@ -166,7 +171,7 @@
         .signup-container { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
-            min-height: calc(100vh - 80px);
+            min-height: calc(100vh - 70px);
         }
         
         .signup-left {
@@ -269,14 +274,14 @@
         
         .user-type-icon { 
             margin-bottom: 10px;
-            height: 60px;
+            height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         
         .user-type-icon i {
-            font-size: 3rem;
+            font-size: 3.5rem;
         }
         
         .user-type-option:nth-child(1) .user-type-icon i { color: #0066CC; }
@@ -412,8 +417,8 @@
         @media (max-width: 480px) {
             .signup-right { padding: 30px 15px; }
             .signup-header h2 { font-size: 1.8rem; }
-            .logo-text { font-size: 20px; }
-            .logo-icon { width: 40px; height: 40px; }
+            .logo-text { font-size: 18px; }
+            .logo-icon { width: 35px; height: 35px; }
             .user-type-icon i { font-size: 2.5rem; }
             .language-switcher { margin-top: 10px; }
         }
@@ -487,10 +492,10 @@
                 <div class="user-type-section">
                     <div class="user-type-label" data-en="user_type_label">I am joining as</div>
                     <div class="user-type-options">
-                        <!-- Athlete -->
+                        <!-- Athlete - أيقونة رياضي -->
                         <div class="user-type-option" onclick="selectUserType('athlete')" id="type-athlete">
                             <div class="user-type-icon">
-                                <i class="fas fa-user-ninja"></i>
+                                <i class="fas fa-running"></i> <!-- أيقونة شخص يركض -->
                             </div>
                             <div class="user-type-name" data-en="type_athlete">Athlete</div>
                         </div>
@@ -562,9 +567,40 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" data-en="label_country">Country</label>
-                        <input type="text" class="form-input" id="country" 
-                               data-placeholder-en="placeholder_country"
-                               placeholder="Your country">
+                        <!-- قائمة منسدلة للدول -->
+                        <select class="form-select" id="country" required>
+                            <option value="" data-en="placeholder_country">Select your country</option>
+                            <option value="Egypt">Egypt - مصر</option>
+                            <option value="Saudi Arabia">Saudi Arabia - السعودية</option>
+                            <option value="UAE">UAE - الإمارات</option>
+                            <option value="Qatar">Qatar - قطر</option>
+                            <option value="Kuwait">Kuwait - الكويت</option>
+                            <option value="Bahrain">Bahrain - البحرين</option>
+                            <option value="Oman">Oman - عمان</option>
+                            <option value="Jordan">Jordan - الأردن</option>
+                            <option value="Lebanon">Lebanon - لبنان</option>
+                            <option value="Morocco">Morocco - المغرب</option>
+                            <option value="Tunisia">Tunisia - تونس</option>
+                            <option value="Algeria">Algeria - الجزائر</option>
+                            <option value="Libya">Libya - ليبيا</option>
+                            <option value="Iraq">Iraq - العراق</option>
+                            <option value="Palestine">Palestine - فلسطين</option>
+                            <option value="Yemen">Yemen - اليمن</option>
+                            <option value="Sudan">Sudan - السودان</option>
+                            <option value="Somalia">Somalia - الصومال</option>
+                            <option value="United States">United States</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Canada">Canada</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Germany">Germany</option>
+                            <option value="France">France</option>
+                            <option value="Spain">Spain</option>
+                            <option value="Italy">Italy</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Brazil">Brazil</option>
+                            <option value="Argentina">Argentina</option>
+                            <option value="Other">Other - أخرى</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-en="label_phone">Phone Number</label>
@@ -649,7 +685,7 @@
             const confirmPassword = document.getElementById('confirmPassword').value;
             const dateOfBirth = document.getElementById('dateOfBirth').value;
             const gender = document.getElementById('gender').value;
-            const country = document.getElementById('country').value.trim();
+            const country = document.getElementById('country').value;
             const phone = document.getElementById('phone').value.trim();
 
             // 1. Validate User Type
@@ -697,6 +733,7 @@
                 });
 
                 if (authError) {
+                    console.error('Auth error:', authError);
                     if (authError.message.includes('already registered')) {
                         showAlert('error', t('alert_email_exists'));
                     } else {
