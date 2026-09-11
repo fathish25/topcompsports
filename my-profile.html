@@ -236,7 +236,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary" id="saveBtn"> <span data-en="btn_save">Save Changes</span></button>
+                <button type="submit" class="btn btn-primary" id="saveBtn">💾 <span data-en="btn_save">Save Changes</span></button>
                 <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">← <span data-en="btn_back">Back to Home</span></button>
             </form>
         </div>
@@ -348,11 +348,11 @@
             showAlert('success', 'Photo selected. Click Save to upload.');
         }
 
-        // 7. ⭐⭐⭐ رفع وثيقة الهوية (تم التعديل: 2 MB بدلاً من 5 MB) ⭐⭐⭐
+        // 7. رفع وثيقة الهوية (2 MB)
         async function handleIDDocumentUpload(event) {
             const file = event.target.files[0];
-            if (!file || file.size > 2 * 1024 * 1024) {  // ✅ التعديل: 2 MB
-                showAlert('error', 'File size must be less than 2MB');  // ✅ التعديل: 2MB
+            if (!file || file.size > 2 * 1024 * 1024) {
+                showAlert('error', 'File size must be less than 2MB');
                 return;
             }
             idDocumentFile = file;
@@ -361,7 +361,7 @@
             showAlert('success', 'ID document selected. Click Save to upload.');
         }
 
-        // 8. حفظ البيانات
+        // 8. ⭐⭐ حفظ تحديثات البروفايل (مع إصلاح مسار رفع الصور) ⭐⭐⭐
         async function handleProfileUpdate(e) {
             e.preventDefault();
             const saveBtn = document.getElementById('saveBtn');
@@ -381,35 +381,72 @@
                     updated_at: new Date().toISOString()
                 };
 
-                // رفع صورة البروفايل
+                console.log('💾 Updating profile:', profileData);
+
+                // ⭐⭐⭐ رفع صورة البروفايل (مسار مُحدّث) ⭐⭐⭐
                 if (profilePictureFile) {
                     try {
                         const fileExt = profilePictureFile.name.split('.').pop();
-                        const { error: uploadError } = await db.storage.from('profiles').upload(`${currentUser.id}-profile.${fileExt}`, profilePictureFile, { upsert: true });
+                        // ✅ المسار الجديد: user_id/filename.ext
+                        const filePath = `${currentUser.id}/${currentUser.id}-profile.${fileExt}`;
+                        
+                        const { error: uploadError } = await db.storage
+                            .from('profiles')
+                            .upload(filePath, profilePictureFile, { upsert: true });
+                            
                         if (!uploadError) {
-                            const { data: { publicUrl } } = db.storage.from('profiles').getPublicUrl(`${currentUser.id}-profile.${fileExt}`);
+                            const { data: { publicUrl } } = db.storage
+                                .from('profiles')
+                                .getPublicUrl(filePath);
                             profileData.profile_picture_url = publicUrl;
+                            console.log('✅ Picture uploaded:', publicUrl);
+                        } else {
+                            console.error('❌ Upload error:', uploadError);
                         }
-                    } catch (err) { console.warn('⚠️ Picture upload skipped:', err); }
+                    } catch (err) { 
+                        console.warn('️ Picture upload skipped:', err); 
+                    }
                 }
 
-                // رفع وثيقة الهوية
+                // ⭐⭐⭐ رفع وثيقة الهوية (مسار مُحدّث) ⭐⭐⭐
                 if (idDocumentFile && userType === 'organizer') {
                     try {
                         const fileExt = idDocumentFile.name.split('.').pop();
-                        const { error: uploadError } = await db.storage.from('id_documents').upload(`${currentUser.id}-id-document.${fileExt}`, idDocumentFile, { upsert: true });
+                        // ✅ المسار الجديد: user_id/filename.ext
+                        const filePath = `${currentUser.id}/${currentUser.id}-id-document.${fileExt}`;
+                        
+                        const { error: uploadError } = await db.storage
+                            .from('id_documents')
+                            .upload(filePath, idDocumentFile, { upsert: true });
+                            
                         if (!uploadError) {
-                            const { data: { publicUrl } } = db.storage.from('id_documents').getPublicUrl(`${currentUser.id}-id-document.${fileExt}`);
+                            const { data: { publicUrl } } = db.storage
+                                .from('id_documents')
+                                .getPublicUrl(filePath);
                             profileData.id_document_url = publicUrl;
+                            console.log('✅ ID document uploaded:', publicUrl);
+                        } else {
+                            console.error(' ID document upload error:', uploadError);
                         }
-                    } catch (err) { console.warn('⚠️ ID document upload skipped:', err); }
+                    } catch (err) { 
+                        console.warn('⚠️ ID document upload skipped:', err); 
+                    }
                 }
 
-                const { error: upsertError } = await db.from('users').upsert(profileData, { onConflict: 'id' });
-                if (upsertError) throw upsertError;
+                // ✅ حفظ البيانات في جدول users
+                const { error: upsertError } = await db
+                    .from('users')
+                    .upsert(profileData, { onConflict: 'id' });
 
+                if (upsertError) {
+                    console.error('❌ Database update error:', upsertError);
+                    throw upsertError;
+                }
+
+                console.log('✅ Profile updated successfully');
                 showAlert('success', '✅ Profile updated successfully!');
                 
+                // تحديث localStorage
                 const localData = JSON.parse(localStorage.getItem('currentUser') || '{}');
                 localData.full_name = profileData.full_name;
                 localData.user_type = profileData.user_type;
@@ -419,8 +456,8 @@
                 setTimeout(() => { window.location.reload(); }, 1500);
 
             } catch (error) {
-                console.error('❌ Error:', error);
-                showAlert('error', error.message);
+                console.error('❌ Error updating profile:', error);
+                showAlert('error', '❌ Error: ' + error.message);
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = '💾 Save Changes';
