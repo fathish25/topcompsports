@@ -8,13 +8,13 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Supabase (مكتبة واحدة فقط) -->
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- auth.js - يحتوي على Supabase Client المشترك -->
+    <!-- auth.js -->
     <script src="auth.js"></script>
     
-    <!-- ملف الترجمة -->
+    <!-- translations.js -->
     <script src="translations.js"></script>
     
     <style>
@@ -136,6 +136,27 @@
         .loading-content i { font-size: 4rem; color: var(--accent-yellow); }
         .loading-content p { margin-top: 20px; font-size: 1.2rem; }
 
+        .file-upload-box {
+            border: 2px dashed #E2E8F0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            background: var(--light-bg);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload-box:hover {
+            border-color: var(--primary-blue);
+            background: rgba(0,102,204,0.05);
+        }
+
+        .file-upload-box i {
+            font-size: 3rem;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+
         /* ===== Responsive ===== */
         @media (max-width: 768px) {
             .profile-container { padding: 30px 15px; }
@@ -225,7 +246,6 @@
                             <option value="" data-en="placeholder_gender">Select gender</option>
                             <option value="Male" data-en="gender_male">Male</option>
                             <option value="Female" data-en="gender_female">Female</option>
-                            <option value="Other" data-en="gender_other">Other</option>
                         </select>
                     </div>
                 </div>
@@ -233,11 +253,59 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" data-en="label_country">Country</label>
-                        <input type="text" class="form-input" id="country" data-placeholder-en="placeholder_country" placeholder="Your country">
+                        <select class="form-select" id="country" required>
+                            <option value="" data-en="placeholder_country">Select your country</option>
+                            <option value="Egypt">Egypt - مصر</option>
+                            <option value="Saudi Arabia">Saudi Arabia - السعودية</option>
+                            <option value="UAE">UAE - الإمارات</option>
+                            <option value="Qatar">Qatar - قطر</option>
+                            <option value="Kuwait">Kuwait - الكويت</option>
+                            <option value="Bahrain">Bahrain - البحرين</option>
+                            <option value="Oman">Oman - عمان</option>
+                            <option value="Jordan">Jordan - الأردن</option>
+                            <option value="Lebanon">Lebanon - لبنان</option>
+                            <option value="Morocco">Morocco - المغرب</option>
+                            <option value="Tunisia">Tunisia - تونس</option>
+                            <option value="Algeria">Algeria - الجزائر</option>
+                            <option value="Libya">Libya - ليبيا</option>
+                            <option value="Iraq">Iraq - العراق</option>
+                            <option value="Palestine">Palestine - فلسطين</option>
+                            <option value="Yemen">Yemen - اليمن</option>
+                            <option value="Sudan">Sudan - السودان</option>
+                            <option value="Somalia">Somalia - الصومال</option>
+                            <option value="United States">United States</option>
+                            <option value="United Kingdom">United Kingdom</option>
+                            <option value="Canada">Canada</option>
+                            <option value="Australia">Australia</option>
+                            <option value="Germany">Germany</option>
+                            <option value="France">France</option>
+                            <option value="Spain">Spain</option>
+                            <option value="Italy">Italy</option>
+                            <option value="Netherlands">Netherlands</option>
+                            <option value="Brazil">Brazil</option>
+                            <option value="Argentina">Argentina</option>
+                            <option value="Other">Other - أخرى</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-en="label_phone">Phone Number</label>
                         <input type="tel" class="form-input" id="phone" data-placeholder-en="placeholder_phone" placeholder="+1 (234) 567-8900">
+                    </div>
+                </div>
+
+                <!-- ID Document Upload (للمنظمين) -->
+                <div class="form-group" id="idDocumentSection" style="display: none;">
+                    <label class="form-label" data-en="label_id_document">
+                        <i class="fas fa-id-card"></i> ID Document (National ID or Passport)
+                    </label>
+                    <div class="file-upload-box" onclick="document.getElementById('idDocument').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p data-en="upload_id_doc">Click to upload ID document (PDF, JPG, PNG - Max 5MB)</p>
+                        <input type="file" id="idDocument" accept=".pdf,.jpg,.jpeg,.png" onchange="handleIDDocumentUpload(event)" style="display: none;">
+                    </div>
+                    <div id="idDocumentPreview" style="margin-top: 10px; display: none;">
+                        <i class="fas fa-check-circle" style="color: #10B981;"></i>
+                        <span id="idDocumentName"></span>
                     </div>
                 </div>
 
@@ -252,17 +320,19 @@
     </div>
 
     <script>
-        // ===== الحل الجذري: استخدام اسم متغير مختلف لتجنب التضارب =====
+        // ===== Supabase Client =====
         const db = window.supabaseClient;
         
         if (!db) {
-            console.error('❌ Supabase client not loaded. Make sure auth.js is included.');
+            console.error(' Supabase client not loaded.');
         }
 
         let currentUser = null;
         let profilePictureFile = null;
+        let idDocumentFile = null;
+        let userType = null;
 
-        // ===== دالة مساعدة للترجمة =====
+        // ===== Translation Helper =====
         function t(key) {
             const lang = localStorage.getItem('selectedLanguage') || 'en';
             return (window.translations && window.translations[lang] && window.translations[lang][key]) 
@@ -270,7 +340,7 @@
                 : key;
         }
 
-        // ===== دالة عرض التنبيهات =====
+        // ===== Show Alert =====
         function showAlert(type, message) {
             const alert = document.getElementById('alert');
             alert.className = `alert alert-${type} show`;
@@ -278,14 +348,14 @@
             setTimeout(() => alert.classList.remove('show'), 5000);
         }
 
-        // ===== عند تحميل الصفحة =====
+        // ===== On Load =====
         window.addEventListener('DOMContentLoaded', async () => {
             console.log('🔄 Loading profile page...');
             try {
                 const { data: { user }, error } = await db.auth.getUser();
                 
                 if (error || !user) {
-                    console.error('❌ Auth error:', error);
+                    console.error(' Auth error:', error);
                     showAlert('error', t('error_not_logged_in') || 'Not logged in. Redirecting...');
                     setTimeout(() => { window.location.href = 'login.html'; }, 2000);
                     return;
@@ -293,6 +363,16 @@
 
                 currentUser = user;
                 console.log('✅ User authenticated:', user.email);
+                
+                // Get user type from metadata
+                userType = user.user_metadata?.user_type || 'user';
+                console.log('User type:', userType);
+                
+                // Show ID document section for organizers
+                if (userType === 'organizer') {
+                    document.getElementById('idDocumentSection').style.display = 'block';
+                }
+                
                 await loadProfile();
                 
             } catch (error) {
@@ -301,7 +381,7 @@
             }
         });
 
-        // ===== جلب بيانات البروفايل من قاعدة البيانات =====
+        // ===== Load Profile Data =====
         async function loadProfile() {
             try {
                 console.log('🔍 Fetching profile data for user:', currentUser.id);
@@ -321,7 +401,6 @@
                 console.log('✅ Profile data loaded:', profile);
                 let userData = profile;
 
-                // Fallback إذا لم تكن البيانات موجودة في جدول users
                 if (!userData) {
                     console.warn('⚠️ No profile found in users table, using auth metadata');
                     showAlert('info', t('info_complete_profile') || 'Profile not found. Please complete your information.');
@@ -332,11 +411,12 @@
                         gender: null,
                         country: null,
                         phone: null,
-                        profile_picture_url: null
+                        profile_picture_url: null,
+                        id_document_url: null
                     };
                 }
 
-                // تحديث الواجهة
+                // Update UI
                 document.getElementById('profileName').textContent = userData.full_name || 'User';
                 document.getElementById('profileEmail').textContent = userData.email;
                 document.getElementById('fullName').value = userData.full_name || '';
@@ -346,7 +426,7 @@
                 document.getElementById('country').value = userData.country || '';
                 document.getElementById('phone').value = userData.phone || '';
 
-                // تحديث الصورة
+                // Update avatar
                 if (userData.profile_picture_url) {
                     document.getElementById('profileAvatar').innerHTML = `<img src="${userData.profile_picture_url}" alt="Profile">`;
                 } else {
@@ -354,7 +434,13 @@
                     document.getElementById('profileAvatar').innerHTML = `<span style="font-size: 60px; color: white; font-weight: bold;">${initials}</span>`;
                 }
 
-                // إخفاء التحميل وإظهار المحتوى
+                // Show ID document if exists
+                if (userData.id_document_url) {
+                    document.getElementById('idDocumentPreview').style.display = 'block';
+                    document.getElementById('idDocumentName').textContent = 'ID Document uploaded';
+                }
+
+                // Hide loading, show content
                 document.getElementById('loadingOverlay').style.display = 'none';
                 document.getElementById('profileContent').style.display = 'block';
 
@@ -365,7 +451,7 @@
             }
         }
 
-        // ===== معالجة رفع صورة البروفايل =====
+        // ===== Handle Profile Picture Upload =====
         async function handleProfilePicUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -389,7 +475,30 @@
             showAlert('success', t('success_photo_selected') || 'Photo selected. Click Save to upload.');
         }
 
-        // ===== حفظ تحديثات البروفايل =====
+        // ===== Handle ID Document Upload =====
+        async function handleIDDocumentUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('error', 'File size must be less than 5MB');
+                return;
+            }
+
+            const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+            if (!validTypes.includes(file.type)) {
+                showAlert('error', 'Please upload PDF, JPG, or PNG file');
+                return;
+            }
+
+            idDocumentFile = file;
+            document.getElementById('idDocumentPreview').style.display = 'block';
+            document.getElementById('idDocumentName').textContent = file.name;
+
+            showAlert('success', 'ID document selected. Click Save to upload.');
+        }
+
+        // ===== Handle Profile Update =====
         async function handleProfileUpdate(e) {
             e.preventDefault();
             const saveBtn = document.getElementById('saveBtn');
@@ -403,14 +512,14 @@
                     full_name: document.getElementById('fullName').value.trim(),
                     date_of_birth: document.getElementById('dateOfBirth').value || null,
                     gender: document.getElementById('gender').value || null,
-                    country: document.getElementById('country').value.trim() || null,
+                    country: document.getElementById('country').value || null,
                     phone: document.getElementById('phone').value.trim() || null,
                     updated_at: new Date().toISOString()
                 };
 
                 console.log('💾 Updating profile:', profileData);
 
-                // رفع الصورة إذا تم اختيارها
+                // Upload profile picture if selected
                 if (profilePictureFile) {
                     console.log('📤 Uploading profile picture...');
                     const fileExt = profilePictureFile.name.split('.').pop();
@@ -420,24 +529,50 @@
                         .from('profiles')
                         .upload(fileName, profilePictureFile, { upsert: true });
 
-                    if (uploadError) throw uploadError;
-
-                    const { data: { publicUrl } } = db.storage.from('profiles').getPublicUrl(fileName);
-                    profileData.profile_picture_url = publicUrl;
-                    console.log('✅ Picture uploaded:', publicUrl);
+                    if (uploadError) {
+                        console.error(' Upload error:', uploadError);
+                        // Continue even if upload fails
+                    } else {
+                        const { data: { publicUrl } } = db.storage.from('profiles').getPublicUrl(fileName);
+                        profileData.profile_picture_url = publicUrl;
+                        console.log('✅ Picture uploaded:', publicUrl);
+                    }
                 }
 
-                // تحديث قاعدة البيانات باستخدام upsert
+                // Upload ID document if selected (for organizers)
+                if (idDocumentFile && userType === 'organizer') {
+                    console.log('📤 Uploading ID document...');
+                    const fileExt = idDocumentFile.name.split('.').pop();
+                    const fileName = `${currentUser.id}-id-document.${fileExt}`;
+                    
+                    const { error: uploadError } = await db.storage
+                        .from('id_documents')
+                        .upload(fileName, idDocumentFile, { upsert: true });
+
+                    if (uploadError) {
+                        console.error('❌ ID document upload error:', uploadError);
+                        // Continue even if upload fails
+                    } else {
+                        const { data: { publicUrl } } = db.storage.from('id_documents').getPublicUrl(fileName);
+                        profileData.id_document_url = publicUrl;
+                        console.log('✅ ID document uploaded:', publicUrl);
+                    }
+                }
+
+                // Update database using upsert
                 const { error: upsertError } = await db
                     .from('users')
                     .upsert(profileData, { onConflict: 'id' });
 
-                if (upsertError) throw upsertError;
+                if (upsertError) {
+                    console.error('❌ Database update error:', upsertError);
+                    throw upsertError;
+                }
 
                 console.log('✅ Profile updated successfully');
                 showAlert('success', t('success_profile_updated') || '✅ Profile updated successfully!');
                 
-                // تحديث localStorage
+                // Update localStorage
                 const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
                 userData.full_name = profileData.full_name;
                 userData.profile_picture_url = profileData.profile_picture_url;
@@ -454,7 +589,7 @@
             }
         }
 
-        // ===== تسجيل الخروج =====
+        // ===== Logout =====
         async function handleLogout() {
             if (confirm(t('confirm_logout') || 'Are you sure you want to logout?')) {
                 try {
