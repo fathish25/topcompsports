@@ -170,11 +170,11 @@
                             <div class="user-type-name">Athlete</div>
                         </div>
                         <div class="user-type-option" onclick="selectUserType('coach')" id="type-coach">
-                            <div class="user-type-icon">👨🏫</div>
+                            <div class="user-type-icon">👨‍🏫</div>
                             <div class="user-type-name">Coach</div>
                         </div>
                         <div class="user-type-option" onclick="selectUserType('organizer')" id="type-organizer">
-                            <div class="user-type-icon">📋</div>
+                            <div class="user-type-icon"></div>
                             <div class="user-type-name">Organizer</div>
                         </div>
                     </div>
@@ -239,7 +239,7 @@
     </div>
 
     <script>
-        // ===== Supabase Setup - مرة واحدة فقط =====
+        // ===== Supabase Setup =====
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -340,9 +340,8 @@
                 });
 
                 if (authError) {
-                    // Handle specific Supabase errors
                     if (authError.message.includes('already registered')) {
-                        showAlert('error', '⚠️ This email is already registered. Please use a different email or sign in.');
+                        showAlert('error', '️ This email is already registered. Please use a different email or sign in.');
                     } else {
                         showAlert('error', '⚠️ ' + authError.message);
                     }
@@ -351,8 +350,8 @@
                     return;
                 }
 
-                // 7. Create user profile in database
-                const { error: profileError } = await supabaseClient
+                // 7. Create user profile in users table
+                const { error: userError } = await supabaseClient
                     .from('users')
                     .insert([{
                         id: authData.user.id,
@@ -367,20 +366,118 @@
                         created_at: new Date().toISOString()
                     }]);
 
-                if (profileError) {
-                    console.error('Profile error:', profileError);
-                    // Even if profile fails, auth succeeded
+                if (userError) {
+                    console.error('User error:', userError);
+                    // Delete auth user if profile creation fails
+                    await supabaseClient.auth.admin.deleteUser(authData.user.id);
+                    showAlert('error', '⚠️ Failed to create user profile: ' + userError.message);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Create Account →';
+                    return;
                 }
 
-                // 8. Success!
+                // 8. Create profile in specific table (athletes/coaches/organizers)
+                let tableError = null;
+                
+                if (userType === 'athlete') {
+                    const { error } = await supabaseClient
+                        .from('athletes')
+                        .insert([{
+                            user_id: authData.user.id,
+                            full_name: fullName,
+                            email: email,
+                            phone: phone || null,
+                            country: country || null,
+                            city: null,
+                            date_of_birth: dateOfBirth || null,
+                            gender: gender || null,
+                            belt_level: null,
+                            ranking: 0,
+                            weight: null,
+                            profile_photo_url: null,
+                            id_document_url: null,
+                            belt_certificate_url: null,
+                            team_id: null,
+                            is_freestyle: false,
+                            verification_status: 'pending',
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        }]);
+                    tableError = error;
+                } else if (userType === 'coach') {
+                    const { error } = await supabaseClient
+                        .from('coaches')
+                        .insert([{
+                            user_id: authData.user.id,
+                            full_name: fullName,
+                            email: email,
+                            phone: phone || null,
+                            country: country || null,
+                            city: null,
+                            date_of_birth: dateOfBirth || null,
+                            gender: gender || null,
+                            belt_level: null,
+                            belt_certificate_url: null,
+                            id_document_url: null,
+                            team_name: null,
+                            team_address: null,
+                            team_email: null,
+                            team_phone: null,
+                            experience_years: 0,
+                            bio: null,
+                            profile_photo_url: null,
+                            verification_status: 'pending',
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        }]);
+                    tableError = error;
+                } else if (userType === 'organizer') {
+                    const { error } = await supabaseClient
+                        .from('organizers')
+                        .insert([{
+                            user_id: authData.user.id,
+                            full_name: fullName,
+                            email: email,
+                            phone: phone || null,
+                            whatsapp: null,
+                            telegram: null,
+                            country: country || null,
+                            city: null,
+                            date_of_birth: dateOfBirth || null,
+                            gender: gender || null,
+                            organization_name: null,
+                            organization_type: null,
+                            organization_address: null,
+                            organization_logo_url: null,
+                            website: null,
+                            bio: null,
+                            profile_photo_url: null,
+                            id_document_url: null,
+                            social_media_facebook: null,
+                            social_media_instagram: null,
+                            social_media_twitter: null,
+                            verification_status: 'pending',
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        }]);
+                    tableError = error;
+                }
+
+                if (tableError) {
+                    console.error('Table error:', tableError);
+                    showAlert('error', '⚠️ Account created but profile setup failed. Please contact support.');
+                    // Don't delete auth user - they can complete profile later
+                }
+
+                // 9. Success!
                 showAlert('success', '✅ Account created successfully! Please check your email to confirm your account. You will be redirected to login page.');
                 
-                // 9. Clear form
+                // 10. Clear form
                 document.getElementById('signupForm').reset();
                 document.querySelectorAll('.user-type-option').forEach(opt => opt.classList.remove('active'));
                 document.getElementById('userType').value = '';
 
-                // 10. Redirect to login after 4 seconds
+                // 11. Redirect to login after 4 seconds
                 setTimeout(() => {
                     window.location.href = 'login.html?email=' + encodeURIComponent(email);
                 }, 4000);
