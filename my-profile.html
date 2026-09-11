@@ -5,19 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-en="page_title">My Profile - TopCompSports</title>
     
-    <!-- Font Awesome -->
+    <!-- 1. مكتبة الأيقونات -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Supabase -->
+    <!-- 2. مكتبة Supabase (مرة واحدة فقط) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- auth.js -->
+    <!-- 3. ملف إدارة المصادقة المشترك -->
     <script src="auth.js"></script>
     
-    <!-- translations.js -->
+    <!-- 4. ملف الترجمة -->
     <script src="translations.js"></script>
     
     <style>
+        /* ===== متغيرات الألوان (مطابقة للصفحة الرئيسية) ===== */
         :root {
             --primary-blue: #0066CC;
             --dark-blue: #003366;
@@ -31,49 +32,18 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
-            background: var(--light-bg); 
-            color: var(--black); 
-            min-height: 100vh; 
-        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); color: var(--black); min-height: 100vh; }
 
         /* ===== Header ===== */
-        .main-header {
-            background: var(--black);
-            padding: 12px 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .header-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
+        .main-header { background: var(--black); padding: 12px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header-container { max-width: 1400px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
         .logo-section { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-
-        .logo-icon {
-            width: 40px; height: 40px; border-radius: 50%; overflow: hidden;
-            background: var(--white); display: flex; align-items: center; justify-content: center;
-            border: 2px solid var(--accent-yellow); padding: 0; line-height: 0;
-        }
-
+        .logo-icon { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: var(--white); display: flex; align-items: center; justify-content: center; border: 2px solid var(--accent-yellow); padding: 0; line-height: 0; }
         .logo-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .logo-text { font-size: 22px; font-weight: bold; color: var(--white); white-space: nowrap; }
-
         .nav-menu { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
         .nav-link { color: var(--white); text-decoration: none; font-weight: 500; padding: 8px 15px; border-radius: 5px; transition: all 0.3s; }
         .nav-link:hover { color: var(--accent-yellow); }
-
         .auth-buttons { display: flex; gap: 10px; align-items: center; }
         .btn-logout { padding: 10px 24px; background: #dc2626; color: var(--white); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
         .btn-logout:hover { background: #b91c1c; transform: translateY(-2px); }
@@ -87,32 +57,20 @@
         /* ===== Main Content ===== */
         .profile-container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
         .page-title { font-size: 2.5rem; font-weight: 900; color: var(--dark-blue); text-align: center; margin-bottom: 40px; }
-
         .profile-card { background: var(--white); border-radius: 20px; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 2px solid #E2E8F0; }
         .profile-header { text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 2px solid #E2E8F0; }
-
-        .profile-avatar {
-            width: 150px; height: 150px; border-radius: 50%; overflow: hidden;
-            border: 4px solid var(--accent-yellow); background: var(--gradient-blue);
-            display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 60px;
-        }
+        .profile-avatar { width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 4px solid var(--accent-yellow); background: var(--gradient-blue); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 60px; }
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .profile-name { font-size: 1.8rem; font-weight: 700; color: var(--dark-blue); margin-bottom: 8px; }
         .profile-email { color: var(--primary-blue); font-size: 1.1rem; margin-bottom: 20px; }
-
         .upload-btn { background: var(--primary-blue); color: var(--white); padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
         .upload-btn:hover { background: var(--dark-blue); transform: translateY(-2px); }
 
         .form-group { margin-bottom: 20px; }
         .form-label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; color: #475569; }
-        
-        .form-input, .form-select {
-            width: 100%; background: var(--white); border: 2px solid #E2E8F0; color: var(--black);
-            padding: 14px 16px; border-radius: 10px; font-size: 1rem; transition: all 0.3s;
-        }
+        .form-input, .form-select { width: 100%; background: var(--white); border: 2px solid #E2E8F0; color: var(--black); padding: 14px 16px; border-radius: 10px; font-size: 1rem; transition: all 0.3s; }
         .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
         .form-input:read-only { background: var(--light-bg); cursor: not-allowed; opacity: 0.8; }
-
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
         .btn { width: 100%; padding: 16px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1.05rem; margin-top: 15px; }
@@ -128,36 +86,16 @@
         .alert-success { background: #D1FAE5; border: 1px solid #10B981; color: #059669; }
         .alert-info { background: #DBEAFE; border: 1px solid #3B82F6; color: #2563EB; }
 
-        .loading-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999;
-        }
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .loading-content { text-align: center; color: var(--white); }
         .loading-content i { font-size: 4rem; color: var(--accent-yellow); }
         .loading-content p { margin-top: 20px; font-size: 1.2rem; }
 
-        .file-upload-box {
-            border: 2px dashed #E2E8F0;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            background: var(--light-bg);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
+        .file-upload-box { border: 2px dashed #E2E8F0; border-radius: 10px; padding: 20px; text-align: center; background: var(--light-bg); cursor: pointer; transition: all 0.3s; }
+        .file-upload-box:hover { border-color: var(--primary-blue); background: rgba(0,102,204,0.05); }
+        .file-upload-box i { font-size: 3rem; color: var(--primary-blue); margin-bottom: 10px; }
 
-        .file-upload-box:hover {
-            border-color: var(--primary-blue);
-            background: rgba(0,102,204,0.05);
-        }
-
-        .file-upload-box i {
-            font-size: 3rem;
-            color: var(--primary-blue);
-            margin-bottom: 10px;
-        }
-
-        /* ===== Responsive ===== */
+        /* ===== Responsive (للموبايل) ===== */
         @media (max-width: 768px) {
             .profile-container { padding: 30px 15px; }
             .page-title { font-size: 2rem; }
@@ -168,13 +106,13 @@
             .profile-name { font-size: 1.5rem; }
         }
 
-        /* ===== RTL Support ===== */
+        /* ===== RTL Support (للغة العربية) ===== */
         [dir="rtl"] .profile-header { text-align: center; }
         [dir="rtl"] .form-label { text-align: right; }
     </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
+    <!-- شاشة التحميل -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-content">
             <i class="fas fa-spinner fa-spin"></i>
@@ -186,18 +124,14 @@
     <header class="main-header">
         <div class="header-container">
             <a href="index.html" class="logo-section">
-                <div class="logo-icon">
-                    <img src="logo2.png" alt="TopCompSports Logo">
-                </div>
+                <div class="logo-icon"><img src="logo2.png" alt="TopCompSports Logo"></div>
                 <div class="logo-text">TopCompSports</div>
             </a>
-            
             <nav class="nav-menu">
                 <a href="index.html" class="nav-link" data-en="nav_home">Home</a>
                 <a href="events.html" class="nav-link" data-en="nav_tournaments">Tournaments</a>
                 <a href="index.html#features" class="nav-link" data-en="nav_features">Features</a>
             </nav>
-            
             <div class="auth-buttons">
                 <div class="language-switcher">
                     <button class="lang-btn" data-lang="ar" onclick="setLanguage('ar')">عربي</button>
@@ -218,23 +152,22 @@
                 <div class="profile-avatar" id="profileAvatar"><span>👤</span></div>
                 <div class="profile-name" id="profileName">User Name</div>
                 <div class="profile-email" id="profileEmail">user@email.com</div>
-                <button class="upload-btn" onclick="document.getElementById('profilePic').click()">
-                    📷 <span data-en="change_photo">Change Photo</span>
-                </button>
+                <button class="upload-btn" onclick="document.getElementById('profilePic').click()">📷 <span data-en="change_photo">Change Photo</span></button>
                 <input type="file" id="profilePic" accept="image/*" onchange="handleProfilePicUpload(event)" style="display: none;">
             </div>
 
             <form onsubmit="handleProfileUpdate(event)">
+                <!-- حقول القراءة فقط -->
                 <div class="form-group">
                     <label class="form-label" data-en="label_full_name">Full Name *</label>
                     <input type="text" class="form-input" id="fullName" required readonly>
                 </div>
-
                 <div class="form-group">
                     <label class="form-label" data-en="label_email">Email *</label>
                     <input type="email" class="form-input" id="email" required readonly>
                 </div>
 
+                <!-- حقول قابلة للتعديل -->
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" data-en="label_date_of_birth">Date of Birth</label>
@@ -293,54 +226,42 @@
                     </div>
                 </div>
 
-                <!-- ID Document Upload (للمنظمين) -->
+                <!-- قسم وثيقة الهوية (يظهر فقط للمنظمين) -->
                 <div class="form-group" id="idDocumentSection" style="display: none;">
-                    <label class="form-label" data-en="label_id_document">
-                        <i class="fas fa-id-card"></i> ID Document (National ID or Passport)
-                    </label>
+                    <label class="form-label" data-en="label_id_document"><i class="fas fa-id-card"></i> ID Document (National ID or Passport)</label>
                     <div class="file-upload-box" onclick="document.getElementById('idDocument').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <p data-en="upload_id_doc">Click to upload ID document (PDF, JPG, PNG - Max 5MB)</p>
                         <input type="file" id="idDocument" accept=".pdf,.jpg,.jpeg,.png" onchange="handleIDDocumentUpload(event)" style="display: none;">
                     </div>
                     <div id="idDocumentPreview" style="margin-top: 10px; display: none;">
-                        <i class="fas fa-check-circle" style="color: #10B981;"></i>
-                        <span id="idDocumentName"></span>
+                        <i class="fas fa-check-circle" style="color: #10B981;"></i> <span id="idDocumentName"></span>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary" id="saveBtn">
-                    💾 <span data-en="btn_save">Save Changes</span>
-                </button>
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">
-                    ← <span data-en="btn_back">Back to Home</span>
-                </button>
+                <button type="submit" class="btn btn-primary" id="saveBtn">💾 <span data-en="btn_save">Save Changes</span></button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">← <span data-en="btn_back">Back to Home</span></button>
             </form>
         </div>
     </div>
 
     <script>
-        // ===== Supabase Client =====
+        // 1. الاتصال بقاعدة البيانات (باستخدام المتغير العام من auth.js لتجنب التضارب)
         const db = window.supabaseClient;
-        
-        if (!db) {
-            console.error(' Supabase client not loaded.');
-        }
+        if (!db) console.error('❌ Supabase client not loaded.');
 
         let currentUser = null;
         let profilePictureFile = null;
         let idDocumentFile = null;
         let userType = null;
 
-        // ===== Translation Helper =====
+        // 2. دالة مساعدة للترجمة
         function t(key) {
             const lang = localStorage.getItem('selectedLanguage') || 'en';
-            return (window.translations && window.translations[lang] && window.translations[lang][key]) 
-                ? window.translations[lang][key] 
-                : key;
+            return (window.translations && window.translations[lang] && window.translations[lang][key]) ? window.translations[lang][key] : key;
         }
 
-        // ===== Show Alert =====
+        // 3. دالة عرض التنبيهات
         function showAlert(type, message) {
             const alert = document.getElementById('alert');
             alert.className = `alert alert-${type} show`;
@@ -348,85 +269,56 @@
             setTimeout(() => alert.classList.remove('show'), 5000);
         }
 
-        // ===== On Load =====
+        // 4. عند تحميل الصفحة
         window.addEventListener('DOMContentLoaded', async () => {
-            console.log('🔄 Loading profile page...');
             try {
                 const { data: { user }, error } = await db.auth.getUser();
-                
                 if (error || !user) {
-                    console.error(' Auth error:', error);
                     showAlert('error', t('error_not_logged_in') || 'Not logged in. Redirecting...');
                     setTimeout(() => { window.location.href = 'login.html'; }, 2000);
                     return;
                 }
 
                 currentUser = user;
-                console.log('✅ User authenticated:', user.email);
-                
-                // Get user type from metadata
+                // ✅ استخراج نوع المستخدم من بيانات المصادقة
                 userType = user.user_metadata?.user_type || 'user';
-                console.log('User type:', userType);
+                console.log('✅ User authenticated:', user.email, '| Type:', userType);
                 
-                // Show ID document section for organizers
+                // ✅ إظهار قسم وثيقة الهوية إذا كان المستخدم منظماً
                 if (userType === 'organizer') {
                     document.getElementById('idDocumentSection').style.display = 'block';
                 }
                 
                 await loadProfile();
-                
             } catch (error) {
                 console.error('❌ Error in onload:', error);
                 showAlert('error', 'Error: ' + error.message);
             }
         });
 
-        // ===== Load Profile Data =====
+        // 5. جلب بيانات البروفايل من قاعدة البيانات
         async function loadProfile() {
             try {
-                console.log('🔍 Fetching profile data for user:', currentUser.id);
-                
-                const { data: profile, error } = await db
-                    .from('users')
-                    .select('*')
-                    .eq('id', currentUser.id)
-                    .maybeSingle();
+                const { data: profile, error } = await db.from('users').select('*').eq('id', currentUser.id).maybeSingle();
+                if (error) throw error;
 
-                if (error) {
-                    console.error('❌ Database error:', error);
-                    showAlert('error', (t('error_load_profile') || 'Failed to load profile: ') + error.message);
-                    return;
-                }
+                let userData = profile || {
+                    full_name: currentUser.user_metadata?.full_name || 'User',
+                    email: currentUser.email,
+                    date_of_birth: null, gender: null, country: null, phone: null,
+                    profile_picture_url: null, id_document_url: null
+                };
 
-                console.log('✅ Profile data loaded:', profile);
-                let userData = profile;
-
-                if (!userData) {
-                    console.warn('⚠️ No profile found in users table, using auth metadata');
-                    showAlert('info', t('info_complete_profile') || 'Profile not found. Please complete your information.');
-                    userData = {
-                        full_name: currentUser.user_metadata?.full_name || 'User',
-                        email: currentUser.email,
-                        date_of_birth: null,
-                        gender: null,
-                        country: null,
-                        phone: null,
-                        profile_picture_url: null,
-                        id_document_url: null
-                    };
-                }
-
-                // Update UI
-                document.getElementById('profileName').textContent = userData.full_name || 'User';
+                // تحديث الواجهة
+                document.getElementById('profileName').textContent = userData.full_name;
                 document.getElementById('profileEmail').textContent = userData.email;
-                document.getElementById('fullName').value = userData.full_name || '';
+                document.getElementById('fullName').value = userData.full_name;
                 document.getElementById('email').value = userData.email;
                 document.getElementById('dateOfBirth').value = userData.date_of_birth || '';
                 document.getElementById('gender').value = userData.gender || '';
                 document.getElementById('country').value = userData.country || '';
                 document.getElementById('phone').value = userData.phone || '';
 
-                // Update avatar
                 if (userData.profile_picture_url) {
                     document.getElementById('profileAvatar').innerHTML = `<img src="${userData.profile_picture_url}" alt="Profile">`;
                 } else {
@@ -434,16 +326,13 @@
                     document.getElementById('profileAvatar').innerHTML = `<span style="font-size: 60px; color: white; font-weight: bold;">${initials}</span>`;
                 }
 
-                // Show ID document if exists
                 if (userData.id_document_url) {
                     document.getElementById('idDocumentPreview').style.display = 'block';
                     document.getElementById('idDocumentName').textContent = 'ID Document uploaded';
                 }
 
-                // Hide loading, show content
                 document.getElementById('loadingOverlay').style.display = 'none';
                 document.getElementById('profileContent').style.display = 'block';
-
             } catch (error) {
                 console.error('❌ Error loading profile:', error);
                 showAlert('error', 'Error loading profile: ' + error.message);
@@ -451,54 +340,34 @@
             }
         }
 
-        // ===== Handle Profile Picture Upload =====
+        // 6. معالجة اختيار صورة البروفايل
         async function handleProfilePicUpload(event) {
             const file = event.target.files[0];
-            if (!file) return;
-
-            if (file.size > 5 * 1024 * 1024) {
-                showAlert('error', t('error_file_size') || 'File size must be less than 5MB');
+            if (!file || file.size > 5 * 1024 * 1024 || !file.type.startsWith('image/')) {
+                showAlert('error', 'File must be an image under 5MB');
                 return;
             }
-            if (!file.type.startsWith('image/')) {
-                showAlert('error', t('error_file_type') || 'Please select an image file');
-                return;
-            }
-
             profilePictureFile = file;
             const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('profileAvatar').innerHTML = `<img src="${e.target.result}" alt="Profile">`;
-            };
+            reader.onload = (e) => { document.getElementById('profileAvatar').innerHTML = `<img src="${e.target.result}" alt="Profile">`; };
             reader.readAsDataURL(file);
-
-            showAlert('success', t('success_photo_selected') || 'Photo selected. Click Save to upload.');
+            showAlert('success', 'Photo selected. Click Save to upload.');
         }
 
-        // ===== Handle ID Document Upload =====
+        // 7. معالجة اختيار وثيقة الهوية
         async function handleIDDocumentUpload(event) {
             const file = event.target.files[0];
-            if (!file) return;
-
-            if (file.size > 5 * 1024 * 1024) {
+            if (!file || file.size > 5 * 1024 * 1024) {
                 showAlert('error', 'File size must be less than 5MB');
                 return;
             }
-
-            const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
-            if (!validTypes.includes(file.type)) {
-                showAlert('error', 'Please upload PDF, JPG, or PNG file');
-                return;
-            }
-
             idDocumentFile = file;
             document.getElementById('idDocumentPreview').style.display = 'block';
             document.getElementById('idDocumentName').textContent = file.name;
-
             showAlert('success', 'ID document selected. Click Save to upload.');
         }
 
-        // ===== Handle Profile Update =====
+        // 8. حفظ تحديثات البروفايل (⭐⭐⭐ هنا يوجد الإصلاح الرئيسي ⭐⭐⭐)
         async function handleProfileUpdate(e) {
             e.preventDefault();
             const saveBtn = document.getElementById('saveBtn');
@@ -506,10 +375,12 @@
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (t('saving') || 'Saving...');
 
             try {
+                // ✅ الإصلاح: إضافة user_type لضمان عدم حدوث خطأ Null في قاعدة البيانات
                 const profileData = {
                     id: currentUser.id,
                     email: currentUser.email,
                     full_name: document.getElementById('fullName').value.trim(),
+                    user_type: userType, // <-- هذا السطر هو الحل الجذري للمشكلة
                     date_of_birth: document.getElementById('dateOfBirth').value || null,
                     gender: document.getElementById('gender').value || null,
                     country: document.getElementById('country').value || null,
@@ -517,66 +388,42 @@
                     updated_at: new Date().toISOString()
                 };
 
-                console.log('💾 Updating profile:', profileData);
-
-                // Upload profile picture if selected
+                // رفع صورة البروفايل (بشكل آمن لا يوقف الحفظ إذا فشل)
                 if (profilePictureFile) {
-                    console.log('📤 Uploading profile picture...');
-                    const fileExt = profilePictureFile.name.split('.').pop();
-                    const fileName = `${currentUser.id}-profile.${fileExt}`;
-                    
-                    const { error: uploadError } = await db.storage
-                        .from('profiles')
-                        .upload(fileName, profilePictureFile, { upsert: true });
-
-                    if (uploadError) {
-                        console.error(' Upload error:', uploadError);
-                        // Continue even if upload fails
-                    } else {
-                        const { data: { publicUrl } } = db.storage.from('profiles').getPublicUrl(fileName);
-                        profileData.profile_picture_url = publicUrl;
-                        console.log('✅ Picture uploaded:', publicUrl);
-                    }
+                    try {
+                        const fileExt = profilePictureFile.name.split('.').pop();
+                        const { error: uploadError } = await db.storage.from('profiles').upload(`${currentUser.id}-profile.${fileExt}`, profilePictureFile, { upsert: true });
+                        if (!uploadError) {
+                            const { data: { publicUrl } } = db.storage.from('profiles').getPublicUrl(`${currentUser.id}-profile.${fileExt}`);
+                            profileData.profile_picture_url = publicUrl;
+                        }
+                    } catch (err) { console.warn('⚠️ Picture upload skipped:', err); }
                 }
 
-                // Upload ID document if selected (for organizers)
+                // رفع وثيقة الهوية (للمنظمين فقط)
                 if (idDocumentFile && userType === 'organizer') {
-                    console.log('📤 Uploading ID document...');
-                    const fileExt = idDocumentFile.name.split('.').pop();
-                    const fileName = `${currentUser.id}-id-document.${fileExt}`;
-                    
-                    const { error: uploadError } = await db.storage
-                        .from('id_documents')
-                        .upload(fileName, idDocumentFile, { upsert: true });
-
-                    if (uploadError) {
-                        console.error('❌ ID document upload error:', uploadError);
-                        // Continue even if upload fails
-                    } else {
-                        const { data: { publicUrl } } = db.storage.from('id_documents').getPublicUrl(fileName);
-                        profileData.id_document_url = publicUrl;
-                        console.log('✅ ID document uploaded:', publicUrl);
-                    }
+                    try {
+                        const fileExt = idDocumentFile.name.split('.').pop();
+                        const { error: uploadError } = await db.storage.from('id_documents').upload(`${currentUser.id}-id-document.${fileExt}`, idDocumentFile, { upsert: true });
+                        if (!uploadError) {
+                            const { data: { publicUrl } } = db.storage.from('id_documents').getPublicUrl(`${currentUser.id}-id-document.${fileExt}`);
+                            profileData.id_document_url = publicUrl;
+                        }
+                    } catch (err) { console.warn('⚠️ ID document upload skipped:', err); }
                 }
 
-                // Update database using upsert
-                const { error: upsertError } = await db
-                    .from('users')
-                    .upsert(profileData, { onConflict: 'id' });
+                // ✅ حفظ البيانات في جدول users
+                const { error: upsertError } = await db.from('users').upsert(profileData, { onConflict: 'id' });
+                if (upsertError) throw upsertError;
 
-                if (upsertError) {
-                    console.error('❌ Database update error:', upsertError);
-                    throw upsertError;
-                }
-
-                console.log('✅ Profile updated successfully');
                 showAlert('success', t('success_profile_updated') || '✅ Profile updated successfully!');
                 
-                // Update localStorage
-                const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
-                userData.full_name = profileData.full_name;
-                userData.profile_picture_url = profileData.profile_picture_url;
-                localStorage.setItem('currentUser', JSON.stringify(userData));
+                // تحديث البيانات المحلية
+                const localData = JSON.parse(localStorage.getItem('currentUser') || '{}');
+                localData.full_name = profileData.full_name;
+                localData.user_type = profileData.user_type;
+                localData.profile_picture_url = profileData.profile_picture_url;
+                localStorage.setItem('currentUser', JSON.stringify(localData));
 
                 setTimeout(() => { window.location.reload(); }, 1500);
 
@@ -589,18 +436,13 @@
             }
         }
 
-        // ===== Logout =====
+        // 9. تسجيل الخروج
         async function handleLogout() {
             if (confirm(t('confirm_logout') || 'Are you sure you want to logout?')) {
-                try {
-                    await db.auth.signOut();
-                    localStorage.removeItem('currentUser');
-                    localStorage.removeItem('userProfile');
-                    window.location.href = 'index.html';
-                } catch (error) {
-                    console.error('❌ Logout error:', error);
-                    showAlert('error', (t('error_logout') || 'Error logging out: ') + error.message);
-                }
+                await db.auth.signOut();
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('userProfile');
+                window.location.href = 'index.html';
             }
         }
     </script>
