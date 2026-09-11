@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - TopCompSports</title>
+    <title data-en="page_title">My Profile - TopCompSports</title>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Supabase (مرة واحدة فقط) -->
+    <!-- Supabase (مكتبة واحدة فقط) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <!-- auth.js - يحتوي على Supabase Client المشترك -->
@@ -59,324 +59,82 @@
             gap: 15px;
         }
 
-        .logo-section { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            text-decoration: none;
-        }
+        .logo-section { display: flex; align-items: center; gap: 12px; text-decoration: none; }
 
         .logo-icon {
-            width: 40px; 
-            height: 40px;
-            border-radius: 50%;
-            overflow: hidden;
-            background: var(--white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--accent-yellow);
-            padding: 0;
-            line-height: 0;
+            width: 40px; height: 40px; border-radius: 50%; overflow: hidden;
+            background: var(--white); display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--accent-yellow); padding: 0; line-height: 0;
         }
 
-        .logo-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+        .logo-icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .logo-text { font-size: 22px; font-weight: bold; color: var(--white); white-space: nowrap; }
 
-        .logo-text {
-            font-size: 22px;
-            font-weight: bold;
-            color: var(--white);
-            white-space: nowrap;
-        }
+        .nav-menu { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .nav-link { color: var(--white); text-decoration: none; font-weight: 500; padding: 8px 15px; border-radius: 5px; transition: all 0.3s; }
+        .nav-link:hover { color: var(--accent-yellow); }
 
-        .nav-menu { 
-            display: flex; 
-            gap: 20px; 
-            align-items: center; 
-            flex-wrap: wrap;
-        }
-
-        .nav-link {
-            color: var(--white);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 8px 15px;
-            border-radius: 5px;
-            transition: all 0.3s;
-        }
-
-        .nav-link:hover { 
-            color: var(--accent-yellow);
-        }
-
-        .auth-buttons { 
-            display: flex; 
-            gap: 10px; 
-            align-items: center;
-        }
-
-        .btn-logout {
-            padding: 10px 24px;
-            background: #dc2626;
-            color: var(--white);
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-logout:hover { 
-            background: #b91c1c;
-            transform: translateY(-2px);
-        }
+        .auth-buttons { display: flex; gap: 10px; align-items: center; }
+        .btn-logout { padding: 10px 24px; background: #dc2626; color: var(--white); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .btn-logout:hover { background: #b91c1c; transform: translateY(-2px); }
 
         /* ===== Language Switcher ===== */
-        .language-switcher {
-            display: flex;
-            gap: 5px;
-            background: var(--dark-gray);
-            padding: 4px;
-            border-radius: 8px;
-        }
-
-        .lang-btn {
-            padding: 8px 16px;
-            border: none;
-            background: transparent;
-            color: var(--white);
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .lang-btn:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .lang-btn.active {
-            background: var(--primary-blue);
-            color: var(--white);
-        }
+        .language-switcher { display: flex; gap: 5px; background: var(--dark-gray); padding: 4px; border-radius: 8px; }
+        .lang-btn { padding: 8px 16px; border: none; background: transparent; color: var(--white); border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 0.9rem; }
+        .lang-btn:hover { background: rgba(255,255,255,0.1); }
+        .lang-btn.active { background: var(--primary-blue); color: var(--white); }
 
         /* ===== Main Content ===== */
-        .profile-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
+        .profile-container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        .page-title { font-size: 2.5rem; font-weight: 900; color: var(--dark-blue); text-align: center; margin-bottom: 40px; }
 
-        .page-title {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--dark-blue);
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .profile-card {
-            background: var(--white);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            border: 2px solid #E2E8F0;
-        }
-
-        .profile-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 30px;
-            border-bottom: 2px solid #E2E8F0;
-        }
+        .profile-card { background: var(--white); border-radius: 20px; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 2px solid #E2E8F0; }
+        .profile-header { text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 2px solid #E2E8F0; }
 
         .profile-avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 4px solid var(--accent-yellow);
-            background: var(--gradient-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 60px;
+            width: 150px; height: 150px; border-radius: 50%; overflow: hidden;
+            border: 4px solid var(--accent-yellow); background: var(--gradient-blue);
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 60px;
         }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-name { font-size: 1.8rem; font-weight: 700; color: var(--dark-blue); margin-bottom: 8px; }
+        .profile-email { color: var(--primary-blue); font-size: 1.1rem; margin-bottom: 20px; }
 
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .upload-btn { background: var(--primary-blue); color: var(--white); padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .upload-btn:hover { background: var(--dark-blue); transform: translateY(-2px); }
 
-        .profile-name {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--dark-blue);
-            margin-bottom: 8px;
-        }
-
-        .profile-email {
-            color: var(--primary-blue);
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-        }
-
-        .upload-btn {
-            background: var(--primary-blue);
-            color: var(--white);
-            padding: 10px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .upload-btn:hover {
-            background: var(--dark-blue);
-            transform: translateY(-2px);
-        }
-
-        .form-group { 
-            margin-bottom: 20px; 
-        }
-        
-        .form-label { 
-            display: block; 
-            font-size: 0.9rem; 
-            font-weight: 600; 
-            margin-bottom: 8px; 
-            color: #475569;
-        }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; color: #475569; }
         
         .form-input, .form-select {
-            width: 100%;
-            background: var(--white);
-            border: 2px solid #E2E8F0;
-            color: var(--black);
-            padding: 14px 16px;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s;
+            width: 100%; background: var(--white); border: 2px solid #E2E8F0; color: var(--black);
+            padding: 14px 16px; border-radius: 10px; font-size: 1rem; transition: all 0.3s;
         }
-        
-        .form-input:focus, .form-select:focus { 
-            outline: none; 
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
-        }
-        
-        .form-input:read-only { 
-            background: var(--light-bg); 
-            cursor: not-allowed;
-            opacity: 0.8;
-        }
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
+        .form-input:read-only { background: var(--light-bg); cursor: not-allowed; opacity: 0.8; }
 
-        .form-row { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 20px; 
-        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-        .btn {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1.05rem;
-            margin-top: 15px;
-        }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1.05rem; margin-top: 15px; }
+        .btn-primary { background: var(--gradient-blue); color: var(--white); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: transparent; border: 2px solid var(--dark-gray); color: var(--dark-gray); }
+        .btn-secondary:hover { background: var(--dark-gray); color: var(--white); }
 
-        .btn-primary { 
-            background: var(--gradient-blue); 
-            color: var(--white); 
-        }
-        
-        .btn-primary:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 8px 25px rgba(0,102,204,0.4); 
-        }
-        
-        .btn-primary:disabled { 
-            opacity: 0.6; 
-            cursor: not-allowed; 
-            transform: none; 
-        }
-        
-        .btn-secondary { 
-            background: transparent; 
-            border: 2px solid var(--dark-gray); 
-            color: var(--dark-gray); 
-        }
-        
-        .btn-secondary:hover { 
-            background: var(--dark-gray); 
-            color: var(--white); 
-        }
-
-        .alert { 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-bottom: 20px; 
-            display: none; 
-            font-weight: 600; 
-        }
-        
+        .alert { padding: 15px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
         .alert.show { display: block; }
-        .alert-error { 
-            background: #FEE2E2; 
-            border: 1px solid #EF4444; 
-            color: #DC2626; 
-        }
-        .alert-success { 
-            background: #D1FAE5; 
-            border: 1px solid #10B981; 
-            color: #059669; 
-        }
-        .alert-info { 
-            background: #DBEAFE; 
-            border: 1px solid #3B82F6; 
-            color: #2563EB; 
-        }
+        .alert-error { background: #FEE2E2; border: 1px solid #EF4444; color: #DC2626; }
+        .alert-success { background: #D1FAE5; border: 1px solid #10B981; color: #059669; }
+        .alert-info { background: #DBEAFE; border: 1px solid #3B82F6; color: #2563EB; }
 
         .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999;
         }
-
-        .loading-content {
-            text-align: center;
-            color: var(--white);
-        }
-
-        .loading-content i {
-            font-size: 4rem;
-            color: var(--accent-yellow);
-        }
-
-        .loading-content p {
-            margin-top: 20px;
-            font-size: 1.2rem;
-        }
+        .loading-content { text-align: center; color: var(--white); }
+        .loading-content i { font-size: 4rem; color: var(--accent-yellow); }
+        .loading-content p { margin-top: 20px; font-size: 1.2rem; }
 
         /* ===== Responsive ===== */
         @media (max-width: 768px) {
@@ -390,13 +148,8 @@
         }
 
         /* ===== RTL Support ===== */
-        [dir="rtl"] .profile-header {
-            text-align: center;
-        }
-
-        [dir="rtl"] .form-label {
-            text-align: right;
-        }
+        [dir="rtl"] .profile-header { text-align: center; }
+        [dir="rtl"] .form-label { text-align: right; }
     </style>
 </head>
 <body>
@@ -404,7 +157,7 @@
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-content">
             <i class="fas fa-spinner fa-spin"></i>
-            <p>Loading profile...</p>
+            <p data-en="loading_profile">Loading profile...</p>
         </div>
     </div>
 
@@ -419,9 +172,9 @@
             </a>
             
             <nav class="nav-menu">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="events.html" class="nav-link">Tournaments</a>
-                <a href="index.html#features" class="nav-link">Features</a>
+                <a href="index.html" class="nav-link" data-en="nav_home">Home</a>
+                <a href="events.html" class="nav-link" data-en="nav_tournaments">Tournaments</a>
+                <a href="index.html#features" class="nav-link" data-en="nav_features">Features</a>
             </nav>
             
             <div class="auth-buttons">
@@ -429,127 +182,131 @@
                     <button class="lang-btn" data-lang="ar" onclick="setLanguage('ar')">عربي</button>
                     <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">English</button>
                 </div>
-                
-                <button class="btn-logout" onclick="handleLogout()">Logout</button>
+                <button class="btn-logout" onclick="handleLogout()" data-en="btn_logout">Logout</button>
             </div>
         </div>
     </header>
 
     <!-- ===== Main Content ===== -->
     <div class="profile-container">
-        <h1 class="page-title">My Profile</h1>
-
+        <h1 class="page-title" data-en="page_title">My Profile</h1>
         <div id="alert" class="alert"></div>
 
         <div id="profileContent" class="profile-card" style="display: none;">
             <div class="profile-header">
-                <div class="profile-avatar" id="profileAvatar">
-                    <span>👤</span>
-                </div>
+                <div class="profile-avatar" id="profileAvatar"><span>👤</span></div>
                 <div class="profile-name" id="profileName">User Name</div>
                 <div class="profile-email" id="profileEmail">user@email.com</div>
                 <button class="upload-btn" onclick="document.getElementById('profilePic').click()">
-                    📷 Change Photo
+                    📷 <span data-en="change_photo">Change Photo</span>
                 </button>
                 <input type="file" id="profilePic" accept="image/*" onchange="handleProfilePicUpload(event)" style="display: none;">
             </div>
 
             <form onsubmit="handleProfileUpdate(event)">
                 <div class="form-group">
-                    <label class="form-label">Full Name *</label>
+                    <label class="form-label" data-en="label_full_name">Full Name *</label>
                     <input type="text" class="form-input" id="fullName" required readonly>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Email *</label>
+                    <label class="form-label" data-en="label_email">Email *</label>
                     <input type="email" class="form-input" id="email" required readonly>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Date of Birth</label>
+                        <label class="form-label" data-en="label_date_of_birth">Date of Birth</label>
                         <input type="date" class="form-input" id="dateOfBirth">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Gender</label>
+                        <label class="form-label" data-en="label_gender">Gender</label>
                         <select class="form-select" id="gender">
-                            <option value="">Select gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
+                            <option value="" data-en="placeholder_gender">Select gender</option>
+                            <option value="Male" data-en="gender_male">Male</option>
+                            <option value="Female" data-en="gender_female">Female</option>
+                            <option value="Other" data-en="gender_other">Other</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Country</label>
-                        <input type="text" class="form-input" id="country" placeholder="Your country">
+                        <label class="form-label" data-en="label_country">Country</label>
+                        <input type="text" class="form-input" id="country" data-placeholder-en="placeholder_country" placeholder="Your country">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Phone Number</label>
-                        <input type="tel" class="form-input" id="phone" placeholder="+1 (234) 567-8900">
+                        <label class="form-label" data-en="label_phone">Phone Number</label>
+                        <input type="tel" class="form-input" id="phone" data-placeholder-en="placeholder_phone" placeholder="+1 (234) 567-8900">
                     </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary" id="saveBtn">
-                     Save Changes
+                    💾 <span data-en="btn_save">Save Changes</span>
                 </button>
-                
                 <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">
-                    ← Back to Home
+                    ← <span data-en="btn_back">Back to Home</span>
                 </button>
             </form>
         </div>
     </div>
 
     <script>
-        // ===== استخدام Supabase Client من auth.js =====
-        // هذا يحل مشكلة "redeclaration of supabase"
-        const supabase = window.supabaseClient;
+        // ===== الحل الجذري: استخدام اسم متغير مختلف لتجنب التضارب =====
+        const db = window.supabaseClient;
         
-        if (!supabase) {
+        if (!db) {
             console.error('❌ Supabase client not loaded. Make sure auth.js is included.');
         }
 
         let currentUser = null;
         let profilePictureFile = null;
 
-        // ===== On Load =====
+        // ===== دالة مساعدة للترجمة =====
+        function t(key) {
+            const lang = localStorage.getItem('selectedLanguage') || 'en';
+            return (window.translations && window.translations[lang] && window.translations[lang][key]) 
+                ? window.translations[lang][key] 
+                : key;
+        }
+
+        // ===== دالة عرض التنبيهات =====
+        function showAlert(type, message) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 5000);
+        }
+
+        // ===== عند تحميل الصفحة =====
         window.addEventListener('DOMContentLoaded', async () => {
             console.log('🔄 Loading profile page...');
             try {
-                // Check authentication
-                const { data: { user }, error } = await supabase.auth.getUser();
+                const { data: { user }, error } = await db.auth.getUser();
                 
                 if (error || !user) {
                     console.error('❌ Auth error:', error);
-                    alert('Not logged in. Redirecting to login...');
-                    setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
+                    showAlert('error', t('error_not_logged_in') || 'Not logged in. Redirecting...');
+                    setTimeout(() => { window.location.href = 'login.html'; }, 2000);
                     return;
                 }
 
                 currentUser = user;
                 console.log('✅ User authenticated:', user.email);
-                
-                // Load profile data
                 await loadProfile();
                 
             } catch (error) {
                 console.error('❌ Error in onload:', error);
-                alert('Error: ' + error.message);
+                showAlert('error', 'Error: ' + error.message);
             }
         });
 
-        // ===== Load Profile Data from Database =====
+        // ===== جلب بيانات البروفايل من قاعدة البيانات =====
         async function loadProfile() {
             try {
                 console.log('🔍 Fetching profile data for user:', currentUser.id);
                 
-                // Query users table
-                const { data: profile, error } = await supabase
+                const { data: profile, error } = await db
                     .from('users')
                     .select('*')
                     .eq('id', currentUser.id)
@@ -557,18 +314,17 @@
 
                 if (error) {
                     console.error('❌ Database error:', error);
-                    alert('Failed to load profile: ' + error.message);
+                    showAlert('error', (t('error_load_profile') || 'Failed to load profile: ') + error.message);
                     return;
                 }
 
                 console.log('✅ Profile data loaded:', profile);
-
                 let userData = profile;
 
-                // Fallback if no profile in users table
+                // Fallback إذا لم تكن البيانات موجودة في جدول users
                 if (!userData) {
-                    console.warn('️ No profile found in users table, using auth metadata');
-                    alert('Profile not found. Please complete your information.');
+                    console.warn('⚠️ No profile found in users table, using auth metadata');
+                    showAlert('info', t('info_complete_profile') || 'Profile not found. Please complete your information.');
                     userData = {
                         full_name: currentUser.user_metadata?.full_name || 'User',
                         email: currentUser.email,
@@ -580,7 +336,7 @@
                     };
                 }
 
-                // Update UI with data
+                // تحديث الواجهة
                 document.getElementById('profileName').textContent = userData.full_name || 'User';
                 document.getElementById('profileEmail').textContent = userData.email;
                 document.getElementById('fullName').value = userData.full_name || '';
@@ -590,65 +346,55 @@
                 document.getElementById('country').value = userData.country || '';
                 document.getElementById('phone').value = userData.phone || '';
 
-                // Update avatar
+                // تحديث الصورة
                 if (userData.profile_picture_url) {
-                    document.getElementById('profileAvatar').innerHTML = 
-                        `<img src="${userData.profile_picture_url}" alt="Profile">`;
+                    document.getElementById('profileAvatar').innerHTML = `<img src="${userData.profile_picture_url}" alt="Profile">`;
                 } else {
-                    // Generate avatar from initials
                     const initials = (userData.full_name || 'U').split(' ').map(n => n[0]).join('').toUpperCase();
-                    document.getElementById('profileAvatar').innerHTML = 
-                        `<span style="font-size: 60px; color: white; font-weight: bold;">${initials}</span>`;
+                    document.getElementById('profileAvatar').innerHTML = `<span style="font-size: 60px; color: white; font-weight: bold;">${initials}</span>`;
                 }
 
-                // Hide loading, show content
+                // إخفاء التحميل وإظهار المحتوى
                 document.getElementById('loadingOverlay').style.display = 'none';
                 document.getElementById('profileContent').style.display = 'block';
 
             } catch (error) {
                 console.error('❌ Error loading profile:', error);
-                alert('Error loading profile: ' + error.message);
+                showAlert('error', 'Error loading profile: ' + error.message);
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
         }
 
-        // ===== Handle Profile Picture Upload =====
+        // ===== معالجة رفع صورة البروفايل =====
         async function handleProfilePicUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            // Validate file size (max 5MB)
             if (file.size > 5 * 1024 * 1024) {
-                alert('File size must be less than 5MB');
+                showAlert('error', t('error_file_size') || 'File size must be less than 5MB');
                 return;
             }
-
-            // Validate file type
             if (!file.type.startsWith('image/')) {
-                alert('Please select an image file');
+                showAlert('error', t('error_file_type') || 'Please select an image file');
                 return;
             }
 
             profilePictureFile = file;
-            
-            // Preview image
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('profileAvatar').innerHTML = 
-                    `<img src="${e.target.result}" alt="Profile">`;
+                document.getElementById('profileAvatar').innerHTML = `<img src="${e.target.result}" alt="Profile">`;
             };
             reader.readAsDataURL(file);
 
-            alert('Photo selected. Click Save to upload.');
+            showAlert('success', t('success_photo_selected') || 'Photo selected. Click Save to upload.');
         }
 
-        // ===== Handle Profile Update =====
+        // ===== حفظ تحديثات البروفايل =====
         async function handleProfileUpdate(e) {
             e.preventDefault();
-
             const saveBtn = document.getElementById('saveBtn');
             saveBtn.disabled = true;
-            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (t('saving') || 'Saving...');
 
             try {
                 const profileData = {
@@ -664,71 +410,61 @@
 
                 console.log('💾 Updating profile:', profileData);
 
-                // Upload profile picture if selected
+                // رفع الصورة إذا تم اختيارها
                 if (profilePictureFile) {
-                    console.log(' Uploading profile picture...');
+                    console.log('📤 Uploading profile picture...');
                     const fileExt = profilePictureFile.name.split('.').pop();
                     const fileName = `${currentUser.id}-profile.${fileExt}`;
                     
-                    const { error: uploadError } = await supabase.storage
+                    const { error: uploadError } = await db.storage
                         .from('profiles')
                         .upload(fileName, profilePictureFile, { upsert: true });
 
-                    if (uploadError) {
-                        console.error('❌ Upload error:', uploadError);
-                        throw uploadError;
-                    }
+                    if (uploadError) throw uploadError;
 
-                    const { data: { publicUrl } } = supabase.storage
-                        .from('profiles')
-                        .getPublicUrl(fileName);
+                    const { data: { publicUrl } } = db.storage.from('profiles').getPublicUrl(fileName);
                     profileData.profile_picture_url = publicUrl;
                     console.log('✅ Picture uploaded:', publicUrl);
                 }
 
-                // Update database using upsert (insert or update)
-                const { error: upsertError } = await supabase
+                // تحديث قاعدة البيانات باستخدام upsert
+                const { error: upsertError } = await db
                     .from('users')
                     .upsert(profileData, { onConflict: 'id' });
 
-                if (upsertError) {
-                    console.error('❌ Database update error:', upsertError);
-                    throw upsertError;
-                }
+                if (upsertError) throw upsertError;
 
                 console.log('✅ Profile updated successfully');
-                alert('✅ Profile updated successfully!');
+                showAlert('success', t('success_profile_updated') || '✅ Profile updated successfully!');
                 
-                // Update localStorage for other pages
+                // تحديث localStorage
                 const userData = JSON.parse(localStorage.getItem('currentUser') || '{}');
                 userData.full_name = profileData.full_name;
                 userData.profile_picture_url = profileData.profile_picture_url;
                 localStorage.setItem('currentUser', JSON.stringify(userData));
 
-                // Reload profile after 1.5 seconds
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
+                setTimeout(() => { window.location.reload(); }, 1500);
 
             } catch (error) {
                 console.error('❌ Error updating profile:', error);
-                alert('❌ Error: ' + error.message);
+                showAlert('error', (t('error_update_profile') || '❌ Error: ') + error.message);
             } finally {
                 saveBtn.disabled = false;
-                saveBtn.innerHTML = '💾 Save Changes';
+                saveBtn.innerHTML = '💾 <span data-en="btn_save">' + (t('btn_save') || 'Save Changes') + '</span>';
             }
         }
 
-        // ===== Logout =====
+        // ===== تسجيل الخروج =====
         async function handleLogout() {
-            if (confirm('Are you sure you want to logout?')) {
+            if (confirm(t('confirm_logout') || 'Are you sure you want to logout?')) {
                 try {
-                    await supabase.auth.signOut();
+                    await db.auth.signOut();
                     localStorage.removeItem('currentUser');
+                    localStorage.removeItem('userProfile');
                     window.location.href = 'index.html';
                 } catch (error) {
                     console.error('❌ Logout error:', error);
-                    alert('Error logging out: ' + error.message);
+                    showAlert('error', (t('error_logout') || 'Error logging out: ') + error.message);
                 }
             }
         }
