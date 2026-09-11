@@ -3,103 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TopCompSports - Coach Dashboard</title>
+    <title>Coach Dashboard - TopCompSports</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-blue: #0066CC;
+            --dark-blue: #003366;
+            --accent-yellow: #FFB800;
+            --black: #0A0A0A;
+            --dark-gray: #1A1A1A;
+            --medium-gray: #2A2A2A;
+            --white: #FFFFFF;
+            --light-bg: #F8FAFC;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
-            color: #fff;
-            min-height: 100vh;
-        }
-        .header {
-            background: rgba(21, 29, 43, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 20px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #2a3548;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .logo { display: flex; align-items: center; gap: 15px; }
-        .logo-icon {
-            width: 45px; height: 45px;
-            background: linear-gradient(135deg, #2563EB, #1e40af);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; font-weight: bold; color: #fff;
-        }
-        .logo-text { font-size: 22px; font-weight: bold; }
-        .user-menu { display: flex; align-items: center; gap: 20px; }
-        .user-name { color: rgba(255,255,255,0.9); font-weight: 600; }
-        .btn-logout {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid #ef4444;
-            padding: 8px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        .btn-logout:hover { background: #ef4444; color: #fff; }
-        
-        .container { max-width: 1400px; margin: 0 auto; padding: 40px 50px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); color: var(--black); min-height: 100vh; }
+
+        /* ===== Header ===== */
+        .main-header { background: var(--black); padding: 12px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header-container { max-width: 1400px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .logo-section { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-icon { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: var(--white); display: flex; align-items: center; justify-content: center; border: 2px solid var(--accent-yellow); }
+        .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .logo-text { font-size: 22px; font-weight: bold; color: var(--white); }
+        .nav-menu { display: flex; gap: 20px; align-items: center; }
+        .nav-link { color: var(--white); text-decoration: none; font-weight: 500; padding: 8px 15px; border-radius: 5px; transition: all 0.3s; }
+        .nav-link:hover { color: var(--accent-yellow); }
+        .auth-buttons { display: flex; gap: 10px; align-items: center; }
+        .btn-logout { padding: 10px 24px; background: #dc2626; color: var(--white); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .btn-logout:hover { background: #b91c1c; transform: translateY(-2px); }
+        .language-switcher { display: flex; gap: 5px; background: var(--dark-gray); padding: 4px; border-radius: 8px; }
+        .lang-btn { padding: 8px 16px; border: none; background: transparent; color: var(--white); border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .lang-btn:hover { background: rgba(255,255,255,0.1); }
+        .lang-btn.active { background: var(--primary-blue); color: var(--white); }
+
+        /* ===== Main Content ===== */
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
         
         .welcome-section {
-            background: linear-gradient(135deg, #2563EB 0%, #1e40af 100%);
+            background: var(--gradient-blue);
             padding: 40px;
             border-radius: 16px;
             margin-bottom: 40px;
+            color: var(--white);
             position: relative;
             overflow: hidden;
         }
         .welcome-section::before {
             content: '';
             position: absolute;
-            top: -50%; right: -20%;
-            width: 400px; height: 400px;
+            top: -50%; right: -10%;
+            width: 300px; height: 300px;
             background: rgba(255,255,255,0.1);
             border-radius: 50%;
         }
         .welcome-title { font-size: 32px; font-weight: bold; margin-bottom: 10px; position: relative; z-index: 1; }
         .welcome-subtitle { color: rgba(255,255,255,0.9); font-size: 16px; position: relative; z-index: 1; }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 40px;
-        }
+
+        /* ===== Stats Grid ===== */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
         .stat-card {
-            background: #151d2b;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--white);
+            border: 2px solid #E2E8F0;
             border-radius: 12px;
             padding: 25px;
             transition: all 0.3s;
         }
         .stat-card:hover {
             transform: translateY(-5px);
-            border-color: #2563EB;
-            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.2);
+            border-color: var(--primary-blue);
+            box-shadow: 0 10px 30px rgba(0,102,204,0.15);
         }
-        .stat-icon { font-size: 32px; margin-bottom: 15px; }
-        .stat-value { font-size: 36px; font-weight: bold; color: #f1c40f; margin-bottom: 5px; }
-        .stat-label { color: rgba(255,255,255,0.7); font-size: 14px; }
+        .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .stat-icon { font-size: 32px; color: var(--primary-blue); }
+        .stat-value { font-size: 36px; font-weight: bold; color: var(--dark-blue); margin-bottom: 5px; }
+        .stat-label { color: #64748B; font-size: 14px; }
+
+        /* ===== Content Grid ===== */
+        .content-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
         
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
-        }
-        
+        /* ===== Profile Card ===== */
         .profile-card {
-            background: #151d2b;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--white);
+            border: 2px solid #E2E8F0;
             border-radius: 16px;
             padding: 30px;
             text-align: center;
@@ -109,23 +98,23 @@
             border-radius: 50%;
             object-fit: cover;
             margin: 0 auto 20px;
-            border: 4px solid #2563EB;
+            border: 4px solid var(--accent-yellow);
         }
-        .profile-name { font-size: 24px; font-weight: bold; margin-bottom: 5px; }
-        .profile-role { color: #f1c40f; font-size: 14px; margin-bottom: 20px; }
+        .profile-name { font-size: 24px; font-weight: bold; margin-bottom: 5px; color: var(--dark-blue); }
+        .profile-role { color: var(--primary-blue); font-size: 14px; margin-bottom: 20px; font-weight: 600; }
         .profile-info { text-align: left; margin-top: 20px; }
         .info-item {
             display: flex;
             justify-content: space-between;
             padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid #E2E8F0;
         }
-        .info-label { color: rgba(255,255,255,0.7); font-size: 14px; }
-        .info-value { font-weight: 600; }
+        .info-label { color: #64748B; font-size: 14px; }
+        .info-value { font-weight: 600; color: var(--black); }
         .btn-edit {
             width: 100%;
-            background: #2563EB;
-            color: #fff;
+            background: var(--gradient-blue);
+            color: var(--white);
             border: none;
             padding: 12px;
             border-radius: 8px;
@@ -134,11 +123,12 @@
             margin-top: 20px;
             transition: all 0.3s;
         }
-        .btn-edit:hover { background: #1d4ed8; }
-        
+        .btn-edit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.3); }
+
+        /* ===== Team Section ===== */
         .team-section {
-            background: #151d2b;
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--white);
+            border: 2px solid #E2E8F0;
             border-radius: 16px;
             padding: 30px;
         }
@@ -147,24 +137,57 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        .section-title { font-size: 24px; font-weight: bold; }
+        .section-title { font-size: 24px; font-weight: bold; color: var(--dark-blue); }
         .btn-primary {
-            background: linear-gradient(135deg, #2563EB, #1d4ed8);
-            color: #fff;
+            background: var(--gradient-blue);
+            color: var(--white);
             border: none;
             padding: 10px 20px;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
-        
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.3); }
+
+        /* ===== Teams List ===== */
+        .teams-list { display: flex; flex-direction: column; gap: 15px; }
+        .team-item {
+            background: var(--light-bg);
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .team-item:hover {
+            border-color: var(--primary-blue);
+            background: rgba(0,102,204,0.05);
+            transform: translateX(5px);
+        }
+        .team-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .team-name { font-size: 18px; font-weight: bold; color: var(--dark-blue); }
+        .team-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            background: var(--accent-yellow);
+            color: var(--black);
+        }
+        .team-info { display: flex; gap: 20px; color: #64748B; font-size: 14px; }
+        .team-info-item { display: flex; align-items: center; gap: 5px; }
+
+        /* ===== Athletes List ===== */
         .athletes-list { display: flex; flex-direction: column; gap: 15px; }
         .athlete-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--light-bg);
+            border: 2px solid #E2E8F0;
             border-radius: 12px;
             padding: 20px;
             display: flex;
@@ -173,130 +196,168 @@
             transition: all 0.3s;
         }
         .athlete-item:hover {
-            border-color: #2563EB;
-            background: rgba(37, 99, 235, 0.05);
+            border-color: var(--primary-blue);
+            background: rgba(0,102,204,0.05);
         }
-        .athlete-info h4 { font-size: 18px; margin-bottom: 5px; }
-        .athlete-info p { color: rgba(255,255,255,0.7); font-size: 14px; }
+        .athlete-info h4 { font-size: 18px; margin-bottom: 5px; color: var(--dark-blue); }
+        .athlete-info p { color: #64748B; font-size: 14px; }
         .belt-badge {
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
             font-weight: bold;
-            background: rgba(37, 99, 235, 0.2);
-            color: #2563EB;
+            background: rgba(0,102,204,0.1);
+            color: var(--primary-blue);
         }
-        
+
+        /* ===== Empty State ===== */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: rgba(255,255,255,0.5);
+            color: #64748B;
         }
-        .empty-state-icon { font-size: 64px; margin-bottom: 20px; }
-        
-        .lang-switcher { display: flex; gap: 10px; }
-        .lang-btn {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        .lang-btn.active { background: #2563EB; border-color: #2563EB; }
-        
+        .empty-state-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.5; }
+
+        /* ===== Responsive ===== */
         @media (max-width: 1024px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .content-grid { grid-template-columns: 1fr; }
+            .nav-menu { display: none; }
+        }
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .section-header { flex-direction: column; align-items: flex-start; }
+            .team-info { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <div class="logo">
-            <div class="logo-icon">T</div>
-            <div class="logo-text">TopCompSports</div>
-        </div>
-        <div class="user-menu">
-            <div class="lang-switcher">
-                <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
-                <button class="lang-btn" onclick="setLanguage('ar')">AR</button>
+    <!-- ===== Header ===== -->
+    <header class="main-header">
+        <div class="header-container">
+            <a href="index.html" class="logo-section">
+                <div class="logo-icon"><img src="logo2.png" alt="Logo"></div>
+                <div class="logo-text">TopCompSports</div>
+            </a>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="events.html" class="nav-link">Tournaments</a>
+                <a href="coach-dashboard.html" class="nav-link" style="color: var(--accent-yellow);">Dashboard</a>
+            </nav>
+            <div class="auth-buttons">
+                <div class="language-switcher">
+                    <button class="lang-btn" onclick="setLanguage('ar')">عربي</button>
+                    <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+                </div>
+                <button class="btn-logout" onclick="handleLogout()">Logout</button>
             </div>
-            <span class="user-name" id="userName">Loading...</span>
-            <button class="btn-logout" onclick="handleLogout()" data-en="Logout" data-ar="تسجيل الخروج">Logout</button>
         </div>
     </header>
 
+    <!-- ===== Main Content ===== -->
     <div class="container">
+        <!-- Welcome Section -->
         <div class="welcome-section">
-            <h1 class="welcome-title" data-en="Welcome back, Coach!" data-ar="مرحباً بعودتك، مدرب!">Welcome back, Coach!</h1>
-            <p class="welcome-subtitle" data-en="Manage your team and track your athletes' progress." data-ar="أدر فريقك وتابع تقدم لاعبيك.">Manage your team and track your athletes' progress.</p>
+            <h1 class="welcome-title">Welcome back, Coach!</h1>
+            <p class="welcome-subtitle">Manage your teams and track your athletes' progress</p>
         </div>
 
+        <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon">👥</div>
+                <div class="stat-header">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                </div>
                 <div class="stat-value" id="statAthletes">0</div>
-                <div class="stat-label" data-en="Athletes" data-ar="لاعبين">Athletes</div>
+                <div class="stat-label">Total Athletes</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"></div>
-                <div class="stat-value" id="statTournaments">0</div>
-                <div class="stat-label" data-en="Tournaments" data-ar="بطولات">Tournaments</div>
+                <div class="stat-header">
+                    <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
+                </div>
+                <div class="stat-value" id="statTeams">0</div>
+                <div class="stat-label">My Teams</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">🥋</div>
-                <div class="stat-value" id="statBelt">-</div>
-                <div class="stat-label" data-en="Belt Level" data-ar="لون الحزام">Belt Level</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">⭐</div>
+                <div class="stat-header">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                </div>
                 <div class="stat-value" id="statExperience">-</div>
-                <div class="stat-label" data-en="Years Experience" data-ar="سنوات الخبرة">Years Experience</div>
+                <div class="stat-label">Years Experience</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <div class="stat-icon"><i class="fas fa-bell"></i></div>
+                </div>
+                <div class="stat-value" id="statRequests">0</div>
+                <div class="stat-label">Join Requests</div>
             </div>
         </div>
 
+        <!-- Content Grid -->
         <div class="content-grid">
+            <!-- Profile Card -->
             <div class="profile-card">
                 <img src="" alt="Profile" class="profile-photo" id="profilePhoto" style="display:none;">
-                <div class="profile-photo" id="profilePhotoPlaceholder" style="background: #2563EB; display:flex; align-items:center; justify-content:center; font-size:48px; color:#fff;">‍🏫</div>
+                <div class="profile-photo" id="profilePhotoPlaceholder" style="background: var(--gradient-blue); display:flex; align-items:center; justify-content:center; font-size:48px; color:#fff;">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
                 <h2 class="profile-name" id="profileName">Loading...</h2>
-                <p class="profile-role" data-en="Coach" data-ar="مدرب">Coach</p>
+                <p class="profile-role">Coach</p>
                 
                 <div class="profile-info">
                     <div class="info-item">
-                        <span class="info-label" data-en="Email" data-ar="البريد">Email</span>
+                        <span class="info-label">Email</span>
                         <span class="info-value" id="profileEmail">-</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label" data-en="Phone" data-ar="الهاتف">Phone</span>
+                        <span class="info-label">Phone</span>
                         <span class="info-value" id="profilePhone">-</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label" data-en="Team" data-ar="الفريق">Team</span>
-                        <span class="info-value" id="profileTeam">-</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label" data-en="Certification" data-ar="الشهادة">Certification</span>
-                        <span class="info-value" id="profileCert">-</span>
+                        <span class="info-label">Country</span>
+                        <span class="info-value" id="profileCountry">-</span>
                     </div>
                 </div>
                 
-                <button class="btn-edit" onclick="window.location.href='complete-coach.html'" data-en="Edit Profile" data-ar="تعديل الملف">Edit Profile</button>
+                <button class="btn-edit" onclick="window.location.href='my-profile.html'">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
             </div>
 
+            <!-- Teams & Athletes Section -->
             <div class="team-section">
                 <div class="section-header">
-                    <h2 class="section-title" data-en="My Athletes" data-ar="لاعبي">My Athletes</h2>
-                    <button class="btn-primary" data-en="Add Athlete →" data-ar="إضافة لاعب ←">Add Athlete →</button>
+                    <h2 class="section-title">
+                        <i class="fas fa-shield-alt"></i> My Teams
+                    </h2>
+                    <a href="create-team.html" class="btn-primary">
+                        <i class="fas fa-plus"></i> Create New Team
+                    </a>
                 </div>
                 
-                <div class="athletes-list" id="athletesList">
+                <div class="teams-list" id="teamsList">
                     <div class="empty-state">
-                        <div class="empty-state-icon">👥</div>
-                        <p data-en="No athletes in your team yet." data-ar="لا يوجد لاعبين في فريقك بعد.">No athletes in your team yet.</p>
+                        <div class="empty-state-icon"><i class="fas fa-shield-alt"></i></div>
+                        <p>You haven't created any teams yet.</p>
+                        <a href="create-team.html" class="btn-primary" style="margin-top: 20px;">
+                            <i class="fas fa-plus"></i> Create Your First Team
+                        </a>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px; padding-top: 40px; border-top: 2px solid #E2E8F0;">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-users"></i> My Athletes
+                        </h2>
+                    </div>
+                    
+                    <div class="athletes-list" id="athletesList">
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fas fa-users"></i></div>
+                            <p>No athletes in your teams yet.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -308,22 +369,19 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        let currentLang = 'en';
+        let currentCoach = null;
 
+        // ===== Language Switcher =====
         function setLanguage(lang) {
-            currentLang = lang;
             document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
             document.documentElement.lang = lang;
-            
-            document.querySelectorAll('[data-en]').forEach(el => {
-                const text = el.getAttribute(`data-${lang}`);
-                if (text) el.textContent = text;
-            });
+            localStorage.setItem('selectedLanguage', lang);
             
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
         }
 
+        // ===== Load Profile =====
         async function loadProfile() {
             const { data: { user } } = await supabase.auth.getUser();
             
@@ -339,16 +397,16 @@
                 .single();
 
             if (error || !coach) {
-                window.location.href = 'complete-coach.html';
+                window.location.href = 'my-profile.html';
                 return;
             }
 
-            document.getElementById('userName').textContent = coach.full_name;
+            currentCoach = coach;
+
             document.getElementById('profileName').textContent = coach.full_name;
             document.getElementById('profileEmail').textContent = coach.email;
             document.getElementById('profilePhone').textContent = coach.phone || '-';
-            document.getElementById('profileTeam').textContent = coach.team_name || '-';
-            document.getElementById('profileCert').textContent = coach.certification_level || '-';
+            document.getElementById('profileCountry').textContent = coach.country || '-';
             
             if (coach.profile_photo_url) {
                 document.getElementById('profilePhoto').src = coach.profile_photo_url;
@@ -356,18 +414,97 @@
                 document.getElementById('profilePhotoPlaceholder').style.display = 'none';
             }
 
-            document.getElementById('statBelt').textContent = coach.belt_level || '-';
-            document.getElementById('statExperience').textContent = coach.years_of_experience || '-';
+            document.getElementById('statExperience').textContent = coach.experience_years || '-';
 
-            await loadAthletes(coach.id);
+            // Load teams and athletes
+            await loadTeams(coach.id);
+            await loadAllAthletes(coach.id);
+            await loadJoinRequests();
         }
 
-        async function loadAthletes(coachId) {
-            const { data: athletes, error } = await supabase
-                .from('athletes')
+        // ===== Load Teams =====
+        async function loadTeams(coachId) {
+            const { data: teams, error } = await supabase
+                .from('teams')
                 .select('*')
                 .eq('coach_id', coachId)
-                .order('full_name');
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error loading teams:', error);
+                return;
+            }
+
+            const list = document.getElementById('teamsList');
+            document.getElementById('statTeams').textContent = teams ? teams.length : 0;
+            
+            if (!teams || teams.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-shield-alt"></i></div>
+                        <p>You haven't created any teams yet.</p>
+                        <a href="create-team.html" class="btn-primary" style="margin-top: 20px;">
+                            <i class="fas fa-plus"></i> Create Your First Team
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = teams.map(team => `
+                <div class="team-item" onclick="window.location.href='team-dashboard.html?id=${team.id}'">
+                    <div class="team-header">
+                        <div class="team-name">${team.name}</div>
+                        <span class="team-badge">${team.is_active ? 'Active' : 'Inactive'}</span>
+                    </div>
+                    <div class="team-info">
+                        <div class="team-info-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${team.city || 'N/A'}${team.city && team.country ? ', ' : ''}${team.country || ''}</span>
+                        </div>
+                        <div class="team-info-item">
+                            <i class="fas fa-users"></i>
+                            <span>View Members →</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===== Load All Athletes from All Teams =====
+        async function loadAllAthletes(coachId) {
+            // Get all teams first
+            const { data: teams } = await supabase
+                .from('teams')
+                .select('id')
+                .eq('coach_id', coachId);
+
+            if (!teams || teams.length === 0) {
+                document.getElementById('athletesList').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-users"></i></div>
+                        <p>No athletes in your teams yet.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const teamIds = teams.map(t => t.id);
+
+            // Get all team members
+            const { data: members, error } = await supabase
+                .from('team_members')
+                .select(`
+                    *,
+                    athlete:athletes (
+                        id,
+                        full_name,
+                        country,
+                        belt_level
+                    )
+                `)
+                .in('team_id', teamIds)
+                .eq('status', 'approved');
 
             if (error) {
                 console.error('Error loading athletes:', error);
@@ -375,36 +512,71 @@
             }
 
             const list = document.getElementById('athletesList');
+            document.getElementById('statAthletes').textContent = members ? members.length : 0;
             
-            if (!athletes || athletes.length === 0) {
+            if (!members || members.length === 0) {
                 list.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">👥</div>
-                        <p data-en="No athletes in your team yet." data-ar="لا يوجد لاعبين في فريقك بعد.">No athletes in your team yet.</p>
+                        <div class="empty-state-icon"><i class="fas fa-users"></i></div>
+                        <p>No athletes in your teams yet.</p>
                     </div>
                 `;
-                document.getElementById('statAthletes').textContent = '0';
                 return;
             }
 
-            document.getElementById('statAthletes').textContent = athletes.length;
-
-            list.innerHTML = athletes.map(athlete => `
+            list.innerHTML = members.map(member => `
                 <div class="athlete-item">
                     <div class="athlete-info">
-                        <h4>${athlete.full_name}</h4>
-                        <p>${athlete.country || '-'} • ${athlete.weight ? athlete.weight + ' kg' : '-'}</p>
+                        <h4>${member.athlete.full_name}</h4>
+                        <p>${member.athlete.country || 'N/A'}</p>
                     </div>
-                    <span class="belt-badge">${athlete.belt_level || '-'}</span>
+                    <span class="belt-badge">${member.athlete.belt_level || 'N/A'}</span>
                 </div>
             `).join('');
         }
 
-        async function handleLogout() {
-            await supabase.auth.signOut();
-            window.location.href = 'index.html';
+        // ===== Load Join Requests =====
+        async function loadJoinRequests() {
+            if (!currentCoach) return;
+
+            const { data: teams } = await supabase
+                .from('teams')
+                .select('id')
+                .eq('coach_id', currentCoach.id);
+
+            if (!teams || teams.length === 0) return;
+
+            const teamIds = teams.map(t => t.id);
+
+            const { data: requests, error } = await supabase
+                .from('team_join_requests')
+                .select(`
+                    *,
+                    athlete:athletes (
+                        full_name,
+                        email
+                    )
+                `)
+                .in('team_id', teamIds)
+                .eq('status', 'pending');
+
+            if (error) {
+                console.error('Error loading requests:', error);
+                return;
+            }
+
+            document.getElementById('statRequests').textContent = requests ? requests.length : 0;
         }
 
+        // ===== Logout =====
+        async function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                await supabase.auth.signOut();
+                window.location.href = 'index.html';
+            }
+        }
+
+        // ===== Initialize =====
         window.onload = loadProfile;
     </script>
 </body>
