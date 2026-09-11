@@ -73,7 +73,6 @@
             align-items: center;
             justify-content: center;
             border: 2px solid var(--accent-yellow);
-            /* إزالة أي فراغات */
             padding: 0;
             line-height: 0;
         }
@@ -81,8 +80,8 @@
         .logo-icon img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* تغطية كاملة بدون فراغات */
-            display: block; /* إزالة الفراغات */
+            object-fit: cover;
+            display: block;
         }
 
         .logo-text {
@@ -460,7 +459,6 @@
             </nav>
             
             <div class="auth-buttons">
-                <!-- Language Switcher -->
                 <div class="language-switcher">
                     <button class="lang-btn" data-lang="ar" onclick="setLanguage('ar')">عربي</button>
                     <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">English</button>
@@ -492,15 +490,13 @@
                 <div class="user-type-section">
                     <div class="user-type-label" data-en="user_type_label">I am joining as</div>
                     <div class="user-type-options">
-                        <!-- Athlete - أيقونة رياضي -->
                         <div class="user-type-option" onclick="selectUserType('athlete')" id="type-athlete">
                             <div class="user-type-icon">
-                                <i class="fas fa-running"></i> <!-- أيقونة شخص يركض -->
+                                <i class="fas fa-running"></i>
                             </div>
                             <div class="user-type-name" data-en="type_athlete">Athlete</div>
                         </div>
                         
-                        <!-- Coach -->
                         <div class="user-type-option" onclick="selectUserType('coach')" id="type-coach">
                             <div class="user-type-icon">
                                 <i class="fas fa-chalkboard-teacher"></i>
@@ -508,7 +504,6 @@
                             <div class="user-type-name" data-en="type_coach">Coach</div>
                         </div>
                         
-                        <!-- Organizer -->
                         <div class="user-type-option" onclick="selectUserType('organizer')" id="type-organizer">
                             <div class="user-type-icon">
                                 <i class="fas fa-trophy"></i>
@@ -567,7 +562,6 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" data-en="label_country">Country</label>
-                        <!-- قائمة منسدلة للدول -->
                         <select class="form-select" id="country" required>
                             <option value="" data-en="placeholder_country">Select your country</option>
                             <option value="Egypt">Egypt - مصر</option>
@@ -721,6 +715,7 @@
 
             try {
                 // 6. Sign up with Supabase Auth
+                // الـ Trigger سينشئ المستخدم تلقائياً في جدول users
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
@@ -744,31 +739,26 @@
                     return;
                 }
 
-                // 7. Create user profile in users table
-                const { error: userError } = await supabaseClient
+                // 7. انتظار لحظة حتى يتم إنشاء المستخدم في جدول users عبر الـ Trigger
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                // 8. تحديث بيانات المستخدم في جدول users (إضافة الحقول الإضافية)
+                const { error: updateError } = await supabaseClient
                     .from('users')
-                    .insert([{
-                        id: authData.user.id,
-                        email: email,
-                        full_name: fullName,
-                        user_type: userType,
+                    .update({
                         date_of_birth: dateOfBirth || null,
                         gender: gender || null,
                         country: country || null,
-                        phone: phone || null,
-                        email_confirmed: false,
-                        created_at: new Date().toISOString()
-                    }]);
+                        phone: phone || null
+                    })
+                    .eq('id', authData.user.id);
 
-                if (userError) {
-                    console.error('User error:', userError);
-                    showAlert('error', t('alert_profile_failed') + userError.message);
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = t('btn_create_account');
-                    return;
+                if (updateError) {
+                    console.error('Update error:', updateError);
+                    // لا نوقف العملية، فقط نسجل الخطأ
                 }
 
-                // 8. Create profile in specific table
+                // 9. إنشاء السجل في الجدول المناسب (athletes/coaches/organizers)
                 let tableError = null;
                 
                 if (userType === 'athlete') {
@@ -820,15 +810,15 @@
                     showAlert('error', t('alert_table_error'));
                 }
 
-                // 9. Success!
+                // 10. Success!
                 showAlert('success', t('alert_success'));
                 
-                // 10. Clear form
+                // 11. Clear form
                 document.getElementById('signupForm').reset();
                 document.querySelectorAll('.user-type-option').forEach(opt => opt.classList.remove('active'));
                 document.getElementById('userType').value = '';
 
-                // 11. Redirect to login after 4 seconds
+                // 12. Redirect to login after 4 seconds
                 setTimeout(() => {
                     window.location.href = 'login.html?email=' + encodeURIComponent(email);
                 }, 4000);
