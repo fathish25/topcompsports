@@ -18,7 +18,7 @@
     <script src="translations.js"></script>
     
     <style>
-        /* ===== متغيرات الألوان ===== */
+        /* ===== متغيرات الألوان (مطابقة للصفحة الرئيسية) ===== */
         :root {
             --primary-blue: #0066CC;
             --dark-blue: #003366;
@@ -95,7 +95,7 @@
         .file-upload-box:hover { border-color: var(--primary-blue); background: rgba(0,102,204,0.05); }
         .file-upload-box i { font-size: 3rem; color: var(--primary-blue); margin-bottom: 10px; }
 
-        /* ===== Responsive ===== */
+        /* ===== Responsive (للموبايل) ===== */
         @media (max-width: 768px) {
             .profile-container { padding: 30px 15px; }
             .page-title { font-size: 2rem; }
@@ -106,6 +106,7 @@
             .profile-name { font-size: 1.5rem; }
         }
 
+        /* ===== RTL Support (للغة العربية) ===== */
         [dir="rtl"] .profile-header { text-align: center; }
         [dir="rtl"] .form-label { text-align: right; }
     </style>
@@ -156,6 +157,7 @@
             </div>
 
             <form onsubmit="handleProfileUpdate(event)">
+                <!-- حقول القراءة فقط -->
                 <div class="form-group">
                     <label class="form-label" data-en="label_full_name">Full Name *</label>
                     <input type="text" class="form-input" id="fullName" required readonly>
@@ -165,6 +167,7 @@
                     <input type="email" class="form-input" id="email" required readonly>
                 </div>
 
+                <!-- حقول قابلة للتعديل -->
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" data-en="label_date_of_birth">Date of Birth</label>
@@ -223,21 +226,28 @@
                     </div>
                 </div>
 
-                <!-- قسم وثيقة الهوية (للمنظمين فقط) -->
+                <!-- ⭐ قسم وثيقة الهوية (للمنظمين، المدربين، واللاعبين) ⭐ -->
                 <div class="form-group" id="idDocumentSection" style="display: none;">
-                    <label class="form-label" data-en="label_id_document"><i class="fas fa-id-card"></i> ID Document (National ID or Passport)</label>
+                    <label class="form-label" data-en="label_id_document">
+                        <i class="fas fa-id-card"></i> ID Document (National ID or Passport)
+                    </label>
                     <div class="file-upload-box" onclick="document.getElementById('idDocument').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <p data-en="upload_id_doc">Click to upload ID document (PDF, JPG, PNG - Max 2MB)</p>
                         <input type="file" id="idDocument" accept=".pdf,.jpg,.jpeg,.png" onchange="handleIDDocumentUpload(event)" style="display: none;">
                     </div>
                     <div id="idDocumentPreview" style="margin-top: 10px; display: none;">
-                        <i class="fas fa-check-circle" style="color: #10B981;"></i> <span id="idDocumentName"></span>
+                        <i class="fas fa-check-circle" style="color: #10B981;"></i> 
+                        <span id="idDocumentName"></span>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary" id="saveBtn">💾 <span data-en="btn_save">Save Changes</span></button>
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">← <span data-en="btn_back">Back to Home</span></button>
+                <button type="submit" class="btn btn-primary" id="saveBtn">
+                    💾 <span data-en="btn_save">Save Changes</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">
+                    ← <span data-en="btn_back">Back to Home</span>
+                </button>
             </form>
         </div>
     </div>
@@ -255,7 +265,9 @@
         // 2. دالة الترجمة
         function t(key) {
             const lang = localStorage.getItem('selectedLanguage') || 'en';
-            return (window.translations && window.translations[lang] && window.translations[lang][key]) ? window.translations[lang][key] : key;
+            return (window.translations && window.translations[lang] && window.translations[lang][key]) 
+                ? window.translations[lang][key] 
+                : key;
         }
 
         // 3. دالة التنبيهات
@@ -280,7 +292,8 @@
                 userType = user.user_metadata?.user_type || 'user';
                 console.log('✅ User:', user.email, '| Type:', userType);
                 
-                if (userType === 'organizer') {
+                // ⭐ إظهار قسم وثيقة الهوية للمنظمين، المدربين، واللاعبين
+                if (userType === 'organizer' || userType === 'coach' || userType === 'athlete') {
                     document.getElementById('idDocumentSection').style.display = 'block';
                 }
                 
@@ -294,16 +307,26 @@
         // 5. جلب البيانات
         async function loadProfile() {
             try {
-                const { data: profile, error } = await db.from('users').select('*').eq('id', currentUser.id).maybeSingle();
+                const { data: profile, error } = await db
+                    .from('users')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .maybeSingle();
+                
                 if (error) throw error;
 
                 let userData = profile || {
                     full_name: currentUser.user_metadata?.full_name || 'User',
                     email: currentUser.email,
-                    date_of_birth: null, gender: null, country: null, phone: null,
-                    profile_picture_url: null, id_document_url: null
+                    date_of_birth: null, 
+                    gender: null, 
+                    country: null, 
+                    phone: null,
+                    profile_picture_url: null, 
+                    id_document_url: null
                 };
 
+                // تحديث الواجهة
                 document.getElementById('profileName').textContent = userData.full_name;
                 document.getElementById('profileEmail').textContent = userData.email;
                 document.getElementById('fullName').value = userData.full_name;
@@ -313,13 +336,17 @@
                 document.getElementById('country').value = userData.country || '';
                 document.getElementById('phone').value = userData.phone || '';
 
+                // تحديث صورة البروفايل
                 if (userData.profile_picture_url) {
-                    document.getElementById('profileAvatar').innerHTML = `<img src="${userData.profile_picture_url}" alt="Profile">`;
+                    document.getElementById('profileAvatar').innerHTML = 
+                        `<img src="${userData.profile_picture_url}" alt="Profile">`;
                 } else {
                     const initials = (userData.full_name || 'U').split(' ').map(n => n[0]).join('').toUpperCase();
-                    document.getElementById('profileAvatar').innerHTML = `<span style="font-size: 60px; color: white; font-weight: bold;">${initials}</span>`;
+                    document.getElementById('profileAvatar').innerHTML = 
+                        `<span style="font-size: 60px; color: white; font-weight: bold;">${initials}</span>`;
                 }
 
+                // تحديث معاينة وثيقة الهوية
                 if (userData.id_document_url) {
                     document.getElementById('idDocumentPreview').style.display = 'block';
                     document.getElementById('idDocumentName').textContent = 'ID Document uploaded';
@@ -343,7 +370,10 @@
             }
             profilePictureFile = file;
             const reader = new FileReader();
-            reader.onload = (e) => { document.getElementById('profileAvatar').innerHTML = `<img src="${e.target.result}" alt="Profile">`; };
+            reader.onload = (e) => { 
+                document.getElementById('profileAvatar').innerHTML = 
+                    `<img src="${e.target.result}" alt="Profile">`; 
+            };
             reader.readAsDataURL(file);
             showAlert('success', 'Photo selected. Click Save to upload.');
         }
@@ -361,7 +391,7 @@
             showAlert('success', 'ID document selected. Click Save to upload.');
         }
 
-        // 8. ⭐⭐ حفظ تحديثات البروفايل (مع إصلاح مسار رفع الصور) ⭐⭐⭐
+        // 8. حفظ تحديثات البروفايل
         async function handleProfileUpdate(e) {
             e.preventDefault();
             const saveBtn = document.getElementById('saveBtn');
@@ -373,7 +403,7 @@
                     id: currentUser.id,
                     email: currentUser.email,
                     full_name: document.getElementById('fullName').value.trim(),
-                    user_type: userType,  // ✅ مهم جداً
+                    user_type: userType,
                     date_of_birth: document.getElementById('dateOfBirth').value || null,
                     gender: document.getElementById('gender').value || null,
                     country: document.getElementById('country').value || null,
@@ -383,11 +413,10 @@
 
                 console.log('💾 Updating profile:', profileData);
 
-                // ⭐⭐⭐ رفع صورة البروفايل (مسار مُحدّث) ⭐⭐⭐
+                // رفع صورة البروفايل
                 if (profilePictureFile) {
                     try {
                         const fileExt = profilePictureFile.name.split('.').pop();
-                        // ✅ المسار الجديد: user_id/filename.ext
                         const filePath = `${currentUser.id}/${currentUser.id}-profile.${fileExt}`;
                         
                         const { error: uploadError } = await db.storage
@@ -404,15 +433,14 @@
                             console.error('❌ Upload error:', uploadError);
                         }
                     } catch (err) { 
-                        console.warn('️ Picture upload skipped:', err); 
+                        console.warn('⚠️ Picture upload skipped:', err); 
                     }
                 }
 
-                // ⭐⭐⭐ رفع وثيقة الهوية (مسار مُحدّث) ⭐⭐⭐
-                if (idDocumentFile && userType === 'organizer') {
+                // ⭐ رفع وثيقة الهوية (للمنظمين، المدربين، واللاعبين)
+                if (idDocumentFile) {
                     try {
                         const fileExt = idDocumentFile.name.split('.').pop();
-                        // ✅ المسار الجديد: user_id/filename.ext
                         const filePath = `${currentUser.id}/${currentUser.id}-id-document.${fileExt}`;
                         
                         const { error: uploadError } = await db.storage
@@ -426,14 +454,14 @@
                             profileData.id_document_url = publicUrl;
                             console.log('✅ ID document uploaded:', publicUrl);
                         } else {
-                            console.error(' ID document upload error:', uploadError);
+                            console.error('❌ ID document upload error:', uploadError);
                         }
                     } catch (err) { 
                         console.warn('⚠️ ID document upload skipped:', err); 
                     }
                 }
 
-                // ✅ حفظ البيانات في جدول users
+                // حفظ البيانات في جدول users الرئيسي
                 const { error: upsertError } = await db
                     .from('users')
                     .upsert(profileData, { onConflict: 'id' });
@@ -441,6 +469,23 @@
                 if (upsertError) {
                     console.error('❌ Database update error:', upsertError);
                     throw upsertError;
+                }
+
+                // ⭐ حفظ رابط الوثيقة أيضاً في الجدول الفرعي الخاص بنوع المستخدم لضمان التكامل
+                let tableUpdateError = null;
+                if (userType === 'organizer') {
+                    const { error } = await db.from('organizers').update({ id_document_url: profileData.id_document_url }).eq('user_id', currentUser.id);
+                    tableUpdateError = error;
+                } else if (userType === 'coach') {
+                    const { error } = await db.from('coaches').update({ id_document_url: profileData.id_document_url }).eq('user_id', currentUser.id);
+                    tableUpdateError = error;
+                } else if (userType === 'athlete') {
+                    const { error } = await db.from('athletes').update({ id_document_url: profileData.id_document_url }).eq('user_id', currentUser.id);
+                    tableUpdateError = error;
+                }
+
+                if (tableUpdateError) {
+                    console.warn('⚠️ Table update warning:', tableUpdateError);
                 }
 
                 console.log('✅ Profile updated successfully');
@@ -451,6 +496,7 @@
                 localData.full_name = profileData.full_name;
                 localData.user_type = profileData.user_type;
                 localData.profile_picture_url = profileData.profile_picture_url;
+                localData.id_document_url = profileData.id_document_url;
                 localStorage.setItem('currentUser', JSON.stringify(localData));
 
                 setTimeout(() => { window.location.reload(); }, 1500);
@@ -460,7 +506,7 @@
                 showAlert('error', '❌ Error: ' + error.message);
             } finally {
                 saveBtn.disabled = false;
-                saveBtn.innerHTML = '💾 Save Changes';
+                saveBtn.innerHTML = '💾 <span data-en="btn_save">Save Changes</span>';
             }
         }
 
@@ -469,6 +515,7 @@
             if (confirm('Are you sure?')) {
                 await db.auth.signOut();
                 localStorage.removeItem('currentUser');
+                localStorage.removeItem('userProfile');
                 window.location.href = 'index.html';
             }
         }
