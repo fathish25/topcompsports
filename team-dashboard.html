@@ -13,7 +13,6 @@
             --accent-yellow: #FFB800;
             --black: #0A0A0A;
             --dark-gray: #1A1A1A;
-            --medium-gray: #2A2A2A;
             --white: #FFFFFF;
             --light-bg: #F8FAFC;
             --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
@@ -22,7 +21,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); color: var(--black); min-height: 100vh; }
 
-        /* ===== Header ===== */
         .main-header { background: var(--black); padding: 12px 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .header-container { max-width: 1400px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
         .logo-section { display: flex; align-items: center; gap: 12px; text-decoration: none; }
@@ -33,7 +31,6 @@
         .nav-link { color: var(--white); text-decoration: none; font-weight: 500; padding: 8px 15px; border-radius: 5px; transition: all 0.3s; }
         .nav-link:hover { color: var(--accent-yellow); }
 
-        /* ===== Main Content ===== */
         .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
         
         .team-header {
@@ -44,30 +41,30 @@
             color: var(--white);
             position: relative;
             overflow: hidden;
-        }
-        .team-header.has-cover {
             background-size: cover;
             background-position: center;
+            transition: background-image 0.3s ease;
         }
         .team-header::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, rgba(0,102,204,0.9) 0%, rgba(0,51,102,0.9) 100%);
+            background: linear-gradient(135deg, rgba(0,51,102,0.85) 0%, rgba(0,102,204,0.85) 100%);
+            z-index: 1;
         }
-        .team-header-content { position: relative; z-index: 1; display: flex; align-items: center; gap: 30px; }
+        .team-header-content { position: relative; z-index: 2; display: flex; align-items: center; gap: 30px; }
         .team-logo {
             width: 120px; height: 120px;
             border-radius: 50%;
             border: 4px solid var(--accent-yellow);
             object-fit: cover;
             background: var(--white);
+            flex-shrink: 0;
         }
         .team-title-section h1 { font-size: 36px; font-weight: bold; margin-bottom: 10px; }
-        .team-meta { display: flex; gap: 20px; flex-wrap: wrap; opacity: 0.9; }
-        .team-meta-item { display: flex; align-items: center; gap: 8px; }
+        .team-meta { display: flex; gap: 20px; flex-wrap: wrap; opacity: 0.95; }
+        .team-meta-item { display: flex; align-items: center; gap: 8px; font-size: 15px; }
 
-        /* ===== Tabs ===== */
         .tabs {
             background: var(--white);
             border: 2px solid #E2E8F0;
@@ -77,6 +74,7 @@
             display: flex;
             gap: 10px;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         .tab-btn {
             padding: 12px 24px;
@@ -88,51 +86,26 @@
             border-radius: 8px;
             transition: all 0.3s;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .tab-btn:hover { background: var(--light-bg); }
-        .tab-btn.active {
-            background: var(--gradient-blue);
-            color: var(--white);
-        }
+        .tab-btn.active { background: var(--gradient-blue); color: var(--white); }
+        .badge { background: var(--accent-yellow); color: var(--black); padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: bold; }
 
-        /* ===== Stats Cards ===== */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card {
-            background: var(--white);
-            border: 2px solid #E2E8F0;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-        }
+        .stat-card { background: var(--white); border: 2px solid #E2E8F0; border-radius: 12px; padding: 20px; text-align: center; transition: transform 0.3s; }
+        .stat-card:hover { transform: translateY(-3px); border-color: var(--primary-blue); }
         .stat-icon { font-size: 32px; color: var(--primary-blue); margin-bottom: 10px; }
         .stat-value { font-size: 32px; font-weight: bold; color: var(--dark-blue); margin-bottom: 5px; }
         .stat-label { color: #64748B; font-size: 14px; }
 
-        /* ===== Content Cards ===== */
-        .content-card {
-            background: var(--white);
-            border: 2px solid #E2E8F0;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #E2E8F0;
-        }
+        .content-card { background: var(--white); border: 2px solid #E2E8F0; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #E2E8F0; flex-wrap: wrap; gap: 15px; }
         .card-title { font-size: 24px; font-weight: bold; color: var(--dark-blue); }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
         .btn-primary { background: var(--gradient-blue); color: var(--white); }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.3); }
         .btn-secondary { background: transparent; border: 2px solid var(--dark-gray); color: var(--dark-gray); }
@@ -142,9 +115,8 @@
         .btn-danger { background: #EF4444; color: var(--white); }
         .btn-danger:hover { background: #DC2626; }
 
-        /* ===== Members List ===== */
-        .members-list { display: grid; gap: 15px; }
-        .member-item {
+        .members-list, .requests-list { display: grid; gap: 15px; }
+        .member-item, .request-item {
             background: var(--light-bg);
             border: 2px solid #E2E8F0;
             border-radius: 12px;
@@ -153,61 +125,45 @@
             align-items: center;
             justify-content: space-between;
             transition: all 0.3s;
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        .member-item:hover { border-color: var(--primary-blue); }
-        .member-info { display: flex; align-items: center; gap: 15px; }
-        .member-photo {
-            width: 50px; height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--accent-yellow);
-        }
-        .member-details h4 { font-size: 18px; margin-bottom: 5px; color: var(--dark-blue); }
-        .member-details p { color: #64748B; font-size: 14px; }
-        .member-actions { display: flex; gap: 10px; }
+        .member-item:hover, .request-item:hover { border-color: var(--primary-blue); background: rgba(0,102,204,0.03); }
+        .member-info, .request-info { display: flex; align-items: center; gap: 15px; flex: 1; min-width: 250px; }
+        .member-photo { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-yellow); background: var(--white); }
+        .member-details h4, .request-details h4 { font-size: 18px; margin-bottom: 5px; color: var(--dark-blue); }
+        .member-details p, .request-details p { color: #64748B; font-size: 14px; }
+        .member-actions, .request-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
-        /* ===== Requests List ===== */
-        .request-item {
-            background: var(--light-bg);
-            border: 2px solid #E2E8F0;
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-        .request-info { display: flex; align-items: center; gap: 15px; }
-        .request-details h4 { font-size: 18px; margin-bottom: 5px; }
-        .request-details p { color: #64748B; font-size: 14px; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .info-item { padding: 15px; background: var(--light-bg); border-radius: 8px; border-left: 4px solid var(--primary-blue); }
+        .info-label { color: #64748B; font-size: 13px; margin-bottom: 5px; text-transform: uppercase; font-weight: 600; }
+        .info-value { font-weight: 600; color: var(--black); font-size: 15px; word-break: break-word; }
+        .info-value a { color: var(--primary-blue); text-decoration: none; }
+        .info-value a:hover { text-decoration: underline; }
 
-        /* ===== Team Info ===== */
-        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-        .info-item { padding: 15px; background: var(--light-bg); border-radius: 8px; }
-        .info-label { color: #64748B; font-size: 14px; margin-bottom: 5px; }
-        .info-value { font-weight: 600; color: var(--black); }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--black); }
+        .form-input, .form-select, .form-textarea { width: 100%; padding: 12px 15px; border: 2px solid #E2E8F0; border-radius: 8px; font-size: 1rem; transition: all 0.3s; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary-blue); }
+        .form-textarea { min-height: 100px; resize: vertical; }
 
-        /* ===== Empty State ===== */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #64748B;
-        }
-        .empty-state-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.5; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #64748B; }
+        .empty-state-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.3; }
 
-        /* ===== Responsive ===== */
         @media (max-width: 768px) {
             .team-header-content { flex-direction: column; text-align: center; }
-            .info-grid { grid-template-columns: 1fr; }
+            .team-meta { justify-content: center; }
             .nav-menu { display: none; }
-            .member-item { flex-direction: column; text-align: center; gap: 15px; }
-            .request-item { flex-direction: column; gap: 15px; text-align: center; }
+            .member-item, .request-item { flex-direction: column; text-align: center; }
+            .member-info, .request-info { flex-direction: column; }
+            .member-actions, .request-actions { width: 100%; justify-content: center; }
+            .btn { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== Header ===== -->
     <header class="main-header">
         <div class="header-container">
             <a href="index.html" class="logo-section">
@@ -221,216 +177,85 @@
         </div>
     </header>
 
-    <!-- ===== Main Content ===== -->
     <div class="container">
-        <!-- Team Header -->
         <div class="team-header" id="teamHeader">
             <div class="team-header-content">
                 <img src="" alt="Team Logo" class="team-logo" id="teamLogo" style="display:none;">
-                <div class="team-logo" id="teamLogoPlaceholder" style="display:none; background: var(--white); align-items:center; justify-content:center; font-size:48px; color:var(--primary-blue);">
+                <div class="team-logo" id="teamLogoPlaceholder" style="display:none; align-items:center; justify-content:center; font-size:48px; color:var(--primary-blue);">
                     <i class="fas fa-shield-alt"></i>
                 </div>
                 <div class="team-title-section">
                     <h1 id="teamName">Loading...</h1>
                     <div class="team-meta">
-                        <div class="team-meta-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span id="teamLocation">-</span>
-                        </div>
-                        <div class="team-meta-item">
-                            <i class="fas fa-users"></i>
-                            <span id="teamMembersCount">0 members</span>
-                        </div>
-                        <div class="team-meta-item">
-                            <i class="fas fa-sports"></i>
-                            <span id="teamSports">-</span>
-                        </div>
+                        <div class="team-meta-item"><i class="fas fa-map-marker-alt"></i><span id="teamLocation">-</span></div>
+                        <div class="team-meta-item"><i class="fas fa-users"></i><span id="teamMembersCount">0 members</span></div>
+                        <div class="team-meta-item"><i class="fas fa-fist-raised"></i><span id="teamSports">-</span></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('overview')">
-                <i class="fas fa-info-circle"></i> Overview
-            </button>
-            <button class="tab-btn" onclick="switchTab('members')">
-                <i class="fas fa-users"></i> Members
-            </button>
-            <button class="tab-btn" onclick="switchTab('requests')">
-                <i class="fas fa-clock"></i> Join Requests
-                <span id="requestsBadge" style="background: var(--accent-yellow); color: var(--black); padding: 2px 8px; border-radius: 10px; margin-left: 5px; font-size: 12px;">0</span>
-            </button>
-            <button class="tab-btn" onclick="switchTab('settings')">
-                <i class="fas fa-cog"></i> Settings
-            </button>
+            <button class="tab-btn active" onclick="switchTab('overview', this)"><i class="fas fa-info-circle"></i> Overview</button>
+            <button class="tab-btn" onclick="switchTab('members', this)"><i class="fas fa-users"></i> Members</button>
+            <button class="tab-btn" onclick="switchTab('requests', this)"><i class="fas fa-clock"></i> Join Requests <span id="requestsBadge" class="badge" style="display:none;">0</span></button>
+            <button class="tab-btn" onclick="switchTab('settings', this)"><i class="fas fa-cog"></i> Settings</button>
         </div>
 
-        <!-- Overview Tab -->
         <div id="overviewTab" class="tab-content">
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-users"></i></div>
-                    <div class="stat-value" id="statMembers">0</div>
-                    <div class="stat-label">Total Members</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
-                    <div class="stat-value" id="statRequests">0</div>
-                    <div class="stat-label">Pending Requests</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-trophy"></i></div>
-                    <div class="stat-value" id="statTournaments">0</div>
-                    <div class="stat-label">Tournaments</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-                    <div class="stat-value" id="statStatus">Active</div>
-                    <div class="stat-label">Status</div>
-                </div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value" id="statMembers">0</div><div class="stat-label">Total Members</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value" id="statRequests">0</div><div class="stat-label">Pending Requests</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-trophy"></i></div><div class="stat-value" id="statTournaments">0</div><div class="stat-label">Tournaments</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value" id="statStatus" style="font-size: 24px;">Active</div><div class="stat-label">Status</div></div>
             </div>
 
             <div class="content-card">
                 <div class="card-header">
                     <h2 class="card-title">Team Information</h2>
-                    <button class="btn btn-primary" onclick="switchTab('settings')">
-                        <i class="fas fa-edit"></i> Edit Team
-                    </button>
+                    <button class="btn btn-primary" onclick="switchTab('settings', document.querySelectorAll('.tab-btn')[3])"><i class="fas fa-edit"></i> Edit Team</button>
                 </div>
-                <div class="info-grid" id="teamInfo">
-                    <!-- Will be populated by JavaScript -->
-                </div>
+                <div class="info-grid" id="teamInfo"></div>
             </div>
         </div>
 
-        <!-- Members Tab -->
         <div id="membersTab" class="tab-content" style="display:none;">
             <div class="content-card">
-                <div class="card-header">
-                    <h2 class="card-title">Team Members</h2>
-                    <button class="btn btn-primary" onclick="loadMembers()">
-                        <i class="fas fa-sync"></i> Refresh
-                    </button>
-                </div>
+                <div class="card-header"><h2 class="card-title">Team Members</h2></div>
                 <div class="members-list" id="membersList">
-                    <div class="empty-state">
-                        <div class="empty-state-icon"><i class="fas fa-users"></i></div>
-                        <p>No members yet</p>
-                    </div>
+                    <div class="empty-state"><div class="empty-state-icon"><i class="fas fa-users"></i></div><p>No members yet</p></div>
                 </div>
             </div>
         </div>
 
-        <!-- Requests Tab -->
         <div id="requestsTab" class="tab-content" style="display:none;">
             <div class="content-card">
-                <div class="card-header">
-                    <h2 class="card-title">Join Requests</h2>
-                    <button class="btn btn-primary" onclick="loadJoinRequests()">
-                        <i class="fas fa-sync"></i> Refresh
-                    </button>
-                </div>
-                <div id="requestsList">
-                    <div class="empty-state">
-                        <div class="empty-state-icon"><i class="fas fa-clock"></i></div>
-                        <p>No pending requests</p>
-                    </div>
+                <div class="card-header"><h2 class="card-title">Join Requests</h2></div>
+                <div class="requests-list" id="requestsList">
+                    <div class="empty-state"><div class="empty-state-icon"><i class="fas fa-clock"></i></div><p>No pending requests</p></div>
                 </div>
             </div>
         </div>
 
-        <!-- Settings Tab -->
         <div id="settingsTab" class="tab-content" style="display:none;">
             <div class="content-card">
-                <div class="card-header">
-                    <h2 class="card-title">Team Settings</h2>
-                </div>
+                <div class="card-header"><h2 class="card-title">Team Settings</h2></div>
                 <form onsubmit="updateTeamSettings(event)">
                     <div class="info-grid">
-                        <div class="form-group">
-                            <label class="form-label">Team Name</label>
-                            <input type="text" class="form-input" id="editTeamName" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Country</label>
-                            <select class="form-select" id="editCountry">
-                                <option value="">Select country</option>
-                                <option value="Egypt">Egypt - مصر</option>
-                                <option value="Saudi Arabia">Saudi Arabia - السعودية</option>
-                                <option value="UAE">UAE - الإمارات</option>
-                                <option value="Qatar">Qatar - قطر</option>
-                                <option value="Kuwait">Kuwait - الكويت</option>
-                                <option value="Bahrain">Bahrain - البحرين</option>
-                                <option value="Oman">Oman - عمان</option>
-                                <option value="Jordan">Jordan - الأردن</option>
-                                <option value="Lebanon">Lebanon - لبنان</option>
-                                <option value="Morocco">Morocco - المغرب</option>
-                                <option value="Tunisia">Tunisia - تونس</option>
-                                <option value="Algeria">Algeria - الجزائر</option>
-                                <option value="Libya">Libya - ليبيا</option>
-                                <option value="Iraq">Iraq - العراق</option>
-                                <option value="Palestine">Palestine - فلسطين</option>
-                                <option value="Yemen">Yemen - اليمن</option>
-                                <option value="Sudan">Sudan - السودان</option>
-                                <option value="Somalia">Somalia - الصومال</option>
-                                <option value="United States">United States</option>
-                                <option value="United Kingdom">United Kingdom</option>
-                                <option value="Canada">Canada</option>
-                                <option value="Australia">Australia</option>
-                                <option value="Germany">Germany</option>
-                                <option value="France">France</option>
-                                <option value="Spain">Spain</option>
-                                <option value="Italy">Italy</option>
-                                <option value="Netherlands">Netherlands</option>
-                                <option value="Brazil">Brazil</option>
-                                <option value="Argentina">Argentina</option>
-                                <option value="Other">Other - أخرى</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">City</label>
-                            <input type="text" class="form-input" id="editCity">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Address</label>
-                            <input type="text" class="form-input" id="editAddress">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Person in Charge</label>
-                            <input type="text" class="form-input" id="editPersonInCharge">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-input" id="editEmail">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Phone</label>
-                            <input type="tel" class="form-input" id="editPhone">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Website</label>
-                            <input type="url" class="form-input" id="editWebsite">
-                        </div>
+                        <div class="form-group"><label class="form-label">Team Name *</label><input type="text" class="form-input" id="editTeamName" required></div>
+                        <div class="form-group"><label class="form-label">Country *</label><select class="form-select" id="editCountry" required><option value="">Select country</option><option value="Egypt">Egypt</option><option value="Saudi Arabia">Saudi Arabia</option><option value="UAE">UAE</option><option value="Other">Other</option></select></div>
+                        <div class="form-group"><label class="form-label">City *</label><input type="text" class="form-input" id="editCity" required></div>
+                        <div class="form-group"><label class="form-label">Address</label><input type="text" class="form-input" id="editAddress"></div>
+                        <div class="form-group"><label class="form-label">Person in Charge</label><input type="text" class="form-input" id="editPersonInCharge"></div>
+                        <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="editEmail"></div>
+                        <div class="form-group"><label class="form-label">Phone</label><input type="tel" class="form-input" id="editPhone"></div>
+                        <div class="form-group"><label class="form-label">Website</label><input type="url" class="form-input" id="editWebsite"></div>
                     </div>
-                    <div class="form-group" style="margin-top: 20px;">
-                        <label>
-                            <input type="checkbox" id="editAutoApprove" style="margin-right: 8px;">
-                            Auto-approve member join requests
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">About Team</label>
-                        <textarea class="form-textarea" id="editAbout" rows="4"></textarea>
-                    </div>
-                    <div style="margin-top: 20px;">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Save Changes
-                        </button>
-                        <button type="button" class="btn btn-secondary" onclick="switchTab('overview')" style="margin-left: 10px;">
-                            Cancel
-                        </button>
+                    <div class="form-group"><label><input type="checkbox" id="editAutoApprove" style="margin-right: 8px;"> Auto-approve member join requests</label></div>
+                    <div class="form-group"><label class="form-label">About Team</label><textarea class="form-textarea" id="editAbout" rows="4"></textarea></div>
+                    <div style="margin-top: 20px; display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                        <button type="button" class="btn btn-secondary" onclick="switchTab('overview', document.querySelectorAll('.tab-btn')[0])">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -438,14 +263,13 @@
     </div>
 
     <script>
+        // ✅ FIX 1: تغيير اسم المتغير لتجنب التعارض مع مكتبة Supabase
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentTeam = null;
         let currentCoach = null;
-
-        // Get team ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const teamId = urlParams.get('id');
 
@@ -454,29 +278,20 @@
             window.location.href = 'coach-dashboard.html';
         }
 
-        // ===== Switch Tab =====
-        function switchTab(tabName) {
-            // Hide all tabs
+        function switchTab(tabName, btnElement) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             
-            // Show selected tab
             document.getElementById(tabName + 'Tab').style.display = 'block';
-            event.target.closest('.tab-btn').classList.add('active');
+            if (btnElement) btnElement.classList.add('active');
             
-            // Load data based on tab
             if (tabName === 'members') loadMembers();
             if (tabName === 'requests') loadJoinRequests();
             if (tabName === 'settings') loadTeamSettings();
         }
 
-        // ===== Load Team Data =====
         async function loadTeam() {
-            const { data: team, error } = await supabase
-                .from('teams')
-                .select('*')
-                .eq('id', teamId)
-                .single();
+            const { data: team, error } = await supabaseClient.from('teams').select('*').eq('id', teamId).single();
 
             if (error || !team) {
                 alert('Team not found');
@@ -486,7 +301,11 @@
 
             currentTeam = team;
 
-            // Update header
+            // ✅ FIX 3: تطبيق صورة الغلاف بشكل صحيح
+            if (team.cover_url) {
+                document.getElementById('teamHeader').style.backgroundImage = `url('${team.cover_url}')`;
+            }
+
             document.getElementById('teamName').textContent = team.name;
             document.getElementById('teamLocation').textContent = `${team.city || ''}${team.city && team.country ? ', ' : ''}${team.country || ''}`;
             document.getElementById('teamSports').textContent = team.sports ? team.sports.join(', ') : '-';
@@ -498,188 +317,116 @@
                 document.getElementById('teamLogoPlaceholder').style.display = 'flex';
             }
 
-            // Update stats
-            document.getElementById('statStatus').textContent = team.is_active ? 'Active' : 'Inactive';
+            document.getElementById('statStatus').textContent = team.is_active ? 'Active' : 'Suspended';
+            document.getElementById('statStatus').style.color = team.is_active ? '#10B981' : '#EF4444';
 
-            // Load team info
             loadTeamInfo(team);
         }
 
-        // ===== Load Team Info =====
         function loadTeamInfo(team) {
+            // ✅ FIX 2: تغيير about إلى description ليتطابق مع هيكل قاعدة البيانات
             const infoHTML = `
-                <div class="info-item">
-                    <div class="info-label">Team Name</div>
-                    <div class="info-value">${team.name}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Country</div>
-                    <div class="info-value">${team.country || '-'}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">City</div>
-                    <div class="info-value">${team.city || '-'}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Address</div>
-                    <div class="info-value">${team.address || '-'}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Person in Charge</div>
-                    <div class="info-value">${team.person_in_charge || '-'}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Email</div>
-                    <div class="info-value">${team.email || '-'}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Phone</div>
-                    <div class="info-value">${team.phone || '-'}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Website</div>
-                    <div class="info-value">${team.website ? `<a href="${team.website}" target="_blank">${team.website}</a>` : '-'}</div>
-                </div>
-                <div class="info-item" style="grid-column: span 2;">
-                    <div class="info-label">About</div>
-                    <div class="info-value">${team.about || 'No description yet'}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Sports</div>
-                    <div class="info-value">${team.sports ? team.sports.join(', ') : '-'}</div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">Auto Approve</div>
-                    <div class="info-value">${team.auto_approve_members ? 'Yes' : 'No'}</div>
-                </div>
+                <div class="info-item"><div class="info-label">Team Name</div><div class="info-value">${team.name}</div></div>
+                <div class="info-item"><div class="info-label">Country</div><div class="info-value">${team.country || '-'}</div></div>
+                <div class="info-item"><div class="info-label">City</div><div class="info-value">${team.city || '-'}</div></div>
+                <div class="info-item"><div class="info-label">Address</div><div class="info-value">${team.address || '-'}</div></div>
+                <div class="info-item"><div class="info-label">Person in Charge</div><div class="info-value">${team.person_in_charge || '-'}</div></div>
+                <div class="info-item"><div class="info-label">Email</div><div class="info-value">${team.email || '-'}</div></div>
+                <div class="info-item"><div class="info-label">Phone</div><div class="info-value">${team.phone || '-'}</div></div>
+                <div class="info-item"><div class="info-label">Website</div><div class="info-value">${team.website ? `<a href="${team.website}" target="_blank">${team.website}</a>` : '-'}</div></div>
+                <div class="info-item" style="grid-column: 1 / -1;"><div class="info-label">About</div><div class="info-value">${team.description || 'No description yet'}</div></div>
+                <div class="info-item"><div class="info-label">Sports</div><div class="info-value">${team.sports ? team.sports.join(', ') : '-'}</div></div>
+                <div class="info-item"><div class="info-label">Auto Approve</div><div class="info-value">${team.auto_approve_members ? 'Yes' : 'No'}</div></div>
             `;
             document.getElementById('teamInfo').innerHTML = infoHTML;
         }
 
-        // ===== Load Members =====
         async function loadMembers() {
-            const { data: members, error } = await supabase
+            const { data: members, error } = await supabaseClient
                 .from('team_members')
-                .select(`
-                    *,
-                    athlete:athletes (
-                        id,
-                        full_name,
-                        email,
-                        country,
-                        belt_level,
-                        profile_photo_url
-                    )
-                `)
+                .select(`*, athlete:athletes (id, full_name, email, country, belt_level, profile_photo_url)`)
                 .eq('team_id', teamId)
                 .eq('status', 'approved')
                 .order('joined_at', { ascending: false });
 
-            if (error) {
-                console.error('Error loading members:', error);
-                return;
-            }
+            if (error) { console.error('Error loading members:', error); return; }
 
             const list = document.getElementById('membersList');
             document.getElementById('statMembers').textContent = members ? members.length : 0;
             document.getElementById('teamMembersCount').textContent = `${members ? members.length : 0} members`;
             
             if (!members || members.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon"><i class="fas fa-users"></i></div>
-                        <p>No members yet</p>
-                    </div>
-                `;
+                list.innerHTML = `<div class="empty-state"><div class="empty-state-icon"><i class="fas fa-users"></i></div><p>No members yet</p></div>`;
                 return;
             }
 
-            list.innerHTML = members.map(member => `
+            list.innerHTML = members.map(member => {
+                const athlete = member.athlete || {};
+                const initials = athlete.full_name ? athlete.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '?';
+                return `
                 <div class="member-item">
                     <div class="member-info">
-                        <img src="${member.athlete.profile_photo_url || ''}" 
-                             alt="${member.athlete.full_name}" 
-                             class="member-photo"
-                             onerror="this.style.display='none'">
+                        ${athlete.profile_photo_url 
+                            ? `<img src="${athlete.profile_photo_url}" alt="${athlete.full_name}" class="member-photo">`
+                            : `<div class="member-photo" style="display:flex;align-items:center;justify-content:center;font-weight:bold;color:var(--primary-blue);">${initials}</div>`
+                        }
                         <div class="member-details">
-                            <h4>${member.athlete.full_name}</h4>
-                            <p>${member.athlete.country || 'N/A'} • ${member.athlete.belt_level || 'N/A'}</p>
+                            <h4>${athlete.full_name || 'Unknown'}</h4>
+                            <p>${athlete.country || 'N/A'} • ${athlete.belt_level || 'N/A'}</p>
                         </div>
                     </div>
                     <div class="member-actions">
-                        <button class="btn btn-secondary" onclick="viewAthlete('${member.athlete.id}')">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                        <button class="btn btn-danger" onclick="removeMember('${member.id}')">
-                            <i class="fas fa-trash"></i> Remove
-                        </button>
+                        <button class="btn btn-secondary" onclick="viewAthlete('${athlete.id}')"><i class="fas fa-eye"></i> View</button>
+                        <button class="btn btn-danger" onclick="removeMember('${member.id}')"><i class="fas fa-trash"></i> Remove</button>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
-        // ===== Load Join Requests =====
         async function loadJoinRequests() {
-            const { data: requests, error } = await supabase
+            const { data: requests, error } = await supabaseClient
                 .from('team_join_requests')
-                .select(`
-                    *,
-                    athlete:athletes (
-                        id,
-                        full_name,
-                        email,
-                        country,
-                        belt_level
-                    )
-                `)
+                .select(`*, athlete:athletes (id, full_name, email, country, belt_level)`)
                 .eq('team_id', teamId)
                 .eq('status', 'pending')
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                console.error('Error loading requests:', error);
-                return;
-            }
+            if (error) { console.error('Error loading requests:', error); return; }
 
             const list = document.getElementById('requestsList');
-            document.getElementById('statRequests').textContent = requests ? requests.length : 0;
-            document.getElementById('requestsBadge').textContent = requests ? requests.length : 0;
+            const count = requests ? requests.length : 0;
+            document.getElementById('statRequests').textContent = count;
+            
+            const badge = document.getElementById('requestsBadge');
+            badge.textContent = count;
+            badge.style.display = count > 0 ? 'inline-block' : 'none';
             
             if (!requests || requests.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon"><i class="fas fa-clock"></i></div>
-                        <p>No pending requests</p>
-                    </div>
-                `;
+                list.innerHTML = `<div class="empty-state"><div class="empty-state-icon"><i class="fas fa-clock"></i></div><p>No pending requests</p></div>`;
                 return;
             }
 
-            list.innerHTML = requests.map(request => `
+            list.innerHTML = requests.map(request => {
+                const athlete = request.athlete || {};
+                return `
                 <div class="request-item">
                     <div class="request-info">
                         <div class="request-details">
-                            <h4>${request.athlete.full_name}</h4>
-                            <p>${request.athlete.email} • ${request.athlete.country || 'N/A'} • ${request.athlete.belt_level || 'N/A'}</p>
-                            ${request.message ? `<p style="margin-top: 5px; font-style: italic;">"${request.message}"</p>` : ''}
+                            <h4>${athlete.full_name || 'Unknown'}</h4>
+                            <p>${athlete.email || 'N/A'} • ${athlete.country || 'N/A'} • ${athlete.belt_level || 'N/A'}</p>
+                            ${request.message ? `<p style="margin-top: 8px; font-style: italic; color: var(--dark-blue);">"${request.message}"</p>` : ''}
                         </div>
                     </div>
-                    <div class="member-actions">
-                        <button class="btn btn-success" onclick="approveRequest('${request.id}')">
-                            <i class="fas fa-check"></i> Approve
-                        </button>
-                        <button class="btn btn-danger" onclick="rejectRequest('${request.id}')">
-                            <i class="fas fa-times"></i> Reject
-                        </button>
+                    <div class="request-actions">
+                        <button class="btn btn-success" onclick="approveRequest('${request.id}')"><i class="fas fa-check"></i> Approve</button>
+                        <button class="btn btn-danger" onclick="rejectRequest('${request.id}')"><i class="fas fa-times"></i> Reject</button>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
-        // ===== Load Team Settings =====
         function loadTeamSettings() {
             if (!currentTeam) return;
-            
             document.getElementById('editTeamName').value = currentTeam.name || '';
             document.getElementById('editCountry').value = currentTeam.country || '';
             document.getElementById('editCity').value = currentTeam.city || '';
@@ -689,13 +436,12 @@
             document.getElementById('editPhone').value = currentTeam.phone || '';
             document.getElementById('editWebsite').value = currentTeam.website || '';
             document.getElementById('editAutoApprove').checked = currentTeam.auto_approve_members || false;
-            document.getElementById('editAbout').value = currentTeam.about || '';
+            // ✅ FIX 2: استخدام description بدلاً من about
+            document.getElementById('editAbout').value = currentTeam.description || '';
         }
 
-        // ===== Update Team Settings =====
         async function updateTeamSettings(e) {
             e.preventDefault();
-
             const updatedData = {
                 name: document.getElementById('editTeamName').value.trim(),
                 country: document.getElementById('editCountry').value,
@@ -706,129 +452,58 @@
                 phone: document.getElementById('editPhone').value.trim(),
                 website: document.getElementById('editWebsite').value.trim(),
                 auto_approve_members: document.getElementById('editAutoApprove').checked,
-                about: document.getElementById('editAbout').value.trim(),
+                description: document.getElementById('editAbout').value.trim(), // ✅ FIX 2
                 updated_at: new Date().toISOString()
             };
 
-            const { error } = await supabase
-                .from('teams')
-                .update(updatedData)
-                .eq('id', teamId);
-
-            if (error) {
-                alert('Error updating team: ' + error.message);
-                return;
-            }
+            const { error } = await supabaseClient.from('teams').update(updatedData).eq('id', teamId);
+            if (error) { alert('Error updating team: ' + error.message); return; }
 
             alert('Team updated successfully!');
             currentTeam = { ...currentTeam, ...updatedData };
             loadTeamInfo(currentTeam);
-            switchTab('overview');
+            switchTab('overview', document.querySelectorAll('.tab-btn')[0]);
         }
 
-        // ===== Approve Request =====
         async function approveRequest(requestId) {
             if (!confirm('Approve this join request?')) return;
-
-            const { error } = await supabase
-                .from('team_join_requests')
-                .update({
-                    status: 'approved',
-                    reviewed_at: new Date().toISOString(),
-                    reviewed_by: currentCoach.id
-                })
-                .eq('id', requestId);
-
-            if (error) {
-                alert('Error approving request: ' + error.message);
-                return;
-            }
-
-            // Add to team_members
-            const { data: request } = await supabase
-                .from('team_join_requests')
-                .select('athlete_id, team_id')
-                .eq('id', requestId)
-                .single();
-
-            await supabase.from('team_members').insert([{
-                team_id: request.team_id,
-                athlete_id: request.athlete_id,
-                status: 'approved',
-                joined_at: new Date().toISOString()
-            }]);
+            const { data: request } = await supabaseClient.from('team_join_requests').select('athlete_id, team_id').eq('id', requestId).single();
+            
+            // إضافة العضو
+            await supabaseClient.from('team_members').insert([{ team_id: request.team_id, athlete_id: request.athlete_id, status: 'approved', joined_at: new Date().toISOString() }]);
+            // تحديث حالة الطلب
+            await supabaseClient.from('team_join_requests').update({ status: 'approved', reviewed_at: new Date().toISOString(), reviewed_by: currentCoach.id }).eq('id', requestId);
 
             alert('Request approved!');
             loadJoinRequests();
             loadMembers();
         }
 
-        // ===== Reject Request =====
         async function rejectRequest(requestId) {
             if (!confirm('Reject this join request?')) return;
-
-            const { error } = await supabase
-                .from('team_join_requests')
-                .update({
-                    status: 'rejected',
-                    reviewed_at: new Date().toISOString(),
-                    reviewed_by: currentCoach.id
-                })
-                .eq('id', requestId);
-
-            if (error) {
-                alert('Error rejecting request: ' + error.message);
-                return;
-            }
-
+            await supabaseClient.from('team_join_requests').update({ status: 'rejected', reviewed_at: new Date().toISOString(), reviewed_by: currentCoach.id }).eq('id', requestId);
             alert('Request rejected');
             loadJoinRequests();
         }
 
-        // ===== Remove Member =====
         async function removeMember(memberId) {
             if (!confirm('Are you sure you want to remove this member?')) return;
-
-            const { error } = await supabase
-                .from('team_members')
-                .delete()
-                .eq('id', memberId);
-
-            if (error) {
-                alert('Error removing member: ' + error.message);
-                return;
-            }
-
+            const { error } = await supabaseClient.from('team_members').delete().eq('id', memberId);
+            if (error) { alert('Error removing member: ' + error.message); return; }
             alert('Member removed');
             loadMembers();
         }
 
-        // ===== View Athlete =====
         function viewAthlete(athleteId) {
-            // TODO: Navigate to athlete profile
-            alert('View athlete profile: ' + athleteId);
+            alert('Athlete profile view coming soon! (ID: ' + athleteId + ')');
         }
 
-        // ===== Initialize =====
         window.onload = async () => {
-            // Get coach data
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) { window.location.href = 'login.html'; return; }
 
-            const { data: coach } = await supabase
-                .from('coaches')
-                .select('id')
-                .eq('user_id', user.id)
-                .single();
-
-            if (!coach) {
-                alert('Coach profile not found');
-                window.location.href = 'my-profile.html';
-                return;
-            }
+            const { data: coach } = await supabaseClient.from('coaches').select('id').eq('user_id', user.id).single();
+            if (!coach) { alert('Coach profile not found'); window.location.href = 'my-profile.html'; return; }
 
             currentCoach = coach;
             await loadTeam();
