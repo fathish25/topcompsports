@@ -308,22 +308,53 @@
                     return;
                 }
 
-                console.log('User ID:', user.id);
-                console.log('User Email:', user.email);
+                console.log('🔍 Debug Info:');
+                console.log('- User ID:', user.id);
+                console.log('- User Email:', user.email);
 
-                // 2. البحث عن coach_id باستخدام email (أكثر موثوقية)
-                const { data: coachData, error: coachError } = await supabaseClient
+                // 2. البحث عن coach_id باستخدام email أو user_id
+                let coachData = null;
+                let coachError = null;
+
+                // المحاولة الأولى: البحث بالـ email
+                const { data: emailResult, error: emailError } = await supabaseClient
                     .from('coaches')
-                    .select('id')
-                    .eq('email', user.email)
+                    .select('id, email, user_id')
+                    .ilike('email', user.email)
                     .maybeSingle();
 
-                if (coachError) {
-                    console.error('Coach query error:', coachError);
+                console.log(' Search by email result:', emailResult);
+                console.log('📧 Search by email error:', emailError);
+
+                if (emailResult) {
+                    coachData = emailResult;
+                } else {
+                    // المحاولة الثانية: البحث بالـ user_id
+                    const { data: userIdResult, error: userIdError } = await supabaseClient
+                        .from('coaches')
+                        .select('id, email, user_id')
+                        .eq('user_id', user.id)
+                        .maybeSingle();
+
+                    console.log(' Search by user_id result:', userIdResult);
+                    console.log('👤 Search by user_id error:', userIdError);
+
+                    if (userIdResult) {
+                        coachData = userIdResult;
+                    } else {
+                        coachError = userIdError;
+                    }
                 }
 
                 if (!coachData) {
-                    showAlert('⚠️ Coach profile not found. Please contact admin.', 'error');
+                    // عرض جميع المدربين للمساعدة في التصحيح
+                    const { data: allCoaches } = await supabaseClient
+                        .from('coaches')
+                        .select('id, email, user_id');
+                    
+                    console.log('📋 All coaches in DB:', allCoaches);
+                    
+                    showAlert('️ Coach profile not found. Please contact admin.', 'error');
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Team';
                     return;
