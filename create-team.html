@@ -99,7 +99,6 @@
         <div id="alert" class="alert"></div>
 
         <form id="createTeamForm">
-            <!-- Basic Information -->
             <div class="form-card">
                 <h2>Basic Information</h2>
                 
@@ -157,7 +156,6 @@
                 </div>
             </div>
 
-            <!-- Contact Information -->
             <div class="form-card">
                 <h2>Contact Information</h2>
                 
@@ -184,7 +182,6 @@
                 </div>
             </div>
 
-            <!-- Team Details -->
             <div class="form-card">
                 <h2>Team Details</h2>
                 
@@ -212,7 +209,6 @@
                 </div>
             </div>
 
-            <!-- Team Branding -->
             <div class="form-card">
                 <h2>Team Branding</h2>
                 
@@ -239,7 +235,6 @@
                 </div>
             </div>
 
-            <!-- Form Actions -->
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" onclick="window.location.href='coach-dashboard.html'">
                     <i class="fas fa-times"></i> Cancel
@@ -304,6 +299,7 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
 
             try {
+                // 1. التحقق من تسجيل الدخول
                 const { data: { user } } = await supabaseClient.auth.getUser();
                 if (!user) {
                     showAlert('Please login first', 'error');
@@ -311,72 +307,59 @@
                     return;
                 }
 
-                // التحقق من نوع المستخدم
-                const { data: userData } = await supabaseClient
-                    .from('users')
-                    .select('user_type')
-                    .eq('id', user.id)
-                    .single();
-
-                if (!userData || !['coach', 'organizer', 'admin', 'super_admin'].includes(userData.user_type)) {
-                    showAlert('Only coaches and organizers can create teams', 'error');
-                    return;
-                }
-
-                // البحث عن coach_id
-                let coachId = null;
-                const { data: coachData } = await supabaseClient
+                // 2. البحث عن coach_id الموجود (بدون محاولة إنشاء جديد)
+                const { data: coachData, error: coachError } = await supabaseClient
                     .from('coaches')
                     .select('id')
                     .eq('user_id', user.id)
                     .single();
 
-                if (coachData) {
-                    coachId = coachData.id;
-                } else {
-                    // إنشاء سجل coach تلقائياً إذا لم يكن موجوداً
-                    const { data: newCoach, error: coachError } = await supabaseClient
-                        .from('coaches')
-                        .insert({
-                            user_id: user.id,
-                            full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Coach',
-                            email: user.email,
-                            created_at: new Date().toISOString(),
-                            updated_at: new Date().toISOString()
-                        })
-                        .select('id')
-                        .single();
-
-                    if (coachError) {
-                        console.warn('Could not create coach record:', coachError);
-                    } else {
-                        coachId = newCoach.id;
-                    }
+                if (coachError || !coachData) {
+                    showAlert('⚠️ Coach profile not found. Please contact admin.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Team';
+                    return;
                 }
 
-                let logoUrl = null;
-                let coverUrl = null;
+                const coachId = coachData.id;
+                console.log('✅ Coach ID found:', coachId);
 
+                // 3. رفع الشعار (اختياري)
+                let logoUrl = null;
                 if (logoFile) {
                     const fileExt = logoFile.name.split('.').pop();
-                    const fileName = `${Date.now()}-logo.${fileExt}`;
-                    const { error } = await supabaseClient.storage.from('tournament_images').upload(fileName, logoFile);
+                    const fileName = `teams/${Date.now()}-logo.${fileExt}`;
+                    const { error } = await supabaseClient.storage
+                        .from('tournament_images')
+                        .upload(fileName, logoFile);
                     if (error) throw error;
-                    const { data } = supabaseClient.storage.from('tournament_images').getPublicUrl(fileName);
+                    const { data } = supabaseClient.storage
+                        .from('tournament_images')
+                        .getPublicUrl(fileName);
                     logoUrl = data.publicUrl;
                 }
 
+                // 4. رفع صورة الغلاف (اختياري)
+                let coverUrl = null;
                 if (coverFile) {
                     const fileExt = coverFile.name.split('.').pop();
-                    const fileName = `${Date.now()}-cover.${fileExt}`;
-                    const { error } = await supabaseClient.storage.from('tournament_images').upload(fileName, coverFile);
+                    const fileName = `teams/${Date.now()}-cover.${fileExt}`;
+                    const { error } = await supabaseClient.storage
+                        .from('tournament_images')
+                        .upload(fileName, coverFile);
                     if (error) throw error;
-                    const { data } = supabaseClient.storage.from('tournament_images').getPublicUrl(fileName);
+                    const { data } = supabaseClient.storage
+                        .from('tournament_images')
+                        .getPublicUrl(fileName);
                     coverUrl = data.publicUrl;
                 }
 
-                const sportsArray = Array.from(document.getElementById('sports').selectedOptions).map(opt => opt.value);
+                // 5. جمع الرياضات المختارة
+                const sportsArray = Array.from(
+                    document.getElementById('sports').selectedOptions
+                ).map(opt => opt.value);
 
+                // 6. تجهيز بيانات الفريق
                 const teamData = {
                     name: document.getElementById('teamName').value.trim(),
                     country: document.getElementById('country').value,
@@ -397,7 +380,10 @@
                     updated_at: new Date().toISOString()
                 };
 
-                const { error } = await supabaseClient.from('teams').insert([teamData]);
+                // 7. إرسال البيانات إلى جدول teams فقط
+                const { error } = await supabaseClient
+                    .from('teams')
+                    .insert([teamData]);
 
                 if (error) throw error;
 
@@ -406,7 +392,7 @@
 
             } catch (error) {
                 console.error('Error:', error);
-                showAlert(' Error: ' + error.message, 'error');
+                showAlert('❌ Error: ' + error.message, 'error');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Team';
             }
