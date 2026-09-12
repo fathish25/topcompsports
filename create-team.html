@@ -254,7 +254,9 @@
     <script>
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // ✅ تم تغيير اسم المتغير لتجنب التعارض
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let logoFile = null;
         let coverFile = null;
@@ -303,14 +305,14 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
 
             try {
-                const { data: { user } } = await supabase.auth.getUser();
+                const { data: { user } } = await supabaseClient.auth.getUser();
                 if (!user) {
                     showAlert('Please login first', 'error');
                     window.location.href = 'login.html';
                     return;
                 }
 
-                const { data: coach } = await supabase
+                const { data: coach } = await supabaseClient
                     .from('coaches')
                     .select('id')
                     .eq('user_id', user.id)
@@ -327,18 +329,18 @@
                 if (logoFile) {
                     const fileExt = logoFile.name.split('.').pop();
                     const fileName = `${Date.now()}-logo.${fileExt}`;
-                    const { error } = await supabase.storage.from('tournament_images').upload(fileName, logoFile);
+                    const { error } = await supabaseClient.storage.from('tournament_images').upload(fileName, logoFile);
                     if (error) throw error;
-                    const { data } = supabase.storage.from('tournament_images').getPublicUrl(fileName);
+                    const { data } = supabaseClient.storage.from('tournament_images').getPublicUrl(fileName);
                     logoUrl = data.publicUrl;
                 }
 
                 if (coverFile) {
                     const fileExt = coverFile.name.split('.').pop();
                     const fileName = `${Date.now()}-cover.${fileExt}`;
-                    const { error } = await supabase.storage.from('tournament_images').upload(fileName, coverFile);
+                    const { error } = await supabaseClient.storage.from('tournament_images').upload(fileName, coverFile);
                     if (error) throw error;
-                    const { data } = supabase.storage.from('tournament_images').getPublicUrl(fileName);
+                    const { data } = supabaseClient.storage.from('tournament_images').getPublicUrl(fileName);
                     coverUrl = data.publicUrl;
                 }
 
@@ -363,7 +365,7 @@
                     created_at: new Date().toISOString()
                 };
 
-                const { error } = await supabase.from('teams').insert([teamData]);
+                const { error } = await supabaseClient.from('teams').insert([teamData]);
 
                 if (error) throw error;
 
