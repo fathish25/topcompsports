@@ -95,6 +95,53 @@
         .file-upload-box:hover { border-color: var(--primary-blue); background: rgba(0,102,204,0.05); }
         .file-upload-box i { font-size: 3rem; color: var(--primary-blue); margin-bottom: 10px; }
 
+        /* ===== Team Dashboard Button ===== */
+        .team-dashboard-card {
+            background: linear-gradient(135deg, var(--accent-yellow) 0%, #F59E0B 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid var(--accent-yellow);
+            box-shadow: 0 10px 30px rgba(251, 191, 36, 0.3);
+        }
+        .team-dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(251, 191, 36, 0.5);
+        }
+        .team-dashboard-card h3 {
+            color: var(--black);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: 900;
+        }
+        .team-dashboard-card p {
+            color: var(--black);
+            opacity: 0.9;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+        .team-dashboard-btn {
+            background: var(--black);
+            color: var(--accent-yellow);
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .team-dashboard-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
         /* ===== Responsive (للموبايل) ===== */
         @media (max-width: 768px) {
             .profile-container { padding: 30px 15px; }
@@ -104,6 +151,8 @@
             .nav-menu { display: none; }
             .profile-avatar { width: 120px; height: 120px; }
             .profile-name { font-size: 1.5rem; }
+            .team-dashboard-card { padding: 20px; }
+            .team-dashboard-card h3 { font-size: 1.2rem; }
         }
 
         /* ===== RTL Support (للغة العربية) ===== */
@@ -147,12 +196,21 @@
         <h1 class="page-title" data-en="page_title">My Profile</h1>
         <div id="alert" class="alert"></div>
 
+        <!-- زر إدارة الفرق (يظهر فقط للمدرب والأدمن) -->
+        <div id="teamDashboardCard" class="team-dashboard-card" style="display: none;">
+            <h3><i class="fas fa-shield-alt"></i> Team Management Dashboard</h3>
+            <p>Create and manage your teams, view members, and handle join requests</p>
+            <button class="team-dashboard-btn" onclick="window.location.href='coach-dashboard.html'">
+                <i class="fas fa-arrow-right"></i> Go to Team Dashboard
+            </button>
+        </div>
+
         <div id="profileContent" class="profile-card" style="display: none;">
             <div class="profile-header">
                 <div class="profile-avatar" id="profileAvatar"><span>👤</span></div>
                 <div class="profile-name" id="profileName">User Name</div>
                 <div class="profile-email" id="profileEmail">user@email.com</div>
-                <button class="upload-btn" onclick="document.getElementById('profilePic').click()">📷 <span data-en="change_photo">Change Photo</span></button>
+                <button class="upload-btn" onclick="document.getElementById('profilePic').click()"> <span data-en="change_photo">Change Photo</span></button>
                 <input type="file" id="profilePic" accept="image/*" onchange="handleProfilePicUpload(event)" style="display: none;">
             </div>
 
@@ -226,7 +284,7 @@
                     </div>
                 </div>
 
-                <!-- ⭐ قسم وثيقة الهوية (للمنظمين، المدربين، واللاعبين) ⭐ -->
+                <!-- قسم وثيقة الهوية (لجميع المستخدمين) -->
                 <div class="form-group" id="idDocumentSection" style="display: none;">
                     <label class="form-label" data-en="label_id_document">
                         <i class="fas fa-id-card"></i> ID Document (National ID or Passport)
@@ -292,9 +350,14 @@
                 userType = user.user_metadata?.user_type || 'user';
                 console.log('✅ User:', user.email, '| Type:', userType);
                 
-                // ⭐ إظهار قسم وثيقة الهوية للمنظمين، المدربين، واللاعبين
+                // إظهار قسم وثيقة الهوية لجميع المستخدمين
                 if (userType === 'organizer' || userType === 'coach' || userType === 'athlete') {
                     document.getElementById('idDocumentSection').style.display = 'block';
+                }
+
+                // ⭐ إظهار زر إدارة الفرق للمدرب والأدمن والسوبر أدمن
+                if (userType === 'coach' || userType === 'admin' || userType === 'super_admin') {
+                    document.getElementById('teamDashboardCard').style.display = 'block';
                 }
                 
                 await loadProfile();
@@ -437,7 +500,7 @@
                     }
                 }
 
-                // ⭐ رفع وثيقة الهوية (للمنظمين، المدربين، واللاعبين)
+                // رفع وثيقة الهوية
                 if (idDocumentFile) {
                     try {
                         const fileExt = idDocumentFile.name.split('.').pop();
@@ -461,7 +524,7 @@
                     }
                 }
 
-                // حفظ البيانات في جدول users الرئيسي
+                // حفظ البيانات في جدول users
                 const { error: upsertError } = await db
                     .from('users')
                     .upsert(profileData, { onConflict: 'id' });
@@ -471,7 +534,7 @@
                     throw upsertError;
                 }
 
-                // ⭐ حفظ رابط الوثيقة أيضاً في الجدول الفرعي الخاص بنوع المستخدم لضمان التكامل
+                // حفظ رابط الوثيقة في الجدول الفرعي
                 let tableUpdateError = null;
                 if (userType === 'organizer') {
                     const { error } = await db.from('organizers').update({ id_document_url: profileData.id_document_url }).eq('user_id', currentUser.id);
@@ -506,7 +569,7 @@
                 showAlert('error', '❌ Error: ' + error.message);
             } finally {
                 saveBtn.disabled = false;
-                saveBtn.innerHTML = '💾 <span data-en="btn_save">Save Changes</span>';
+                saveBtn.innerHTML = ' <span data-en="btn_save">Save Changes</span>';
             }
         }
 
