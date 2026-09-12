@@ -42,8 +42,6 @@
             border-radius: 16px;
             margin-bottom: 40px;
             color: var(--white);
-            position: relative;
-            overflow: hidden;
         }
         .welcome-title { font-size: 32px; font-weight: bold; margin-bottom: 10px; }
         .welcome-subtitle { color: rgba(255,255,255,0.9); font-size: 16px; }
@@ -246,21 +244,21 @@
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // ✅ تغيير اسم المتغير لتجنب التعارض
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentCoach = null;
 
         async function loadProfile() {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } } = await supabaseClient.auth.getUser();
             if (!user) { window.location.href = 'login.html'; return; }
 
-            const { data: coach, error } = await supabase
+            const { data: coach, error } = await supabaseClient
                 .from('coaches')
                 .select('*')
                 .eq('user_id', user.id)
                 .single();
 
             if (error || !coach) {
-                // إذا لم يكن هناك ملف مدرب، وجهه لإنشاء واحد أو للبروفايل
                 document.getElementById('profileName').textContent = "Profile Incomplete";
                 document.getElementById('teamsList').innerHTML = `
                     <div class="empty-state">
@@ -280,7 +278,7 @@
         }
 
         async function loadTeams(coachId) {
-            const { data: teams, error } = await supabase
+            const { data: teams, error } = await supabaseClient
                 .from('teams')
                 .select('*')
                 .eq('coach_id', coachId)
@@ -329,14 +327,13 @@
             `).join('');
         }
 
-        // ===== دالة الحذف الجديدة والفعالة =====
         async function deleteTeam(teamId, teamName) {
-            if (!confirm(`Are you absolutely sure you want to delete the team "${teamName}"?\n\nThis action cannot be undone and will remove the team from the database.`)) {
-                return; // إلغاء العملية
+            if (!confirm(`Are you absolutely sure you want to delete the team "${teamName}"?\n\nThis action cannot be undone.`)) {
+                return;
             }
             
             try {
-                const { error } = await supabase
+                const { error } = await supabaseClient
                     .from('teams')
                     .delete()
                     .eq('id', teamId);
@@ -344,7 +341,7 @@
                 if (error) throw error;
                 
                 alert('✅ Team deleted successfully!');
-                window.location.reload(); // إعادة تحميل الصفحة لتحديث القائمة فوراً
+                window.location.reload();
                 
             } catch (error) {
                 console.error('Error deleting team:', error);
@@ -354,7 +351,7 @@
 
         async function handleLogout() {
             if (confirm('Are you sure you want to logout?')) {
-                await supabase.auth.signOut();
+                await supabaseClient.auth.signOut();
                 window.location.href = 'index.html';
             }
         }
