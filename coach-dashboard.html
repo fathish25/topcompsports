@@ -30,7 +30,6 @@
         .nav-menu { display: flex; gap: 20px; align-items: center; }
         .nav-link { color: var(--white); text-decoration: none; font-weight: 500; padding: 8px 15px; border-radius: 5px; transition: all 0.3s; }
         .nav-link:hover { color: var(--accent-yellow); }
-        .auth-buttons { display: flex; gap: 10px; align-items: center; }
         .btn-logout { padding: 10px 24px; background: #dc2626; color: var(--white); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
         .btn-logout:hover { background: #b91c1c; transform: translateY(-2px); }
 
@@ -46,7 +45,7 @@
         .welcome-title { font-size: 32px; font-weight: bold; margin-bottom: 10px; }
         .welcome-subtitle { color: rgba(255,255,255,0.9); font-size: 16px; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
         .stat-card {
             background: var(--white);
             border: 2px solid #E2E8F0;
@@ -55,8 +54,7 @@
             transition: all 0.3s;
         }
         .stat-card:hover { transform: translateY(-5px); border-color: var(--primary-blue); box-shadow: 0 10px 30px rgba(0,102,204,0.15); }
-        .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .stat-icon { font-size: 32px; color: var(--primary-blue); }
+        .stat-icon { font-size: 32px; color: var(--primary-blue); margin-bottom: 10px; }
         .stat-value { font-size: 36px; font-weight: bold; color: var(--dark-blue); margin-bottom: 5px; }
         .stat-label { color: #64748B; font-size: 14px; }
 
@@ -132,31 +130,163 @@
         }
         .btn-danger:hover { background: #DC2626; }
 
-        .teams-list { display: flex; flex-direction: column; gap: 15px; }
-        .team-item {
+        .btn-warning {
+            background: var(--accent-yellow);
+            color: var(--black);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,184,0,0.4); }
+
+        .btn-success {
+            background: #10B981;
+            color: var(--white);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        .btn-success:hover { background: #059669; }
+
+        .teams-list { display: flex; flex-direction: column; gap: 20px; }
+        
+        /* تصميم جديد للفريق: صورة على اليسار + بيانات على اليمين */
+        .team-card {
             background: var(--light-bg);
             border: 2px solid #E2E8F0;
             border-radius: 12px;
             padding: 20px;
             transition: all 0.3s;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
         }
-        .team-item:hover { border-color: var(--primary-blue); background: rgba(0,102,204,0.05); }
-        .team-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;}
-        .team-name { font-size: 18px; font-weight: bold; color: var(--dark-blue); }
-        .team-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; background: var(--accent-yellow); color: var(--black); }
-        .team-info { display: flex; gap: 20px; color: #64748B; font-size: 14px; margin-bottom: 15px; }
-        .team-info-item { display: flex; align-items: center; gap: 5px; }
+        .team-card:hover { border-color: var(--primary-blue); background: rgba(0,102,204,0.03); }
+        .team-card.suspended { opacity: 0.6; border-color: #EF4444; background: rgba(239,68,68,0.03); }
         
-        .team-actions { display: flex; gap: 10px; }
+        .team-logo-container {
+            flex-shrink: 0;
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--white);
+            border: 2px solid #E2E8F0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .team-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .team-logo-placeholder {
+            font-size: 48px;
+            color: var(--primary-blue);
+        }
+        
+        .team-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .team-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .team-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--dark-blue);
+            margin: 0;
+        }
+        .team-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .badge-active { background: var(--accent-yellow); color: var(--black); }
+        .badge-suspended { background: #EF4444; color: var(--white); }
+        
+        .team-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: var(--white);
+            border-radius: 8px;
+        }
+        .team-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #64748B;
+        }
+        .team-detail-item i {
+            color: var(--primary-blue);
+            width: 16px;
+        }
+        .team-detail-item strong {
+            color: var(--black);
+        }
+        
+        .team-sports {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        .sport-tag {
+            background: rgba(0,102,204,0.1);
+            color: var(--primary-blue);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .team-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding-top: 12px;
+            border-top: 1px solid #E2E8F0;
+        }
 
         .empty-state { text-align: center; padding: 60px 20px; color: #64748B; }
         .empty-state-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.5; }
 
         @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } .nav-menu { display: none; } }
         @media (max-width: 768px) {
-            .stats-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
             .section-header { flex-direction: column; align-items: flex-start; }
-            .team-info { flex-direction: column; gap: 10px; }
+            .team-card { flex-direction: column; }
+            .team-logo-container { width: 100%; height: 150px; }
+            .team-details { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -187,12 +317,22 @@
 
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-header"><div class="stat-icon"><i class="fas fa-shield-alt"></i></div></div>
+                <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
                 <div class="stat-value" id="statTeams">0</div>
                 <div class="stat-label">My Teams</div>
             </div>
             <div class="stat-card">
-                <div class="stat-header"><div class="stat-icon"><i class="fas fa-users"></i></div></div>
+                <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-value" id="statActiveTeams">0</div>
+                <div class="stat-label">Active Teams</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-pause-circle"></i></div>
+                <div class="stat-value" id="statSuspendedTeams">0</div>
+                <div class="stat-label">Suspended</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
                 <div class="stat-value" id="statAthletes">0</div>
                 <div class="stat-label">Total Athletes</div>
             </div>
@@ -244,7 +384,6 @@
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         
-        // ✅ تغيير اسم المتغير لتجنب التعارض
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentCoach = null;
 
@@ -278,6 +417,7 @@
         }
 
         async function loadTeams(coachId) {
+            // جلب جميع الفرق (النشطة والمعلَّقة) للمدرب
             const { data: teams, error } = await supabaseClient
                 .from('teams')
                 .select('*')
@@ -287,8 +427,16 @@
             if (error) { console.error('Error loading teams:', error); return; }
 
             const list = document.getElementById('teamsList');
-            document.getElementById('statTeams').textContent = teams ? teams.length : 0;
             
+            // إحصائيات
+            const totalTeams = teams ? teams.length : 0;
+            const activeTeams = teams ? teams.filter(t => t.is_active).length : 0;
+            const suspendedTeams = totalTeams - activeTeams;
+            
+            document.getElementById('statTeams').textContent = totalTeams;
+            document.getElementById('statActiveTeams').textContent = activeTeams;
+            document.getElementById('statSuspendedTeams').textContent = suspendedTeams;
+
             if (!teams || teams.length === 0) {
                 list.innerHTML = `
                     <div class="empty-state">
@@ -301,34 +449,146 @@
                 return;
             }
 
-            list.innerHTML = teams.map(team => `
-                <div class="team-item">
-                    <div class="team-header">
-                        <div class="team-name">${team.name}</div>
-                        <span class="team-badge" style="background: ${team.is_active ? 'var(--accent-yellow)' : '#EF4444'}; color: ${team.is_active ? 'var(--black)' : '#fff'}">
-                            ${team.is_active ? 'Active' : 'Inactive'}
-                        </span>
+            // جلب عدد الأعضاء لكل فريق
+            const teamIds = teams.map(t => t.id);
+            let membersCount = {};
+            
+            if (teamIds.length > 0) {
+                const { data: members } = await supabaseClient
+                    .from('team_members')
+                    .select('team_id')
+                    .in('team_id', teamIds)
+                    .eq('status', 'approved');
+                
+                if (members) {
+                    members.forEach(m => {
+                        membersCount[m.team_id] = (membersCount[m.team_id] || 0) + 1;
+                    });
+                }
+            }
+            
+            document.getElementById('statAthletes').textContent = Object.values(membersCount).reduce((a, b) => a + b, 0);
+
+            list.innerHTML = teams.map(team => {
+                const isActive = team.is_active !== false;
+                const memberCount = membersCount[team.id] || 0;
+                const sports = team.sports || [];
+                
+                return `
+                <div class="team-card ${!isActive ? 'suspended' : ''}">
+                    <!-- صورة الفريق على اليسار -->
+                    <div class="team-logo-container">
+                        ${team.logo_url 
+                            ? `<img src="${team.logo_url}" alt="${team.name}" class="team-logo">`
+                            : `<i class="fas fa-shield-alt team-logo-placeholder"></i>`
+                        }
                     </div>
-                    <div class="team-info">
-                        <div class="team-info-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>${team.city || 'N/A'}${team.city && team.country ? ', ' : ''}${team.country || ''}</span>
+                    
+                    <!-- المحتوى على اليمين -->
+                    <div class="team-content">
+                        <div class="team-header">
+                            <h3 class="team-name">${team.name}</h3>
+                            <span class="team-badge ${isActive ? 'badge-active' : 'badge-suspended'}">
+                                <i class="fas ${isActive ? 'fa-check-circle' : 'fa-pause-circle'}"></i>
+                                ${isActive ? 'Active' : 'Suspended'}
+                            </span>
+                        </div>
+                        
+                        <!-- تفاصيل الفريق -->
+                        <div class="team-details">
+                            <div class="team-detail-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span><strong>${team.city || 'N/A'}</strong>, ${team.country || 'N/A'}</span>
+                            </div>
+                            <div class="team-detail-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>${team.email || 'No email'}</span>
+                            </div>
+                            <div class="team-detail-item">
+                                <i class="fas fa-phone"></i>
+                                <span>${team.phone || 'No phone'}</span>
+                            </div>
+                            <div class="team-detail-item">
+                                <i class="fas fa-users"></i>
+                                <span><strong>${memberCount}</strong> member${memberCount !== 1 ? 's' : ''}</span>
+                            </div>
+                            ${team.website ? `
+                            <div class="team-detail-item">
+                                <i class="fas fa-globe"></i>
+                                <a href="${team.website}" target="_blank" style="color: var(--primary-blue); text-decoration: none;">${team.website.replace(/^https?:\/\//, '').substring(0, 30)}</a>
+                            </div>
+                            ` : ''}
+                        </div>
+                        
+                        <!-- الرياضات -->
+                        ${sports.length > 0 ? `
+                        <div class="team-sports">
+                            ${sports.map(s => `<span class="sport-tag">${s}</span>`).join('')}
+                        </div>
+                        ` : ''}
+                        
+                        <!-- الأزرار -->
+                        <div class="team-actions">
+                            <button class="btn-primary" style="padding: 8px 15px; font-size: 14px;" onclick="window.location.href='create-team.html?edit=${team.id}'">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="${isActive ? 'btn-warning' : 'btn-success'}" onclick="toggleTeamStatus('${team.id}', '${team.name}', ${isActive})">
+                                <i class="fas ${isActive ? 'fa-pause-circle' : 'fa-play-circle'}"></i>
+                                ${isActive ? 'Suspend' : 'Activate'}
+                            </button>
+                            <button class="btn-danger" onclick="deleteTeam('${team.id}', '${team.name}')">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
                         </div>
                     </div>
-                    <div class="team-actions">
-                        <button class="btn-primary" style="padding: 8px 15px; font-size: 14px;" onclick="window.location.href='create-team.html?edit=${team.id}'">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="btn-danger" onclick="deleteTeam('${team.id}', '${team.name}')">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
+        // ===== تعليق/تفعيل الفريق =====
+        async function toggleTeamStatus(teamId, teamName, currentStatus) {
+            const action = currentStatus ? 'suspend' : 'activate';
+            const actionText = currentStatus ? 'SUSPEND' : 'ACTIVATE';
+            
+            if (!confirm(`Are you sure you want to ${action} the team "${teamName}"?\n\n${currentStatus ? 'The team will be hidden from public lists and cannot participate in tournaments.' : 'The team will be visible again and can participate in tournaments.'}`)) {
+                return;
+            }
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('teams')
+                    .update({ 
+                        is_active: !currentStatus,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', teamId);
+                    
+                if (error) throw error;
+                
+                alert(`✅ Team ${actionText}ED successfully!`);
+                window.location.reload();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // ===== حذف الفريق =====
         async function deleteTeam(teamId, teamName) {
-            if (!confirm(`Are you absolutely sure you want to delete the team "${teamName}"?\n\nThis action cannot be undone.`)) {
+            if (!confirm(`⚠️ WARNING: Are you absolutely sure you want to PERMANENTLY DELETE the team "${teamName}"?\n\nThis action CANNOT be undone and will remove all team data.`)) {
+                return;
+            }
+            
+            // تأكيد ثانٍ
+            if (!confirm(`Final confirmation: Type OK in the next prompt to confirm deletion.`)) {
+                return;
+            }
+            
+            const confirmation = prompt('Type "DELETE" to confirm:');
+            if (confirmation !== 'DELETE') {
+                alert('Deletion cancelled.');
                 return;
             }
             
@@ -340,12 +600,12 @@
                     
                 if (error) throw error;
                 
-                alert('✅ Team deleted successfully!');
+                alert('✅ Team deleted permanently!');
                 window.location.reload();
                 
             } catch (error) {
                 console.error('Error deleting team:', error);
-                alert('❌ Error deleting team: ' + error.message);
+                alert('❌ Error: ' + error.message);
             }
         }
 
