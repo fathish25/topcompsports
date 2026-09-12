@@ -74,8 +74,40 @@
             margin: 0 auto 20px;
             border: 4px solid var(--accent-yellow);
         }
+        .profile-photo-placeholder {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            border: 4px solid var(--accent-yellow);
+            background: var(--gradient-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: var(--white);
+        }
         .profile-name { font-size: 24px; font-weight: bold; margin-bottom: 5px; color: var(--dark-blue); }
         .profile-role { color: var(--primary-blue); font-size: 14px; margin-bottom: 20px; font-weight: 600; }
+        
+        .profile-details {
+            background: var(--light-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: left;
+        }
+        .profile-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #E2E8F0;
+            font-size: 14px;
+        }
+        .profile-detail-item:last-child { border-bottom: none; }
+        .profile-detail-item i { color: var(--primary-blue); width: 20px; }
+        .profile-detail-item strong { color: var(--black); }
+        
         .profile-info { text-align: left; margin-top: 20px; }
         .info-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #E2E8F0; }
         .info-label { color: #64748B; font-size: 14px; }
@@ -164,7 +196,6 @@
 
         .teams-list { display: flex; flex-direction: column; gap: 20px; }
         
-        /* تصميم جديد للفريق: صورة على اليسار + بيانات على اليمين */
         .team-card {
             background: var(--light-bg);
             border: 2px solid #E2E8F0;
@@ -200,10 +231,7 @@
             color: var(--primary-blue);
         }
         
-        .team-content {
-            flex: 1;
-            min-width: 0;
-        }
+        .team-content { flex: 1; min-width: 0; }
         .team-header {
             display: flex;
             justify-content: space-between;
@@ -217,7 +245,10 @@
             font-weight: bold;
             color: var(--dark-blue);
             margin: 0;
+            cursor: pointer;
+            transition: color 0.3s;
         }
+        .team-name:hover { color: var(--primary-blue); text-decoration: underline; }
         .team-badge {
             padding: 6px 14px;
             border-radius: 20px;
@@ -246,13 +277,8 @@
             font-size: 14px;
             color: #64748B;
         }
-        .team-detail-item i {
-            color: var(--primary-blue);
-            width: 16px;
-        }
-        .team-detail-item strong {
-            color: var(--black);
-        }
+        .team-detail-item i { color: var(--primary-blue); width: 16px; }
+        .team-detail-item strong { color: var(--black); }
         
         .team-sports {
             display: flex;
@@ -340,11 +366,35 @@
 
         <div class="content-grid">
             <div class="profile-card">
-                <div class="profile-photo" id="profilePhotoPlaceholder" style="background: var(--gradient-blue); display:flex; align-items:center; justify-content:center; font-size:48px; color:#fff;">
-                    <i class="fas fa-chalkboard-teacher"></i>
+                <!-- صورة المدرب الفعلية -->
+                <div id="coachPhotoContainer">
+                    <div class="profile-photo-placeholder">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
                 </div>
+                
                 <h2 class="profile-name" id="profileName">Loading...</h2>
                 <p class="profile-role">Coach</p>
+                
+                <!-- بيانات المدرب الإضافية -->
+                <div class="profile-details" id="profileDetails" style="display: none;">
+                    <div class="profile-detail-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="coachLocation">-</span>
+                    </div>
+                    <div class="profile-detail-item">
+                        <i class="fas fa-phone"></i>
+                        <span id="coachPhone">-</span>
+                    </div>
+                    <div class="profile-detail-item">
+                        <i class="fas fa-clock"></i>
+                        <span id="coachExperience">-</span>
+                    </div>
+                    <div class="profile-detail-item">
+                        <i class="fas fa-award"></i>
+                        <span id="coachBelt">-</span>
+                    </div>
+                </div>
                 
                 <div class="profile-info">
                     <div class="info-item">
@@ -413,11 +463,44 @@
             document.getElementById('profileEmail').textContent = coach.email;
             document.getElementById('profileCountry').textContent = coach.country || '-';
 
+            // عرض صورة المدرب الفعلية
+            const photoContainer = document.getElementById('coachPhotoContainer');
+            if (coach.profile_photo_url) {
+                photoContainer.innerHTML = `
+                    <img src="${coach.profile_photo_url}" alt="${coach.full_name}" class="profile-photo">
+                `;
+            }
+
+            // عرض بيانات المدرب الإضافية
+            const detailsDiv = document.getElementById('profileDetails');
+            let hasDetails = false;
+
+            if (coach.city || coach.country) {
+                document.getElementById('coachLocation').textContent = 
+                    `${coach.city || ''}${coach.city && coach.country ? ', ' : ''}${coach.country || ''}`;
+                hasDetails = true;
+            }
+            if (coach.phone) {
+                document.getElementById('coachPhone').textContent = coach.phone;
+                hasDetails = true;
+            }
+            if (coach.experience_years) {
+                document.getElementById('coachExperience').textContent = `${coach.experience_years} years experience`;
+                hasDetails = true;
+            }
+            if (coach.belt_level) {
+                document.getElementById('coachBelt').textContent = `Belt: ${coach.belt_level}`;
+                hasDetails = true;
+            }
+
+            if (hasDetails) {
+                detailsDiv.style.display = 'block';
+            }
+
             await loadTeams(coach.id);
         }
 
         async function loadTeams(coachId) {
-            // جلب جميع الفرق (النشطة والمعلَّقة) للمدرب
             const { data: teams, error } = await supabaseClient
                 .from('teams')
                 .select('*')
@@ -428,9 +511,8 @@
 
             const list = document.getElementById('teamsList');
             
-            // إحصائيات
             const totalTeams = teams ? teams.length : 0;
-            const activeTeams = teams ? teams.filter(t => t.is_active).length : 0;
+            const activeTeams = teams ? teams.filter(t => t.is_active !== false).length : 0;
             const suspendedTeams = totalTeams - activeTeams;
             
             document.getElementById('statTeams').textContent = totalTeams;
@@ -476,7 +558,6 @@
                 
                 return `
                 <div class="team-card ${!isActive ? 'suspended' : ''}">
-                    <!-- صورة الفريق على اليسار -->
                     <div class="team-logo-container">
                         ${team.logo_url 
                             ? `<img src="${team.logo_url}" alt="${team.name}" class="team-logo">`
@@ -484,17 +565,18 @@
                         }
                     </div>
                     
-                    <!-- المحتوى على اليمين -->
                     <div class="team-content">
                         <div class="team-header">
-                            <h3 class="team-name">${team.name}</h3>
+                            <!-- اسم الفريق كرابط ينقل إلى صفحة الفريق -->
+                            <h3 class="team-name" onclick="window.location.href='team-dashboard.html?id=${team.id}'">
+                                ${team.name} <i class="fas fa-external-link-alt" style="font-size: 14px; margin-left: 5px;"></i>
+                            </h3>
                             <span class="team-badge ${isActive ? 'badge-active' : 'badge-suspended'}">
                                 <i class="fas ${isActive ? 'fa-check-circle' : 'fa-pause-circle'}"></i>
                                 ${isActive ? 'Active' : 'Suspended'}
                             </span>
                         </div>
                         
-                        <!-- تفاصيل الفريق -->
                         <div class="team-details">
                             <div class="team-detail-item">
                                 <i class="fas fa-map-marker-alt"></i>
@@ -520,14 +602,12 @@
                             ` : ''}
                         </div>
                         
-                        <!-- الرياضات -->
                         ${sports.length > 0 ? `
                         <div class="team-sports">
                             ${sports.map(s => `<span class="sport-tag">${s}</span>`).join('')}
                         </div>
                         ` : ''}
                         
-                        <!-- الأزرار -->
                         <div class="team-actions">
                             <button class="btn-primary" style="padding: 8px 15px; font-size: 14px;" onclick="window.location.href='create-team.html?edit=${team.id}'">
                                 <i class="fas fa-edit"></i> Edit
@@ -546,12 +626,11 @@
             }).join('');
         }
 
-        // ===== تعليق/تفعيل الفريق =====
         async function toggleTeamStatus(teamId, teamName, currentStatus) {
             const action = currentStatus ? 'suspend' : 'activate';
             const actionText = currentStatus ? 'SUSPEND' : 'ACTIVATE';
             
-            if (!confirm(`Are you sure you want to ${action} the team "${teamName}"?\n\n${currentStatus ? 'The team will be hidden from public lists and cannot participate in tournaments.' : 'The team will be visible again and can participate in tournaments.'}`)) {
+            if (!confirm(`Are you sure you want to ${action} the team "${teamName}"?\n\n${currentStatus ? 'The team will be hidden from public lists.' : 'The team will be visible again.'}`)) {
                 return;
             }
             
@@ -575,14 +654,8 @@
             }
         }
 
-        // ===== حذف الفريق =====
         async function deleteTeam(teamId, teamName) {
-            if (!confirm(`⚠️ WARNING: Are you absolutely sure you want to PERMANENTLY DELETE the team "${teamName}"?\n\nThis action CANNOT be undone and will remove all team data.`)) {
-                return;
-            }
-            
-            // تأكيد ثانٍ
-            if (!confirm(`Final confirmation: Type OK in the next prompt to confirm deletion.`)) {
+            if (!confirm(`⚠️ WARNING: Are you absolutely sure you want to PERMANENTLY DELETE "${teamName}"?`)) {
                 return;
             }
             
