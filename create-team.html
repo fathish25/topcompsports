@@ -255,7 +255,6 @@
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         
-        // ✅ تم تغيير اسم المتغير لتجنب التعارض
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let logoFile = null;
@@ -312,15 +311,47 @@
                     return;
                 }
 
-                const { data: coach } = await supabaseClient
+                // التحقق من نوع المستخدم
+                const { data: userData } = await supabaseClient
+                    .from('users')
+                    .select('user_type')
+                    .eq('id', user.id)
+                    .single();
+
+                if (!userData || !['coach', 'organizer', 'admin', 'super_admin'].includes(userData.user_type)) {
+                    showAlert('Only coaches and organizers can create teams', 'error');
+                    return;
+                }
+
+                // البحث عن coach_id
+                let coachId = null;
+                const { data: coachData } = await supabaseClient
                     .from('coaches')
                     .select('id')
                     .eq('user_id', user.id)
                     .single();
 
-                if (!coach) {
-                    showAlert('Coach profile not found', 'error');
-                    return;
+                if (coachData) {
+                    coachId = coachData.id;
+                } else {
+                    // إنشاء سجل coach تلقائياً إذا لم يكن موجوداً
+                    const { data: newCoach, error: coachError } = await supabaseClient
+                        .from('coaches')
+                        .insert({
+                            user_id: user.id,
+                            full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Coach',
+                            email: user.email,
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        })
+                        .select('id')
+                        .single();
+
+                    if (coachError) {
+                        console.warn('Could not create coach record:', coachError);
+                    } else {
+                        coachId = newCoach.id;
+                    }
                 }
 
                 let logoUrl = null;
@@ -347,7 +378,6 @@
                 const sportsArray = Array.from(document.getElementById('sports').selectedOptions).map(opt => opt.value);
 
                 const teamData = {
-                    coach_id: coach.id,
                     name: document.getElementById('teamName').value.trim(),
                     country: document.getElementById('country').value,
                     city: document.getElementById('city').value.trim(),
@@ -356,25 +386,27 @@
                     email: document.getElementById('teamEmail').value.trim() || null,
                     phone: document.getElementById('teamPhone').value.trim() || null,
                     website: document.getElementById('website').value.trim() || null,
-                    about: document.getElementById('about').value.trim() || null,
-                    sports: sportsArray,
+                    description: document.getElementById('about').value.trim() || null,
+                    sports: sportsArray.length > 0 ? sportsArray : null,
                     auto_approve_members: document.getElementById('autoApprove').checked,
                     logo_url: logoUrl,
                     cover_url: coverUrl,
                     is_active: true,
-                    created_at: new Date().toISOString()
+                    coach_id: coachId,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
                 };
 
                 const { error } = await supabaseClient.from('teams').insert([teamData]);
 
                 if (error) throw error;
 
-                showAlert('✅ Team created successfully!', 'success');
+                showAlert('✅ Team created successfully! Redirecting...', 'success');
                 setTimeout(() => window.location.href = 'coach-dashboard.html', 2000);
 
             } catch (error) {
                 console.error('Error:', error);
-                showAlert('❌ Error: ' + error.message, 'error');
+                showAlert(' Error: ' + error.message, 'error');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Team';
             }
