@@ -307,14 +307,22 @@
                     return;
                 }
 
-                // 2. البحث عن coach_id الموجود (بدون محاولة إنشاء جديد)
+                // 2. البحث عن coach_id - قراءة فقط
                 const { data: coachData, error: coachError } = await supabaseClient
                     .from('coaches')
                     .select('id')
                     .eq('user_id', user.id)
-                    .single();
+                    .maybeSingle();
 
-                if (coachError || !coachData) {
+                if (coachError) {
+                    console.error('Coach query error:', coachError);
+                    showAlert('Error reading coach profile: ' + coachError.message, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Team';
+                    return;
+                }
+
+                if (!coachData) {
                     showAlert('⚠️ Coach profile not found. Please contact admin.', 'error');
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Team';
@@ -392,7 +400,7 @@
 
             } catch (error) {
                 console.error('Error:', error);
-                showAlert('❌ Error: ' + error.message, 'error');
+                showAlert(' Error: ' + error.message, 'error');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Team';
             }
