@@ -97,6 +97,18 @@
         .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #10B981; }
         .alert-error { background: #FEE2E2; color: #991B1B; border: 1px solid #EF4444; }
 
+        /* Access Denied */
+        .access-denied {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .access-denied-icon { font-size: 80px; color: var(--danger); margin-bottom: 20px; }
+        .access-denied h2 { font-size: 2rem; color: var(--black); margin-bottom: 15px; }
+        .access-denied p { color: rgba(0,0,0,0.6); font-size: 1.1rem; margin-bottom: 30px; }
+
         /* Responsive */
         @media (max-width: 768px) {
             .header { padding: 15px 20px; flex-direction: column; gap: 15px; }
@@ -132,199 +144,212 @@
     </header>
 
     <div class="container">
-        <div class="page-header">
-            <h1>Create New Tournament</h1>
-            <p>Fill in the details to create your tournament</p>
+        <!-- Access Denied Message -->
+        <div id="accessDenied" class="access-denied" style="display: none;">
+            <div class="access-denied-icon">🚫</div>
+            <h2>Access Denied</h2>
+            <p>Only organizers and administrators can create tournaments.</p>
+            <button class="btn btn-primary" onclick="window.location.href='index.html'">
+                ← Back to Home
+            </button>
         </div>
 
-        <div id="alert" class="alert"></div>
-
-        <form id="tournamentForm">
-            <!-- Basic Information -->
-            <div class="form-section">
-                <h2 class="section-title"><span class="icon">📋</span> Basic Information</h2>
-                
-                <div class="form-group">
-                    <label class="form-label">Tournament Name <span class="required">*</span></label>
-                    <input type="text" id="tournamentName" class="form-input" required placeholder="e.g., Cairo Open 2026">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea id="description" class="form-textarea" placeholder="Describe your tournament..."></textarea>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Sport Type <span class="required">*</span></label>
-                        <select id="sportType" class="form-select" required>
-                            <option value="">Select sport...</option>
-                            <option value="BJJ">Brazilian Jiu-Jitsu (BJJ)</option>
-                            <option value="Gi">Gi Jiu-Jitsu</option>
-                            <option value="No-Gi">No-Gi Jiu-Jitsu</option>
-                            <option value="Grappling">Grappling</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Age Division <span class="required">*</span></label>
-                        <select id="ageDivision" class="form-select" required>
-                            <option value="">Select division...</option>
-                            <option value="Kids">Kids (Under 16)</option>
-                            <option value="Youth">Youth (16-17)</option>
-                            <option value="Adult">Adult (18-29)</option>
-                            <option value="Master">Master (30+)</option>
-                            <option value="All">All Ages</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Fight Duration (minutes) <span class="required">*</span></label>
-                        <input type="number" id="fightDuration" class="form-input" min="1" max="30" required value="5">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Golden Score Duration (minutes)</label>
-                        <input type="number" id="goldenScoreDuration" class="form-input" min="0" max="15" value="3">
-                    </div>
-                </div>
+        <!-- Tournament Form (يظهر فقط للمنظمين) -->
+        <div id="tournamentFormContainer" style="display: none;">
+            <div class="page-header">
+                <h1>Create New Tournament</h1>
+                <p>Fill in the details to create your tournament</p>
             </div>
 
-            <!-- Date & Location -->
-            <div class="form-section">
-                <h2 class="section-title"><span class="icon">📅</span> Date & Location</h2>
+            <div id="alert" class="alert"></div>
 
-                <div class="form-row">
+            <form id="tournamentForm">
+                <!-- Basic Information -->
+                <div class="form-section">
+                    <h2 class="section-title"><span class="icon">📋</span> Basic Information</h2>
+                    
                     <div class="form-group">
-                        <label class="form-label">Event Start Date <span class="required">*</span></label>
-                        <input type="date" id="eventStartDate" class="form-input" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Event End Date</label>
-                        <input type="date" id="eventEndDate" class="form-input">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Country <span class="required">*</span></label>
-                        <select id="country" class="form-select" required>
-                            <option value="">Select country...</option>
-                            <option value="Egypt">Egypt</option>
-                            <option value="UAE">UAE</option>
-                            <option value="Saudi Arabia">Saudi Arabia</option>
-                            <option value="Jordan">Jordan</option>
-                            <option value="Lebanon">Lebanon</option>
-                            <option value="Morocco">Morocco</option>
-                            <option value="Other">Other</option>
-                        </select>
+                        <label class="form-label">Tournament Name <span class="required">*</span></label>
+                        <input type="text" id="tournamentName" class="form-input" required placeholder="e.g., Cairo Open 2026">
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Location / Venue <span class="required">*</span></label>
-                        <input type="text" id="location" class="form-input" required placeholder="e.g., Cairo Stadium Arena">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Participants & Fees -->
-            <div class="form-section">
-                <h2 class="section-title"><span class="icon">👥</span> Participants & Fees</h2>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Max Participants</label>
-                        <input type="number" id="maxParticipants" class="form-input" min="1" placeholder="e.g., 200">
+                        <label class="form-label">Description</label>
+                        <textarea id="description" class="form-textarea" placeholder="Describe your tournament..."></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Base Registration Fee (USD)</label>
-                        <input type="number" id="registrationFee" class="form-input" min="0" step="0.01" placeholder="e.g., 50">
-                        <div class="form-hint">Base fee (can be overridden per division)</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Divisions & Pricing -->
-            <div class="form-section">
-                <h2 class="section-title"><span class="icon">🏆</span> Divisions & Pricing</h2>
-                <p style="color: rgba(0,0,0,0.6); margin-bottom: 20px;">Add divisions for your tournament. You can add as many as you need.</p>
-
-                <div id="divisionsList" class="divisions-list"></div>
-
-                <button type="button" class="btn btn-add" onclick="addDivision()">
-                    <span>➕</span> Add Division
-                </button>
-            </div>
-
-            <!-- Payment Settings -->
-            <div class="form-section">
-                <h2 class="section-title"><span class="icon">💳</span> Payment Settings</h2>
-
-                <div class="payment-toggle">
-                    <label class="switch">
-                        <input type="checkbox" id="paymentEnabled">
-                        <span class="slider"></span>
-                    </label>
-                    <div>
-                        <div class="toggle-label">Enable Online Payment</div>
-                        <div class="form-hint">Currently disabled - Cash payment only</div>
-                    </div>
-                </div>
-
-                <div id="paymentOptions" style="display: none;">
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Payment Method</label>
-                            <select id="paymentMethod" class="form-select">
-                                <option value="cash">Cash Only</option>
-                                <option value="card">Credit/Debit Card</option>
-                                <option value="bank">Bank Transfer</option>
-                                <option value="both">Multiple Methods</option>
+                            <label class="form-label">Sport Type <span class="required">*</span></label>
+                            <select id="sportType" class="form-select" required>
+                                <option value="">Select sport...</option>
+                                <option value="BJJ">Brazilian Jiu-Jitsu (BJJ)</option>
+                                <option value="Gi">Gi Jiu-Jitsu</option>
+                                <option value="No-Gi">No-Gi Jiu-Jitsu</option>
+                                <option value="Grappling">Grappling</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Currency</label>
-                            <select id="currency" class="form-select">
-                                <option value="USD">USD ($)</option>
-                                <option value="EUR">EUR (€)</option>
-                                <option value="EGP">EGP (ج.م)</option>
-                                <option value="SAR">SAR (ر.س)</option>
+                            <label class="form-label">Age Division <span class="required">*</span></label>
+                            <select id="ageDivision" class="form-select" required>
+                                <option value="">Select division...</option>
+                                <option value="Kids">Kids (Under 16)</option>
+                                <option value="Youth">Youth (16-17)</option>
+                                <option value="Adult">Adult (18-29)</option>
+                                <option value="Master">Master (30+)</option>
+                                <option value="All">All Ages</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Early Bird Discount (%)</label>
-                            <input type="number" id="earlyBirdDiscount" class="form-input" min="0" max="100" value="0">
+                            <label class="form-label">Fight Duration (minutes) <span class="required">*</span></label>
+                            <input type="number" id="fightDuration" class="form-input" min="1" max="30" required value="5">
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Late Fee Percentage (%)</label>
-                            <input type="number" id="lateFeePercentage" class="form-input" min="0" max="100" value="0">
+                            <label class="form-label">Golden Score Duration (minutes)</label>
+                            <input type="number" id="goldenScoreDuration" class="form-input" min="0" max="15" value="3">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date & Location -->
+                <div class="form-section">
+                    <h2 class="section-title"><span class="icon">📅</span> Date & Location</h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Event Start Date <span class="required">*</span></label>
+                            <input type="date" id="eventStartDate" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Event End Date</label>
+                            <input type="date" id="eventEndDate" class="form-input">
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">Refund Policy</label>
-                        <textarea id="refundPolicy" class="form-textarea" placeholder="Describe your refund policy..."></textarea>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Country <span class="required">*</span></label>
+                            <select id="country" class="form-select" required>
+                                <option value="">Select country...</option>
+                                <option value="Egypt">Egypt</option>
+                                <option value="UAE">UAE</option>
+                                <option value="Saudi Arabia">Saudi Arabia</option>
+                                <option value="Jordan">Jordan</option>
+                                <option value="Lebanon">Lebanon</option>
+                                <option value="Morocco">Morocco</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Location / Venue <span class="required">*</span></label>
+                            <input type="text" id="location" class="form-input" required placeholder="e.g., Cairo Stadium Arena">
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Form Actions -->
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='organizer-dashboard.html'">Cancel</button>
-                <button type="submit" class="btn btn-primary" id="submitBtn">
-                    <span>✨</span> Create Tournament
-                </button>
-            </div>
-        </form>
+                <!-- Participants & Fees -->
+                <div class="form-section">
+                    <h2 class="section-title"><span class="icon">👥</span> Participants & Fees</h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Max Participants</label>
+                            <input type="number" id="maxParticipants" class="form-input" min="1" placeholder="e.g., 200">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Base Registration Fee (USD)</label>
+                            <input type="number" id="registrationFee" class="form-input" min="0" step="0.01" placeholder="e.g., 50">
+                            <div class="form-hint">Base fee (can be overridden per division)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Divisions & Pricing -->
+                <div class="form-section">
+                    <h2 class="section-title"><span class="icon">🏆</span> Divisions & Pricing</h2>
+                    <p style="color: rgba(0,0,0,0.6); margin-bottom: 20px;">Add divisions for your tournament. You can add as many as you need.</p>
+
+                    <div id="divisionsList" class="divisions-list"></div>
+
+                    <button type="button" class="btn btn-add" onclick="addDivision()">
+                        <span>➕</span> Add Division
+                    </button>
+                </div>
+
+                <!-- Payment Settings -->
+                <div class="form-section">
+                    <h2 class="section-title"><span class="icon">💳</span> Payment Settings</h2>
+
+                    <div class="payment-toggle">
+                        <label class="switch">
+                            <input type="checkbox" id="paymentEnabled">
+                            <span class="slider"></span>
+                        </label>
+                        <div>
+                            <div class="toggle-label">Enable Online Payment</div>
+                            <div class="form-hint">Currently disabled - Cash payment only</div>
+                        </div>
+                    </div>
+
+                    <div id="paymentOptions" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Payment Method</label>
+                                <select id="paymentMethod" class="form-select">
+                                    <option value="cash">Cash Only</option>
+                                    <option value="card">Credit/Debit Card</option>
+                                    <option value="bank">Bank Transfer</option>
+                                    <option value="both">Multiple Methods</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Currency</label>
+                                <select id="currency" class="form-select">
+                                    <option value="USD">USD ($)</option>
+                                    <option value="EUR">EUR (€)</option>
+                                    <option value="EGP">EGP (ج.م)</option>
+                                    <option value="SAR">SAR (ر.س)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Early Bird Discount (%)</label>
+                                <input type="number" id="earlyBirdDiscount" class="form-input" min="0" max="100" value="0">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Late Fee Percentage (%)</label>
+                                <input type="number" id="lateFeePercentage" class="form-input" min="0" max="100" value="0">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Refund Policy</label>
+                            <textarea id="refundPolicy" class="form-textarea" placeholder="Describe your refund policy..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='organizer-dashboard.html'">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <span>✨</span> Create Tournament
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -333,6 +358,58 @@
         const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let divisionCount = 0;
+
+        // ===== التحقق من صلاحيات المستخدم عند تحميل الصفحة =====
+        async function checkUserPermissions() {
+            try {
+                const { data: { user } } = await dbClient.auth.getUser();
+                
+                if (!user) {
+                    // غير مسجل دخول
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // جلب نوع المستخدم من جدول users
+                const { data: userData, error } = await dbClient
+                    .from('users')
+                    .select('user_type')
+                    .eq('id', user.id)
+                    .single();
+
+                if (error || !userData) {
+                    console.error('Error fetching user data:', error);
+                    showAccessDenied();
+                    return;
+                }
+
+                const userType = userData.user_type;
+                console.log('User type:', userType);
+
+                // السماح فقط للمنظمين والأدمن والسوبر أدمن
+                const allowedTypes = ['organizer', 'admin', 'super_admin'];
+                
+                if (!allowedTypes.includes(userType)) {
+                    console.log('Access denied for user type:', userType);
+                    showAccessDenied();
+                    return;
+                }
+
+                // المستخدم مصرح له - إظهار النموذج
+                document.getElementById('accessDenied').style.display = 'none';
+                document.getElementById('tournamentFormContainer').style.display = 'block';
+
+            } catch (error) {
+                console.error('Permission check error:', error);
+                showAccessDenied();
+            }
+        }
+
+        // إظهار رسالة رفض الوصول
+        function showAccessDenied() {
+            document.getElementById('accessDenied').style.display = 'block';
+            document.getElementById('tournamentFormContainer').style.display = 'none';
+        }
 
         // Toggle payment options
         document.getElementById('paymentEnabled').addEventListener('change', function() {
@@ -427,7 +504,7 @@
             
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span>⏳</span> Creating...';
+            submitBtn.innerHTML = '<span></span> Creating...';
 
             try {
                 // Get current user
@@ -519,6 +596,9 @@
 
         // Add one empty division by default
         addDivision();
+
+        // التحقق من الصلاحيات عند تحميل الصفحة
+        window.onload = checkUserPermissions;
     </script>
 </body>
 </html>
