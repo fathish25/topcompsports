@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TopCompSports - Athlete Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -80,7 +81,7 @@
         /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
             margin-bottom: 40px;
         }
@@ -147,8 +148,8 @@
         }
         .btn-edit:hover { background: #1d4ed8; }
         
-        /* Tournaments Section */
-        .tournaments-section {
+        /* Sections */
+        .main-section {
             background: #151d2b;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 16px;
@@ -159,8 +160,10 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        .section-title { font-size: 24px; font-weight: bold; }
+        .section-title { font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 10px; }
         .btn-primary {
             background: linear-gradient(135deg, #2563EB, #1d4ed8);
             color: #fff;
@@ -170,11 +173,51 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3); }
         
-        .tournament-list { display: flex; flex-direction: column; gap: 15px; }
-        .tournament-item {
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .tab-btn.active {
+            background: #2563EB;
+            color: #fff;
+        }
+        .tab-badge {
+            background: #f1c40f;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        /* Lists */
+        .items-list { display: flex; flex-direction: column; gap: 15px; }
+        .item-card {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 12px;
@@ -183,13 +226,44 @@
             justify-content: space-between;
             align-items: center;
             transition: all 0.3s;
+            flex-wrap: wrap;
+            gap: 15px;
         }
-        .tournament-item:hover {
+        .item-card:hover {
             border-color: #2563EB;
             background: rgba(37, 99, 235, 0.05);
+            cursor: pointer;
         }
-        .tournament-info h4 { font-size: 18px; margin-bottom: 5px; }
-        .tournament-info p { color: rgba(255,255,255,0.7); font-size: 14px; }
+        .item-info { display: flex; align-items: center; gap: 15px; flex: 1; min-width: 250px; }
+        .item-logo {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #2563EB;
+            background: #2563EB;
+        }
+        .item-logo-placeholder {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563EB, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+            border: 3px solid #f1c40f;
+        }
+        .item-details h4 { font-size: 18px; margin-bottom: 5px; }
+        .item-details p { color: rgba(255,255,255,0.7); font-size: 14px; }
+        .item-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .badge-member { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .badge-pending { background: rgba(241, 196, 15, 0.2); color: #f1c40f; }
+        
         .status-badge {
             padding: 6px 12px;
             border-radius: 20px;
@@ -205,7 +279,7 @@
             padding: 60px 20px;
             color: rgba(255,255,255,0.5);
         }
-        .empty-state-icon { font-size: 64px; margin-bottom: 20px; }
+        .empty-state-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.5; }
         
         .lang-switcher { display: flex; gap: 10px; }
         .lang-btn {
@@ -219,9 +293,19 @@
         }
         .lang-btn.active { background: #2563EB; border-color: #2563EB; }
         
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
         @media (max-width: 1024px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .content-grid { grid-template-columns: 1fr; }
+            .header { padding: 20px; }
+            .container { padding: 20px; }
+        }
+        @media (max-width: 768px) {
+            .item-card { flex-direction: column; text-align: center; }
+            .item-info { flex-direction: column; }
+            .tabs { flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -245,31 +329,31 @@
     <div class="container">
         <!-- Welcome Section -->
         <div class="welcome-section">
-            <h1 class="welcome-title" data-en="Welcome back, Athlete!" data-ar="مرحباً بعودتك، بطل!">Welcome back, Athlete!</h1>
-            <p class="welcome-subtitle" data-en="Track your progress and manage your tournament registrations." data-ar="تابع تقدمك وأدر تسجيلاتك في البطولات.">Track your progress and manage your tournament registrations.</p>
+            <h1 class="welcome-title" data-en="Welcome back, Athlete!" data-ar="مرحباً بك يا بطل!">Welcome back, Athlete!</h1>
+            <p class="welcome-subtitle" data-en="Manage your teams and track your tournament progress." data-ar="أدر فرقك وتتبع تقدمك في البطولات.">Manage your teams and track your tournament progress.</p>
         </div>
 
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon">🏆</div>
+                <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="stat-value" id="statMyTeams">0</div>
+                <div class="stat-label" data-en="My Teams" data-ar="فرقي">My Teams</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-trophy"></i></div>
                 <div class="stat-value" id="statTournaments">0</div>
                 <div class="stat-label" data-en="Tournaments" data-ar="بطولات">Tournaments</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon">✅</div>
-                <div class="stat-value" id="statWins">0</div>
-                <div class="stat-label" data-en="Wins" data-ar="انتصارات">Wins</div>
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-value" id="statPending">0</div>
+                <div class="stat-label" data-en="Pending Requests" data-ar="طلبات معلقة">Pending Requests</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon"></div>
+                <div class="stat-icon"><i class="fas fa-medal"></i></div>
                 <div class="stat-value" id="statBelt">-</div>
-                <div class="stat-label" data-en="Belt Level" data-ar="لون الحزام">Belt Level</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">⚖️</div>
-                <div class="stat-value" id="statWeight">-</div>
-                <div class="stat-label" data-en="Weight (kg)" data-ar="الوزن (كجم)">Weight (kg)</div>
+                <div class="stat-label" data-en="Belt Level" data-ar="الحزام">Belt Level</div>
             </div>
         </div>
 
@@ -278,7 +362,9 @@
             <!-- Profile Card -->
             <div class="profile-card">
                 <img src="" alt="Profile" class="profile-photo" id="profilePhoto" style="display:none;">
-                <div class="profile-photo" id="profilePhotoPlaceholder" style="background: #2563EB; display:flex; align-items:center; justify-content:center; font-size:48px; color:#fff;">👤</div>
+                <div class="profile-photo" id="profilePhotoPlaceholder" style="background: linear-gradient(135deg, #2563EB, #1d4ed8); display:flex; align-items:center; justify-content:center; font-size:48px; color:#fff;">
+                    <i class="fas fa-user"></i>
+                </div>
                 <h2 class="profile-name" id="profileName">Loading...</h2>
                 <p class="profile-role" data-en="Athlete" data-ar="لاعب">Athlete</p>
                 
@@ -288,33 +374,74 @@
                         <span class="info-value" id="profileEmail">-</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label" data-en="Phone" data-ar="الهاتف">Phone</span>
-                        <span class="info-value" id="profilePhone">-</span>
-                    </div>
-                    <div class="info-item">
                         <span class="info-label" data-en="Country" data-ar="الدولة">Country</span>
                         <span class="info-value" id="profileCountry">-</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label" data-en="Team" data-ar="الفريق">Team</span>
-                        <span class="info-value" id="profileTeam">-</span>
+                        <span class="info-label" data-en="Belt" data-ar="الحزام">Belt</span>
+                        <span class="info-value" id="profileBelt">-</span>
                     </div>
                 </div>
                 
-                <button class="btn-edit" onclick="window.location.href='complete-athlete.html'" data-en="Edit Profile" data-ar="تعديل الملف">Edit Profile</button>
+                <button class="btn-edit" onclick="window.location.href='my-profile.html'" data-en="Edit Profile" data-ar="تعديل الملف">Edit Profile</button>
             </div>
 
-            <!-- Tournaments Section -->
-            <div class="tournaments-section">
-                <div class="section-header">
-                    <h2 class="section-title" data-en="My Tournaments" data-ar="بطولاتي">My Tournaments</h2>
-                    <button class="btn-primary" onclick="window.location.href='events.html'" data-en="Browse Events →" data-ar="تصفح البطولات ←">Browse Events →</button>
+            <!-- Main Section with Tabs -->
+            <div class="main-section">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('teams')">
+                        <i class="fas fa-shield-alt"></i> <span data-en="My Teams" data-ar="فرقي">My Teams</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('requests')">
+                        <i class="fas fa-clock"></i> <span data-en="Join Requests" data-ar="طلبات الانضمام">Join Requests</span>
+                        <span class="tab-badge" id="requestsBadge">0</span>
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('tournaments')">
+                        <i class="fas fa-trophy"></i> <span data-en="Tournaments" data-ar="البطولات">Tournaments</span>
+                    </button>
                 </div>
-                
-                <div class="tournament-list" id="tournamentList">
-                    <div class="empty-state">
-                        <div class="empty-state-icon"></div>
-                        <p data-en="No tournaments registered yet. Browse events to register!" data-ar="لم تسجل في أي بطولة بعد. تصفح البطولات للتسجيل!">No tournaments registered yet. Browse events to register!</p>
+
+                <!-- Teams Tab -->
+                <div id="teamsTab" class="tab-content active">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-shield-alt"></i> <span data-en="My Teams" data-ar="فرقي">My Teams</span>
+                        </h2>
+                        <a href="teams-directory.html" class="btn-primary">
+                            <i class="fas fa-search"></i> <span data-en="Find Teams" data-ar="البحث عن فرق">Find Teams</span>
+                        </a>
+                    </div>
+                    <div class="items-list" id="teamsList">
+                        <div class="loading" style="text-align:center; padding:40px;">
+                            <i class="fas fa-spinner fa-spin" style="font-size:32px; color:#2563EB;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Requests Tab -->
+                <div id="requestsTab" class="tab-content">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-clock"></i> <span data-en="Join Requests" data-ar="طلبات الانضمام">Join Requests</span>
+                        </h2>
+                    </div>
+                    <div class="items-list" id="requestsList">
+                        <div class="loading" style="text-align:center; padding:40px;">
+                            <i class="fas fa-spinner fa-spin" style="font-size:32px; color:#2563EB;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tournaments Tab -->
+                <div id="tournamentsTab" class="tab-content">
+                    <div class="section-header">
+                        <h2 class="section-title" data-en="My Tournaments" data-ar="بطولاتي">My Tournaments</h2>
+                        <a href="events.html" class="btn-primary" data-en="Browse Events" data-ar="تصفح البطولات">Browse Events</a>
+                    </div>
+                    <div class="items-list" id="tournamentList">
+                        <div class="loading" style="text-align:center; padding:40px;">
+                            <i class="fas fa-spinner fa-spin" style="font-size:32px; color:#2563EB;"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -326,20 +453,34 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        let currentLang = 'en';
+        let currentAthlete = null;
+        let currentLang = localStorage.getItem('selectedLanguage') || 'en';
 
         function setLanguage(lang) {
             currentLang = lang;
-            document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            localStorage.setItem('selectedLanguage', lang);
             document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
             
-            document.querySelectorAll('[data-en]').forEach(el => {
-                const text = el.getAttribute(`data-${lang}`);
-                if (text) el.textContent = text;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.lang === lang) btn.classList.add('active');
             });
             
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('[data-en][data-ar]').forEach(el => {
+                if (lang === 'ar') {
+                    el.textContent = el.dataset.ar;
+                } else {
+                    el.textContent = el.dataset.en;
+                }
+            });
+            
+            // Reload data to update language
+            if (currentAthlete) {
+                loadTeams(currentAthlete.id);
+                loadJoinRequests(currentAthlete.id);
+                loadTournaments(currentAthlete.id);
+            }
         }
 
         async function loadProfile() {
@@ -357,16 +498,16 @@
                 .single();
 
             if (error || !athlete) {
-                window.location.href = 'complete-athlete.html';
+                window.location.href = 'my-profile.html';
                 return;
             }
 
+            currentAthlete = athlete;
             document.getElementById('userName').textContent = athlete.full_name;
             document.getElementById('profileName').textContent = athlete.full_name;
             document.getElementById('profileEmail').textContent = athlete.email;
-            document.getElementById('profilePhone').textContent = athlete.phone || '-';
             document.getElementById('profileCountry').textContent = athlete.country || '-';
-            document.getElementById('profileTeam').textContent = athlete.team_name || '-';
+            document.getElementById('profileBelt').textContent = athlete.belt_level || '-';
             
             if (athlete.profile_photo_url) {
                 document.getElementById('profilePhoto').src = athlete.profile_photo_url;
@@ -375,67 +516,216 @@
             }
 
             document.getElementById('statBelt').textContent = athlete.belt_level || '-';
-            document.getElementById('statWeight').textContent = athlete.weight || '-';
 
-            await loadTournaments(athlete.id);
+            // Load all data
+            await Promise.all([
+                loadTeams(athlete.id),
+                loadJoinRequests(athlete.id),
+                loadTournaments(athlete.id)
+            ]);
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.closest('.tab-btn').classList.add('active');
+        }
+
+        async function loadTeams(athleteId) {
+            try {
+                const { data: members, error } = await supabase
+                    .from('team_members')
+                    .select(`
+                        *,
+                        team:teams (
+                            id,
+                            name,
+                            logo_url,
+                            city,
+                            country,
+                            coach:coaches (
+                                full_name
+                            )
+                        )
+                    `)
+                    .eq('athlete_id', athleteId)
+                    .eq('status', 'approved');
+
+                if (error) throw error;
+
+                const list = document.getElementById('teamsList');
+                const count = members ? members.length : 0;
+                document.getElementById('statMyTeams').textContent = count;
+
+                if (!members || members.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fas fa-shield-alt"></i></div>
+                            <p>${currentLang === 'ar' ? 'أنت لست عضواً في أي فرق بعد.' : "You are not a member of any teams yet."}</p>
+                            <a href="teams-directory.html" class="btn-primary" style="margin-top: 20px;">
+                                <i class="fas fa-search"></i> ${currentLang === 'ar' ? 'تصفح الفرق' : 'Browse Teams'}
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                list.innerHTML = members.map(member => {
+                    const team = member.team;
+                    const coach = team.coach;
+                    return `
+                    <div class="item-card" onclick="window.location.href='team-public.html?id=${team.id}'">
+                        <div class="item-info">
+                            ${team.logo_url 
+                                ? `<img src="${team.logo_url}" alt="${team.name}" class="item-logo">`
+                                : `<div class="item-logo-placeholder"><i class="fas fa-shield-alt"></i></div>`
+                            }
+                            <div class="item-details">
+                                <h4>${team.name}</h4>
+                                <p>${team.city || 'N/A'}, ${team.country || 'N/A'} ${coach ? `• ${currentLang === 'ar' ? 'المدرب' : 'Coach'}: ${coach.full_name}` : ''}</p>
+                            </div>
+                        </div>
+                        <span class="item-badge badge-member">${currentLang === 'ar' ? 'عضو' : 'Member'}</span>
+                    </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading teams:', error);
+            }
+        }
+
+        async function loadJoinRequests(athleteId) {
+            try {
+                const { data: requests, error } = await supabase
+                    .from('team_join_requests')
+                    .select(`
+                        *,
+                        team:teams (
+                            id,
+                            name,
+                            city,
+                            country
+                        )
+                    `)
+                    .eq('athlete_id', athleteId)
+                    .eq('status', 'pending')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const list = document.getElementById('requestsList');
+                const count = requests ? requests.length : 0;
+                document.getElementById('statPending').textContent = count;
+                document.getElementById('requestsBadge').textContent = count;
+
+                if (!requests || requests.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fas fa-clock"></i></div>
+                            <p>${currentLang === 'ar' ? 'لا توجد طلبات معلقة.' : 'No pending requests.'}</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                list.innerHTML = requests.map(request => {
+                    const team = request.team;
+                    const requestDate = new Date(request.created_at).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US', {
+                        year: 'numeric', month: 'short', day: 'numeric'
+                    });
+                    
+                    return `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <div class="item-logo-placeholder"><i class="fas fa-shield-alt"></i></div>
+                            <div class="item-details">
+                                <h4>${team.name}</h4>
+                                <p>${team.city || 'N/A'}, ${team.country || 'N/A'}</p>
+                                <p style="margin-top: 5px; font-size: 12px; color: rgba(255,255,255,0.6);">
+                                    <i class="fas fa-clock"></i> ${currentLang === 'ar' ? 'طُلب في' : 'Requested'} ${requestDate}
+                                </p>
+                            </div>
+                        </div>
+                        <span class="status-badge status-pending">
+                            <i class="fas fa-clock"></i> ${currentLang === 'ar' ? 'معلق' : 'Pending'}
+                        </span>
+                    </div>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading requests:', error);
+            }
         }
 
         async function loadTournaments(athleteId) {
-            const { data: registrations, error } = await supabase
-                .from('tournament_registrations')
-                .select(`
-                    *,
-                    tournaments (
-                        name,
-                        event_date,
-                        location
-                    )
-                `)
-                .eq('athlete_id', athleteId)
-                .order('created_at', { ascending: false });
+            try {
+                const { data: registrations, error } = await supabase
+                    .from('tournament_registrations')
+                    .select(`
+                        *,
+                        tournaments (
+                            name,
+                            event_date,
+                            location
+                        )
+                    `)
+                    .eq('athlete_id', athleteId)
+                    .order('created_at', { ascending: false });
 
-            if (error) {
-                console.error('Error loading tournaments:', error);
-                return;
-            }
+                if (error) throw error;
 
-            const list = document.getElementById('tournamentList');
-            
-            if (!registrations || registrations.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon"></div>
-                        <p data-en="No tournaments registered yet. Browse events to register!" data-ar="لم تسجل في أي بطولة بعد. تصفح البطولات للتسجيل!">No tournaments registered yet. Browse events to register!</p>
-                    </div>
-                `;
-                document.getElementById('statTournaments').textContent = '0';
-                return;
-            }
+                const list = document.getElementById('tournamentList');
+                const count = registrations ? registrations.length : 0;
+                document.getElementById('statTournaments').textContent = count;
 
-            document.getElementById('statTournaments').textContent = registrations.length;
+                if (!registrations || registrations.length === 0) {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="fas fa-trophy"></i></div>
+                            <p>${currentLang === 'ar' ? 'لم تسجل في أي بطولة بعد.' : "You haven't registered for any tournaments yet."}</p>
+                            <a href="events.html" class="btn-primary" style="margin-top: 20px;">
+                                <i class="fas fa-search"></i> ${currentLang === 'ar' ? 'تصفح البطولات' : 'Browse Events'}
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
 
-            list.innerHTML = registrations.map(reg => {
-                const statusClass = reg.status === 'accepted' ? 'status-accepted' : 
-                                   reg.status === 'rejected' ? 'status-rejected' : 'status-pending';
-                const statusText = reg.status === 'accepted' ? (currentLang === 'ar' ? 'مقبول' : 'Accepted') :
-                                  reg.status === 'rejected' ? (currentLang === 'ar' ? 'مرفوض' : 'Rejected') :
-                                  (currentLang === 'ar' ? 'قيد المراجعة' : 'Pending');
-                
-                return `
-                    <div class="tournament-item">
-                        <div class="tournament-info">
-                            <h4>${reg.tournaments?.name || 'Tournament'}</h4>
-                            <p>${reg.tournaments?.event_date || ''} • ${reg.tournaments?.location || ''}</p>
+                list.innerHTML = registrations.map(reg => {
+                    const statusClass = reg.status === 'accepted' ? 'status-accepted' : 
+                                       reg.status === 'rejected' ? 'status-rejected' : 'status-pending';
+                    const statusText = reg.status === 'accepted' ? (currentLang === 'ar' ? 'مقبول' : 'Accepted') :
+                                      reg.status === 'rejected' ? (currentLang === 'ar' ? 'مرفوض' : 'Rejected') :
+                                      (currentLang === 'ar' ? 'قيد المراجعة' : 'Pending');
+                    
+                    return `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <div class="item-logo-placeholder"><i class="fas fa-trophy"></i></div>
+                            <div class="item-details">
+                                <h4>${reg.tournaments?.name || 'Tournament'}</h4>
+                                <p>${reg.tournaments?.event_date || ''} • ${reg.tournaments?.location || ''}</p>
+                            </div>
                         </div>
                         <span class="status-badge ${statusClass}">${statusText}</span>
                     </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Error loading tournaments:', error);
+            }
         }
 
         async function handleLogout() {
-            await supabase.auth.signOut();
-            window.location.href = 'index.html';
+            if (confirm(currentLang === 'ar' ? 'هل أنت متأكد من تسجيل الخروج؟' : 'Are you sure you want to logout?')) {
+                await supabase.auth.signOut();
+                window.location.href = 'index.html';
+            }
         }
 
         window.onload = loadProfile;
