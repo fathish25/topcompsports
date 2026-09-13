@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Details - TopCompSports</title>
+    <title>Team Profile - TopCompSports</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
             --primary-blue: #0066CC;
@@ -14,1016 +13,451 @@
             --accent-yellow: #FFB800;
             --black: #0A0A0A;
             --dark-gray: #1A1A1A;
-            --medium-gray: #2A2A2A;
-            --light-gray: #F1F5F9;
             --white: #FFFFFF;
-            --light-bg: #F8FAFC;
-            --border-color: #E2E8F0;
+            --light-bg: #F5F7FA;
             --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Segoe UI', Tahoma, sans-serif; 
-            background: var(--light-bg); 
-            color: var(--black); 
-            min-height: 100vh; 
-        }
-
-        /* ===== Header ===== */
-        .main-header { 
-            background: var(--black); 
-            padding: 12px 0; 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-        }
-        .header-container { 
-            max-width: 1400px; 
-            margin: 0 auto; 
-            padding: 0 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        .logo-section { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            text-decoration: none; 
-        }
-        .logo-icon { 
-            width: 40px; 
-            height: 40px; 
-            border-radius: 50%; 
-            overflow: hidden; 
-            background: var(--white); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            border: 2px solid var(--accent-yellow); 
-        }
-        .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
-        .logo-text { font-size: 22px; font-weight: bold; color: var(--white); }
-        .nav-menu { display: flex; gap: 20px; align-items: center; }
-        .nav-link { 
-            color: var(--white); 
-            text-decoration: none; 
-            font-weight: 500; 
-            padding: 8px 15px; 
-            border-radius: 5px; 
-            transition: all 0.3s; 
-        }
-        .nav-link:hover { color: var(--accent-yellow); }
-        .btn-back { 
-            padding: 8px 16px; 
-            background: transparent; 
-            color: var(--white); 
-            border: 2px solid var(--white); 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            text-decoration: none; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 8px; 
-            transition: all 0.3s;
-        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); color: var(--black); min-height: 100vh; }
+        
+        .header { background: var(--black); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo { display: flex; align-items: center; gap: 15px; text-decoration: none; color: var(--white); }
+        .logo-icon { width: 40px; height: 40px; background: var(--gradient-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--accent-yellow); }
+        .nav { display: flex; gap: 30px; }
+        .nav a { color: var(--white); text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        .nav a:hover { color: var(--accent-yellow); }
+        .btn-back { background: transparent; border: 2px solid var(--white); color: var(--white); padding: 8px 20px; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s; }
         .btn-back:hover { background: var(--white); color: var(--black); }
-
-        /* ===== Team Cover Section (مثل SmoothComp) ===== */
-        .team-cover-section {
-            position: relative;
-            width: 100%;
-            height: 350px;
-            background: var(--gradient-blue);
-            overflow: hidden;
-        }
-        .team-cover-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.4;
-        }
-        .team-cover-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,51,102,0.8));
-        }
-
-        /* ===== Team Header Info ===== */
-        .team-header-info {
-            position: relative;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            margin-top: -80px;
-            display: flex;
-            gap: 30px;
-            align-items: flex-end;
-            flex-wrap: wrap;
-        }
-        .team-logo-container {
-            flex-shrink: 0;
-        }
-        .team-logo-large {
-            width: 160px;
-            height: 160px;
-            border-radius: 50%;
-            border: 5px solid var(--white);
-            background: var(--white);
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        .team-logo-large img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .team-logo-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 64px;
-            color: var(--primary-blue);
-            background: var(--light-bg);
-        }
-        .team-title-block {
-            flex: 1;
-            color: var(--white);
-            padding-bottom: 20px;
-        }
-        .team-title {
-            font-size: 42px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-        .team-meta-info {
-            display: flex;
-            gap: 25px;
-            flex-wrap: wrap;
-            font-size: 15px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-        .team-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .team-meta-item i {
-            color: var(--accent-yellow);
-        }
-        .team-status-badge {
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-            background: var(--accent-yellow);
-            color: var(--black);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
-        /* ===== Main Layout (Sidebar + Content) ===== */
-        .main-layout {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 30px;
-        }
-
-        /* ===== Sidebar ===== */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        .sidebar-card {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .sidebar-menu {
-            list-style: none;
-        }
-        .sidebar-item {
-            padding: 12px 15px;
-            margin-bottom: 5px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
-            color: var(--dark-gray);
-            border: 2px solid transparent;
-        }
-        .sidebar-item:hover {
-            background: var(--light-bg);
-            color: var(--primary-blue);
-        }
-        .sidebar-item.active {
-            background: var(--gradient-blue);
-            color: var(--white);
-            border-color: var(--primary-blue);
-        }
-        .sidebar-item i { width: 20px; text-align: center; }
-        .sidebar-section-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            color: #64748B;
-            font-weight: 700;
-            padding: 15px 15px 10px;
-            letter-spacing: 0.5px;
-        }
-        .btn-host-tournament {
-            width: 100%;
-            padding: 12px;
-            background: var(--primary-blue);
-            color: var(--white);
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-        .btn-host-tournament:hover {
-            background: var(--dark-blue);
-            transform: translateY(-2px);
-        }
-
-        /* ===== Content Area ===== */
-        .content-area {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-        .content-section {
-            display: none;
-        }
-        .content-section.active {
-            display: block;
-        }
-        .section-card {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .section-title {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--dark-blue);
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid var(--primary-blue);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* ===== Map Container ===== */
-        .map-container {
-            background: var(--light-bg);
-            border-radius: 8px;
-            overflow: hidden;
-            margin-top: 20px;
-            border: 2px solid var(--border-color);
-        }
-        #teamMap {
-            height: 400px;
-            width: 100%;
-        }
-
-        /* ===== Info Cards ===== */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        .info-card {
-            background: var(--light-bg);
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary-blue);
-        }
-        .info-card h4 {
-            color: #64748B;
-            font-size: 12px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            font-weight: 700;
-        }
-        .info-card p, .info-card a {
-            color: var(--black);
-            font-size: 16px;
-            font-weight: 600;
-        }
-        .info-card a {
-            color: var(--primary-blue);
-            text-decoration: none;
-        }
-        .info-card a:hover { text-decoration: underline; }
-
-        /* ===== Contact Persons ===== */
-        .contact-persons-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .contact-person-item {
-            background: var(--light-bg);
-            padding: 15px 20px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .contact-person-name {
-            font-weight: 600;
-            color: var(--dark-blue);
-        }
-        .contact-person-role {
-            padding: 4px 12px;
-            background: var(--primary-blue);
-            color: var(--white);
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        /* ===== Sports Tags ===== */
-        .sports-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .sport-tag {
-            background: rgba(0,102,204,0.1);
-            color: var(--primary-blue);
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        /* ===== Join Request Button ===== */
-        .join-request-card {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-        .join-request-card h3 {
-            font-size: 20px;
-            margin-bottom: 15px;
-            color: var(--dark-blue);
-        }
-        .join-request-card p {
-            color: #64748B;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        .btn-join-request {
-            width: 100%;
-            padding: 16px;
-            background: var(--gradient-blue);
-            color: var(--white);
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        .btn-join-request:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,102,204,0.4);
-        }
-        .btn-join-request:disabled {
-            background: #94A3B8;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* ===== Modal ===== */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.6);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            padding: 20px;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal-content {
-            background: var(--white);
-            border-radius: 16px;
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .modal-header {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--dark-blue);
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .form-group { margin-bottom: 20px; }
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--black);
-        }
-        .form-input, .form-textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.3s;
-        }
-        .form-input:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-        }
-        .form-textarea { min-height: 100px; resize: vertical; }
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 25px;
-        }
-        .btn-cancel {
-            flex: 1;
-            padding: 12px;
-            background: transparent;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn-cancel:hover { background: var(--light-bg); }
-        .btn-submit {
-            flex: 2;
-            padding: 12px;
-            background: var(--gradient-blue);
-            color: var(--white);
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.3); }
-
-        /* ===== Loading & Empty States ===== */
-        .loading {
-            text-align: center;
-            padding: 60px;
-        }
-        .loading i {
-            font-size: 48px;
-            color: var(--primary-blue);
-            animation: spin 1s linear infinite;
-        }
+        
+        .team-hero { background: var(--gradient-blue); padding: 80px 50px; position: relative; overflow: hidden; }
+        .team-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.2); }
+        .hero-content { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 40px; flex-wrap: wrap; }
+        .team-logo-large { width: 150px; height: 150px; border-radius: 50%; border: 5px solid var(--accent-yellow); object-fit: cover; background: var(--white); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .team-logo-placeholder { width: 150px; height: 150px; border-radius: 50%; background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 60px; color: var(--primary-blue); border: 5px solid var(--accent-yellow); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .team-hero-info { flex: 1; color: var(--white); }
+        .team-hero-info h1 { font-size: 42px; font-weight: 900; margin-bottom: 15px; }
+        .team-hero-info p { font-size: 18px; opacity: 0.9; margin-bottom: 20px; }
+        .team-badges { display: flex; gap: 15px; flex-wrap: wrap; }
+        .badge { padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; }
+        .badge-active { background: var(--accent-yellow); color: var(--black); }
+        .badge-sport { background: rgba(255,255,255,0.2); color: var(--white); }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 50px 50px; }
+        .content-grid { display: grid; grid-template-columns: 1fr 350px; gap: 30px; }
+        
+        .main-content { background: var(--white); border-radius: 16px; padding: 40px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .section { margin-bottom: 40px; }
+        .section:last-child { margin-bottom: 0; }
+        .section-title { font-size: 24px; font-weight: bold; color: var(--dark-blue); margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid var(--primary-blue); display: flex; align-items: center; gap: 10px; }
+        
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .info-card { background: var(--light-bg); padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary-blue); transition: all 0.3s; }
+        .info-card:hover { transform: translateX(5px); box-shadow: 0 4px 15px rgba(0,102,204,0.15); }
+        .info-label { color: #64748B; font-size: 12px; text-transform: uppercase; margin-bottom: 8px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .info-label i { color: var(--primary-blue); }
+        .info-value { font-weight: 600; color: var(--black); font-size: 15px; word-break: break-word; }
+        .info-value a { color: var(--primary-blue); text-decoration: none; }
+        .info-value a:hover { text-decoration: underline; }
+        
+        .about-text { background: var(--light-bg); padding: 25px; border-radius: 12px; line-height: 1.8; color: var(--dark-gray); border-left: 4px solid var(--primary-blue); }
+        
+        .sports-list { display: flex; flex-wrap: wrap; gap: 12px; }
+        .sport-tag { background: rgba(0,102,204,0.1); color: var(--primary-blue); padding: 10px 18px; border-radius: 12px; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; }
+        .sport-tag i { font-size: 12px; }
+        
+        .sidebar { display: flex; flex-direction: column; gap: 25px; }
+        .sidebar-card { background: var(--white); border-radius: 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        
+        .coach-card { text-align: center; }
+        .coach-photo-large { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; border: 4px solid var(--accent-yellow); object-fit: cover; background: var(--gradient-blue); display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 48px; overflow: hidden; }
+        .coach-photo-large img { width: 100%; height: 100%; object-fit: cover; }
+        .coach-name-large { font-size: 22px; font-weight: bold; color: var(--dark-blue); margin-bottom: 5px; }
+        .coach-role { color: var(--primary-blue); font-size: 14px; margin-bottom: 25px; font-weight: 600; }
+        .coach-contact { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+        .coach-contact-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--light-bg); border-radius: 8px; font-size: 14px; }
+        .coach-contact-item i { color: var(--primary-blue); width: 20px; text-align: center; }
+        
+        .join-card { text-align: center; }
+        .join-card h3 { font-size: 20px; margin-bottom: 15px; color: var(--dark-blue); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .join-card p { color: #64748B; margin-bottom: 25px; font-size: 14px; line-height: 1.6; }
+        .btn-join { width: 100%; padding: 16px; background: var(--gradient-blue); color: var(--white); border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 16px; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-join:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
+        .btn-join:disabled { background: #94A3B8; cursor: not-allowed; transform: none; }
+        .status-message { padding: 15px; border-radius: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .status-pending { background: rgba(255,184,0,0.15); color: #B45309; border: 1px solid rgba(255,184,0,0.3); }
+        .status-member { background: rgba(16,185,129,0.15); color: #047857; border: 1px solid rgba(16,185,129,0.3); }
+        .status-login { background: rgba(0,102,204,0.1); color: var(--primary-blue); border: 1px solid rgba(0,102,204,0.3); }
+        
+        .loading { text-align: center; padding: 60px 20px; }
+        .loading i { font-size: 48px; color: var(--primary-blue); animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #64748B;
-        }
-        .empty-state i {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.3;
-        }
-
-        /* ===== Responsive ===== */
+        
+        .empty-state { text-align: center; padding: 40px; color: #64748B; }
+        .empty-state i { font-size: 48px; margin-bottom: 15px; opacity: 0.5; }
+        
         @media (max-width: 1024px) {
-            .main-layout { grid-template-columns: 1fr; }
+            .content-grid { grid-template-columns: 1fr; }
             .sidebar { order: -1; }
-            .nav-menu { display: none; }
+            .header { padding: 15px 30px; }
+            .container { padding: 30px 20px; }
+            .team-hero { padding: 60px 30px; }
+            .hero-content { flex-direction: column; text-align: center; }
+            .team-hero-info h1 { font-size: 32px; }
         }
+        
         @media (max-width: 768px) {
-            .team-cover-section { height: 250px; }
-            .team-header-info { 
-                flex-direction: column; 
-                align-items: center; 
-                text-align: center; 
-                margin-top: -60px;
-            }
-            .team-logo-large { 
-                width: 120px; 
-                height: 120px; 
-            }
-            .team-title { font-size: 28px; }
-            .team-meta-info { justify-content: center; }
+            .header { padding: 12px 20px; flex-direction: column; gap: 15px; }
+            .nav { flex-wrap: wrap; justify-content: center; gap: 15px; }
+            .team-hero { padding: 50px 20px; }
+            .team-hero-info h1 { font-size: 28px; }
+            .container { padding: 20px 15px; }
+            .main-content, .sidebar-card { padding: 25px 20px; }
             .info-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <header class="main-header">
-        <div class="header-container">
-            <a href="index.html" class="logo-section">
-                <div class="logo-icon"><img src="logo2.png" alt="Logo"></div>
-                <div class="logo-text">TopCompSports</div>
-            </a>
-            <nav class="nav-menu">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="events.html" class="nav-link">Tournaments</a>
-                <a href="teams-directory.html" class="nav-link">Teams</a>
-            </nav>
-            <a href="teams-directory.html" class="btn-back">
-                <i class="fas fa-arrow-left"></i> Back to Teams
-            </a>
-        </div>
+    <header class="header">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">T</div>
+            <div style="font-size: 20px; font-weight: bold;">TopCompSports</div>
+        </a>
+        <nav class="nav">
+            <a href="index.html" data-i18n="nav_home">Home</a>
+            <a href="tournaments.html" data-i18n="nav_tournaments">Tournaments</a>
+            <a href="teams-directory.html" data-i18n="nav_teams">Teams</a>
+        </nav>
+        <a href="teams-directory.html" class="btn-back"><i class="fas fa-arrow-left"></i> <span data-i18n="back_teams">Back to Teams</span></a>
     </header>
 
-    <!-- Team Cover Section -->
-    <div class="team-cover-section" id="teamCoverSection">
-        <div id="teamCoverPlaceholder" style="width: 100%; height: 100%; background: var(--gradient-blue); opacity: 0.4;"></div>
-        <div class="team-cover-overlay"></div>
-    </div>
-
-    <!-- Team Header Info -->
-    <div class="team-header-info">
-        <div class="team-logo-container">
-            <div class="team-logo-large" id="teamLogo">
-                <div class="team-logo-placeholder">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
+    <div class="team-hero">
+        <div class="hero-content">
+            <div class="team-logo-placeholder" id="teamLogo">
+                <i class="fas fa-shield-alt"></i>
             </div>
-        </div>
-        <div class="team-title-block">
-            <h1 class="team-title" id="teamName">Loading...</h1>
-            <div class="team-meta-info">
-                <div class="team-meta-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span id="teamLocation">-</span>
+            <div class="team-hero-info">
+                <h1 id="teamName">Loading...</h1>
+                <p id="teamDescription">Loading team information...</p>
+                <div class="team-badges">
+                    <span class="badge badge-active" id="teamStatus"><i class="fas fa-check-circle"></i> <span data-i18n="active">Active</span></span>
+                    <span class="badge badge-sport" id="teamSport"><i class="fas fa-fist-raised"></i> <span>-</span></span>
                 </div>
-                <div class="team-meta-item">
-                    <i class="fas fa-users"></i>
-                    <span id="teamMembersCount">0 members</span>
-                </div>
-                <div class="team-meta-item">
-                    <i class="fas fa-fist-raised"></i>
-                    <span id="teamSports">-</span>
-                </div>
-                <span class="team-status-badge" id="teamStatus">
-                    <i class="fas fa-check-circle"></i> Active
-                </span>
             </div>
         </div>
     </div>
 
-    <!-- Main Layout -->
-    <div class="main-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-card">
-                <ul class="sidebar-menu">
-                    <li class="sidebar-item active" onclick="showSection('home', this)">
-                        <i class="fas fa-home"></i> Home
-                    </li>
-                    <li class="sidebar-item" onclick="showSection('members', this)">
-                        <i class="fas fa-users"></i> Members
-                    </li>
-                    <li class="sidebar-item" onclick="showSection('statistics', this)">
-                        <i class="fas fa-chart-bar"></i> Statistics
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Join Request Card -->
-            <div class="join-request-card" id="joinRequestCard" style="display: none;">
-                <h3><i class="fas fa-user-plus"></i> Join This Team</h3>
-                <p>Send a request to join this team. The coach will review your request.</p>
-                <button class="btn-join-request" onclick="openJoinModal()">
-                    <i class="fas fa-paper-plane"></i> Request to Join
-                </button>
-            </div>
-
-            <div class="join-request-card" id="alreadyMemberCard" style="display: none;">
-                <h3 style="color: #10B981;"><i class="fas fa-check-circle"></i> You're a Member!</h3>
-                <p>You are already a member of this team.</p>
-            </div>
-
-            <div class="join-request-card" id="pendingRequestCard" style="display: none;">
-                <h3 style="color: var(--accent-yellow);"><i class="fas fa-clock"></i> Request Pending</h3>
-                <p>Your request to join is pending approval from the coach.</p>
-            </div>
-        </aside>
-
-        <!-- Content Area -->
-        <main class="content-area">
-            <!-- Loading -->
-            <div id="loadingSection" class="content-section active">
-                <div class="section-card">
-                    <div class="loading">
-                        <i class="fas fa-spinner"></i>
-                        <p>Loading team data...</p>
+    <div class="container">
+        <div class="content-grid">
+            <div class="main-content">
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-info-circle"></i> <span data-i18n="team_info">Team Information</span></h2>
+                    <div class="info-grid" id="teamInfo">
+                        <div class="loading"><i class="fas fa-spinner fa-spin"></i></div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-align-left"></i> <span data-i18n="about_team">About Team</span></h2>
+                    <div class="about-text" id="teamAbout">
+                        <div class="loading"><i class="fas fa-spinner fa-spin"></i></div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2 class="section-title"><i class="fas fa-fist-raised"></i> <span data-i18n="sports">Sports</span></h2>
+                    <div class="sports-list" id="teamSportsList">
+                        <div class="loading"><i class="fas fa-spinner fa-spin"></i></div>
                     </div>
                 </div>
             </div>
-
-            <!-- Home Section -->
-            <div id="homeSection" class="content-section">
-                <div class="section-card">
-                    <h2 class="section-title"><i class="fas fa-info-circle"></i> Team Information</h2>
-                    
-                    <div class="info-grid">
-                        <div class="info-card">
-                            <h4><i class="fas fa-map-marker-alt"></i> Location</h4>
-                            <p id="infoLocation">-</p>
-                        </div>
-                        <div class="info-card">
-                            <h4><i class="fas fa-envelope"></i> Email</h4>
-                            <p id="infoEmail">-</p>
-                        </div>
-                        <div class="info-card">
-                            <h4><i class="fas fa-phone"></i> Phone</h4>
-                            <p id="infoPhone">-</p>
-                        </div>
-                        <div class="info-card">
-                            <h4><i class="fas fa-user-tie"></i> Person in Charge</h4>
-                            <p id="infoPerson">-</p>
-                        </div>
-                        <div class="info-card">
-                            <h4><i class="fas fa-globe"></i> Website</h4>
-                            <p id="infoWebsite">-</p>
-                        </div>
-                        <div class="info-card">
-                            <h4><i class="fas fa-calendar"></i> Founded</h4>
-                            <p id="infoFounded">-</p>
-                        </div>
+            
+            <div class="sidebar">
+                <div class="sidebar-card coach-card">
+                    <div class="coach-photo-large" id="coachPhoto">
+                        <i class="fas fa-user"></i>
                     </div>
-
-                    <h3 style="margin: 30px 0 15px; color: var(--dark-blue); font-size: 20px;">
-                        <i class="fas fa-align-left"></i> About Team
-                    </h3>
-                    <div style="background: var(--light-bg); padding: 25px; border-radius: 8px; line-height: 1.8; border-left: 4px solid var(--primary-blue);">
-                        <p id="infoDescription" style="color: var(--black);">No description available.</p>
-                    </div>
-
-                    <h3 style="margin: 30px 0 15px; color: var(--dark-blue); font-size: 20px;">
-                        <i class="fas fa-fist-raised"></i> Sports
-                    </h3>
-                    <div class="sports-list" id="infoSports">
-                        <span style="color: #64748B;">No sports listed.</span>
-                    </div>
-
-                    <h3 style="margin: 30px 0 15px; color: var(--dark-blue); font-size: 20px;">
-                        <i class="fas fa-map-marked-alt"></i> Location Map
-                    </h3>
-                    <div class="map-container">
-                        <div id="teamMap"></div>
+                    <h3 class="coach-name-large" id="coachName">-</h3>
+                    <p class="coach-role" data-i18n="head_coach">Head Coach</p>
+                    <div class="coach-contact" id="coachContact">
+                        <div class="loading" style="font-size: 20px;"><i class="fas fa-spinner fa-spin"></i></div>
                     </div>
                 </div>
-
-                <!-- Contact Persons -->
-                <div class="section-card">
-                    <h2 class="section-title"><i class="fas fa-address-book"></i> Contact Persons</h2>
-                    <div class="contact-persons-list" id="contactPersonsList">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Members Section -->
-            <div id="membersSection" class="content-section">
-                <div class="section-card">
-                    <h2 class="section-title">
-                        <i class="fas fa-users"></i> Team Members
-                        <span id="membersCountBadge" style="font-size: 16px; color: #64748B; margin-left: 10px;">(0)</span>
-                    </h2>
-                    <div id="membersList">
-                        <div class="empty-state">
-                            <i class="fas fa-users"></i>
-                            <p>No members yet.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Statistics Section -->
-            <div id="statisticsSection" class="content-section">
-                <div class="section-card">
-                    <h2 class="section-title"><i class="fas fa-chart-bar"></i> Team Statistics</h2>
-                    <div class="empty-state">
-                        <i class="fas fa-chart-bar"></i>
-                        <p>Statistics will be available soon.</p>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Join Request Modal -->
-    <div class="modal-overlay" id="joinModal">
-        <div class="modal-content">
-            <h3 class="modal-header">
-                <i class="fas fa-paper-plane"></i> Request to Join Team
-            </h3>
-            <form onsubmit="submitJoinRequest(event)">
-                <div class="form-group">
-                    <label class="form-label">Your Name</label>
-                    <input type="text" class="form-input" id="athleteName" required readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Your Email</label>
-                    <input type="email" class="form-input" id="athleteEmail" required readonly>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Message to Coach (Optional)</label>
-                    <textarea class="form-textarea" id="joinMessage" placeholder="Tell the coach about your experience, belt level, etc..."></textarea>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="closeJoinModal()">Cancel</button>
-                    <button type="submit" class="btn-submit">
-                        <i class="fas fa-paper-plane"></i> Send Request
+                
+                <div class="sidebar-card join-card" id="joinCard">
+                    <h3><i class="fas fa-user-plus"></i> <span data-i18n="join_title">Join This Team</span></h3>
+                    <p data-i18n="join_desc">Send a request to join this team. The coach will review your request.</p>
+                    <button class="btn-join" id="btnJoin" onclick="requestJoin()">
+                        <i class="fas fa-paper-plane"></i> <span data-i18n="request_join">Request to Join</span>
                     </button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        const translations = {
+            en: {
+                nav_home: 'Home', nav_tournaments: 'Tournaments', nav_teams: 'Teams', back_teams: 'Back to Teams',
+                active: 'Active', team_info: 'Team Information', about_team: 'About Team', sports: 'Sports',
+                head_coach: 'Head Coach', join_title: 'Join This Team', join_desc: 'Send a request to join this team. The coach will review your request.',
+                request_join: 'Request to Join', login_required: 'Login to Request Join', profile_required: 'Complete Your Profile',
+                already_member: 'You are a Member', member_desc: 'You are already a member of this team.',
+                request_pending: 'Request Pending', pending_desc: 'Your request is waiting for coach approval.',
+                location: 'Location', email: 'Email', phone: 'Phone', person_charge: 'Person in Charge',
+                website: 'Website', founded: 'Founded', no_description: 'No description available.',
+                no_sports: 'No sports listed', loading: 'Loading...'
+            },
+            ar: {
+                nav_home: 'الرئيسية', nav_tournaments: 'البطولات', nav_teams: 'الفرق', back_teams: 'العودة للفرق',
+                active: 'نشط', team_info: 'معلومات الفريق', about_team: 'عن الفريق', sports: 'الرياضات',
+                head_coach: 'المدرب الرئيسي', join_title: 'انضم لهذا الفريق', join_desc: 'أرسل طلب للانضمام للفريق. المدرب سيراجع طلبك.',
+                request_join: 'طلب الانضمام', login_required: 'سجل دخول لطلب الانضمام', profile_required: 'أكمل ملفك الشخصي',
+                already_member: 'أنت عضو في الفريق', member_desc: 'أنت بالفعل عضو في هذا الفريق.',
+                request_pending: 'الطلب قيد المراجعة', pending_desc: 'طلبك في انتظار موافقة المدرب.',
+                location: 'الموقع', email: 'البريد الإلكتروني', phone: 'الهاتف', person_charge: 'المسؤول',
+                website: 'الموقع الإلكتروني', founded: 'سنة التأسيس', no_description: 'لا يوجد وصف متاح.',
+                no_sports: 'لا توجد رياضات مدرجة', loading: 'جاري التحميل...'
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || 'en';
+        
+        function updateLanguage() {
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) el.textContent = translations[currentLang][key];
+            });
+        }
+
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentTeam = null;
         let currentUser = null;
         let currentAthlete = null;
-        let map = null;
 
         const urlParams = new URLSearchParams(window.location.search);
         const teamId = urlParams.get('id');
 
-        if (!teamId) {
-            alert('Team ID not found!');
-            window.location.href = 'teams-directory.html';
-        }
+        if (!teamId) { alert('Team ID not found'); window.location.href = 'teams-directory.html'; }
 
         async function loadTeam() {
             try {
-                const { data: team, error } = await supabaseClient
+                const { data: team, error } = await supabase
                     .from('teams')
-                    .select(`
-                        *,
-                        coach:coaches (
-                            id,
-                            full_name,
-                            email,
-                            phone,
-                            profile_photo_url
-                        )
-                    `)
+                    .select(`*, coach:coaches(id, full_name, email, phone, profile_photo_url)`)
                     .eq('id', teamId)
                     .single();
-
+                
                 if (error || !team) {
-                    alert('Team not found!');
+                    alert('Team not found');
                     window.location.href = 'teams-directory.html';
                     return;
                 }
-
+                
                 currentTeam = team;
-                updateTeamUI(team);
-                await checkUserMembership();
-
-                document.getElementById('loadingSection').classList.remove('active');
-                document.getElementById('homeSection').classList.add('active');
-
-            } catch (error) {
-                console.error('Error loading team:', error);
-                alert('Error loading team data!');
-            }
-        }
-
-        function updateTeamUI(team) {
-            document.getElementById('teamName').textContent = team.name;
-            document.getElementById('teamLocation').textContent = 
-                `${team.city || 'N/A'}, ${team.country || 'N/A'}`;
-            document.getElementById('teamSports').textContent = 
-                team.sports ? team.sports.join(', ') : '-';
-            
-            const statusBadge = document.getElementById('teamStatus');
-            const isActive = team.is_active !== false;
-            statusBadge.innerHTML = isActive ? 
-                '<i class="fas fa-check-circle"></i> Active' : 
-                '<i class="fas fa-pause-circle"></i> Suspended';
-            statusBadge.style.background = isActive ? 'var(--accent-yellow)' : '#EF4444';
-
-            // Cover photo
-            if (team.cover_url) {
-                document.getElementById('teamCoverPlaceholder').style.display = 'none';
-                const coverImg = document.createElement('img');
-                coverImg.src = team.cover_url;
-                coverImg.className = 'team-cover-img';
-                coverImg.alt = 'Team Cover';
-                document.getElementById('teamCoverSection').insertBefore(coverImg, document.getElementById('teamCoverPlaceholder'));
-            }
-
-            // Logo
-            const logoDiv = document.getElementById('teamLogo');
-            if (team.logo_url) {
-                logoDiv.innerHTML = `<img src="${team.logo_url}" alt="${team.name}">`;
-            }
-
-            // Info cards
-            document.getElementById('infoLocation').textContent = 
-                `${team.address || 'N/A'}, ${team.city || ''}, ${team.country || ''}`;
-            document.getElementById('infoEmail').textContent = team.email || 'Not provided';
-            document.getElementById('infoPhone').textContent = team.phone || 'Not provided';
-            document.getElementById('infoPerson').textContent = team.person_in_charge || 'Not specified';
-            
-            const websiteEl = document.getElementById('infoWebsite');
-            if (team.website) {
-                websiteEl.innerHTML = `<a href="${team.website}" target="_blank">${team.website}</a>`;
-            } else {
-                websiteEl.textContent = 'Not provided';
-            }
-            
-            document.getElementById('infoFounded').textContent = 
-                team.founded_year ? `${team.founded_year}` : 'Not specified';
-            
-            document.getElementById('infoDescription').textContent = 
-                team.description || 'No description available.';
-
-            // Sports
-            const sportsDiv = document.getElementById('infoSports');
-            if (team.sports && team.sports.length > 0) {
-                sportsDiv.innerHTML = team.sports.map(s => 
-                    `<span class="sport-tag">${s}</span>`
-                ).join('');
-            }
-
-            // Contact Persons
-            const contactList = document.getElementById('contactPersonsList');
-            if (team.coach) {
-                contactList.innerHTML = `
-                    <div class="contact-person-item">
-                        <span class="contact-person-name">${team.coach.full_name}</span>
-                        <span class="contact-person-role">Head Coach</span>
+                updateLanguage();
+                
+                document.getElementById('teamName').textContent = team.name;
+                document.getElementById('teamDescription').textContent = team.description || translations[currentLang].no_description;
+                
+                if (team.logo_url) {
+                    document.getElementById('teamLogo').innerHTML = `<img src="${team.logo_url}" alt="${team.name}" class="team-logo-large">`;
+                }
+                
+                const isActive = team.is_active !== false;
+                document.getElementById('teamStatus').innerHTML = `<i class="fas fa-${isActive ? 'check' : 'pause'}-circle"></i> <span>${isActive ? translations[currentLang].active : 'Suspended'}</span>`;
+                
+                if (team.sports && team.sports.length > 0) {
+                    document.getElementById('teamSport').innerHTML = `<i class="fas fa-fist-raised"></i> <span>${team.sports[0]}</span>`;
+                }
+                
+                const infoHTML = `
+                    <div class="info-card">
+                        <div class="info-label"><i class="fas fa-map-marker-alt"></i> ${translations[currentLang].location}</div>
+                        <div class="info-value">${team.address || 'N/A'}${team.city ? ', ' + team.city : ''}${team.country ? ', ' + team.country : ''}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label"><i class="fas fa-envelope"></i> ${translations[currentLang].email}</div>
+                        <div class="info-value">${team.email || 'N/A'}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label"><i class="fas fa-phone"></i> ${translations[currentLang].phone}</div>
+                        <div class="info-value">${team.phone || 'N/A'}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label"><i class="fas fa-user-tie"></i> ${translations[currentLang].person_charge}</div>
+                        <div class="info-value">${team.person_in_charge || 'N/A'}</div>
+                    </div>
+                    ${team.website ? `
+                    <div class="info-card">
+                        <div class="info-label"><i class="fas fa-globe"></i> ${translations[currentLang].website}</div>
+                        <div class="info-value"><a href="${team.website}" target="_blank">${team.website}</a></div>
+                    </div>
+                    ` : ''}
+                    <div class="info-card">
+                        <div class="info-label"><i class="fas fa-calendar"></i> ${translations[currentLang].founded}</div>
+                        <div class="info-value">${team.founded_year || 'Not specified'}</div>
                     </div>
                 `;
-            }
-
-            // Map
-            if (team.latitude && team.longitude) {
-                initMap(team.latitude, team.longitude, team.name);
-            } else {
-                document.querySelector('.map-container').style.display = 'none';
+                document.getElementById('teamInfo').innerHTML = infoHTML;
+                
+                document.getElementById('teamAbout').textContent = team.description || translations[currentLang].no_description;
+                
+                const sportsDiv = document.getElementById('teamSportsList');
+                if (team.sports && team.sports.length > 0) {
+                    sportsDiv.innerHTML = team.sports.map(s => `<span class="sport-tag"><i class="fas fa-fist-raised"></i> ${s}</span>`).join('');
+                } else {
+                    sportsDiv.innerHTML = `<div class="empty-state"><i class="fas fa-fist-raised"></i><p>${translations[currentLang].no_sports}</p></div>`;
+                }
+                
+                if (team.coach) {
+                    const coach = team.coach;
+                    if (coach.profile_photo_url) {
+                        document.getElementById('coachPhoto').innerHTML = `<img src="${coach.profile_photo_url}" alt="${coach.full_name}">`;
+                    }
+                    document.getElementById('coachName').textContent = coach.full_name;
+                    document.getElementById('coachContact').innerHTML = `
+                        <div class="coach-contact-item"><i class="fas fa-envelope"></i><span>${coach.email || '-'}</span></div>
+                        <div class="coach-contact-item"><i class="fas fa-phone"></i><span>${coach.phone || '-'}</span></div>
+                    `;
+                }
+                
+                await checkMembership();
+                
+            } catch (error) {
+                console.error('Error loading team:', error);
+                alert('Error loading team data');
             }
         }
 
-        function initMap(lat, lng, title) {
-            if (map) map.remove();
-            
-            map = L.map('teamMap').setView([lat, lng], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-            
-            L.marker([lat, lng]).addTo(map)
-                .bindPopup(`<b>${title}</b>`)
-                .openPopup();
-        }
-
-        async function checkUserMembership() {
+        async function checkMembership() {
             try {
-                const { data: { user } } = await supabaseClient.auth.getUser();
+                const { data: { user } } = await supabase.auth.getUser();
+                
                 if (!user) {
-                    document.getElementById('joinRequestCard').style.display = 'none';
+                    updateJoinCard('login', null);
                     return;
                 }
-
+                
                 currentUser = user;
-
-                const { data: athlete } = await supabaseClient
+                
+                const { data: athlete } = await supabase
                     .from('athletes')
                     .select('id')
                     .eq('user_id', user.id)
                     .single();
-
+                
                 if (!athlete) {
-                    document.getElementById('joinRequestCard').style.display = 'none';
+                    updateJoinCard('profile', null);
                     return;
                 }
-
+                
                 currentAthlete = athlete;
-
-                const { data: member } = await supabaseClient
+                
+                const { data: member } = await supabase
                     .from('team_members')
                     .select('id, status')
                     .eq('team_id', teamId)
                     .eq('athlete_id', athlete.id)
+                    .eq('status', 'approved')
                     .single();
-
+                
                 if (member) {
-                    if (member.status === 'approved') {
-                        document.getElementById('alreadyMemberCard').style.display = 'block';
-                    } else if (member.status === 'pending') {
-                        document.getElementById('pendingRequestCard').style.display = 'block';
-                    }
-                } else {
-                    const { data: request } = await supabaseClient
-                        .from('team_join_requests')
-                        .select('id')
-                        .eq('team_id', teamId)
-                        .eq('athlete_id', athlete.id)
-                        .eq('status', 'pending')
-                        .single();
-
-                    if (request) {
-                        document.getElementById('pendingRequestCard').style.display = 'block';
-                    } else {
-                        document.getElementById('joinRequestCard').style.display = 'block';
-                    }
+                    updateJoinCard('member', null);
+                    return;
                 }
-
-                const { count } = await supabaseClient
-                    .from('team_members')
-                    .select('*', { count: 'exact', head: true })
+                
+                const { data: request } = await supabase
+                    .from('team_join_requests')
+                    .select('id, status')
                     .eq('team_id', teamId)
-                    .eq('status', 'approved');
-
-                document.getElementById('teamMembersCount').textContent = 
-                    `${count || 0} members`;
-
+                    .eq('athlete_id', athlete.id)
+                    .eq('status', 'pending')
+                    .single();
+                
+                if (request) {
+                    updateJoinCard('pending', null);
+                    return;
+                }
+                
+                updateJoinCard('join', null);
+                
             } catch (error) {
                 console.error('Error checking membership:', error);
+                updateJoinCard('join', null);
             }
         }
 
-        function showSection(sectionName, element) {
-            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+        function updateJoinCard(status, customMessage) {
+            const card = document.getElementById('joinCard');
+            const t = translations[currentLang];
             
-            document.getElementById(`${sectionName}Section`).classList.add('active');
-            if (element) element.classList.add('active');
+            switch(status) {
+                case 'login':
+                    card.innerHTML = `
+                        <h3><i class="fas fa-sign-in-alt"></i> ${t.login_required}</h3>
+                        <p>${t.join_desc}</p>
+                        <button class="btn-join" onclick="window.location.href='login.html?redirect=' + encodeURIComponent(window.location.href)">
+                            <i class="fas fa-sign-in-alt"></i> ${t.login_required}
+                        </button>
+                    `;
+                    break;
+                case 'profile':
+                    card.innerHTML = `
+                        <h3><i class="fas fa-exclamation-triangle"></i> ${t.profile_required}</h3>
+                        <p>${t.join_desc}</p>
+                        <a href="my-profile.html" class="btn-join" style="text-decoration:none;">
+                            <i class="fas fa-user-edit"></i> ${t.profile_required}
+                        </a>
+                    `;
+                    break;
+                case 'member':
+                    card.innerHTML = `
+                        <h3 style="color: #10B981;"><i class="fas fa-check-circle"></i> ${t.already_member}</h3>
+                        <p style="color: #64748B; margin: 15px 0;">${t.member_desc}</p>
+                        <div class="status-message status-member">
+                            <i class="fas fa-check-circle"></i> ${t.already_member}
+                        </div>
+                    `;
+                    break;
+                case 'pending':
+                    card.innerHTML = `
+                        <h3 style="color: var(--accent-yellow);"><i class="fas fa-clock"></i> ${t.request_pending}</h3>
+                        <p style="color: #64748B; margin: 15px 0;">${t.pending_desc}</p>
+                        <div class="status-message status-pending">
+                            <i class="fas fa-clock"></i> ${t.request_pending}
+                        </div>
+                    `;
+                    break;
+                case 'join':
+                default:
+                    card.innerHTML = `
+                        <h3><i class="fas fa-user-plus"></i> ${t.join_title}</h3>
+                        <p>${t.join_desc}</p>
+                        <button class="btn-join" id="btnJoin" onclick="requestJoin()">
+                            <i class="fas fa-paper-plane"></i> ${t.request_join}
+                        </button>
+                    `;
+            }
         }
 
-        function openJoinModal() {
+        async function requestJoin() {
             if (!currentUser || !currentAthlete) {
-                alert('Please login first!');
-                window.location.href = 'login.html';
+                alert('Please login first');
+                window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
                 return;
             }
-
-            document.getElementById('athleteName').value = currentUser.email;
-            document.getElementById('athleteEmail').value = currentUser.email;
-            document.getElementById('joinMessage').value = '';
-            document.getElementById('joinModal').classList.add('active');
-        }
-
-        function closeJoinModal() {
-            document.getElementById('joinModal').classList.remove('active');
-        }
-
-        async function submitJoinRequest(e) {
-            e.preventDefault();
-
-            const message = document.getElementById('joinMessage').value;
-
+            
+            const message = prompt(currentLang === 'ar' ? 'اكتب رسالة للمدرب (اختياري):' : 'Write a message to the coach (optional):');
+            if (message === null) return;
+            
             try {
-                const { error } = await supabaseClient
+                const { error } = await supabase
                     .from('team_join_requests')
                     .insert([{
                         team_id: teamId,
@@ -1032,24 +466,17 @@
                         status: 'pending',
                         created_at: new Date().toISOString()
                     }]);
-
-                if (error) throw error;
-
-                alert('✅ Request sent successfully! The coach will review your request.');
-                closeJoinModal();
                 
-                document.getElementById('joinRequestCard').style.display = 'none';
-                document.getElementById('pendingRequestCard').style.display = 'block';
-
+                if (error) throw error;
+                
+                alert(currentLang === 'ar' ? '✅ تم إرسال الطلب بنجاح! المدرب سيراجع طلبك.' : '✅ Request sent successfully! The coach will review your request.');
+                updateJoinCard('pending', null);
+                
             } catch (error) {
-                console.error('Error submitting request:', error);
-                alert('Error sending request: ' + error.message);
+                console.error('Error sending request:', error);
+                alert('Error: ' + error.message);
             }
         }
-
-        document.getElementById('joinModal').addEventListener('click', function(e) {
-            if (e.target === this) closeJoinModal();
-        });
 
         window.onload = loadTeam;
     </script>
