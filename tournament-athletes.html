@@ -83,7 +83,6 @@
 
         .athlete-info { display: flex; align-items: center; gap: 15px; }
         
-        /* ✅ تحسين عرض الصورة */
         .athlete-avatar { 
             width: 50px; 
             height: 50px; 
@@ -351,11 +350,6 @@
                 refAgeDivisions = ages.data || [];
                 refWeightClasses = weights.data || [];
                 refBeltLevels = belts.data || [];
-                console.log('Reference data loaded:', { 
-                    ages: refAgeDivisions.length, 
-                    weights: refWeightClasses.length, 
-                    belts: refBeltLevels.length 
-                });
             } catch (error) {
                 console.error('Error loading reference data:', error);
             }
@@ -371,7 +365,7 @@
             loadTournamentAndAthletes();
         }
 
-        // ✅ دالة محسّنة لجلب صورة اللاعب
+        // ✅ الدالة المصححة - استخدام profile_photo_url
         async function fetchAthletePhoto(userId) {
             if (!userId) {
                 console.log('No userId provided');
@@ -383,9 +377,9 @@
                 
                 const { data, error } = await dbClient
                     .from('athletes')
-                    .select('full_name, country, profile_picture_url')
+                    .select('full_name, country, profile_photo_url')  // ✅ العمود الصحيح
                     .eq('user_id', userId)
-                    .maybeSingle();  // ✅ استخدام maybeSingle بدلاً من single
+                    .maybeSingle();
                 
                 if (error) {
                     console.error('Error fetching athlete:', error);
@@ -441,7 +435,6 @@
 
                 console.log('Participants loaded:', participants?.length || 0);
 
-                // ✅ جلب صورة كل لاعب بشكل منفصل
                 const athletesWithPhotos = await Promise.all(
                     (participants || []).map(async (p) => {
                         console.log('Processing participant:', p.player_name || p.id);
@@ -507,7 +500,7 @@
                         <a href="#" class="tab"><span>🏆</span> Brackets</a>
                         <a href="#" class="tab"><span>⚔️</span> Matches</a>
                         <a href="#" class="tab"><span>📅</span> Schedule</a>
-                        <a href="#" class="tab"><span></span> Results</a>
+                        <a href="#" class="tab"><span>📊</span> Results</a>
                     </div>
                 </div>
 
@@ -528,6 +521,7 @@
             `;
         }
 
+        // ✅ استخدام profile_photo_url
         function getAthleteDisplayData(athlete) {
             const athleteData = athlete.athleteData || {};
             const name = athleteData.full_name || athlete.player_name || 'Unknown';
@@ -535,7 +529,7 @@
             return {
                 name: name,
                 country: athleteData.country || athlete.country || '',
-                photo: athleteData.profile_picture_url || '',
+                photo: athleteData.profile_photo_url || '',  // ✅ العمود الصحيح
                 initials: name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
             };
         }
@@ -575,7 +569,6 @@
             return grouped;
         }
 
-        // ✅ دالة محسّنة لعرض الصورة مع fallback
         function renderAvatar(display) {
             if (display.photo && display.photo.trim() !== '') {
                 return `
