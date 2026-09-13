@@ -15,8 +15,7 @@
             --medium-gray: #2A2A2A;
             --light-gray: #3A3A3A;
             --white: #FFFFFF;
-            --light-bg: #F5F7FA;
-            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            --danger-red: #EF4444;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -113,6 +112,30 @@
         .form-group select:focus { outline: none; border-color: var(--primary-blue); }
         .btn-save { width: 100%; background: var(--primary-blue); color: var(--white); padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: all 0.3s; margin-top: 10px; }
         .btn-save:hover { background: var(--dark-blue); }
+        
+        /* ✅ زر الحذف الجديد */
+        .btn-delete-registration { 
+            width: 100%; 
+            background: var(--danger-red); 
+            color: var(--white); 
+            padding: 12px; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            transition: all 0.3s; 
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-delete-registration:hover { 
+            background: #DC2626;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239,68,68,0.4);
+        }
 
         .loading { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); font-size: 1.2rem; }
         .empty-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); }
@@ -229,8 +252,12 @@
                         </select>
                     </div>
                 </div>
-                <button type="submit" class="btn-save">Save Changes</button>
+                <button type="submit" class="btn-save"> Save Changes</button>
             </form>
+            <!-- ✅ زر حذف الاشتراك الجديد -->
+            <button type="button" class="btn-delete-registration" onclick="deleteMyRegistration()">
+                🗑️ Delete My Registration
+            </button>
         </div>
     </div>
 
@@ -251,7 +278,6 @@
         let refAgeDivisions = [];
         let refWeightClasses = [];
         let refBeltLevels = [];
-        let athletesData = {};
 
         window.onload = async function() {
             await checkUserStatus();
@@ -311,6 +337,24 @@
             loadTournamentAndAthletes();
         }
 
+        // ✅ دالة مساعدة لجلب صورة اللاعب بشكل فردي (لتجنب خطأ 400)
+        async function fetchAthletePhoto(userId) {
+            if (!userId) return null;
+            try {
+                const { data, error } = await dbClient
+                    .from('athletes')
+                    .select('full_name, country, profile_picture_url')
+                    .eq('user_id', userId)
+                    .single();
+                
+                if (error || !data) return null;
+                return data;
+            } catch (err) {
+                console.error('Error fetching athlete photo:', err);
+                return null;
+            }
+        }
+
         async function loadTournamentAndAthletes() {
             try {
                 const { data: tournament, error: tournamentError } = await dbClient
@@ -339,28 +383,18 @@
                     return;
                 }
 
-                const userIds = participants.map(p => p.user_id).filter(id => id);
-                let athletesMap = {};
-                
-                if (userIds.length > 0) {
-                    const { data: athletes, error: athletesError } = await dbClient
-                        .from('athletes')
-                        .select('user_id, full_name, country, profile_picture_url')
-                        .in('user_id', userIds);
-                    
-                    if (!athletesError && athletes) {
-                        athletesMap = {};
-                        athletes.forEach(a => {
-                            athletesMap[a.user_id] = a;
-                        });
-                    }
-                }
+                // ✅ جلب صورة كل لاعب بشكل منفصل لتجنب خطأ 400
+                const athletesWithPhotos = await Promise.all(
+                    (participants || []).map(async (p) => {
+                        const athleteData = await fetchAthletePhoto(p.user_id);
+                        return {
+                            ...p,
+                            athleteData: athleteData || {}
+                        };
+                    })
+                );
 
-                allAthletes = participants.map(p => ({
-                    ...p,
-                    athleteData: athletesMap[p.user_id] || {}
-                }));
-
+                allAthletes = athletesWithPhotos;
                 renderTournament(tournament);
                 renderAthletes();
             } catch (error) {
@@ -372,7 +406,7 @@
         function showError(message) {
             document.getElementById('tournamentContent').innerHTML = `
                 <div class="empty-state">
-                    <div class="icon" style="color: #ef4444;"></div>
+                    <div class="icon" style="color: #ef4444;">❌</div>
                     <p>${message}</p>
                 </div>
             `;
@@ -396,7 +430,7 @@
                             </div>
                             <div class="tournament-title">
                                 <h1>${tournament.name}</h1>
-                                <p>📅 ${startDate ? new Date(startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'TBD'}</p>
+                                <p> ${startDate ? new Date(startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'TBD'}</p>
                             </div>
                         </div>
                         <div class="tournament-actions">
@@ -407,11 +441,11 @@
 
                 <div class="tabs-container">
                     <div class="tabs">
-                        <a href="tournament-details.html?tournament_id=${tournamentId}" class="tab"><span></span> Information</a>
-                        <a href="tournament-athletes.html?tournament_id=${tournamentId}" class="tab active"><span></span> Athletes <span style="background:var(--accent-yellow);color:var(--black);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${allAthletes.length}</span></a>
-                        <a href="#" class="tab"><span></span> Brackets</a>
-                        <a href="#" class="tab"><span>️</span> Matches</a>
-                        <a href="#" class="tab"><span></span> Schedule</a>
+                        <a href="tournament-details.html?tournament_id=${tournamentId}" class="tab"><span>📋</span> Information</a>
+                        <a href="tournament-athletes.html?tournament_id=${tournamentId}" class="tab active"><span>👥</span> Athletes <span style="background:var(--accent-yellow);color:var(--black);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${allAthletes.length}</span></a>
+                        <a href="#" class="tab"><span>🏆</span> Brackets</a>
+                        <a href="#" class="tab"><span>⚔️</span> Matches</a>
+                        <a href="#" class="tab"><span>📅</span> Schedule</a>
                         <a href="#" class="tab"><span>📊</span> Results</a>
                     </div>
                 </div>
@@ -438,11 +472,10 @@
             return {
                 name: athleteData.full_name || athlete.player_name || 'Unknown',
                 country: athleteData.country || athlete.country || '',
-                photo: athleteData.profile_picture_url || athlete.profile_photo_url || ''
+                photo: athleteData.profile_picture_url || ''
             };
         }
 
-        // ✅ دالة مساعدة للحصول على اسم الوزن من ID
         function getWeightClassName(weightClassId) {
             if (!weightClassId) return '';
             const weightClass = refWeightClasses.find(w => w.id === weightClassId);
@@ -466,7 +499,6 @@
             renderGroupedAthletes(groupedAthletes);
         }
 
-        // ✅ استخدام weight_class_id للحصول على الاسم
         function groupAthletesByDivision(athletes) {
             const grouped = {};
             athletes.forEach(athlete => {
@@ -479,7 +511,6 @@
             return grouped;
         }
 
-        // ✅ استخدام weight_class_id في العرض
         function renderGroupedAthletes(groupedAthletes) {
             const athletesList = document.getElementById('athletesList');
             
@@ -516,7 +547,6 @@
                                     const editBtn = isMyRecord ? 
                                         `<button class="btn-edit-own" onclick="openEditModal('${athlete.id}')">✏️ Edit My Data</button>` : '';
                                     
-                                    // ✅ الحصول على اسم الوزن المحدث من weight_class_id
                                     const weightClassName = getWeightClassName(athlete.weight_class_id);
                                     const weightDisplay = weightClassName || `${athlete.weight || 0}kg`;
                                     
@@ -525,7 +555,7 @@
                                         <td>
                                             <div class="athlete-info">
                                                 <div class="athlete-avatar">
-                                                    ${display.photo ? `<img src="${display.photo}" alt="${display.name}" onerror="this.style.display='none';this.parentElement.textContent='👤'">` : '👤'}
+                                                    ${display.photo ? `<img src="${display.photo}" alt="${display.name}" onerror="this.parentElement.innerHTML='👤'">` : '👤'}
                                                 </div>
                                                 <div class="athlete-details">
                                                     <div class="athlete-name">${display.name}</div>
@@ -628,7 +658,10 @@
                 ageSelect.value = currentDiv.id;
                 updateEditWeightOptions(currentDiv.id, athlete.gender);
                 setTimeout(() => {
-                    document.getElementById('editWeight').value = athlete.weight_class || '';
+                    const weightSelect = document.getElementById('editWeight');
+                    if (athlete.weight_class_id) {
+                        weightSelect.value = athlete.weight_class_id;
+                    }
                 }, 100);
             }
             beltSelect.value = athlete.belt_level || '';
@@ -651,9 +684,10 @@
 
             fallback.forEach(w => {
                 const opt = document.createElement('option');
-                opt.value = w.name;
+                opt.value = w.id;  // ✅ استخدام ID كـ value
                 opt.textContent = `${w.name} (${w.min_weight}-${w.max_weight} kg)`;
                 opt.dataset.weightId = w.id;
+                opt.dataset.weightName = w.name;
                 opt.dataset.minWeight = w.min_weight;
                 weightSelect.appendChild(opt);
             });
@@ -682,7 +716,6 @@
             const updateData = {
                 age_group: selectedAge.dataset.name || selectedAge.textContent,
                 weight: parseFloat(selectedWeight.dataset.minWeight || 0),
-                // weight_class: selectedWeight.value,  // تم الحذف
                 weight_class_id: selectedWeight.dataset.weightId || null,
                 belt_level: document.getElementById('editBelt').value,
                 gi_type: document.getElementById('editGiType').value
@@ -704,6 +737,46 @@
                 alert('❌ Error updating: ' + err.message);
             }
         });
+
+        // ✅ دالة حذف الاشتراك الجديدة
+        async function deleteMyRegistration() {
+            const participantId = document.getElementById('editParticipantId').value;
+            const athlete = allAthletes.find(a => a.id === participantId);
+            
+            if (!athlete || athlete.user_id !== currentUser.id) {
+                alert("Security Error: You can only delete your own registration.");
+                return;
+            }
+
+            const confirmMsg = `️ WARNING: Are you sure you want to DELETE your registration from this tournament?\n\nThis action cannot be undone!`;
+            
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+
+            // تأكيد إضافي
+            const secondConfirm = prompt('Type "DELETE" to confirm:');
+            if (secondConfirm !== 'DELETE') {
+                alert('Deletion cancelled.');
+                return;
+            }
+
+            try {
+                const { error } = await dbClient
+                    .from('tournament_participants')
+                    .delete()
+                    .eq('id', participantId);
+                
+                if (error) throw error;
+                
+                alert('✅ Your registration has been deleted successfully!');
+                closeEditModal();
+                await loadTournamentAndAthletes();
+            } catch (err) {
+                console.error(err);
+                alert('❌ Error deleting registration: ' + err.message);
+            }
+        }
 
         async function handleLogout() {
             await dbClient.auth.signOut();
