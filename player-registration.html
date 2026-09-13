@@ -45,7 +45,7 @@
         <div id="alert" class="alert"></div>
 
         <div class="section">
-            <div class="section-title">👤 بياناتك الشخصية (من الحساب)</div>
+            <div class="section-title"> بياناتك الشخصية (من الحساب)</div>
             <div id="playerInfo" class="player-info">
                 <div class="loading">جاري تحميل البيانات...</div>
             </div>
@@ -171,6 +171,7 @@
                 .select('*')
                 .order('min_age');
             
+            console.log('✅ Age divisions loaded:', data?.length || 0);
             return data || [];
         }
 
@@ -180,6 +181,7 @@
                 .select('*')
                 .order('min_weight');
             
+            console.log('✅ Weight categories loaded:', data?.length || 0);
             return data || [];
         }
 
@@ -210,23 +212,25 @@
             });
         }
 
-        // ✅ الدالة المصححة
+        // ✅ الدالة المصححة نهائياً
         function updateWeightOptions() {
-            const ageDivisionId = document.getElementById('ageGroup').value;
+            const selectedAgeDivisionId = document.getElementById('ageGroup').value;
             const weightSelect = document.getElementById('weight');
             
-            console.log('🔍 Updating weights for division:', ageDivisionId);
+            console.log(' Updating weights...');
+            console.log(' Selected division ID:', selectedAgeDivisionId);
             console.log(' Current gender:', currentPlayer?.gender);
+            console.log(' Total weights in DB:', weightCategories.length);
             
             weightSelect.innerHTML = '<option value="">جاري التحميل...</option>';
             weightSelect.disabled = true;
             
-            if (!ageDivisionId) {
-                weightSelect.innerHTML = '<option value="">اختر الفئة العمرية أولاً</option>';
+            if (!selectedAgeDivisionId || weightCategories.length === 0) {
+                weightSelect.innerHTML = '<option value="">لا توجد موازين متاحة</option>';
                 return;
             }
             
-            // ✅ تصحيح الجنس ليتطابق مع قاعدة البيانات
+            // ✅ تصحيح الجنس
             const genderMap = {
                 'Male': 'Men',
                 'Female': 'Women',
@@ -236,42 +240,66 @@
                 'Girls': 'Girls'
             };
             
-            const dbGender = genderMap[currentPlayer?.gender] || 'Men';
-            console.log(' Mapping gender:', currentPlayer?.gender, '->', dbGender);
+            const targetGender = genderMap[currentPlayer?.gender] || 'Men';
             
-            // تصفية الموازين
+            // ✅ البحث عن الموازين مع فحص مرن
             const filteredWeights = weightCategories.filter(w => {
-                const matchDivision = w.age_division_id === ageDivisionId;
-                const matchGender = w.gender === dbGender || w.gender === currentPlayer?.gender;
+                const divisionMatch = w.age_division_id === selectedAgeDivisionId;
+                const genderMatch = w.gender === targetGender;
                 
-                return matchDivision && matchGender;
+                return divisionMatch && genderMatch;
             });
             
-            console.log('✅ Filtered weights:', filteredWeights.length, 'from', weightCategories.length);
+            console.log(' Target gender:', targetGender);
+            console.log(' Filtered count:', filteredWeights.length);
             
+            // إذا لم نجد، نعرض جميع الموازين للفئة (بغض النظر عن الجنس)
             if (filteredWeights.length === 0) {
-                const sampleWeights = weightCategories.slice(0, 5).map(w => ({
-                    division: w.age_division_id,
+                console.log('⚠️ No exact match, trying without gender filter...');
+                const fallbackWeights = weightCategories.filter(w => 
+                    w.age_division_id === selectedAgeDivisionId
+                );
+                
+                if (fallbackWeights.length > 0) {
+                    console.log('✅ Found', fallbackWeights.length, 'weights without gender filter');
+                    fallbackWeights.forEach(w => {
+                        const option = document.createElement('option');
+                        option.value = w.name;
+                        option.textContent = `${w.name} (${w.min_weight}-${w.max_weight} كجم) - ${w.gender}`;
+                        option.dataset.minWeight = w.min_weight;
+                        option.dataset.maxWeight = w.max_weight;
+                        weightSelect.appendChild(option);
+                    });
+                    weightSelect.disabled = false;
+                    return;
+                }
+            }
+            
+            // ملء القائمة
+            if (filteredWeights.length === 0) {
+                weightSelect.innerHTML = '<option value="">لا توجد موازين متاحة لهذه الفئة</option>';
+                
+                // عرض عينة للتصحيح
+                const sample = weightCategories.slice(0, 3).map(w => ({
+                    id: w.age_division_id,
                     gender: w.gender,
                     name: w.name
                 }));
-                console.log('❌ No matches. Sample:', sampleWeights);
+                console.log(' Sample from DB:', sample);
+                console.log(' Looking for: division=', selectedAgeDivisionId, 'gender=', targetGender);
+            } else {
+                filteredWeights.forEach(w => {
+                    const option = document.createElement('option');
+                    option.value = w.name;
+                    option.textContent = `${w.name} (${w.min_weight}-${w.max_weight} كجم)`;
+                    option.dataset.minWeight = w.min_weight;
+                    option.dataset.maxWeight = w.max_weight;
+                    weightSelect.appendChild(option);
+                });
                 
-                weightSelect.innerHTML = '<option value="">لا توجد موازين متاحة لهذه الفئة</option>';
-                return;
+                weightSelect.disabled = false;
+                console.log('✅ Loaded', filteredWeights.length, 'weights');
             }
-            
-            filteredWeights.forEach(w => {
-                const option = document.createElement('option');
-                option.value = w.name;
-                option.textContent = `${w.name} (${w.min_weight}-${w.max_weight} كجم)`;
-                option.dataset.minWeight = w.min_weight;
-                option.dataset.maxWeight = w.max_weight;
-                weightSelect.appendChild(option);
-            });
-            
-            weightSelect.disabled = false;
-            console.log('✅ Loaded', filteredWeights.length, 'weights');
         }
 
         function populateTeams() {
@@ -321,6 +349,8 @@
                     populateTeams();
                 })
             ]);
+            
+            console.log('✅ All data loaded successfully');
         };
 
         function displayPlayerInfo() {
