@@ -365,36 +365,39 @@
             loadTournamentAndAthletes();
         }
 
-        // ✅ الدالة المصححة - استخدام profile_photo_url
+        // ✅ جلب الصورة من جدول users (نفس صفحة my-profile.html)
         async function fetchAthletePhoto(userId) {
             if (!userId) {
-                console.log('No userId provided');
+                console.log('❌ No userId provided');
                 return null;
             }
             
             try {
-                console.log('Fetching athlete photo for userId:', userId);
+                console.log('📸 Fetching athlete photo from users table for userId:', userId);
                 
+                // ✅ نفس الاستعلام المستخدم في my-profile.html
                 const { data, error } = await dbClient
-                    .from('athletes')
-                    .select('full_name, country, profile_photo_url')  // ✅ العمود الصحيح
-                    .eq('user_id', userId)
+                    .from('users')  // ✅ جدول users وليس athletes
+                    .select('full_name, country, profile_picture_url')
+                    .eq('id', userId)  // ✅ استخدام id وليس user_id
                     .maybeSingle();
                 
                 if (error) {
-                    console.error('Error fetching athlete:', error);
+                    console.error('❌ Error fetching from users:', error);
                     return null;
                 }
                 
                 if (!data) {
-                    console.log('No athlete found for userId:', userId);
+                    console.log('⚠️ No user found for userId:', userId);
                     return null;
                 }
                 
-                console.log('Athlete data:', data);
+                console.log('✅ User data:', data);
+                console.log('🖼️ Profile picture URL:', data.profile_picture_url);
+                
                 return data;
             } catch (err) {
-                console.error('Exception fetching athlete photo:', err);
+                console.error('❌ Exception fetching athlete photo:', err);
                 return null;
             }
         }
@@ -435,6 +438,7 @@
 
                 console.log('Participants loaded:', participants?.length || 0);
 
+                // ✅ جلب صورة كل لاعب من جدول users
                 const athletesWithPhotos = await Promise.all(
                     (participants || []).map(async (p) => {
                         console.log('Processing participant:', p.player_name || p.id);
@@ -480,7 +484,7 @@
                     <div class="tournament-header-content">
                         <div class="tournament-info">
                             <div class="tournament-logo">
-                                ${bannerImage ? `<img src="${bannerImage}" alt="${tournament.name}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:1.5rem;">🏆</div>'}
+                                ${bannerImage ? `<img src="${bannerImage}" alt="${tournament.name}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:1.5rem;"></div>'}
                             </div>
                             <div class="tournament-title">
                                 <h1>${tournament.name}</h1>
@@ -499,7 +503,7 @@
                         <a href="tournament-athletes.html?tournament_id=${tournamentId}" class="tab active"><span>👥</span> Athletes <span style="background:var(--accent-yellow);color:var(--black);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${allAthletes.length}</span></a>
                         <a href="#" class="tab"><span>🏆</span> Brackets</a>
                         <a href="#" class="tab"><span>⚔️</span> Matches</a>
-                        <a href="#" class="tab"><span>📅</span> Schedule</a>
+                        <a href="#" class="tab"><span></span> Schedule</a>
                         <a href="#" class="tab"><span>📊</span> Results</a>
                     </div>
                 </div>
@@ -521,7 +525,6 @@
             `;
         }
 
-        // ✅ استخدام profile_photo_url
         function getAthleteDisplayData(athlete) {
             const athleteData = athlete.athleteData || {};
             const name = athleteData.full_name || athlete.player_name || 'Unknown';
@@ -529,7 +532,7 @@
             return {
                 name: name,
                 country: athleteData.country || athlete.country || '',
-                photo: athleteData.profile_photo_url || '',  // ✅ العمود الصحيح
+                photo: athleteData.profile_picture_url || '',  // ✅ من جدول users
                 initials: name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
             };
         }
@@ -570,13 +573,20 @@
         }
 
         function renderAvatar(display) {
-            if (display.photo && display.photo.trim() !== '') {
+            console.log('🎨 Rendering avatar for:', display.name, 'Photo:', display.photo);
+            
+            if (display.photo && display.photo.trim() !== '' && display.photo !== 'null') {
                 return `
                     <img src="${display.photo}" 
                          alt="${display.name}" 
-                         onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-placeholder\\'>${display.initials}</div>';">
+                         style="width: 100%; height: 100%; object-fit: cover;"
+                         onerror="console.log('❌ Image failed to load:', this.src); 
+                                  this.onerror=null; 
+                                  this.parentElement.innerHTML='<div class=\\'avatar-placeholder\\'>${display.initials}</div>';">
                 `;
             }
+            
+            console.log('⚠️ No photo available, showing initials:', display.initials);
             return `<div class="avatar-placeholder">${display.initials}</div>`;
         }
 
