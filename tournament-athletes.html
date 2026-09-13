@@ -82,8 +82,39 @@
         .athletes-table tr:last-child td { border-bottom: none; }
 
         .athlete-info { display: flex; align-items: center; gap: 15px; }
-        .athlete-avatar { width: 45px; height: 45px; border-radius: 50%; overflow: hidden; background: var(--medium-gray); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
-        .athlete-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* ✅ تحسين عرض الصورة */
+        .athlete-avatar { 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            overflow: hidden; 
+            background: var(--medium-gray); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 1.5rem; 
+            flex-shrink: 0;
+            border: 2px solid var(--light-gray);
+        }
+        .athlete-avatar img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover;
+            display: block;
+        }
+        .athlete-avatar .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            color: var(--white);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
         .athlete-details { display: flex; flex-direction: column; gap: 3px; }
         .athlete-name { font-weight: 700; color: var(--white); font-size: 1rem; }
         .athlete-country { display: flex; align-items: center; gap: 5px; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
@@ -113,7 +144,6 @@
         .btn-save { width: 100%; background: var(--primary-blue); color: var(--white); padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: all 0.3s; margin-top: 10px; }
         .btn-save:hover { background: var(--dark-blue); }
         
-        /* ✅ زر الحذف الجديد */
         .btn-delete-registration { 
             width: 100%; 
             background: var(--danger-red); 
@@ -161,7 +191,7 @@
             .athletes-header h2 { font-size: 1.5rem; }
             .athletes-table { font-size: 0.85rem; }
             .athletes-table th, .athletes-table td { padding: 10px 12px; }
-            .athlete-avatar { width: 35px; height: 35px; }
+            .athlete-avatar { width: 40px; height: 40px; }
             .form-grid { grid-template-columns: 1fr; }
         }
 
@@ -252,9 +282,8 @@
                         </select>
                     </div>
                 </div>
-                <button type="submit" class="btn-save"> Save Changes</button>
+                <button type="submit" class="btn-save">💾 Save Changes</button>
             </form>
-            <!-- ✅ زر حذف الاشتراك الجديد -->
             <button type="button" class="btn-delete-registration" onclick="deleteMyRegistration()">
                 🗑️ Delete My Registration
             </button>
@@ -322,6 +351,11 @@
                 refAgeDivisions = ages.data || [];
                 refWeightClasses = weights.data || [];
                 refBeltLevels = belts.data || [];
+                console.log('Reference data loaded:', { 
+                    ages: refAgeDivisions.length, 
+                    weights: refWeightClasses.length, 
+                    belts: refBeltLevels.length 
+                });
             } catch (error) {
                 console.error('Error loading reference data:', error);
             }
@@ -337,26 +371,44 @@
             loadTournamentAndAthletes();
         }
 
-        // ✅ دالة مساعدة لجلب صورة اللاعب بشكل فردي (لتجنب خطأ 400)
+        // ✅ دالة محسّنة لجلب صورة اللاعب
         async function fetchAthletePhoto(userId) {
-            if (!userId) return null;
+            if (!userId) {
+                console.log('No userId provided');
+                return null;
+            }
+            
             try {
+                console.log('Fetching athlete photo for userId:', userId);
+                
                 const { data, error } = await dbClient
                     .from('athletes')
                     .select('full_name, country, profile_picture_url')
                     .eq('user_id', userId)
-                    .single();
+                    .maybeSingle();  // ✅ استخدام maybeSingle بدلاً من single
                 
-                if (error || !data) return null;
+                if (error) {
+                    console.error('Error fetching athlete:', error);
+                    return null;
+                }
+                
+                if (!data) {
+                    console.log('No athlete found for userId:', userId);
+                    return null;
+                }
+                
+                console.log('Athlete data:', data);
                 return data;
             } catch (err) {
-                console.error('Error fetching athlete photo:', err);
+                console.error('Exception fetching athlete photo:', err);
                 return null;
             }
         }
 
         async function loadTournamentAndAthletes() {
             try {
+                console.log('Loading tournament:', tournamentId);
+                
                 const { data: tournament, error: tournamentError } = await dbClient
                     .from('tournaments')
                     .select('*')
@@ -364,6 +416,7 @@
                     .single();
                 
                 if (tournamentError) {
+                    console.error('Tournament error:', tournamentError);
                     showError('Error loading tournament: ' + tournamentError.message);
                     return;
                 }
@@ -373,19 +426,25 @@
                     return;
                 }
 
+                console.log('Tournament loaded:', tournament.name);
+
                 const { data: participants, error: participantsError } = await dbClient
                     .from('tournament_participants')
                     .select('*')
                     .eq('tournament_id', tournamentId);
 
                 if (participantsError) {
+                    console.error('Participants error:', participantsError);
                     showError('Error loading athletes: ' + participantsError.message);
                     return;
                 }
 
-                // ✅ جلب صورة كل لاعب بشكل منفصل لتجنب خطأ 400
+                console.log('Participants loaded:', participants?.length || 0);
+
+                // ✅ جلب صورة كل لاعب بشكل منفصل
                 const athletesWithPhotos = await Promise.all(
                     (participants || []).map(async (p) => {
+                        console.log('Processing participant:', p.player_name || p.id);
                         const athleteData = await fetchAthletePhoto(p.user_id);
                         return {
                             ...p,
@@ -395,6 +454,8 @@
                 );
 
                 allAthletes = athletesWithPhotos;
+                console.log('All athletes with photos:', allAthletes);
+                
                 renderTournament(tournament);
                 renderAthletes();
             } catch (error) {
@@ -430,7 +491,7 @@
                             </div>
                             <div class="tournament-title">
                                 <h1>${tournament.name}</h1>
-                                <p> ${startDate ? new Date(startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'TBD'}</p>
+                                <p>📅 ${startDate ? new Date(startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'TBD'}</p>
                             </div>
                         </div>
                         <div class="tournament-actions">
@@ -446,7 +507,7 @@
                         <a href="#" class="tab"><span>🏆</span> Brackets</a>
                         <a href="#" class="tab"><span>⚔️</span> Matches</a>
                         <a href="#" class="tab"><span>📅</span> Schedule</a>
-                        <a href="#" class="tab"><span>📊</span> Results</a>
+                        <a href="#" class="tab"><span></span> Results</a>
                     </div>
                 </div>
 
@@ -469,10 +530,13 @@
 
         function getAthleteDisplayData(athlete) {
             const athleteData = athlete.athleteData || {};
+            const name = athleteData.full_name || athlete.player_name || 'Unknown';
+            
             return {
-                name: athleteData.full_name || athlete.player_name || 'Unknown',
+                name: name,
                 country: athleteData.country || athlete.country || '',
-                photo: athleteData.profile_picture_url || ''
+                photo: athleteData.profile_picture_url || '',
+                initials: name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
             };
         }
 
@@ -488,7 +552,7 @@
             if (allAthletes.length === 0) {
                 athletesList.innerHTML = `
                     <div class="empty-state">
-                        <div class="icon"></div>
+                        <div class="icon">👥</div>
                         <p>No athletes registered yet</p>
                     </div>
                 `;
@@ -511,13 +575,25 @@
             return grouped;
         }
 
+        // ✅ دالة محسّنة لعرض الصورة مع fallback
+        function renderAvatar(display) {
+            if (display.photo && display.photo.trim() !== '') {
+                return `
+                    <img src="${display.photo}" 
+                         alt="${display.name}" 
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'avatar-placeholder\\'>${display.initials}</div>';">
+                `;
+            }
+            return `<div class="avatar-placeholder">${display.initials}</div>`;
+        }
+
         function renderGroupedAthletes(groupedAthletes) {
             const athletesList = document.getElementById('athletesList');
             
             if (Object.keys(groupedAthletes).length === 0) {
                 athletesList.innerHTML = `
                     <div class="empty-state">
-                        <div class="icon"></div>
+                        <div class="icon">🔍</div>
                         <p>No athletes found</p>
                     </div>
                 `;
@@ -555,12 +631,12 @@
                                         <td>
                                             <div class="athlete-info">
                                                 <div class="athlete-avatar">
-                                                    ${display.photo ? `<img src="${display.photo}" alt="${display.name}" onerror="this.parentElement.innerHTML='👤'">` : '👤'}
+                                                    ${renderAvatar(display)}
                                                 </div>
                                                 <div class="athlete-details">
                                                     <div class="athlete-name">${display.name}</div>
                                                     <div class="athlete-country">
-                                                        <span>${display.country || ''}</span>
+                                                        <span>${display.country || '🌍'}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -684,7 +760,7 @@
 
             fallback.forEach(w => {
                 const opt = document.createElement('option');
-                opt.value = w.id;  // ✅ استخدام ID كـ value
+                opt.value = w.id;
                 opt.textContent = `${w.name} (${w.min_weight}-${w.max_weight} kg)`;
                 opt.dataset.weightId = w.id;
                 opt.dataset.weightName = w.name;
@@ -738,7 +814,6 @@
             }
         });
 
-        // ✅ دالة حذف الاشتراك الجديدة
         async function deleteMyRegistration() {
             const participantId = document.getElementById('editParticipantId').value;
             const athlete = allAthletes.find(a => a.id === participantId);
@@ -748,13 +823,12 @@
                 return;
             }
 
-            const confirmMsg = `️ WARNING: Are you sure you want to DELETE your registration from this tournament?\n\nThis action cannot be undone!`;
+            const confirmMsg = `⚠️ WARNING: Are you sure you want to DELETE your registration from this tournament?\n\nThis action cannot be undone!`;
             
             if (!confirm(confirmMsg)) {
                 return;
             }
 
-            // تأكيد إضافي
             const secondConfirm = prompt('Type "DELETE" to confirm:');
             if (secondConfirm !== 'DELETE') {
                 alert('Deletion cancelled.');
