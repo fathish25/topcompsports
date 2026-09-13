@@ -328,9 +328,17 @@
                     return;
                 }
 
+                // ✅ جلب البيانات مع JOIN جدول athletes للحصول على الصورة
                 const { data: athletes, error: athletesError } = await dbClient
                     .from('tournament_participants')
-                    .select('*')
+                    .select(`
+                        *,
+                        athletes (
+                            full_name,
+                            country,
+                            profile_picture_url
+                        )
+                    `)
                     .eq('tournament_id', tournamentId);
 
                 if (athletesError) {
@@ -387,8 +395,8 @@
                     <div class="tabs">
                         <a href="tournament-details.html?tournament_id=${tournamentId}" class="tab"><span></span> Information</a>
                         <a href="tournament-athletes.html?tournament_id=${tournamentId}" class="tab active"><span></span> Athletes <span style="background:var(--accent-yellow);color:var(--black);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${allAthletes.length}</span></a>
-                        <a href="#" class="tab"><span>🏆</span> Brackets</a>
-                        <a href="#" class="tab"><span>⚔️</span> Matches</a>
+                        <a href="#" class="tab"><span></span> Brackets</a>
+                        <a href="#" class="tab"><span>️</span> Matches</a>
                         <a href="#" class="tab"><span></span> Schedule</a>
                         <a href="#" class="tab"><span>📊</span> Results</a>
                     </div>
@@ -412,10 +420,12 @@
         }
 
         function getAthleteDisplayData(athlete) {
+            // ✅ جلب البيانات من جدول athletes المرتبط
+            const athleteData = athlete.athletes || {};
             return {
-                name: athlete.player_name || 'Unknown',
-                country: athlete.country || '',
-                photo: athlete.profile_photo_url || ''
+                name: athleteData.full_name || athlete.player_name || 'Unknown',
+                country: athleteData.country || athlete.country || '',
+                photo: athleteData.profile_picture_url || athlete.profile_photo_url || ''
             };
         }
 
@@ -439,7 +449,9 @@
         function groupAthletesByDivision(athletes) {
             const grouped = {};
             athletes.forEach(athlete => {
-                const key = `${athlete.age_group || 'Unknown'}|${athlete.gender || 'Unknown'}|${athlete.belt_level || 'Unknown'}|${athlete.weight || 0}kg`;
+                // ✅ استخدام weight_class إذا موجود، иначе استخدام weight
+                const weightDisplay = athlete.weight_class || `${athlete.weight || 0}kg`;
+                const key = `${athlete.age_group || 'Unknown'}|${athlete.gender || 'Unknown'}|${athlete.belt_level || 'Unknown'}|${weightDisplay}`;
                 if (!grouped[key]) grouped[key] = [];
                 grouped[key].push(athlete);
             });
@@ -482,17 +494,20 @@
                                     const editBtn = isMyRecord ? 
                                         `<button class="btn-edit-own" onclick="openEditModal('${athlete.id}')">✏️ Edit My Data</button>` : '';
                                     
+                                    // ✅ عرض weight_class إذا موجود، иначе weight
+                                    const weightDisplay = athlete.weight_class || `${athlete.weight || 0}kg`;
+                                    
                                     return `
                                     <tr>
                                         <td>
                                             <div class="athlete-info">
                                                 <div class="athlete-avatar">
-                                                    ${display.photo ? `<img src="${display.photo}" alt="${display.name}">` : ''}
+                                                    ${display.photo ? `<img src="${display.photo}" alt="${display.name}" onerror="this.style.display='none';this.parentElement.textContent='👤'">` : '👤'}
                                                 </div>
                                                 <div class="athlete-details">
                                                     <div class="athlete-name">${display.name}</div>
                                                     <div class="athlete-country">
-                                                        <span>${display.country || '🌍'}</span>
+                                                        <span>${display.country || ''}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -503,7 +518,7 @@
                                         <td>
                                             <span class="gender-badge ${athlete.gender?.toLowerCase() || 'male'}">${athlete.gender || 'Male'}</span>
                                             <div style="margin-top: 5px; font-size: 0.85rem; color: rgba(255,255,255,0.6);">
-                                                ${athlete.age_group || 'N/A'} • ${athlete.weight || 0}kg • ${athlete.belt_level || 'N/A'}
+                                                ${athlete.age_group || 'N/A'} • ${weightDisplay} • ${athlete.belt_level || 'N/A'}
                                             </div>
                                             ${athlete.gi_type ? `<div style="font-size: 0.8rem; color: var(--primary-blue); margin-top: 3px;">${athlete.gi_type}</div>` : ''}
                                             ${editBtn}
@@ -540,7 +555,7 @@
             }
             
             const filteredAthletes = allAthletes.filter(athlete => 
-                (athlete.player_name || '').toLowerCase().includes(searchTerm) ||
+                (athlete.athletes?.full_name || athlete.player_name || '').toLowerCase().includes(searchTerm) ||
                 (athlete.team || '').toLowerCase().includes(searchTerm) ||
                 (athlete.age_group || '').toLowerCase().includes(searchTerm) ||
                 (athlete.belt_level || '').toLowerCase().includes(searchTerm)
@@ -626,7 +641,6 @@
             updateEditWeightOptions(this.value, athlete?.gender || 'Male');
         });
 
-        // ✅ تم التعديل: إزالة weight_class
         document.getElementById('editForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const participantId = document.getElementById('editParticipantId').value;
@@ -642,11 +656,10 @@
             const weightSelect = document.getElementById('editWeight');
             const selectedWeight = weightSelect.options[weightSelect.selectedIndex];
 
-            // ✅ إزالة weight_class لأن العمود غير موجود في الجدول
             const updateData = {
                 age_group: selectedAge.dataset.name || selectedAge.textContent,
                 weight: parseFloat(selectedWeight.dataset.minWeight || 0),
-                // weight_class: selectedWeight.value,  //  تم الحذف
+                weight_class: selectedWeight.value,
                 weight_class_id: selectedWeight.dataset.weightId || null,
                 belt_level: document.getElementById('editBelt').value,
                 gi_type: document.getElementById('editGiType').value
@@ -662,6 +675,7 @@
                 
                 alert('✅ Registration updated successfully!');
                 closeEditModal();
+                // ✅ إعادة تحميل البيانات بالكامل بعد التعديل
                 await loadTournamentAndAthletes();
             } catch (err) {
                 console.error(err);
