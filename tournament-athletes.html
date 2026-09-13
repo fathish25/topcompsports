@@ -251,6 +251,7 @@
         let refAgeDivisions = [];
         let refWeightClasses = [];
         let refBeltLevels = [];
+        let athletesData = {}; // ✅ تخزين بيانات اللاعبين
 
         window.onload = async function() {
             await checkUserStatus();
@@ -328,25 +329,41 @@
                     return;
                 }
 
-                // ✅ جلب البيانات مع JOIN جدول athletes للحصول على الصورة
-                const { data: athletes, error: athletesError } = await dbClient
+                // ✅ جلب المشاركين بدون JOIN
+                const { data: participants, error: participantsError } = await dbClient
                     .from('tournament_participants')
-                    .select(`
-                        *,
-                        athletes (
-                            full_name,
-                            country,
-                            profile_picture_url
-                        )
-                    `)
+                    .select('*')
                     .eq('tournament_id', tournamentId);
 
-                if (athletesError) {
-                    showError('Error loading athletes: ' + athletesError.message);
+                if (participantsError) {
+                    showError('Error loading athletes: ' + participantsError.message);
                     return;
                 }
 
-                allAthletes = athletes || [];
+                // ✅ جلب بيانات اللاعبين من جدول athletes بشكل منفصل
+                const userIds = participants.map(p => p.user_id).filter(id => id);
+                let athletesMap = {};
+                
+                if (userIds.length > 0) {
+                    const { data: athletes, error: athletesError } = await dbClient
+                        .from('athletes')
+                        .select('user_id, full_name, country, profile_picture_url')
+                        .in('user_id', userIds);
+                    
+                    if (!athletesError && athletes) {
+                        athletesMap = {};
+                        athletes.forEach(a => {
+                            athletesMap[a.user_id] = a;
+                        });
+                    }
+                }
+
+                // ✅ دمج البيانات
+                allAthletes = participants.map(p => ({
+                    ...p,
+                    athleteData: athletesMap[p.user_id] || {}
+                }));
+
                 renderTournament(tournament);
                 renderAthletes();
             } catch (error) {
@@ -420,8 +437,8 @@
         }
 
         function getAthleteDisplayData(athlete) {
-            // ✅ جلب البيانات من جدول athletes المرتبط
-            const athleteData = athlete.athletes || {};
+            // ✅ جلب البيانات من athleteData المخزنة
+            const athleteData = athlete.athleteData || {};
             return {
                 name: athleteData.full_name || athlete.player_name || 'Unknown',
                 country: athleteData.country || athlete.country || '',
@@ -449,7 +466,6 @@
         function groupAthletesByDivision(athletes) {
             const grouped = {};
             athletes.forEach(athlete => {
-                // ✅ استخدام weight_class إذا موجود، иначе استخدام weight
                 const weightDisplay = athlete.weight_class || `${athlete.weight || 0}kg`;
                 const key = `${athlete.age_group || 'Unknown'}|${athlete.gender || 'Unknown'}|${athlete.belt_level || 'Unknown'}|${weightDisplay}`;
                 if (!grouped[key]) grouped[key] = [];
@@ -494,7 +510,6 @@
                                     const editBtn = isMyRecord ? 
                                         `<button class="btn-edit-own" onclick="openEditModal('${athlete.id}')">✏️ Edit My Data</button>` : '';
                                     
-                                    // ✅ عرض weight_class إذا موجود، иначе weight
                                     const weightDisplay = athlete.weight_class || `${athlete.weight || 0}kg`;
                                     
                                     return `
@@ -555,7 +570,7 @@
             }
             
             const filteredAthletes = allAthletes.filter(athlete => 
-                (athlete.athletes?.full_name || athlete.player_name || '').toLowerCase().includes(searchTerm) ||
+                (athlete.athleteData?.full_name || athlete.player_name || '').toLowerCase().includes(searchTerm) ||
                 (athlete.team || '').toLowerCase().includes(searchTerm) ||
                 (athlete.age_group || '').toLowerCase().includes(searchTerm) ||
                 (athlete.belt_level || '').toLowerCase().includes(searchTerm)
@@ -675,7 +690,6 @@
                 
                 alert('✅ Registration updated successfully!');
                 closeEditModal();
-                // ✅ إعادة تحميل البيانات بالكامل بعد التعديل
                 await loadTournamentAndAthletes();
             } catch (err) {
                 console.error(err);
