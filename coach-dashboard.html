@@ -57,7 +57,7 @@
         
         .profile-card { background: var(--white); border: 2px solid #E2E8F0; border-radius: 16px; padding: 30px; text-align: center; }
         .profile-photo { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 0 auto 20px; border: 4px solid var(--accent-yellow); }
-        .profile-photo-placeholder { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; border: 4px solid var(--accent-yellow); background: var(--gradient-blue); display: flex; align-items: center; justify-content: center; font-size: 48px; color: var(--white); }
+        .profile-photo-placeholder { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; border: 4px solid var(--accent-yellow); background: var(--gradient-blue); display: flex; align-items: center; justify-content: center; font-size: 48px; color: var(--white); overflow: hidden; }
         .profile-name { font-size: 24px; font-weight: bold; margin-bottom: 5px; color: var(--dark-blue); }
         .profile-role { color: var(--primary-blue); font-size: 14px; margin-bottom: 20px; font-weight: 600; }
         .profile-info { text-align: left; margin-top: 20px; }
@@ -429,9 +429,10 @@
             document.getElementById('profileEmail').textContent = coach.email;
             document.getElementById('profileCountry').textContent = coach.country || '-';
 
+            // ✅ التعديل هنا: عرض الصورة داخل الـ div بدون حدود إضافية
+            const photoContainer = document.getElementById('profilePhotoContainer');
             if (coach.profile_photo_url) {
-                document.getElementById('profilePhotoContainer').innerHTML = 
-                    `<img src="${coach.profile_photo_url}" alt="${coach.full_name}" class="profile-photo">`;
+                photoContainer.innerHTML = `<img src="${coach.profile_photo_url}" alt="${coach.full_name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
             }
 
             await loadDashboard();
