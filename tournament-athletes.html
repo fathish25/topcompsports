@@ -1,423 +1,620 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اللاعبون - TopCompSports</title>
+    <title>Athletes - Tournament Details - TopCompSports</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        :root {
+            --primary-blue: #0066CC;
+            --dark-blue: #003366;
+            --accent-yellow: #FFB800;
+            --black: #0A0A0A;
+            --dark-gray: #1A1A1A;
+            --medium-gray: #2A2A2A;
+            --light-gray: #3A3A3A;
+            --white: #FFFFFF;
+            --light-bg: #F5F7FA;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0a0e17; color: #fff; min-height: 100vh; }
-        .navbar { background: #151d2b; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1c40f; }
-        .navbar-brand { display: flex; align-items: center; gap: 10px; font-size: 1.5rem; font-weight: bold; color: #f1c40f; }
-        .navbar-menu { display: flex; gap: 20px; align-items: center; }
-        .navbar-menu a { color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 6px; transition: all 0.3s; }
-        .navbar-menu a:hover { background: rgba(241,196,15,0.2); color: #f1c40f; }
-        .navbar-menu a.active { background: #f1c40f; color: #0a0e17; }
-        .btn-logout { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-        .btn-logout:hover { background: #ef4444; color: #fff; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
-        .tournament-header { background: #151d2b; padding: 25px; border-radius: 12px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .tournament-info { display: flex; gap: 20px; align-items: center; }
-        .tournament-logo { width: 80px; height: 80px; border-radius: 50%; background: #2a3548; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
-        .tournament-name { font-size: 1.8rem; font-weight: bold; color: #f1c40f; }
-        .tournament-date { color: rgba(255,255,255,0.6); margin-top: 5px; }
-        .btn-register { background: #f1c40f; color: #0a0e17; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold; transition: all 0.3s; }
-        .btn-register:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241,196,15,0.3); }
-        .tabs { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; }
-        .tab { padding: 12px 24px; background: rgba(255,255,255,0.05); border-radius: 8px 8px 0 0; cursor: pointer; transition: all 0.3s; text-decoration: none; color: #fff; }
-        .tab:hover { background: rgba(241,196,15,0.1); }
-        .tab.active { background: #f1c40f; color: #0a0e17; font-weight: bold; }
-        .athletes-section { background: #151d2b; padding: 25px; border-radius: 12px; }
-        .section-title { font-size: 2rem; font-weight: bold; margin-bottom: 20px; color: #f1c40f; }
-        .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .filter-btn { padding: 10px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 6px; cursor: pointer; transition: all 0.3s; }
-        .filter-btn:hover { background: rgba(241,196,15,0.2); border-color: #f1c40f; }
-        .filter-btn.active { background: #f1c40f; color: #0a0e17; border-color: #f1c40f; }
-        .search-box { width: 100%; padding: 12px; background: #1a1f2e; border: 2px solid rgba(255,255,255,0.1); color: #fff; border-radius: 8px; margin-bottom: 20px; font-size: 1rem; }
-        .search-box:focus { outline: none; border-color: #f1c40f; }
-        .athlete-card { background: #1a1f2e; padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); }
-        .athlete-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-        .athlete-name { font-size: 1.2rem; font-weight: bold; color: #f1c40f; }
-        .athlete-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .detail-item { padding: 10px; background: rgba(255,255,255,0.05); border-radius: 6px; }
-        .detail-label { color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 5px; }
-        .detail-value { color: #fff; font-weight: bold; }
-        .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-        .btn-edit { background: rgba(59,130,246,0.2); border: 1px solid #3b82f6; color: #3b82f6; padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all 0.3s; }
-        .btn-edit:hover { background: #3b82f6; color: #fff; }
-        .btn-delete { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all 0.3s; }
-        .btn-delete:hover { background: #ef4444; color: #fff; }
-        .btn-edit-profile { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all 0.3s; }
-        .btn-edit-profile:hover { background: #10b981; color: #fff; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
+        img { max-width: 100%; height: auto; }
+
+        /* Header */
+        .header { background: var(--black); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-blue); position: sticky; top: 0; z-index: 1000; }
+        .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .logo-svg { width: 50px; height: 50px; }
+        .logo-text { font-size: 28px; font-weight: bold; color: var(--primary-blue); }
+        .nav { display: flex; gap: 30px; align-items: center; }
+        .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; transition: all 0.3s; font-weight: 600; }
+        .nav a:hover { color: var(--accent-yellow); }
+
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 0.95rem; text-decoration: none; display: inline-block; }
+        .btn-login { background: var(--primary-blue); color: var(--white); }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.4); }
+        .btn-logout { background: transparent; border: 2px solid var(--white); color: var(--white); }
+
+        .lang-switcher { display: flex; gap: 5px; background: var(--medium-gray); padding: 5px; border-radius: 8px; }
+        .lang-btn { padding: 8px 15px; border: none; background: transparent; color: var(--white); cursor: pointer; border-radius: 6px; font-weight: bold; }
+        .lang-btn.active { background: var(--primary-blue); }
+
+        /* Tournament Header */
+        .tournament-header { background: var(--dark-gray); padding: 20px 50px; border-bottom: 1px solid var(--medium-gray); }
+        .tournament-header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .tournament-info { display: flex; align-items: center; gap: 20px; }
+        .tournament-logo { width: 60px; height: 60px; border-radius: 10px; overflow: hidden; background: var(--medium-gray); }
+        .tournament-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .tournament-title h1 { color: var(--white); font-size: 1.5rem; font-weight: 700; margin-bottom: 5px; }
+        .tournament-title p { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+        .tournament-actions { display: flex; gap: 15px; align-items: center; }
+        .btn-register { background: var(--accent-yellow); color: var(--black); padding: 10px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .btn-register:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,184,0,0.4); }
+
+        /* Tabs */
+        .tabs-container { background: var(--dark-gray); border-bottom: 1px solid var(--medium-gray); position: sticky; top: 73px; z-index: 999; }
+        .tabs { max-width: 1400px; margin: 0 auto; display: flex; gap: 5px; padding: 0 50px; overflow-x: auto; }
+        .tab { padding: 15px 25px; color: rgba(255,255,255,0.6); text-decoration: none; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.3s; white-space: nowrap; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .tab:hover { color: var(--white); }
+        .tab.active { color: var(--white); border-bottom-color: var(--accent-yellow); }
+
+        /* Main Content */
+        .main-content { max-width: 1400px; margin: 0 auto; padding: 40px 50px; }
+
+        /* Athletes Header */
+        .athletes-header { margin-bottom: 30px; }
+        .athletes-header h2 { font-size: 2rem; font-weight: 900; color: var(--white); margin-bottom: 20px; }
+        
+        .filters { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 30px; }
+        .filter-btn { padding: 8px 16px; background: var(--medium-gray); color: var(--white); border: 1px solid var(--light-gray); border-radius: 6px; cursor: pointer; transition: all 0.3s; font-size: 0.9rem; }
+        .filter-btn:hover { background: var(--light-gray); }
+        .filter-btn.active { background: var(--primary-blue); border-color: var(--primary-blue); }
+
+        .search-bar { display: flex; gap: 15px; margin-bottom: 30px; }
+        .search-input { flex: 1; padding: 12px 20px; background: var(--medium-gray); border: 1px solid var(--light-gray); border-radius: 8px; color: var(--white); font-size: 1rem; }
+        .search-input:focus { outline: none; border-color: var(--primary-blue); }
+        .search-input::placeholder { color: rgba(255,255,255,0.4); }
+
+        /* Division Groups */
+        .division-group { margin-bottom: 40px; }
+        .division-title { font-size: 1.3rem; font-weight: 700; color: var(--white); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--primary-blue); }
+        .division-title span { color: var(--accent-yellow); }
+
+        /* Athletes Table */
+        .athletes-table { width: 100%; border-collapse: collapse; background: var(--dark-gray); border-radius: 10px; overflow: hidden; }
+        .athletes-table thead { background: var(--medium-gray); }
+        .athletes-table th { padding: 15px 20px; text-align: left; color: rgba(255,255,255,0.7); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
+        .athletes-table td { padding: 15px 20px; border-bottom: 1px solid var(--medium-gray); color: var(--white); vertical-align: middle; }
+        .athletes-table tr:hover { background: var(--light-gray); }
+        .athletes-table tr:last-child td { border-bottom: none; }
+
+        .athlete-info { display: flex; align-items: center; gap: 15px; }
+        .athlete-avatar { width: 45px; height: 45px; border-radius: 50%; overflow: hidden; background: var(--medium-gray); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+        .athlete-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .athlete-details { display: flex; flex-direction: column; gap: 3px; }
+        .athlete-name { font-weight: 700; color: var(--white); font-size: 1rem; }
+        .athlete-country { display: flex; align-items: center; gap: 5px; font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+
+        .academy-link { color: var(--primary-blue); text-decoration: none; font-size: 0.9rem; }
+        .academy-link:hover { text-decoration: underline; }
+
+        .gender-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+        .gender-badge.male { background: rgba(0,102,204,0.2); color: var(--primary-blue); }
+        .gender-badge.female { background: rgba(255,105,180,0.2); color: #FF69B4; }
+
+        .approved-count { color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-top: 10px; }
+
+        .btn-edit-own { background: var(--accent-yellow); color: var(--black); border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; margin-top: 8px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-edit-own:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(255,184,0,0.3); }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
         .modal.show { display: flex; }
-        .modal-content { background: #151d2b; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; border: 2px solid #f1c40f; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #2a3548; }
-        .modal-title { font-size: 1.5rem; color: #f1c40f; }
-        .modal-close { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 8px; font-weight: 600; }
-        .form-group select { width: 100%; background: #1a1f2e; border: 2px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; font-size: 1rem; }
-        .form-group select:focus { outline: none; border-color: #f1c40f; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn-primary { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; padding: 14px 28px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; width: 100%; transition: all 0.3s; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241,196,15,0.3); }
-        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; padding: 14px 28px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; width: 100%; margin-top: 10px; transition: all 0.3s; }
-        .btn-secondary:hover { background: rgba(255,255,255,0.2); }
-        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; text-align: center; }
-        .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
-        .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
-        .alert.show { display: block; }
-        .no-athletes { text-align: center; padding: 40px; color: rgba(255,255,255,0.6); }
-        .my-participant-badge { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; margin-right: 10px; }
+        .modal-content { background: var(--dark-gray); padding: 30px; border-radius: 12px; max-width: 500px; width: 100%; border: 2px solid var(--primary-blue); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--medium-gray); }
+        .modal-header h3 { color: var(--white); font-size: 1.3rem; }
+        .modal-close { background: none; border: none; color: var(--white); font-size: 1.8rem; cursor: pointer; line-height: 1; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .form-group label { display: block; color: rgba(255,255,255,0.7); margin-bottom: 5px; font-size: 0.9rem; font-weight: 600; }
+        .form-group select { width: 100%; padding: 10px; background: var(--medium-gray); border: 1px solid var(--light-gray); border-radius: 6px; color: var(--white); font-size: 0.95rem; }
+        .form-group select:focus { outline: none; border-color: var(--primary-blue); }
+        .btn-save { width: 100%; background: var(--primary-blue); color: var(--white); padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: all 0.3s; margin-top: 10px; }
+        .btn-save:hover { background: var(--dark-blue); }
+
+        /* Loading & Empty */
+        .loading { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); font-size: 1.2rem; }
+        .empty-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); }
+        .empty-state .icon { font-size: 5rem; margin-bottom: 20px; opacity: 0.5; }
+
+        /* Footer */
+        .footer { background: var(--black); padding: 30px 50px; color: rgba(255,255,255,0.6); text-align: center; border-top: 1px solid var(--medium-gray); margin-top: 60px; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .header { padding: 15px 30px; }
+            .tournament-header { padding: 20px 30px; }
+            .tabs { padding: 0 30px; }
+            .main-content { padding: 30px 30px; }
+        }
+
         @media (max-width: 768px) {
-            .tournament-header { flex-direction: column; gap: 20px; text-align: center; }
-            .form-row { grid-template-columns: 1fr; }
-            .athlete-details { grid-template-columns: 1fr; }
-            .athlete-header { flex-direction: column; align-items: flex-start; }
+            .header { padding: 12px 20px; flex-direction: column; gap: 15px; }
+            .nav { flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .tournament-header { padding: 15px 20px; }
+            .tournament-info { flex-direction: column; align-items: flex-start; }
+            .tournament-title h1 { font-size: 1.2rem; }
+            .tabs { padding: 0 20px; overflow-x: auto; }
+            .main-content { padding: 20px 20px; }
+            .athletes-header h2 { font-size: 1.5rem; }
+            .athletes-table { font-size: 0.85rem; }
+            .athletes-table th, .athletes-table td { padding: 10px 12px; }
+            .athlete-avatar { width: 35px; height: 35px; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .header { padding: 10px 15px; }
+            .logo-text { font-size: 22px; }
+            .tournament-header { padding: 15px; }
+            .tournament-actions { flex-direction: column; width: 100%; }
+            .tournament-actions .btn { width: 100%; text-align: center; }
+            .tabs { padding: 0 15px; }
+            .main-content { padding: 15px 15px; }
+            .athletes-table { display: block; overflow-x: auto; }
+            .athletes-table th, .athletes-table td { padding: 8px 10px; font-size: 0.8rem; }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-brand">
-            <div style="width: 40px; height: 40px; background: #f1c40f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #0a0e17;">T</div>
-            TopCompSports
+    <header class="header">
+        <div class="logo" onclick="window.location.href='index.html'">
+            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#0066CC;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#003366;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <circle cx="50" cy="50" r="45" fill="url(#logoGrad)" stroke="#FFB800" stroke-width="3"/>
+                <text x="50" y="65" font-family="Arial Black, sans-serif" font-size="45" font-weight="900" fill="#FFB800" text-anchor="middle">T</text>
+            </svg>
+            <div class="logo-text">TopCompSports</div>
         </div>
-        <div class="navbar-menu">
+        
+        <nav class="nav">
             <a href="index.html">Home</a>
             <a href="tournaments.html">Tournaments</a>
-            <a href="profile.html">My Profile</a>
-            <button class="btn-logout" onclick="logout()">Logout</button>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div id="alert" class="alert"></div>
-
-        <div class="tournament-header">
-            <div class="tournament-info">
-                <div class="tournament-logo">🥋</div>
-                <div>
-                    <div class="tournament-name" id="tournamentName">جاري التحميل...</div>
-                    <div class="tournament-date" id="tournamentDate"></div>
-                </div>
-            </div>
-            <a href="player-registration.html?tournament_id=" class="btn-register" id="registerBtn">Register</a>
-        </div>
-
-        <div class="tabs">
-            <a href="tournament-details.html?tournament_id=" class="tab" id="tabInfo">Information</a>
-            <a href="tournament-athletes.html?tournament_id=" class="tab active" id="tabAthletes">Athletes</a>
-            <a href="tournament-brackets.html?tournament_id=" class="tab" id="tabBrackets">Brackets</a>
-            <a href="tournament-matches.html?tournament_id=" class="tab" id="tabMatches">Matches</a>
-            <a href="tournament-schedule.html?tournament_id=" class="tab" id="tabSchedule">Schedule</a>
-            <a href="tournament-results.html?tournament_id=" class="tab" id="tabResults">Results</a>
-        </div>
-
-        <div class="athletes-section">
-            <h2 class="section-title">Athletes</h2>
             
-            <div class="filters">
-                <button class="filter-btn active" onclick="filterAthletes('all')">All Athletes</button>
-                <button class="filter-btn" onclick="filterAthletes('Gi')">Gi</button>
-                <button class="filter-btn" onclick="filterAthletes('No-Gi')">No-Gi</button>
+            <div id="userSection" class="user-section" style="display: none; gap: 15px; align-items: center;">
+                <a href="my-profile.html" style="color: var(--accent-yellow); text-decoration: none;">My Profile</a>
+                <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
             </div>
+            
+            <a href="login.html" id="loginBtn" class="btn btn-login">Login</a>
+            
+            <div class="lang-switcher">
+                <button class="lang-btn" onclick="changeLanguage('ar')" id="btn-ar">عربي</button>
+                <button class="lang-btn active" onclick="changeLanguage('en')" id="btn-en">English</button>
+            </div>
+        </nav>
+    </header>
 
-            <input type="text" class="search-box" id="searchBox" placeholder="Search athlete or division..." oninput="searchAthletes()">
-
-            <div id="athletesList"></div>
-        </div>
+    <div id="tournamentContent">
+        <div class="loading">Loading tournament details...</div>
     </div>
 
-    <!-- Modal للتعديل -->
+    <!-- Edit Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">تعديل بيانات المشاركة</h3>
-                <button class="modal-close" onclick="closeEditModal()">×</button>
+                <h3>Edit My Registration</h3>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
             </div>
             <form id="editForm">
                 <input type="hidden" id="editParticipantId">
-                
-                <div class="form-row">
+                <div class="form-grid">
                     <div class="form-group">
-                        <label>الفئة العمرية *</label>
-                        <select id="editAgeGroup" required onchange="updateEditWeightOptions()">
-                            <option value="">اختر الفئة...</option>
+                        <label>Age Division *</label>
+                        <select id="editAgeGroup" required>
+                            <option value="">Loading...</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>الوزن (كجم) *</label>
+                        <label>Weight Class *</label>
                         <select id="editWeight" required>
-                            <option value="">اختر الوزن...</option>
+                            <option value="">Select Age First</option>
                         </select>
                     </div>
                 </div>
-
-                <div class="form-row">
+                <div class="form-grid">
                     <div class="form-group">
-                        <label>الحزام *</label>
+                        <label>Belt Level *</label>
                         <select id="editBelt" required>
-                            <option value="">اختر الحزام...</option>
+                            <option value="">Loading...</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>نوع المشاركة *</label>
+                        <label>Gi Type *</label>
                         <select id="editGiType" required>
-                            <option value="Gi">بدلة (Gi)</option>
-                            <option value="No-Gi">بدون بدلة (No-Gi)</option>
+                            <option value="Gi">Gi</option>
+                            <option value="No-Gi">No-Gi</option>
                         </select>
                     </div>
                 </div>
-
-                <button type="submit" class="btn-primary">✅ حفظ التعديلات</button>
-                <button type="button" class="btn-secondary" onclick="closeEditModal()">إلغاء</button>
+                <button type="submit" class="btn-save">Save Changes</button>
             </form>
         </div>
     </div>
 
+    <footer class="footer">
+        <p>© 2026 TopCompSports - All rights reserved</p>
+    </footer>
+
     <script>
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
-        
-        const supabaseClient = window.supabaseClient || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        let tournamentId = null;
-        let athletes = [];
-        let currentFilter = 'all';
-        let ageDivisions = [];
-        let weightCategories = [];
-        let beltLevels = [];
-        let currentUserId = null;
+        const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        async function loadTournamentData() {
+        let currentLang = localStorage.getItem('lang') || 'en';
+        let tournamentId = null;
+        let allAthletes = [];
+        let currentFilter = 'all';
+        let currentUser = null;
+        
+        // Reference data for edit modal
+        let refAgeDivisions = [];
+        let refWeightClasses = [];
+        let refBeltLevels = [];
+
+        window.onload = async function() {
+            await checkUserStatus();
+            await loadReferenceData();
+            
             const urlParams = new URLSearchParams(window.location.search);
             tournamentId = urlParams.get('tournament_id');
             
             if (!tournamentId) {
-                showAlert('error', '❌ بيانات غير صحيحة!');
-                return;
-            }
-
-            // تحديث الروابط
-            document.querySelectorAll('a[href*="tournament_id"]').forEach(link => {
-                link.href += tournamentId;
-            });
-            document.getElementById('registerBtn').href += tournamentId;
-
-            // جلب بيانات البطولة
-            const { data: tournament, error } = await supabaseClient
-                .from('tournaments')
-                .select('*')
-                .eq('id', tournamentId)
-                .single();
-
-            if (error || !tournament) {
-                showAlert('error', ' لم يتم العثور على البطولة!');
-                return;
-            }
-
-            document.getElementById('tournamentName').textContent = tournament.name || 'Test 1';
-            document.getElementById('tournamentDate').textContent = tournament.date || 'Oct 10, 2026';
-
-            // التحقق من تسجيل الدخول
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (user) {
-                currentUserId = user.id;
-            }
-
-            // جلب البيانات المرجعية
-            await Promise.all([
-                loadAgeDivisions(),
-                loadWeightCategories(),
-                loadBeltLevels()
-            ]);
-
-            // جلب اللاعبين
-            await loadAthletes();
-        }
-
-        async function loadAgeDivisions() {
-            const { data } = await supabaseClient
-                .from('ajp_age_divisions')
-                .select('*')
-                .order('min_age');
-            
-            ageDivisions = data || [];
-        }
-
-        async function loadWeightCategories() {
-            const { data } = await supabaseClient
-                .from('ajp_weight_classes')
-                .select('*')
-                .order('min_weight');
-            
-            weightCategories = data || [];
-        }
-
-        async function loadBeltLevels() {
-            const { data } = await supabaseClient
-                .from('ajp_belt_levels')
-                .select('*')
-                .order('sort_order');
-            
-            beltLevels = data || [];
-        }
-
-        async function loadAthletes() {
-            const { data, error } = await supabaseClient
-                .from('tournament_participants')
-                .select(`
-                    *,
-                    athletes (
-                        full_name,
-                        email,
-                        gender,
-                        country
-                    )
-                `)
-                .eq('tournament_id', tournamentId)
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                console.error('Error loading athletes:', error);
-                showAlert('error', '❌ خطأ في تحميل البيانات!');
-                return;
-            }
-
-            athletes = data || [];
-            displayAthletes();
-        }
-
-        function displayAthletes() {
-            const container = document.getElementById('athletesList');
-            
-            let filteredAthletes = athletes;
-            
-            if (currentFilter !== 'all') {
-                filteredAthletes = athletes.filter(a => a.gi_type === currentFilter);
-            }
-
-            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
-            if (searchTerm) {
-                filteredAthletes = filteredAthletes.filter(a => 
-                    a.player_name?.toLowerCase().includes(searchTerm) ||
-                    a.age_group?.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            if (filteredAthletes.length === 0) {
-                container.innerHTML = '<div class="no-athletes">لا يوجد لاعبون مسجلون</div>';
-                return;
-            }
-
-            container.innerHTML = filteredAthletes.map(athlete => {
-                // ✅ التحقق مما إذا كان اللاعب الحالي هو صاحب الحساب
-                const isMyProfile = currentUserId && athlete.user_id === currentUserId;
-                
-                return `
-                    <div class="athlete-card" style="${isMyProfile ? 'border: 2px solid #10b981;' : ''}">
-                        <div class="athlete-header">
-                            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                                <div class="athlete-name">${athlete.player_name || 'لاعب'}</div>
-                                ${isMyProfile ? '<span class="my-participant-badge">✓ مشاركتي</span>' : ''}
-                            </div>
-                            <div class="action-buttons">
-                                ${isMyProfile ? `
-                                    <button class="btn-edit-profile" onclick="openEditModal('${athlete.id}')">
-                                        ✏️ تعديل بياناتي
-                                    </button>
-                                ` : ''}
-                            </div>
-                        </div>
-                        <div class="athlete-details">
-                            <div class="detail-item">
-                                <div class="detail-label">الفئة العمرية</div>
-                                <div class="detail-value">${athlete.age_group || '-'}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">الوزن</div>
-                                <div class="detail-value">${athlete.weight_class || athlete.weight + 'kg' || '-'}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">الحزام</div>
-                                <div class="detail-value">${athlete.belt_level || '-'}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">نوع المشاركة</div>
-                                <div class="detail-value">${athlete.gi_type || '-'}</div>
-                            </div>
-                            <div class="detail-item">
-                                <div class="detail-label">الفريق</div>
-                                <div class="detail-value">${athlete.team || '-'}</div>
-                            </div>
-                        </div>
+                document.getElementById('tournamentContent').innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">❌</div>
+                        <p>Tournament not found</p>
                     </div>
                 `;
-            }).join('');
+                return;
+            }
+            
+            await loadTournamentAndAthletes();
+        };
+
+        async function checkUserStatus() {
+            const { data: { user } } = await dbClient.auth.getUser();
+            if (user) {
+                currentUser = user;
+                document.getElementById('userSection').style.display = 'flex';
+                document.getElementById('loginBtn').style.display = 'none';
+            } else {
+                currentUser = null;
+                document.getElementById('userSection').style.display = 'none';
+                document.getElementById('loginBtn').style.display = 'inline-block';
+            }
         }
 
-        function filterAthletes(type) {
-            currentFilter = type;
+        async function loadReferenceData() {
+            try {
+                const [ages, weights, belts] = await Promise.all([
+                    dbClient.from('ajp_age_divisions').select('*').order('min_age'),
+                    dbClient.from('ajp_weight_classes').select('*').order('min_weight'),
+                    dbClient.from('ajp_belt_levels').select('*').order('sort_order')
+                ]);
+                refAgeDivisions = ages.data || [];
+                refWeightClasses = weights.data || [];
+                refBeltLevels = belts.data || [];
+            } catch (error) {
+                console.error('Error loading reference data:', error);
+            }
+        }
+
+        function changeLanguage(lang) {
+            localStorage.setItem('lang', lang);
+            currentLang = lang;
+            document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            loadTournamentAndAthletes();
+        }
+
+        async function loadTournamentAndAthletes() {
+            try {
+                const { data: tournament, error: tournamentError } = await dbClient
+                    .from('tournaments')
+                    .select('*')
+                    .eq('id', tournamentId)
+                    .single();
+                
+                if (tournamentError || !tournament) {
+                    document.getElementById('tournamentContent').innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">❌</div>
+                            <p>Tournament not found</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Join with athletes table to get profile info safely
+                const { data: athletes, error: athletesError } = await dbClient
+                    .from('tournament_participants')
+                    .select(`
+                        *,
+                        athletes (
+                            full_name,
+                            country,
+                            profile_picture_url
+                        )
+                    `)
+                    .eq('tournament_id', tournamentId)
+                    .eq('status', 'approved')
+                    .order('age_group', { ascending: true });
+
+                if (athletesError) throw athletesError;
+
+                allAthletes = athletes || [];
+                renderTournament(tournament);
+                renderAthletes();
+            } catch (error) {
+                console.error('Error loading tournament:', error);
+                document.getElementById('tournamentContent').innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">❌</div>
+                        <p>Error loading tournament details</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderTournament(tournament) {
+            const isLoggedIn = !!currentUser;
+            const startDate = tournament.event_start_date || tournament.tournament_date || tournament.event_date;
+            const bannerImage = tournament.image_url || '';
+
+            const registerButton = isLoggedIn
+                ? `<button class="btn-register" onclick="window.location.href='player-registration.html?tournament_id=${tournamentId}'">Register</button>`
+                : `<button class="btn btn-login" onclick="window.location.href='login.html?redirect=tournament-details.html?tournament_id=${tournamentId}'">Login to Register</button>`;
+
+            document.getElementById('tournamentContent').innerHTML = `
+                <div class="tournament-header">
+                    <div class="tournament-header-content">
+                        <div class="tournament-info">
+                            <div class="tournament-logo">
+                                ${bannerImage ? `<img src="${bannerImage}" alt="${tournament.name}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:1.5rem;">🏆</div>'}
+                            </div>
+                            <div class="tournament-title">
+                                <h1>${tournament.name}</h1>
+                                <p>📅 ${startDate ? new Date(startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'TBD'}</p>
+                            </div>
+                        </div>
+                        <div class="tournament-actions">
+                            ${registerButton}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tabs-container">
+                    <div class="tabs">
+                        <a href="tournament-details.html?tournament_id=${tournamentId}" class="tab"><span>📋</span> Information</a>
+                        <a href="tournament-athletes.html?tournament_id=${tournamentId}" class="tab active"><span>👥</span> Athletes <span style="background:var(--accent-yellow);color:var(--black);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${allAthletes.length}</span></a>
+                        <a href="#" class="tab"><span>🏆</span> Brackets</a>
+                        <a href="#" class="tab"><span>⚔️</span> Matches</a>
+                        <a href="#" class="tab"><span>📅</span> Schedule</a>
+                        <a href="#" class="tab"><span>📊</span> Results</a>
+                    </div>
+                </div>
+
+                <div class="main-content">
+                    <div class="athletes-header">
+                        <h2>Athletes</h2>
+                        <div class="filters">
+                            <button class="filter-btn active" onclick="filterAthletes('all')">All Athletes</button>
+                            <button class="filter-btn" onclick="filterAthletes('Gi')">Gi</button>
+                            <button class="filter-btn" onclick="filterAthletes('No-Gi')">No-Gi</button>
+                        </div>
+                        <div class="search-bar">
+                            <input type="text" class="search-input" id="searchInput" placeholder="Search athlete or division..." oninput="searchAthletes()">
+                        </div>
+                    </div>
+                    <div id="athletesList"></div>
+                </div>
+            `;
+        }
+
+        function getAthleteDisplayData(athlete) {
+            return {
+                name: athlete.athletes?.full_name || athlete.player_name || 'Unknown',
+                country: athlete.athletes?.country || athlete.country || '',
+                photo: athlete.athletes?.profile_picture_url || athlete.profile_photo_url || ''
+            };
+        }
+
+        function renderAthletes() {
+            const athletesList = document.getElementById('athletesList');
+            
+            if (allAthletes.length === 0) {
+                athletesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">👥</div>
+                        <p>No athletes registered yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const groupedAthletes = groupAthletesByDivision(allAthletes);
+            renderGroupedAthletes(groupedAthletes);
+        }
+
+        function groupAthletesByDivision(athletes) {
+            const grouped = {};
+            athletes.forEach(athlete => {
+                const key = `${athlete.age_group}|${athlete.gender}|${athlete.belt_level}|${athlete.weight}kg`;
+                if (!grouped[key]) grouped[key] = [];
+                grouped[key].push(athlete);
+            });
+            return grouped;
+        }
+
+        function renderGroupedAthletes(groupedAthletes) {
+            const athletesList = document.getElementById('athletesList');
+            
+            if (Object.keys(groupedAthletes).length === 0) {
+                athletesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔍</div>
+                        <p>No athletes found</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            for (const [divisionKey, athletes] of Object.entries(groupedAthletes)) {
+                const [ageGroup, gender, belt, weight] = divisionKey.split('|');
+                const divisionTitle = `${gender} / ${ageGroup} / ${belt} / ${weight}`;
+                
+                html += `
+                    <div class="division-group">
+                        <h3 class="division-title">${divisionTitle}</h3>
+                        <table class="athletes-table">
+                            <thead>
+                                <tr>
+                                    <th>Athlete</th>
+                                    <th>Academy & Affiliation</th>
+                                    <th>Registration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${athletes.map(athlete => {
+                                    const display = getAthleteDisplayData(athlete);
+                                    const isMyRecord = currentUser && athlete.user_id === currentUser.id;
+                                    const editBtn = isMyRecord ? 
+                                        `<button class="btn-edit-own" onclick="openEditModal('${athlete.id}')">✏️ Edit My Data</button>` : '';
+                                    
+                                    return `
+                                    <tr>
+                                        <td>
+                                            <div class="athlete-info">
+                                                <div class="athlete-avatar">
+                                                    ${display.photo ? `<img src="${display.photo}" alt="${display.name}">` : '👤'}
+                                                </div>
+                                                <div class="athlete-details">
+                                                    <div class="athlete-name">${display.name}</div>
+                                                    <div class="athlete-country">
+                                                        <span>${display.country || '🌍'}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="#" class="academy-link">${athlete.team || 'Independent'}</a>
+                                        </td>
+                                        <td>
+                                            <span class="gender-badge ${athlete.gender.toLowerCase()}">${athlete.gender}</span>
+                                            <div style="margin-top: 5px; font-size: 0.85rem; color: rgba(255,255,255,0.6);">
+                                                ${athlete.age_group} • ${athlete.weight}kg • ${athlete.belt_level}
+                                            </div>
+                                            ${athlete.gi_type ? `<div style="font-size: 0.8rem; color: var(--primary-blue); margin-top: 3px;">${athlete.gi_type}</div>` : ''}
+                                            ${editBtn}
+                                        </td>
+                                    </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                        <div class="approved-count">Approved registrations: ${athletes.length}</div>
+                    </div>
+                `;
+            }
+            athletesList.innerHTML = html;
+        }
+
+        function filterAthletes(filter) {
+            currentFilter = filter;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            displayAthletes();
+            
+            let filteredAthletes = allAthletes;
+            if (filter !== 'all') {
+                filteredAthletes = allAthletes.filter(a => a.gi_type === filter);
+            }
+            renderGroupedAthletes(groupAthletesByDivision(filteredAthletes));
         }
 
         function searchAthletes() {
-            displayAthletes();
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            if (!searchTerm) {
+                renderAthletes();
+                return;
+            }
+            
+            const filteredAthletes = allAthletes.filter(athlete => 
+                (athlete.athletes?.full_name || athlete.player_name || '').toLowerCase().includes(searchTerm) ||
+                (athlete.team || '').toLowerCase().includes(searchTerm) ||
+                (athlete.age_group || '').toLowerCase().includes(searchTerm) ||
+                (athlete.belt_level || '').toLowerCase().includes(searchTerm)
+            );
+            renderGroupedAthletes(groupAthletesByDivision(filteredAthletes));
         }
 
-        // ✅ فتح Modal التعديل (فقط للاعب نفسه)
-        async function openEditModal(participantId) {
-            const athlete = athletes.find(a => a.id === participantId);
-            if (!athlete) return;
+        // ================= MODAL & EDIT LOGIC =================
 
-            // ✅ التحقق الأمني: التأكد من أن اللاعب يعدل بياناته فقط
-            if (athlete.user_id !== currentUserId) {
-                showAlert('error', '❌ لا يمكنك تعديل بيانات لاعب آخر!');
+        function openEditModal(participantId) {
+            if (!currentUser) return;
+            const athlete = allAthletes.find(a => a.id === participantId);
+            
+            // Security check: Ensure user can only edit their own record
+            if (!athlete || athlete.user_id !== currentUser.id) {
+                alert("Security Error: You can only edit your own registration.");
                 return;
             }
 
             document.getElementById('editParticipantId').value = participantId;
             document.getElementById('editGiType').value = athlete.gi_type || 'Gi';
 
-            // ملء قائمة الفئات
+            // Populate Age Divisions (only those that have weights)
             const ageSelect = document.getElementById('editAgeGroup');
-            ageSelect.innerHTML = '<option value="">اختر الفئة...</option>';
+            ageSelect.innerHTML = '<option value="">Select Age Division</option>';
+            const availableDivIds = [...new Set(refWeightClasses.map(w => w.age_division_id))];
+            const validAges = refAgeDivisions.filter(d => availableDivIds.includes(d.id));
             
-            const availableDivisionIds = [...new Set(weightCategories.map(w => w.age_division_id))];
-            const divisionsWithWeights = ageDivisions.filter(div => availableDivisionIds.includes(div.id));
-            
-            divisionsWithWeights.forEach(div => {
-                const option = document.createElement('option');
-                option.value = div.id;
-                option.textContent = div.name || `${div.min_age}-${div.max_age} سنة`;
-                ageSelect.appendChild(option);
+            validAges.forEach(div => {
+                const opt = document.createElement('option');
+                opt.value = div.id;
+                opt.textContent = div.name || `${div.min_age}-${div.max_age} yrs`;
+                opt.dataset.name = div.name;
+                ageSelect.appendChild(opt);
             });
 
-            // ملء قائمة الأحزمة
+            // Populate Belts
             const beltSelect = document.getElementById('editBelt');
-            beltSelect.innerHTML = '<option value="">اختر الحزام...</option>';
-            beltLevels.forEach(belt => {
-                const option = document.createElement('option');
-                option.value = belt.name;
-                option.textContent = belt.name;
-                beltSelect.appendChild(option);
+            beltSelect.innerHTML = '<option value="">Select Belt</option>';
+            refBeltLevels.forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b.name;
+                opt.textContent = b.name;
+                beltSelect.appendChild(opt);
             });
 
-            // تعيين القيم الحالية
-            const currentDivision = ageDivisions.find(d => d.name === athlete.age_group);
-            if (currentDivision) {
-                ageSelect.value = currentDivision.id;
-                await updateEditWeightOptions();
-                
-                const weightSelect = document.getElementById('editWeight');
-                weightSelect.value = athlete.weight_class || '';
+            // Set current values
+            const currentDiv = validAges.find(d => d.name === athlete.age_group);
+            if (currentDiv) {
+                ageSelect.value = currentDiv.id;
+                updateEditWeightOptions(currentDiv.id, athlete.gender);
+                setTimeout(() => {
+                    document.getElementById('editWeight').value = athlete.weight_class || '';
+                }, 100);
             }
-
             beltSelect.value = athlete.belt_level || '';
 
             document.getElementById('editModal').classList.add('show');
@@ -427,94 +624,79 @@
             document.getElementById('editModal').classList.remove('show');
         }
 
-        // ✅ تحديث خيارات الوزن في Modal التعديل
-        async function updateEditWeightOptions() {
-            const selectedDivisionId = document.getElementById('editAgeGroup').value;
+        function updateEditWeightOptions(divisionId, gender) {
             const weightSelect = document.getElementById('editWeight');
-            
-            weightSelect.innerHTML = '<option value="">اختر الوزن...</option>';
-            
-            if (!selectedDivisionId) return;
+            weightSelect.innerHTML = '<option value="">Select Weight</option>';
+            if (!divisionId) return;
 
-            const participantId = document.getElementById('editParticipantId').value;
-            const athlete = athletes.find(a => a.id === participantId);
-            const targetGender = athlete?.gender === 'Female' ? 'Women' : 'Men';
+            const targetGender = gender === 'Female' ? 'Women' : 'Men';
+            const filtered = refWeightClasses.filter(w => w.age_division_id === divisionId && w.gender === targetGender);
+            const fallback = filtered.length > 0 ? filtered : refWeightClasses.filter(w => w.age_division_id === divisionId);
 
-            const filteredWeights = weightCategories.filter(w => 
-                w.age_division_id === selectedDivisionId && w.gender === targetGender
-            );
-
-            const weightsToShow = filteredWeights.length > 0 ? filteredWeights : 
-                weightCategories.filter(w => w.age_division_id === selectedDivisionId);
-
-            weightsToShow.forEach(w => {
-                const option = document.createElement('option');
-                option.value = w.name;
-                option.textContent = `${w.name} (${w.min_weight}-${w.max_weight} كجم)`;
-                option.dataset.weightId = w.id;
-                option.dataset.minWeight = w.min_weight;
-                weightSelect.appendChild(option);
+            fallback.forEach(w => {
+                const opt = document.createElement('option');
+                opt.value = w.name;
+                opt.textContent = `${w.name} (${w.min_weight}-${w.max_weight} kg)`;
+                opt.dataset.weightId = w.id;
+                opt.dataset.minWeight = w.min_weight;
+                weightSelect.appendChild(opt);
             });
         }
 
-        // ✅ حفظ التعديلات
+        document.getElementById('editAgeGroup').addEventListener('change', function() {
+            const athlete = allAthletes.find(a => a.id === document.getElementById('editParticipantId').value);
+            updateEditWeightOptions(this.value, athlete?.gender || 'Male');
+        });
+
         document.getElementById('editForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const participantId = document.getElementById('editParticipantId').value;
+            const athlete = allAthletes.find(a => a.id === participantId);
             
-            // ✅ التحقق الأمني مرة أخرى
-            const athlete = athletes.find(a => a.id === participantId);
-            if (!athlete || athlete.user_id !== currentUserId) {
-                showAlert('error', '❌ لا يمكنك تعديل بيانات لاعب آخر!');
+            // Double security check before submission
+            if (!athlete || athlete.user_id !== currentUser.id) {
+                alert("Security Error: You can only edit your own registration.");
                 return;
             }
 
-            const weightSelect = document.getElementById('editWeight');
-            const selectedWeightOption = weightSelect.options[weightSelect.selectedIndex];
             const ageSelect = document.getElementById('editAgeGroup');
-            const selectedDivision = ageDivisions.find(d => d.id === ageSelect.value);
+            const selectedAge = ageSelect.options[ageSelect.selectedIndex];
+            const weightSelect = document.getElementById('editWeight');
+            const selectedWeight = weightSelect.options[weightSelect.selectedIndex];
 
-            const formData = {
-                age_group: selectedDivision?.name || '',
-                weight: parseFloat(selectedWeightOption.dataset.minWeight || 0),
-                weight_class: selectedWeightOption.value,
-                weight_class_id: selectedWeightOption.dataset.weightId || null,
+            const updateData = {
+                age_group: selectedAge.dataset.name || selectedAge.textContent,
+                weight: parseFloat(selectedWeight.dataset.minWeight || 0),
+                weight_class: selectedWeight.value,
+                weight_class_id: selectedWeight.dataset.weightId || null,
                 belt_level: document.getElementById('editBelt').value,
                 gi_type: document.getElementById('editGiType').value
             };
 
             try {
-                const { error } = await supabaseClient
+                const { error } = await dbClient
                     .from('tournament_participants')
-                    .update(formData)
+                    .update(updateData)
                     .eq('id', participantId);
-
+                
                 if (error) throw error;
-
-                showAlert('success', '✅ تم تحديث البيانات بنجاح!');
+                
+                alert('✅ Registration updated successfully!');
                 closeEditModal();
-                await loadAthletes();
-
-            } catch (error) {
-                console.error('Update error:', error);
-                showAlert('error', ' خطأ في التحديث: ' + error.message);
+                await loadTournamentAndAthletes(); // Reload to reflect changes
+            } catch (err) {
+                console.error(err);
+                alert('❌ Error updating: ' + err.message);
             }
         });
 
-        function showAlert(type, message) {
-            const alert = document.getElementById('alert');
-            alert.className = `alert alert-${type} show`;
-            alert.textContent = message;
-            setTimeout(() => alert.classList.remove('show'), 3000);
+        async function handleLogout() {
+            await dbClient.auth.signOut();
+            currentUser = null;
+            document.getElementById('userSection').style.display = 'none';
+            document.getElementById('loginBtn').style.display = 'inline-block';
+            window.location.reload();
         }
-
-        function logout() {
-            supabaseClient.auth.signOut();
-            window.location.href = 'login.html';
-        }
-
-        window.onload = loadTournamentData;
     </script>
 </body>
 </html>
