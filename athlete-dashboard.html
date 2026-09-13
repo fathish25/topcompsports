@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TopCompSports - Athlete Dashboard</title>
+    <title>TopCompSports - Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -253,7 +253,6 @@
             font-weight: bold;
         }
         .badge-member { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-        .badge-pending { background: rgba(241, 196, 15, 0.2); color: #f1c40f; }
         
         .status-badge {
             padding: 6px 12px;
@@ -319,27 +318,27 @@
 
     <div class="container">
         <div class="welcome-section">
-            <h1 class="welcome-title" data-en="Welcome back, Athlete!" data-ar="مرحباً بك يا بطل!">Welcome back, Athlete!</h1>
-            <p class="welcome-subtitle" data-en="Manage your teams and track your tournament progress." data-ar="أدر فرقك وتتبع تقدمك في البطولات.">Manage your teams and track your tournament progress.</p>
+            <h1 class="welcome-title" id="welcomeTitle" data-en="Welcome back!" data-ar="مرحباً بك!">Welcome back!</h1>
+            <p class="welcome-subtitle" id="welcomeSubtitle" data-en="Manage your account and track your progress." data-ar="أدر حسابك وتتبع تقدمك.">Manage your account and track your progress.</p>
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card">
+            <div class="stat-card" id="statTeamsCard">
                 <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
                 <div class="stat-value" id="statMyTeams">0</div>
                 <div class="stat-label" data-en="My Teams" data-ar="فرقي">My Teams</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" id="statTournamentsCard">
                 <div class="stat-icon"><i class="fas fa-trophy"></i></div>
                 <div class="stat-value" id="statTournaments">0</div>
                 <div class="stat-label" data-en="Tournaments" data-ar="بطولات">Tournaments</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" id="statPendingCard">
                 <div class="stat-icon"><i class="fas fa-clock"></i></div>
                 <div class="stat-value" id="statPending">0</div>
                 <div class="stat-label" data-en="Pending Requests" data-ar="طلبات معلقة">Pending Requests</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card" id="statBeltCard">
                 <div class="stat-icon"><i class="fas fa-medal"></i></div>
                 <div class="stat-value" id="statBelt">-</div>
                 <div class="stat-label" data-en="Belt Level" data-ar="الحزام">Belt Level</div>
@@ -353,7 +352,7 @@
                     <i class="fas fa-user"></i>
                 </div>
                 <h2 class="profile-name" id="profileName">Loading...</h2>
-                <p class="profile-role" data-en="Athlete" data-ar="لاعب">Athlete</p>
+                <p class="profile-role" id="profileRole" data-en="Athlete" data-ar="لاعب">Athlete</p>
                 
                 <div class="profile-info">
                     <div class="info-item">
@@ -364,11 +363,11 @@
                         <span class="info-label" data-en="Country" data-ar="الدولة">Country</span>
                         <span class="info-value" id="profileCountry">-</span>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item" id="beltInfoItem">
                         <span class="info-label" data-en="Belt" data-ar="الحزام">Belt</span>
                         <span class="info-value" id="profileBelt">-</span>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item" id="teamInfoItem">
                         <span class="info-label" data-en="Team" data-ar="الفريق">Team</span>
                         <span class="info-value" id="profileTeam">-</span>
                     </div>
@@ -378,11 +377,11 @@
             </div>
 
             <div class="main-section">
-                <div class="tabs">
+                <div class="tabs" id="tabsContainer">
                     <button class="tab-btn active" onclick="window.switchTab('teams')">
                         <i class="fas fa-shield-alt"></i> <span data-en="My Teams" data-ar="فرقي">My Teams</span>
                     </button>
-                    <button class="tab-btn" onclick="window.switchTab('requests')">
+                    <button class="tab-btn" onclick="window.switchTab('requests')" id="requestsTabBtn">
                         <i class="fas fa-clock"></i> <span data-en="Join Requests" data-ar="طلبات الانضمام">Join Requests</span>
                         <span class="tab-badge" id="requestsBadge">0</span>
                     </button>
@@ -396,7 +395,7 @@
                         <h2 class="section-title">
                             <i class="fas fa-shield-alt"></i> <span data-en="My Teams" data-ar="فرقي">My Teams</span>
                         </h2>
-                        <a href="teams-directory.html" class="btn-primary">
+                        <a href="teams-directory.html" class="btn-primary" id="findTeamsBtn">
                             <i class="fas fa-search"></i> <span data-en="Find Teams" data-ar="البحث عن فرق">Find Teams</span>
                         </a>
                     </div>
@@ -441,8 +440,9 @@
             const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
             
             const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            let currentAthlete = null;
+            let currentUser = null;
             let currentLang = localStorage.getItem('selectedLanguage') || 'en';
+            let userType = null; // 'coach' or 'athlete'
 
             window.setLang = function(lang) {
                 currentLang = lang;
@@ -452,8 +452,7 @@
                 
                 document.querySelectorAll('.lang-btn').forEach(btn => {
                     btn.classList.remove('active');
-                    if (btn.textContent.trim().toLowerCase() === lang.toLowerCase() || 
-                        (lang === 'en' && btn.textContent.trim() === 'EN') ||
+                    if ((lang === 'en' && btn.textContent.trim() === 'EN') ||
                         (lang === 'ar' && btn.textContent.trim() === 'AR')) {
                         btn.classList.add('active');
                     }
@@ -463,10 +462,12 @@
                     el.textContent = lang === 'ar' ? el.dataset.ar : el.dataset.en;
                 });
                 
-                if (currentAthlete) {
-                    loadTeams(currentAthlete.id);
-                    loadJoinRequests(currentAthlete.id);
-                    loadTournaments(currentAthlete.id);
+                if (currentUser) {
+                    if (userType === 'athlete') {
+                        loadTeams(currentUser.id);
+                        loadJoinRequests(currentUser.id);
+                    }
+                    loadTournaments(currentUser.id);
                 }
             };
 
@@ -494,40 +495,138 @@
                         return;
                     }
 
-                    const { data: athlete, error } = await supabaseClient
+                    currentUser = user;
+
+                    // Check if user is a coach
+                    const { data: coach } = await supabaseClient
+                        .from('coaches')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .single();
+
+                    if (coach) {
+                        userType = 'coach';
+                        setupCoachDashboard(coach);
+                        return;
+                    }
+
+                    // Check if user is an athlete
+                    const { data: athlete } = await supabaseClient
                         .from('athletes')
                         .select('*')
                         .eq('user_id', user.id)
                         .single();
 
-                    if (error || !athlete) {
-                        window.location.href = 'my-profile.html';
+                    if (athlete) {
+                        userType = 'athlete';
+                        setupAthleteDashboard(athlete);
                         return;
                     }
 
-                    currentAthlete = athlete;
-                    document.getElementById('userName').textContent = athlete.full_name;
-                    document.getElementById('profileName').textContent = athlete.full_name;
-                    document.getElementById('profileEmail').textContent = athlete.email;
-                    document.getElementById('profileCountry').textContent = athlete.country || '-';
-                    document.getElementById('profileBelt').textContent = athlete.belt_level || '-';
-                    document.getElementById('profileTeam').textContent = '-';
-                    
-                    if (athlete.profile_photo_url) {
-                        document.getElementById('profilePhoto').src = athlete.profile_photo_url;
-                        document.getElementById('profilePhoto').style.display = 'block';
-                        document.getElementById('profilePhotoPlaceholder').style.display = 'none';
-                    }
+                    // No profile found
+                    alert(currentLang === 'ar' ? 'لم يتم العثور على ملف شخصي. يرجى إكمال ملفك.' : 'No profile found. Please complete your profile.');
+                    window.location.href = 'my-profile.html';
 
-                    document.getElementById('statBelt').textContent = athlete.belt_level || '-';
-
-                    await Promise.all([
-                        loadTeams(athlete.id),
-                        loadJoinRequests(athlete.id),
-                        loadTournaments(athlete.id)
-                    ]);
                 } catch (error) {
                     console.error('Error loading profile:', error);
+                }
+            }
+
+            function setupCoachDashboard(coach) {
+                document.getElementById('userName').textContent = coach.full_name;
+                document.getElementById('profileName').textContent = coach.full_name;
+                document.getElementById('profileEmail').textContent = coach.email;
+                document.getElementById('profileCountry').textContent = coach.country || '-';
+                document.getElementById('profileBelt').textContent = coach.belt_level || '-';
+                document.getElementById('profileRole').textContent = currentLang === 'ar' ? 'مدرب' : 'Coach';
+                
+                if (coach.profile_photo_url) {
+                    document.getElementById('profilePhoto').src = coach.profile_photo_url;
+                    document.getElementById('profilePhoto').style.display = 'block';
+                    document.getElementById('profilePhotoPlaceholder').style.display = 'none';
+                }
+
+                document.getElementById('statBelt').textContent = coach.belt_level || '-';
+                document.getElementById('welcomeTitle').textContent = currentLang === 'ar' ? `مرحباً بك، ${coach.full_name}!` : `Welcome back, ${coach.full_name}!`;
+                document.getElementById('welcomeSubtitle').textContent = currentLang === 'ar' ? 'أدر فرقك وتتبع تقدم لاعبيك.' : 'Manage your teams and track your athletes progress.';
+
+                // Hide athlete-specific elements
+                document.getElementById('requestsTabBtn').style.display = 'none';
+                document.getElementById('findTeamsBtn').style.display = 'none';
+                document.getElementById('teamInfoItem').style.display = 'none';
+
+                loadCoachTeams(coach.id);
+                loadTournaments(coach.id);
+            }
+
+            function setupAthleteDashboard(athlete) {
+                document.getElementById('userName').textContent = athlete.full_name;
+                document.getElementById('profileName').textContent = athlete.full_name;
+                document.getElementById('profileEmail').textContent = athlete.email;
+                document.getElementById('profileCountry').textContent = athlete.country || '-';
+                document.getElementById('profileBelt').textContent = athlete.belt_level || '-';
+                document.getElementById('profileRole').textContent = currentLang === 'ar' ? 'لاعب' : 'Athlete';
+                
+                if (athlete.profile_photo_url) {
+                    document.getElementById('profilePhoto').src = athlete.profile_photo_url;
+                    document.getElementById('profilePhoto').style.display = 'block';
+                    document.getElementById('profilePhotoPlaceholder').style.display = 'none';
+                }
+
+                document.getElementById('statBelt').textContent = athlete.belt_level || '-';
+                document.getElementById('welcomeTitle').textContent = currentLang === 'ar' ? `مرحباً بك، ${athlete.full_name}!` : `Welcome back, ${athlete.full_name}!`;
+                document.getElementById('welcomeSubtitle').textContent = currentLang === 'ar' ? 'أدر فرقك وتتبع تقدمك في البطولات.' : 'Manage your teams and track your tournament progress.';
+
+                loadTeams(athlete.id);
+                loadJoinRequests(athlete.id);
+                loadTournaments(athlete.id);
+            }
+
+            async function loadCoachTeams(coachId) {
+                try {
+                    const { data: teams, error } = await supabaseClient
+                        .from('teams')
+                        .select('*')
+                        .eq('coach_id', coachId)
+                        .order('created_at', { ascending: false });
+
+                    if (error) throw error;
+
+                    const list = document.getElementById('teamsList');
+                    const count = teams ? teams.length : 0;
+                    document.getElementById('statMyTeams').textContent = count;
+
+                    if (!teams || teams.length === 0) {
+                        list.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-state-icon"><i class="fas fa-shield-alt"></i></div>
+                                <p>${currentLang === 'ar' ? 'لم تقم بإنشاء أي فرق بعد.' : "You haven't created any teams yet."}</p>
+                                <a href="create-team.html" class="btn-primary" style="margin-top: 20px;">
+                                    <i class="fas fa-plus"></i> ${currentLang === 'ar' ? 'إنشاء فريق' : 'Create Team'}
+                                </a>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    list.innerHTML = teams.map(team => `
+                        <div class="item-card" onclick="window.location.href='team-dashboard.html?id=${team.id}'">
+                            <div class="item-info">
+                                ${team.logo_url 
+                                    ? `<img src="${team.logo_url}" alt="${team.name}" class="item-logo">`
+                                    : `<div class="item-logo-placeholder"><i class="fas fa-shield-alt"></i></div>`
+                                }
+                                <div class="item-details">
+                                    <h4>${team.name}</h4>
+                                    <p>${team.city || 'N/A'}, ${team.country || 'N/A'}</p>
+                                </div>
+                            </div>
+                            <span class="item-badge badge-member">${team.is_active !== false ? (currentLang === 'ar' ? 'نشط' : 'Active') : (currentLang === 'ar' ? 'معلق' : 'Suspended')}</span>
+                        </div>
+                    `).join('');
+
+                } catch (error) {
+                    console.error('Error loading coach teams:', error);
                 }
             }
 
@@ -543,9 +642,7 @@
                                 logo_url,
                                 city,
                                 country,
-                                coach:coaches (
-                                    full_name
-                                )
+                                coach:coaches (full_name)
                             )
                         `)
                         .eq('athlete_id', athleteId)
@@ -590,7 +687,6 @@
                         `;
                     }).join('');
 
-                    // Update profile team name
                     if (members.length > 0) {
                         const teamNames = members.map(m => m.team.name).join(', ');
                         document.getElementById('profileTeam').textContent = teamNames;
@@ -605,15 +701,7 @@
                 try {
                     const { data: requests, error } = await supabaseClient
                         .from('team_join_requests')
-                        .select(`
-                            *,
-                            team:teams (
-                                id,
-                                name,
-                                city,
-                                country
-                            )
-                        `)
+                        .select(`*, team:teams (id, name, city, country)`)
                         .eq('athlete_id', athleteId)
                         .eq('status', 'pending')
                         .order('created_at', { ascending: false });
@@ -665,19 +753,12 @@
                 }
             }
 
-            async function loadTournaments(athleteId) {
+            async function loadTournaments(userId) {
                 try {
                     const { data: registrations, error } = await supabaseClient
                         .from('tournament_registrations')
-                        .select(`
-                            *,
-                            tournaments (
-                                name,
-                                event_date,
-                                location
-                            )
-                        `)
-                        .eq('athlete_id', athleteId)
+                        .select(`*, tournaments (name, event_date, location)`)
+                        .eq('athlete_id', userId)
                         .order('created_at', { ascending: false });
 
                     if (error) throw error;
