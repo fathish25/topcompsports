@@ -361,7 +361,7 @@
                 await checkMembership();
                 
             } catch (error) {
-                console.error('❌ Error in loadTeam:', error);
+                console.error(' Error in loadTeam:', error);
                 showError(error.message || translations[currentLang].error_load);
             }
         }
@@ -384,7 +384,7 @@
                     .single();
                 
                 if (error || !coach) {
-                    console.error('❌ Error loading coach:', error);
+                    console.error(' Error loading coach:', error);
                     document.getElementById('coachName').textContent = '-';
                     document.getElementById('coachContact').innerHTML = '<div style="color: #64748B;">No coach info</div>';
                     return;
@@ -511,29 +511,35 @@
 
         async function checkMembership() {
             try {
-                const { data: { user } } = await supabaseClient.auth.getUser();
+                // ✅ استخدام getSession() بدلاً من getUser() للحصول على جلسة موثوقة
+                const { data: { session } } = await supabaseClient.auth.getSession();
                 
-                if (!user) {
-                    console.log('🔴 No user logged in');
+                if (!session || !session.user) {
+                    console.log(' No user logged in');
                     updateJoinCard('login');
                     return;
                 }
                 
-                currentUser = user;
-                console.log('✅ User logged in:', user.email);
+                currentUser = session.user;
+                console.log('✅ User logged in:', currentUser.email);
                 
-                // ✅ التعديل: البحث بالبريد الإلكتروني بدلاً من user_id
+                // ✅ البحث باستخدام ilike (غير حساس لحالة الأحرف) مع trim
                 const { data: athlete, error: athleteError } = await supabaseClient
                     .from('athletes')
                     .select('id, user_id, full_name, email')
-                    .eq('email', user.email)
+                    .ilike('email', currentUser.email.trim())
                     .maybeSingle();
                 
-                console.log('🔍 Searching for athlete by email:', user.email);
+                console.log('🔍 Searching for athlete by email:', currentUser.email.trim());
                 console.log(' Athlete result:', athlete);
+                console.log(' Athlete error:', athleteError);
                 
-                if (athleteError || !athlete) {
-                    console.log('❌ Athlete not found:', athleteError);
+                if (athleteError) {
+                    console.error('❌ Error searching athlete:', athleteError);
+                }
+                
+                if (!athlete) {
+                    console.log('❌ Athlete not found, showing profile button');
                     updateJoinCard('profile');
                     return;
                 }
@@ -586,7 +592,7 @@
             const card = document.getElementById('joinCard');
             const t = translations[currentLang];
             
-            console.log('🎯 Updating join card to status:', status);
+            console.log(' Updating join card to status:', status);
             
             switch(status) {
                 case 'login':
