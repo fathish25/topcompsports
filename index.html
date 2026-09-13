@@ -72,8 +72,21 @@
         .feature-card h3 { font-size: 1.4rem; margin-bottom: 15px; color: var(--black); }
         .feature-card p { color: rgba(0,0,0,0.7); }
 
+        /* Featured Teams Section */
+        .featured-teams { padding: 80px 50px; background: var(--white); }
+        .teams-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .team-card { background: var(--white); border-radius: 15px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); transition: all 0.3s; cursor: pointer; text-decoration: none; display: block; border: 2px solid transparent; text-align: center; padding: 30px 20px; }
+        .team-card:hover { transform: translateY(-8px); box-shadow: 0 12px 35px rgba(0,102,204,0.25); border-color: var(--primary-blue); }
+        .team-logo { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 0 auto 20px; border: 3px solid var(--accent-yellow); background: var(--light-bg); }
+        .team-logo-placeholder { width: 100px; height: 100px; border-radius: 50%; background: var(--gradient-blue); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: var(--white); border: 3px solid var(--accent-yellow); }
+        .team-card h3 { font-size: 1.3rem; font-weight: 700; color: var(--black); margin-bottom: 10px; }
+        .team-location { color: rgba(0,0,0,0.6); font-size: 0.95rem; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .text-center { text-align: center; }
+        .btn-view-all { display: inline-block; margin-top: 40px; padding: 15px 40px; background: var(--gradient-blue); color: var(--white); border-radius: 8px; font-weight: bold; text-decoration: none; transition: all 0.3s; }
+        .btn-view-all:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,102,204,0.4); }
+
         /* Tournaments Section */
-        .latest-tournaments { padding: 80px 50px; background: var(--white); }
+        .latest-tournaments { padding: 80px 50px; background: var(--light-bg); }
         .section-header { text-align: center; margin-bottom: 50px; }
         .section-header h2 { font-size: 2.5rem; font-weight: 900; color: var(--black); margin-bottom: 10px; }
         .section-header h2 span { color: var(--primary-blue); }
@@ -141,7 +154,7 @@
             .hero { padding: 80px 30px; }
             .hero-content { gap: 50px; }
             .hero-text h1 { font-size: 3.5rem; }
-            .features, .latest-tournaments { padding: 60px 30px; }
+            .features, .featured-teams, .latest-tournaments { padding: 60px 30px; }
             .contact-section { padding: 50px 30px; }
         }
 
@@ -154,12 +167,10 @@
             .hero-text h1 { font-size: 2.5rem; }
             .hero-text p { font-size: 1.1rem; }
             .hero-image { height: 300px; }
-            .features { padding: 50px 20px; }
-            .features-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-            .feature-card { padding: 30px 20px; }
-            .latest-tournaments { padding: 50px 20px; }
+            .features, .featured-teams, .latest-tournaments { padding: 50px 20px; }
+            .features-grid, .teams-grid, .tournaments-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .feature-card, .team-card { padding: 30px 20px; }
             .section-header h2 { font-size: 2rem; }
-            .tournaments-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
             .contact-section { padding: 40px 20px; }
             .contact-header h2 { font-size: 2rem; }
             .contact-grid { grid-template-columns: 1fr; }
@@ -176,27 +187,14 @@
             .hero-buttons { flex-direction: column; width: 100%; }
             .hero-buttons .btn { width: 100%; text-align: center; }
             .hero-image { height: 250px; }
-            .features { padding: 40px 15px; }
-            .features-grid { grid-template-columns: 1fr; }
-            .latest-tournaments { padding: 40px 15px; }
+            .features, .featured-teams, .latest-tournaments, .contact-section { padding: 40px 15px; }
+            .features-grid, .teams-grid, .tournaments-grid { grid-template-columns: 1fr; }
             .section-header h2 { font-size: 1.8rem; }
-            .tournaments-grid { grid-template-columns: 1fr; }
-            .contact-section { padding: 30px 15px; }
             .contact-header h2 { font-size: 1.8rem; }
         }
 
-        @media (max-width: 374px) {
-            .header { padding: 8px 10px; }
-            .logo-text { font-size: 20px; }
-            .nav a { padding: 4px 6px; font-size: 0.8rem; }
-            .hero { padding: 30px 10px; }
-            .hero-text h1 { font-size: 1.8rem; }
-            .features, .latest-tournaments, .contact-section { padding: 30px 10px; }
-            .feature-card { padding: 25px 15px; }
-        }
-
         @media (hover: none) and (pointer: coarse) {
-            .btn:active, .tournament-card:active, .feature-card:active, .contact-card:active { transform: scale(0.98); }
+            .btn:active, .tournament-card:active, .team-card:active, .feature-card:active, .contact-card:active { transform: scale(0.98); }
         }
     </style>
 </head>
@@ -219,6 +217,7 @@
         
         <nav class="nav">
             <a href="tournaments.html" data-i18n="nav_tournaments">Tournaments</a>
+            <a href="teams-directory.html" data-i18n="nav_teams">Teams</a>
             <a href="#features" data-i18n="nav_features">Features</a>
             <a href="organizer-dashboard.html" data-i18n="nav_organizer">Organizer</a>
             
@@ -274,10 +273,24 @@
                 <p data-i18n="feature3_desc">Automatic bracket creation</p>
             </div>
             <div class="feature-card">
-                <div class="feature-icon">️</div>
+                <div class="feature-icon">📊</div>
                 <h3 data-i18n="feature4_title">Live Scoreboard</h3>
                 <p data-i18n="feature4_desc">Real-time score tracking</p>
             </div>
+        </div>
+    </section>
+
+    <!-- Featured Teams Section (الجديد) -->
+    <section class="featured-teams" id="teams">
+        <div class="section-header">
+            <h2 data-i18n="teams_title">Featured <span>Teams</span></h2>
+            <p data-i18n="teams_subtitle">Discover top teams and join the competition</p>
+        </div>
+        <div id="teamsGrid" class="teams-grid">
+            <div class="loading-tournaments" data-i18n="loading_teams">Loading teams...</div>
+        </div>
+        <div class="text-center">
+            <a href="teams-directory.html" class="btn-view-all" data-i18n="view_all_teams">View All Teams →</a>
         </div>
     </section>
 
@@ -305,7 +318,7 @@
                     <a href="mailto:support@topcompsports.com">support@topcompsports.com</a>
                 </div>
                 <div class="contact-card">
-                    <div class="contact-icon"></div>
+                    <div class="contact-icon">💬</div>
                     <h3 data-i18n="contact_whatsapp_title">WhatsApp</h3>
                     <p data-i18n="contact_whatsapp_desc">Chat with us on WhatsApp</p>
                     <a href="https://wa.me/1234567890" target="_blank" data-i18n="contact_whatsapp_link">Start Chat</a>
@@ -353,11 +366,13 @@
         // ==========================================
         const translations = {
             en: {
-                nav_tournaments: 'Tournaments', nav_features: 'Features', nav_organizer: 'Organizer', nav_profile: 'My Profile', nav_logout: 'Logout', nav_login: 'Login',
+                nav_tournaments: 'Tournaments', nav_teams: 'Teams', nav_features: 'Features', nav_organizer: 'Organizer', nav_profile: 'My Profile', nav_logout: 'Logout', nav_login: 'Login',
                 hero_title: 'DISCIPLINE.<br><span>FOCUS.</span><br>STRENGTH.', hero_subtitle: 'Professional tournament management platform for Jiu-Jitsu competitions',
                 hero_browse: 'Browse Tournaments', hero_create: 'Create Tournament',
                 feature1_title: 'Easy Registration', feature1_desc: 'Smart registration system', feature2_title: 'Mat Management', feature2_desc: 'Organize matches efficiently',
                 feature3_title: 'Bracket System', feature3_desc: 'Automatic bracket creation', feature4_title: 'Live Scoreboard', feature4_desc: 'Real-time score tracking',
+                teams_title: 'Featured <span>Teams</span>', teams_subtitle: 'Discover top teams and join the competition',
+                loading_teams: 'Loading teams...', no_teams: 'No teams available yet', view_all_teams: 'View All Teams →', team_view_details: 'View Details →',
                 tournaments_title: 'Latest <span>Tournaments</span>', tournaments_subtitle: 'Discover upcoming competitions and register now', loading: 'Loading tournaments...',
                 contact_title: 'Get in <span>Touch</span>', contact_subtitle: "We're here to help you with any questions",
                 contact_email_title: 'Email Us', contact_email_desc: 'Send us an email anytime', contact_whatsapp_title: 'WhatsApp', contact_whatsapp_desc: 'Chat with us on WhatsApp', contact_whatsapp_link: 'Start Chat',
@@ -366,11 +381,13 @@
                 footer_copyright: '© 2026 TopCompSports - All rights reserved', footer_tagline: 'Professional tournament management for Jiu-Jitsu competitions'
             },
             ar: {
-                nav_tournaments: 'البطولات', nav_features: 'المميزات', nav_organizer: 'المنظم', nav_profile: 'حسابي', nav_logout: 'خروج', nav_login: 'تسجيل الدخول',
+                nav_tournaments: 'البطولات', nav_teams: 'الفرق', nav_features: 'المميزات', nav_organizer: 'المنظم', nav_profile: 'حسابي', nav_logout: 'خروج', nav_login: 'تسجيل الدخول',
                 hero_title: 'انضباط.<br><span>تركيز.</span><br>قوة.', hero_subtitle: 'منصة احترافية لإدارة بطولات الجوجيتسو',
                 hero_browse: 'استعرض البطولات', hero_create: 'أنشئ بطولة',
                 feature1_title: 'تسجيل سهل', feature1_desc: 'نظام تسجيل ذكي', feature2_title: 'إدارة البساط', feature2_desc: 'نظّم المباريات بكفاءة',
                 feature3_title: 'نظام البراكيت', feature3_desc: 'إنشاء تلقائي للبراكيت', feature4_title: 'لوحة النتائج', feature4_desc: 'متابعة النتائج مباشرة',
+                teams_title: 'الفرق <span>المميزة</span>', teams_subtitle: 'اكتشف أفضل الفرق وانضم إلى المنافسة',
+                loading_teams: 'جاري تحميل الفرق...', no_teams: 'لا توجد فرق متاحة حالياً', view_all_teams: 'عرض جميع الفرق ←', team_view_details: 'التفاصيل ←',
                 tournaments_title: 'أحدث <span>البطولات</span>', tournaments_subtitle: 'اكتشف البطولات القادمة وسجّل الآن', loading: 'جاري تحميل البطولات...',
                 contact_title: 'تواصل <span>معنا</span>', contact_subtitle: 'نحن هنا لمساعدتك في أي استفسار',
                 contact_email_title: 'البريد الإلكتروني', contact_email_desc: 'أرسل لنا بريدًا في أي وقت', contact_whatsapp_title: 'واتساب', contact_whatsapp_desc: 'دردش معنا على واتساب', contact_whatsapp_link: 'ابدأ الدردشة',
@@ -392,6 +409,7 @@
         // ==========================================
         window.onload = async function() {
             checkUserStatus();
+            await loadFeaturedTeams();
             await loadLatestTournaments();
             const savedLang = localStorage.getItem('lang') || 'en';
             updateLanguage(savedLang);
@@ -445,6 +463,8 @@
                 const key = element.getAttribute('data-i18n');
                 if (translations[lang][key]) element.innerHTML = translations[lang][key];
             });
+            // إعادة تحميل البيانات لتحديث النصوص الديناميكية
+            loadFeaturedTeams();
             loadLatestTournaments();
         }
 
@@ -471,7 +491,56 @@
         }
 
         // ==========================================
-        // 7. تحميل البطولات
+        // 7. تحميل الفرق المميزة
+        // ==========================================
+        async function loadFeaturedTeams() {
+            const grid = document.getElementById('teamsGrid');
+            const currentLang = localStorage.getItem('lang') || 'en';
+            
+            try {
+                const { data: teams, error } = await dbClient
+                    .from('teams')
+                    .select('id, name, logo_url, city, country')
+                    .eq('is_active', true)
+                    .order('created_at', { ascending: false })
+                    .limit(4);
+                
+                if (error) throw error;
+                
+                if (!teams || teams.length === 0) {
+                    const msg = currentLang === 'ar' ? translations.ar.no_teams : translations.en.no_teams;
+                    grid.innerHTML = `<div class="empty-tournaments"><div class="icon">🛡️</div><p>${msg}</p></div>`;
+                    return;
+                }
+                
+                grid.innerHTML = teams.map(t => {
+                    const location = `${t.city || ''}${t.city && t.country ? ', ' : ''}${t.country || ''}` || (currentLang === 'ar' ? 'غير محدد' : 'N/A');
+                    const viewText = currentLang === 'ar' ? translations.ar.team_view_details : translations.en.team_view_details;
+                    
+                    return `
+                        <a href="team-public.html?id=${t.id}" class="team-card">
+                            ${t.logo_url 
+                                ? `<img src="${t.logo_url}" alt="${t.name}" class="team-logo">` 
+                                : `<div class="team-logo-placeholder">🛡️</div>`}
+                            <h3>${t.name || (currentLang === 'ar' ? 'فريق بدون اسم' : 'Unnamed Team')}</h3>
+                            <div class="team-location">
+                                <span>📍</span>
+                                <span>${location}</span>
+                            </div>
+                            <span class="tournament-link">${viewText}</span>
+                        </a>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading teams:', error);
+                const errorMsg = currentLang === 'ar' ? 'خطأ في تحميل الفرق' : 'Error loading teams';
+                grid.innerHTML = `<div class="empty-tournaments"><div class="icon">❌</div><p>${errorMsg}</p></div>`;
+            }
+        }
+
+        // ==========================================
+        // 8. تحميل البطولات
         // ==========================================
         async function loadLatestTournaments() {
             const grid = document.getElementById('tournamentsGrid');
@@ -485,10 +554,7 @@
                     .order('event_start_date', { ascending: true, nullsFirst: false })
                     .limit(4);
                 
-                if (error) {
-                    console.error('Error loading tournaments:', error);
-                    throw error;
-                }
+                if (error) throw error;
                 
                 if (!tournaments || tournaments.length === 0) {
                     const msg = currentLang === 'ar' ? 'لا توجد بطولات حالياً' : 'No tournaments available yet';
@@ -504,14 +570,9 @@
                                 .select('*', { count: 'exact', head: true })
                                 .eq('tournament_id', t.id);
                             
-                            if (countError) {
-                                console.error(`Error getting count for tournament ${t.id}:`, countError);
-                                return { ...t, playerCount: 0 };
-                            }
-                            
+                            if (countError) return { ...t, playerCount: 0 };
                             return { ...t, playerCount: count || 0 };
                         } catch (e) {
-                            console.error(`Error in count query for ${t.id}:`, e);
                             return { ...t, playerCount: 0 };
                         }
                     })
@@ -592,7 +653,7 @@
         }
 
         // ==========================================
-        // 8. تسجيل الخروج
+        // 9. تسجيل الخروج
         // ==========================================
         async function handleLogout() {
             await dbClient.auth.signOut();
