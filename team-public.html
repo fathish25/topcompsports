@@ -242,7 +242,6 @@
                     </div>
                 </div>
                 
-                <!-- ✅ تم التعديل: الزر يبدأ بحالة تحميل -->
                 <div class="sidebar-card join-card" id="joinCard">
                     <div class="loading" style="padding: 20px;">
                         <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: var(--primary-blue);"></i>
@@ -515,34 +514,47 @@
                 const { data: { user } } = await supabaseClient.auth.getUser();
                 
                 if (!user) {
+                    console.log('🔴 No user logged in');
                     updateJoinCard('login');
                     return;
                 }
                 
                 currentUser = user;
+                console.log('✅ User logged in:', user.email);
                 
-                const { data: athlete } = await supabaseClient
+                // ✅ التعديل: البحث بالبريد الإلكتروني بدلاً من user_id
+                const { data: athlete, error: athleteError } = await supabaseClient
                     .from('athletes')
-                    .select('id')
-                    .eq('user_id', user.id)
-                    .single();
+                    .select('id, user_id, full_name, email')
+                    .eq('email', user.email)
+                    .maybeSingle();
                 
-                if (!athlete) {
+                console.log('🔍 Searching for athlete by email:', user.email);
+                console.log(' Athlete result:', athlete);
+                
+                if (athleteError || !athlete) {
+                    console.log('❌ Athlete not found:', athleteError);
                     updateJoinCard('profile');
                     return;
                 }
                 
                 currentAthlete = athlete;
+                console.log('✅ Athlete found:', athlete);
                 
-                const { data: member } = await supabaseClient
+                const { data: member, error: memberError } = await supabaseClient
                     .from('team_members')
                     .select('id, status')
                     .eq('team_id', teamId)
                     .eq('athlete_id', athlete.id)
                     .eq('status', 'approved')
-                    .single();
+                    .maybeSingle();
+                
+                if (memberError) {
+                    console.error('Error checking membership:', memberError);
+                }
                 
                 if (member) {
+                    console.log('✅ User is already a member');
                     updateJoinCard('member');
                     return;
                 }
@@ -553,17 +565,19 @@
                     .eq('team_id', teamId)
                     .eq('athlete_id', athlete.id)
                     .eq('status', 'pending')
-                    .single();
+                    .maybeSingle();
                 
                 if (request) {
+                    console.log('⏳ Pending request found');
                     updateJoinCard('pending');
                     return;
                 }
                 
+                console.log('✅ User can request to join');
                 updateJoinCard('join');
                 
             } catch (error) {
-                console.error('Error checking membership:', error);
+                console.error('❌ Error checking membership:', error);
                 updateJoinCard('join');
             }
         }
@@ -571,6 +585,8 @@
         function updateJoinCard(status) {
             const card = document.getElementById('joinCard');
             const t = translations[currentLang];
+            
+            console.log('🎯 Updating join card to status:', status);
             
             switch(status) {
                 case 'login':
