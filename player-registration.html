@@ -38,7 +38,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1> التسجيل في البطولة</h1>
+            <h1>🏆 التسجيل في البطولة</h1>
             <p style="color: rgba(255,255,255,0.7);">قم بتحديث بياناتك الخاصة بالبطولة أدناه</p>
         </div>
 
@@ -52,7 +52,7 @@
         </div>
 
         <div class="section">
-            <div class="section-title"> بيانات المشاركة في البطولة (قابل للتعديل)</div>
+            <div class="section-title">📝 بيانات المشاركة في البطولة (قابل للتعديل)</div>
             <form id="tournamentForm">
                 <div class="form-row">
                     <div class="form-group">
@@ -125,7 +125,6 @@
         let teamsList = [];
         let ageDivisions = [];
 
-        // ✅ جلب بيانات اللاعب
         async function loadPlayerData(userId) {
             try {
                 const { data: athlete, error: athleteError } = await supabaseClient
@@ -166,7 +165,6 @@
             }
         }
 
-        // ✅ جلب الفئات العمرية من age_divisions
         async function loadAgeDivisions() {
             const { data, error } = await supabaseClient
                 .from('age_divisions')
@@ -177,30 +175,31 @@
             return data || [];
         }
 
-        // ✅ جلب الموازين من ajp_weight_classes (الجدول الرئيسي)
         async function loadWeightCategories() {
             const { data, error } = await supabaseClient
                 .from('ajp_weight_classes')
                 .select('*')
                 .order('min_weight');
             
-            console.log('✅ Weight categories loaded from ajp_weight_classes:', data?.length || 0);
+            console.log('✅ Weight categories loaded:', data?.length || 0);
             
+            // ✅ عرض جميع الـ age_division_ids الفريدة المتاحة
             if (data && data.length > 0) {
-                console.log('📊 Sample weight data:', {
-                    id: data[0].id,
-                    name: data[0].name,
-                    gender: data[0].gender,
-                    min_weight: data[0].min_weight,
-                    max_weight: data[0].max_weight,
-                    age_division_id: data[0].age_division_id
-                });
+                const uniqueDivisions = [...new Set(data.map(w => w.age_division_id))];
+                console.log('📋 Available age_division_ids in ajp_weight_classes:', uniqueDivisions);
+                
+                // عرض عينة مع genders
+                const sampleWithGender = data.slice(0, 10).map(w => ({
+                    division_id: w.age_division_id,
+                    gender: w.gender,
+                    name: w.name
+                }));
+                console.log('📊 Sample weights with divisions:', sampleWithGender);
             }
             
             return data || [];
         }
 
-        // ✅ جلب الفرق
         async function loadTeams() {
             const { data, error } = await supabaseClient
                 .from('teams')
@@ -211,7 +210,6 @@
             return data || [];
         }
 
-        // ✅ ملء قائمة الفئات العمرية
         function populateAgeDivisions() {
             const select = document.getElementById('ageGroup');
             select.innerHTML = '<option value="">اختر الفئة...</option>';
@@ -229,30 +227,22 @@
             });
         }
 
-        // ✅ تحديث خيارات الوزن من جدول ajp_weight_classes
         function updateWeightOptions() {
             const selectedAgeDivisionId = document.getElementById('ageGroup').value;
             const weightSelect = document.getElementById('weight');
             
             console.log('🔄 Updating weights...');
-            console.log('Selected division ID:', selectedAgeDivisionId);
-            console.log('Current gender:', currentPlayer?.gender);
-            console.log('Total weights in ajp_weight_classes:', weightCategories.length);
+            console.log('Selected division:', selectedAgeDivisionId);
+            console.log('Gender:', currentPlayer?.gender);
             
             weightSelect.innerHTML = '<option value="">جاري التحميل...</option>';
             weightSelect.disabled = true;
             
-            if (!selectedAgeDivisionId) {
-                weightSelect.innerHTML = '<option value="">اختر الفئة العمرية أولاً</option>';
+            if (!selectedAgeDivisionId || weightCategories.length === 0) {
+                weightSelect.innerHTML = '<option value="">لا توجد موازين</option>';
                 return;
             }
             
-            if (weightCategories.length === 0) {
-                weightSelect.innerHTML = '<option value="">لا توجد موازين في قاعدة البيانات</option>';
-                return;
-            }
-            
-            // ✅ تصحيح الجنس ليتطابق مع جدول ajp_weight_classes
             const genderMap = {
                 'Male': 'Men',
                 'Female': 'Women',
@@ -263,28 +253,25 @@
             };
             
             const targetGender = genderMap[currentPlayer?.gender] || 'Men';
-            console.log('Target gender for filtering:', targetGender);
             
-            // ✅ البحث عن الموازين المطابقة للفئة والجنس
+            // ✅ البحث مع فحص مرن
             const filteredWeights = weightCategories.filter(w => {
                 return w.age_division_id === selectedAgeDivisionId && 
                        w.gender === targetGender;
             });
             
-            console.log('Filtered weights count:', filteredWeights.length);
+            console.log('Filtered:', filteredWeights.length, 'Target gender:', targetGender);
             
-            // ✅ إذا لم نجد موازين مطابقة، نعرض جميع موازين الفئة
+            // ✅ إذا لم نجد، نعرض جميع موازين الفئة
             if (filteredWeights.length === 0) {
-                console.log('⚠️ No exact match, showing all weights for this division...');
-                
-                const divisionWeights = weightCategories.filter(w => 
+                const fallbackWeights = weightCategories.filter(w => 
                     w.age_division_id === selectedAgeDivisionId
                 );
                 
-                if (divisionWeights.length > 0) {
-                    console.log('✅ Found', divisionWeights.length, 'weights for this division (all genders)');
+                if (fallbackWeights.length > 0) {
+                    console.log('✅ Found', fallbackWeights.length, 'weights (all genders)');
                     
-                    divisionWeights.forEach(w => {
+                    fallbackWeights.forEach(w => {
                         const option = document.createElement('option');
                         option.value = w.name;
                         option.textContent = `${w.name} (${w.min_weight}-${w.max_weight} كجم) - ${w.gender}`;
@@ -299,18 +286,14 @@
                 }
             }
             
-            // ✅ ملء القائمة بالموازين المطابقة
+            // ✅ ملء القائمة
             if (filteredWeights.length === 0) {
-                weightSelect.innerHTML = '<option value="">لا توجد موازين متاحة لهذه الفئة</option>';
+                weightSelect.innerHTML = '<option value="">لا توجد موازين متاحة</option>';
                 
                 // عرض معلومات للتصحيح
-                const sample = weightCategories.slice(0, 3).map(w => ({
-                    division_id: w.age_division_id,
-                    gender: w.gender,
-                    name: w.name
-                }));
-                console.log('Sample from ajp_weight_classes:', sample);
-                console.log('Looking for: division=', selectedAgeDivisionId, 'gender=', targetGender);
+                console.log('❌ No weights found!');
+                console.log('Looking for division:', selectedAgeDivisionId);
+                console.log('Available divisions:', [...new Set(weightCategories.map(w => w.age_division_id))]);
             } else {
                 filteredWeights.forEach(w => {
                     const option = document.createElement('option');
@@ -323,11 +306,10 @@
                 });
                 
                 weightSelect.disabled = false;
-                console.log('✅ Loaded', filteredWeights.length, 'weights from ajp_weight_classes');
+                console.log('✅ Loaded', filteredWeights.length, 'weights');
             }
         }
 
-        // ✅ ملء قائمة الفرق
         function populateTeams() {
             const select = document.getElementById('teamSelect');
             select.innerHTML = '<option value="">اختر الفريق...</option>';
@@ -345,7 +327,6 @@
             });
         }
 
-        // ✅ تحميل الصفحة
         window.onload = async () => {
             const urlParams = new URLSearchParams(window.location.search);
             tournamentId = urlParams.get('tournament_id');
@@ -376,11 +357,8 @@
                     populateTeams();
                 })
             ]);
-            
-            console.log('✅ All data loaded successfully');
         };
 
-        // ✅ عرض بيانات اللاعب
         function displayPlayerInfo() {
             const infoDiv = document.getElementById('playerInfo');
             if (!currentPlayer) {
@@ -389,14 +367,13 @@
             }
             
             infoDiv.innerHTML = `
-                <h3>👤 ${currentPlayer.full_name || 'لاعب'}</h3>
+                <h3> ${currentPlayer.full_name || 'لاعب'}</h3>
                 <div class="info-row"><span class="info-label">البريد الإلكتروني:</span><span class="info-value">${currentPlayer.email || 'غير متوفر'}</span></div>
                 <div class="info-row"><span class="info-label">الجنس:</span><span class="info-value">${currentPlayer.gender === 'Male' ? 'ذكر' : currentPlayer.gender === 'Female' ? 'أنثى' : currentPlayer.gender || 'غير محدد'}</span></div>
                 <div class="info-row"><span class="info-label">الدولة:</span><span class="info-value">${currentPlayer.country || 'غير محدد'}</span></div>
             `;
         }
 
-        // ✅ إرسال النموذج
         document.getElementById('tournamentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -418,8 +395,6 @@
                 team: document.getElementById('teamSelect').value,
                 ranking: parseInt(document.getElementById('ranking').value) || 0
             };
-
-            console.log('Submitting form data:', formData);
 
             try {
                 const { data: existing } = await supabaseClient
@@ -448,7 +423,6 @@
             }
         });
 
-        // ✅ عرض التنبيهات
         function showAlert(type, message) {
             const alert = document.getElementById('alert');
             alert.className = `alert alert-${type} show`;
