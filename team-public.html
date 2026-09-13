@@ -102,6 +102,7 @@
             padding: 20px;
             border-radius: 12px;
             margin: 20px 0;
+            text-align: center;
         }
         
         @media (max-width: 1024px) {
@@ -265,7 +266,6 @@
             errorDiv.className = 'error-message';
             errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <strong>Error:</strong> ${message}`;
             
-            // Hide all loading indicators
             document.querySelectorAll('.loading').forEach(el => {
                 el.innerHTML = `<i class="fas fa-exclamation-circle" style="color: #EF4444;"></i>`;
             });
@@ -273,57 +273,70 @@
 
         async function loadTeam() {
             try {
-                console.log('Loading team with ID:', teamId);
+                console.log('🔍 Starting loadTeam for ID:', teamId);
                 
-                // Try simple query first without coach join
-                let { data: team, error } = await supabase
+                // 1. جلب بيانات الفريق الأساسية فوراً
+                const { data: team, error } = await supabase
                     .from('teams')
                     .select('*')
                     .eq('id', teamId)
                     .single();
                 
                 if (error) {
-                    console.error('Error fetching team:', error);
+                    console.error('❌ Supabase error fetching team:', error);
                     throw new Error(`Failed to load team: ${error.message}`);
                 }
                 
                 if (!team) {
-                    throw new Error('Team not found');
+                    throw new Error('Team not found in database');
                 }
                 
+                console.log('✅ Team data fetched successfully');
                 currentTeam = team;
                 
-                // Try to fetch coach data separately
-                let coachData = null;
-                if (team.coach_id) {
-                    try {
-                        const { data: coach, error: coachError } = await supabase
-                            .from('coaches')
-                            .select('id, full_name, email, phone, profile_photo_url')
-                            .eq('id', team.coach_id)
-                            .single();
-                        
-                        if (!coachError && coach) {
-                            coachData = coach;
-                        }
-                    } catch (coachErr) {
-                        console.warn('Could not load coach data:', coachErr);
-                    }
-                }
-                
-                // Add coach to team object
-                if (coachData) {
-                    team.coach = coachData;
-                }
-                
-                updateLanguage();
+                // 2. عرض واجهة المستخدم فوراً (غير معتمدة على انتظار المدرب أو العضوية)
                 updateTeamUI(team);
-                await checkMembership();
+                
+                // 3. جلب بيانات المدرب في الخلفية
+                if (team.coach_id) {
+                    loadCoachData(team.coach_id).catch(err => {
+                        console.warn('⚠️ Coach data fetch failed (non-critical):', err);
+                    });
+                }
+                
+                // 4. التحقق من العضوية في الخلفية (غير معيق للعرض)
+                checkMembership().catch(err => {
+                    console.warn('⚠️ Membership check failed (non-critical):', err);
+                });
                 
             } catch (error) {
-                console.error('Error in loadTeam:', error);
+                console.error('❌ Critical error in loadTeam:', error);
                 showError(error.message || translations[currentLang].error_load);
             }
+        }
+
+        async function loadCoachData(coachId) {
+            const { data: coach, error } = await supabase
+                .from('coaches')
+                .select('id, full_name, email, phone, profile_photo_url')
+                .eq('id', coachId)
+                .single();
+            
+            if (error || !coach) {
+                console.warn('⚠️ Coach not found or error:', error);
+                document.getElementById('coachName').textContent = '-';
+                document.getElementById('coachContact').innerHTML = '<div style="color: #64748B;">No coach information</div>';
+                return;
+            }
+            
+            if (coach.profile_photo_url) {
+                document.getElementById('coachPhoto').innerHTML = `<img src="${coach.profile_photo_url}" alt="${coach.full_name}">`;
+            }
+            document.getElementById('coachName').textContent = coach.full_name || '-';
+            document.getElementById('coachContact').innerHTML = `
+                <div class="coach-contact-item"><i class="fas fa-envelope"></i><span>${coach.email || '-'}</span></div>
+                <div class="coach-contact-item"><i class="fas fa-phone"></i><span>${coach.phone || '-'}</span></div>
+            `;
         }
 
         function updateTeamUI(team) {
@@ -338,8 +351,16 @@
                 const isActive = team.is_active !== false;
                 document.getElementById('teamStatus').innerHTML = `<i class="fas fa-${isActive ? 'check' : 'pause'}-circle"></i> <span>${isActive ? translations[currentLang].active : 'Suspended'}</span>`;
                 
-                if (team.sports && team.sports.length > 0) {
-                    document.getElementById('teamSport').innerHTML = `<i class="fas fa-fist-raised"></i> <span>${Array.isArray(team.sports) ? team.sports[0] : team.sports}</span>`;
+                // معالجة مرنة لعمود الرياضات (سواء كان Array أو String)
+                let sportsArray = [];
+                if (Array.isArray(team.sports)) {
+                    sportsArray = team.sports;
+                } else if (typeof team.sports === 'string' && team.sports.trim() !== '') {
+                    sportsArray = team.sports.split(',').map(s => s.trim());
+                }
+
+                if (sportsArray.length > 0) {
+                    document.getElementById('teamSport').innerHTML = `<i class="fas fa-fist-raised"></i> <span>${sportsArray[0]}</span>`;
                 }
                 
                 const infoHTML = `
@@ -371,33 +392,17 @@
                     </div>
                 `;
                 document.getElementById('teamInfo').innerHTML = infoHTML;
-                
                 document.getElementById('teamAbout').textContent = team.description || translations[currentLang].no_description;
                 
                 const sportsDiv = document.getElementById('teamSportsList');
-                if (team.sports && Array.isArray(team.sports) && team.sports.length > 0) {
-                    sportsDiv.innerHTML = team.sports.map(s => `<span class="sport-tag"><i class="fas fa-fist-raised"></i> ${s}</span>`).join('');
+                if (sportsArray.length > 0) {
+                    sportsDiv.innerHTML = sportsArray.map(s => `<span class="sport-tag"><i class="fas fa-fist-raised"></i> ${s}</span>`).join('');
                 } else {
                     sportsDiv.innerHTML = `<div class="empty-state"><i class="fas fa-fist-raised"></i><p>${translations[currentLang].no_sports}</p></div>`;
                 }
                 
-                if (team.coach) {
-                    const coach = team.coach;
-                    if (coach.profile_photo_url) {
-                        document.getElementById('coachPhoto').innerHTML = `<img src="${coach.profile_photo_url}" alt="${coach.full_name}">`;
-                    }
-                    document.getElementById('coachName').textContent = coach.full_name || '-';
-                    document.getElementById('coachContact').innerHTML = `
-                        <div class="coach-contact-item"><i class="fas fa-envelope"></i><span>${coach.email || '-'}</span></div>
-                        <div class="coach-contact-item"><i class="fas fa-phone"></i><span>${coach.phone || '-'}</span></div>
-                    `;
-                } else {
-                    document.getElementById('coachName').textContent = '-';
-                    document.getElementById('coachContact').innerHTML = '<div style="color: #64748B;">No coach information</div>';
-                }
-                
             } catch (error) {
-                console.error('Error updating UI:', error);
+                console.error('❌ Error updating UI:', error);
                 showError('Error displaying team data');
             }
         }
@@ -407,20 +412,20 @@
                 const { data: { user } } = await supabase.auth.getUser();
                 
                 if (!user) {
-                    updateJoinCard('login', null);
+                    updateJoinCard('login');
                     return;
                 }
                 
                 currentUser = user;
                 
-                const { data: athlete, error: athleteError } = await supabase
+                const { data: athlete } = await supabase
                     .from('athletes')
                     .select('id')
                     .eq('user_id', user.id)
                     .single();
                 
-                if (athleteError || !athlete) {
-                    updateJoinCard('profile', null);
+                if (!athlete) {
+                    updateJoinCard('profile');
                     return;
                 }
                 
@@ -435,7 +440,7 @@
                     .single();
                 
                 if (member) {
-                    updateJoinCard('member', null);
+                    updateJoinCard('member');
                     return;
                 }
                 
@@ -448,15 +453,16 @@
                     .single();
                 
                 if (request) {
-                    updateJoinCard('pending', null);
+                    updateJoinCard('pending');
                     return;
                 }
                 
-                updateJoinCard('join', null);
+                updateJoinCard('join');
                 
             } catch (error) {
-                console.error('Error checking membership:', error);
-                updateJoinCard('join', null);
+                console.error('❌ Error checking membership:', error);
+                // في حالة الفشل، نعرض زر الانضمام كخيار افتراضي آمن
+                updateJoinCard('join');
             }
         }
 
@@ -537,15 +543,19 @@
                 if (error) throw error;
                 
                 alert(currentLang === 'ar' ? '✅ تم إرسال الطلب بنجاح! المدرب سيراجع طلبك.' : '✅ Request sent successfully! The coach will review your request.');
-                updateJoinCard('pending', null);
+                updateJoinCard('pending');
                 
             } catch (error) {
-                console.error('Error sending request:', error);
+                console.error('❌ Error sending request:', error);
                 alert('Error: ' + error.message);
             }
         }
 
-        window.onload = loadTeam;
+        // بدء التحميل عند جاهزية الصفحة
+        window.addEventListener('DOMContentLoaded', () => {
+            updateLanguage();
+            loadTeam();
+        });
     </script>
 </body>
 </html>
