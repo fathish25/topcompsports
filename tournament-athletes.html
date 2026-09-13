@@ -23,7 +23,6 @@
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
         img { max-width: 100%; height: auto; }
 
-        /* Header */
         .header { background: var(--black); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-blue); position: sticky; top: 0; z-index: 1000; }
         .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; }
         .logo-svg { width: 50px; height: 50px; }
@@ -41,7 +40,6 @@
         .lang-btn { padding: 8px 15px; border: none; background: transparent; color: var(--white); cursor: pointer; border-radius: 6px; font-weight: bold; }
         .lang-btn.active { background: var(--primary-blue); }
 
-        /* Tournament Header */
         .tournament-header { background: var(--dark-gray); padding: 20px 50px; border-bottom: 1px solid var(--medium-gray); }
         .tournament-header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
         .tournament-info { display: flex; align-items: center; gap: 20px; }
@@ -53,17 +51,14 @@
         .btn-register { background: var(--accent-yellow); color: var(--black); padding: 10px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; }
         .btn-register:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,184,0,0.4); }
 
-        /* Tabs */
         .tabs-container { background: var(--dark-gray); border-bottom: 1px solid var(--medium-gray); position: sticky; top: 73px; z-index: 999; }
         .tabs { max-width: 1400px; margin: 0 auto; display: flex; gap: 5px; padding: 0 50px; overflow-x: auto; }
         .tab { padding: 15px 25px; color: rgba(255,255,255,0.6); text-decoration: none; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.3s; white-space: nowrap; display: flex; align-items: center; gap: 8px; cursor: pointer; }
         .tab:hover { color: var(--white); }
         .tab.active { color: var(--white); border-bottom-color: var(--accent-yellow); }
 
-        /* Main Content */
         .main-content { max-width: 1400px; margin: 0 auto; padding: 40px 50px; }
 
-        /* Athletes Header */
         .athletes-header { margin-bottom: 30px; }
         .athletes-header h2 { font-size: 2rem; font-weight: 900; color: var(--white); margin-bottom: 20px; }
         
@@ -77,12 +72,9 @@
         .search-input:focus { outline: none; border-color: var(--primary-blue); }
         .search-input::placeholder { color: rgba(255,255,255,0.4); }
 
-        /* Division Groups */
         .division-group { margin-bottom: 40px; }
         .division-title { font-size: 1.3rem; font-weight: 700; color: var(--white); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--primary-blue); }
-        .division-title span { color: var(--accent-yellow); }
 
-        /* Athletes Table */
         .athletes-table { width: 100%; border-collapse: collapse; background: var(--dark-gray); border-radius: 10px; overflow: hidden; }
         .athletes-table thead { background: var(--medium-gray); }
         .athletes-table th { padding: 15px 20px; text-align: left; color: rgba(255,255,255,0.7); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
@@ -109,7 +101,6 @@
         .btn-edit-own { background: var(--accent-yellow); color: var(--black); border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; margin-top: 8px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 5px; }
         .btn-edit-own:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(255,184,0,0.3); }
 
-        /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
         .modal.show { display: flex; }
         .modal-content { background: var(--dark-gray); padding: 30px; border-radius: 12px; max-width: 500px; width: 100%; border: 2px solid var(--primary-blue); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
@@ -123,15 +114,12 @@
         .btn-save { width: 100%; background: var(--primary-blue); color: var(--white); padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: all 0.3s; margin-top: 10px; }
         .btn-save:hover { background: var(--dark-blue); }
 
-        /* Loading & Empty */
         .loading { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); font-size: 1.2rem; }
         .empty-state { text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5); }
         .empty-state .icon { font-size: 5rem; margin-bottom: 20px; opacity: 0.5; }
 
-        /* Footer */
         .footer { background: var(--black); padding: 30px 50px; color: rgba(255,255,255,0.6); text-align: center; border-top: 1px solid var(--medium-gray); margin-top: 60px; }
 
-        /* Responsive */
         @media (max-width: 1024px) {
             .header { padding: 15px 30px; }
             .tournament-header { padding: 20px 30px; }
@@ -142,7 +130,7 @@
         @media (max-width: 768px) {
             .header { padding: 12px 20px; flex-direction: column; gap: 15px; }
             .nav { flex-wrap: wrap; justify-content: center; gap: 10px; }
-            .tournament-header { padding: 15px 20px; }
+            .tournament-header { padding: 15px 20px; flex-direction: column; }
             .tournament-info { flex-direction: column; align-items: flex-start; }
             .tournament-title h1 { font-size: 1.2rem; }
             .tabs { padding: 0 20px; overflow-x: auto; }
@@ -163,7 +151,6 @@
             .tabs { padding: 0 15px; }
             .main-content { padding: 15px 15px; }
             .athletes-table { display: block; overflow-x: auto; }
-            .athletes-table th, .athletes-table td { padding: 8px 10px; font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -205,7 +192,6 @@
         <div class="loading">Loading tournament details...</div>
     </div>
 
-    <!-- Edit Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -262,8 +248,6 @@
         let allAthletes = [];
         let currentFilter = 'all';
         let currentUser = null;
-        
-        // Reference data for edit modal
         let refAgeDivisions = [];
         let refWeightClasses = [];
         let refBeltLevels = [];
@@ -276,12 +260,7 @@
             tournamentId = urlParams.get('tournament_id');
             
             if (!tournamentId) {
-                document.getElementById('tournamentContent').innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">❌</div>
-                        <p>Tournament not found</p>
-                    </div>
-                `;
+                showError('Tournament ID not found');
                 return;
             }
             
@@ -289,15 +268,20 @@
         };
 
         async function checkUserStatus() {
-            const { data: { user } } = await dbClient.auth.getUser();
-            if (user) {
-                currentUser = user;
-                document.getElementById('userSection').style.display = 'flex';
-                document.getElementById('loginBtn').style.display = 'none';
-            } else {
+            try {
+                const { data: { user } } = await dbClient.auth.getUser();
+                if (user) {
+                    currentUser = user;
+                    document.getElementById('userSection').style.display = 'flex';
+                    document.getElementById('loginBtn').style.display = 'none';
+                } else {
+                    currentUser = null;
+                    document.getElementById('userSection').style.display = 'none';
+                    document.getElementById('loginBtn').style.display = 'inline-block';
+                }
+            } catch (error) {
+                console.error('Auth error:', error);
                 currentUser = null;
-                document.getElementById('userSection').style.display = 'none';
-                document.getElementById('loginBtn').style.display = 'inline-block';
             }
         }
 
@@ -311,6 +295,7 @@
                 refAgeDivisions = ages.data || [];
                 refWeightClasses = weights.data || [];
                 refBeltLevels = belts.data || [];
+                console.log('Reference data loaded:', { ages: refAgeDivisions.length, weights: refWeightClasses.length, belts: refBeltLevels.length });
             } catch (error) {
                 console.error('Error loading reference data:', error);
             }
@@ -328,51 +313,55 @@
 
         async function loadTournamentAndAthletes() {
             try {
+                console.log('Loading tournament:', tournamentId);
+                
                 const { data: tournament, error: tournamentError } = await dbClient
                     .from('tournaments')
                     .select('*')
                     .eq('id', tournamentId)
                     .single();
                 
-                if (tournamentError || !tournament) {
-                    document.getElementById('tournamentContent').innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon">❌</div>
-                            <p>Tournament not found</p>
-                        </div>
-                    `;
+                if (tournamentError) {
+                    console.error('Tournament error:', tournamentError);
+                    showError('Error loading tournament: ' + tournamentError.message);
                     return;
                 }
 
-                // Join with athletes table to get profile info safely
+                if (!tournament) {
+                    showError('Tournament not found');
+                    return;
+                }
+
+                console.log('Tournament loaded:', tournament.name);
+
                 const { data: athletes, error: athletesError } = await dbClient
                     .from('tournament_participants')
-                    .select(`
-                        *,
-                        athletes (
-                            full_name,
-                            country,
-                            profile_picture_url
-                        )
-                    `)
-                    .eq('tournament_id', tournamentId)
-                    .eq('status', 'approved')
-                    .order('age_group', { ascending: true });
+                    .select('*')
+                    .eq('tournament_id', tournamentId);
 
-                if (athletesError) throw athletesError;
+                if (athletesError) {
+                    console.error('Athletes error:', athletesError);
+                    showError('Error loading athletes: ' + athletesError.message);
+                    return;
+                }
 
+                console.log('Athletes loaded:', athletes?.length || 0);
                 allAthletes = athletes || [];
                 renderTournament(tournament);
                 renderAthletes();
             } catch (error) {
                 console.error('Error loading tournament:', error);
-                document.getElementById('tournamentContent').innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">❌</div>
-                        <p>Error loading tournament details</p>
-                    </div>
-                `;
+                showError('Error loading tournament details: ' + error.message);
             }
+        }
+
+        function showError(message) {
+            document.getElementById('tournamentContent').innerHTML = `
+                <div class="empty-state">
+                    <div class="icon" style="color: #ef4444;"></div>
+                    <p>${message}</p>
+                </div>
+            `;
         }
 
         function renderTournament(tournament) {
@@ -382,7 +371,7 @@
 
             const registerButton = isLoggedIn
                 ? `<button class="btn-register" onclick="window.location.href='player-registration.html?tournament_id=${tournamentId}'">Register</button>`
-                : `<button class="btn btn-login" onclick="window.location.href='login.html?redirect=tournament-details.html?tournament_id=${tournamentId}'">Login to Register</button>`;
+                : `<button class="btn btn-login" onclick="window.location.href='login.html?redirect=tournament-athletes.html?tournament_id=${tournamentId}'">Login to Register</button>`;
 
             document.getElementById('tournamentContent').innerHTML = `
                 <div class="tournament-header">
@@ -408,7 +397,7 @@
                         <a href="tournament-athletes.html?tournament_id=${tournamentId}" class="tab active"><span>👥</span> Athletes <span style="background:var(--accent-yellow);color:var(--black);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${allAthletes.length}</span></a>
                         <a href="#" class="tab"><span>🏆</span> Brackets</a>
                         <a href="#" class="tab"><span>⚔️</span> Matches</a>
-                        <a href="#" class="tab"><span>📅</span> Schedule</a>
+                        <a href="#" class="tab"><span></span> Schedule</a>
                         <a href="#" class="tab"><span>📊</span> Results</a>
                     </div>
                 </div>
@@ -432,9 +421,9 @@
 
         function getAthleteDisplayData(athlete) {
             return {
-                name: athlete.athletes?.full_name || athlete.player_name || 'Unknown',
-                country: athlete.athletes?.country || athlete.country || '',
-                photo: athlete.athletes?.profile_picture_url || athlete.profile_photo_url || ''
+                name: athlete.player_name || 'Unknown',
+                country: athlete.country || '',
+                photo: athlete.profile_photo_url || ''
             };
         }
 
@@ -458,7 +447,7 @@
         function groupAthletesByDivision(athletes) {
             const grouped = {};
             athletes.forEach(athlete => {
-                const key = `${athlete.age_group}|${athlete.gender}|${athlete.belt_level}|${athlete.weight}kg`;
+                const key = `${athlete.age_group || 'Unknown'}|${athlete.gender || 'Unknown'}|${athlete.belt_level || 'Unknown'}|${athlete.weight || 0}kg`;
                 if (!grouped[key]) grouped[key] = [];
                 grouped[key].push(athlete);
             });
@@ -506,7 +495,7 @@
                                         <td>
                                             <div class="athlete-info">
                                                 <div class="athlete-avatar">
-                                                    ${display.photo ? `<img src="${display.photo}" alt="${display.name}">` : '👤'}
+                                                    ${display.photo ? `<img src="${display.photo}" alt="${display.name}">` : ''}
                                                 </div>
                                                 <div class="athlete-details">
                                                     <div class="athlete-name">${display.name}</div>
@@ -520,9 +509,9 @@
                                             <a href="#" class="academy-link">${athlete.team || 'Independent'}</a>
                                         </td>
                                         <td>
-                                            <span class="gender-badge ${athlete.gender.toLowerCase()}">${athlete.gender}</span>
+                                            <span class="gender-badge ${athlete.gender?.toLowerCase() || 'male'}">${athlete.gender || 'Male'}</span>
                                             <div style="margin-top: 5px; font-size: 0.85rem; color: rgba(255,255,255,0.6);">
-                                                ${athlete.age_group} • ${athlete.weight}kg • ${athlete.belt_level}
+                                                ${athlete.age_group || 'N/A'} • ${athlete.weight || 0}kg • ${athlete.belt_level || 'N/A'}
                                             </div>
                                             ${athlete.gi_type ? `<div style="font-size: 0.8rem; color: var(--primary-blue); margin-top: 3px;">${athlete.gi_type}</div>` : ''}
                                             ${editBtn}
@@ -532,7 +521,7 @@
                                 }).join('')}
                             </tbody>
                         </table>
-                        <div class="approved-count">Approved registrations: ${athletes.length}</div>
+                        <div class="approved-count">Total registrations: ${athletes.length}</div>
                     </div>
                 `;
             }
@@ -559,7 +548,7 @@
             }
             
             const filteredAthletes = allAthletes.filter(athlete => 
-                (athlete.athletes?.full_name || athlete.player_name || '').toLowerCase().includes(searchTerm) ||
+                (athlete.player_name || '').toLowerCase().includes(searchTerm) ||
                 (athlete.team || '').toLowerCase().includes(searchTerm) ||
                 (athlete.age_group || '').toLowerCase().includes(searchTerm) ||
                 (athlete.belt_level || '').toLowerCase().includes(searchTerm)
@@ -567,13 +556,13 @@
             renderGroupedAthletes(groupAthletesByDivision(filteredAthletes));
         }
 
-        // ================= MODAL & EDIT LOGIC =================
-
         function openEditModal(participantId) {
-            if (!currentUser) return;
+            if (!currentUser) {
+                alert('Please login first');
+                return;
+            }
             const athlete = allAthletes.find(a => a.id === participantId);
             
-            // Security check: Ensure user can only edit their own record
             if (!athlete || athlete.user_id !== currentUser.id) {
                 alert("Security Error: You can only edit your own registration.");
                 return;
@@ -582,7 +571,6 @@
             document.getElementById('editParticipantId').value = participantId;
             document.getElementById('editGiType').value = athlete.gi_type || 'Gi';
 
-            // Populate Age Divisions (only those that have weights)
             const ageSelect = document.getElementById('editAgeGroup');
             ageSelect.innerHTML = '<option value="">Select Age Division</option>';
             const availableDivIds = [...new Set(refWeightClasses.map(w => w.age_division_id))];
@@ -596,7 +584,6 @@
                 ageSelect.appendChild(opt);
             });
 
-            // Populate Belts
             const beltSelect = document.getElementById('editBelt');
             beltSelect.innerHTML = '<option value="">Select Belt</option>';
             refBeltLevels.forEach(b => {
@@ -606,7 +593,6 @@
                 beltSelect.appendChild(opt);
             });
 
-            // Set current values
             const currentDiv = validAges.find(d => d.name === athlete.age_group);
             if (currentDiv) {
                 ageSelect.value = currentDiv.id;
@@ -653,7 +639,6 @@
             const participantId = document.getElementById('editParticipantId').value;
             const athlete = allAthletes.find(a => a.id === participantId);
             
-            // Double security check before submission
             if (!athlete || athlete.user_id !== currentUser.id) {
                 alert("Security Error: You can only edit your own registration.");
                 return;
@@ -683,7 +668,7 @@
                 
                 alert('✅ Registration updated successfully!');
                 closeEditModal();
-                await loadTournamentAndAthletes(); // Reload to reflect changes
+                await loadTournamentAndAthletes();
             } catch (err) {
                 console.error(err);
                 alert('❌ Error updating: ' + err.message);
