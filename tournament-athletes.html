@@ -295,7 +295,6 @@
                 refAgeDivisions = ages.data || [];
                 refWeightClasses = weights.data || [];
                 refBeltLevels = belts.data || [];
-                console.log('Reference data loaded:', { ages: refAgeDivisions.length, weights: refWeightClasses.length, belts: refBeltLevels.length });
             } catch (error) {
                 console.error('Error loading reference data:', error);
             }
@@ -313,8 +312,6 @@
 
         async function loadTournamentAndAthletes() {
             try {
-                console.log('Loading tournament:', tournamentId);
-                
                 const { data: tournament, error: tournamentError } = await dbClient
                     .from('tournaments')
                     .select('*')
@@ -322,7 +319,6 @@
                     .single();
                 
                 if (tournamentError) {
-                    console.error('Tournament error:', tournamentError);
                     showError('Error loading tournament: ' + tournamentError.message);
                     return;
                 }
@@ -332,26 +328,22 @@
                     return;
                 }
 
-                console.log('Tournament loaded:', tournament.name);
-
                 const { data: athletes, error: athletesError } = await dbClient
                     .from('tournament_participants')
                     .select('*')
                     .eq('tournament_id', tournamentId);
 
                 if (athletesError) {
-                    console.error('Athletes error:', athletesError);
                     showError('Error loading athletes: ' + athletesError.message);
                     return;
                 }
 
-                console.log('Athletes loaded:', athletes?.length || 0);
                 allAthletes = athletes || [];
                 renderTournament(tournament);
                 renderAthletes();
             } catch (error) {
                 console.error('Error loading tournament:', error);
-                showError('Error loading tournament details: ' + error.message);
+                showError('Error loading tournament details');
             }
         }
 
@@ -393,8 +385,8 @@
 
                 <div class="tabs-container">
                     <div class="tabs">
-                        <a href="tournament-details.html?tournament_id=${tournamentId}" class="tab"><span>📋</span> Information</a>
-                        <a href="tournament-athletes.html?tournament_id=${tournamentId}" class="tab active"><span>👥</span> Athletes <span style="background:var(--accent-yellow);color:var(--black);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${allAthletes.length}</span></a>
+                        <a href="tournament-details.html?tournament_id=${tournamentId}" class="tab"><span></span> Information</a>
+                        <a href="tournament-athletes.html?tournament_id=${tournamentId}" class="tab active"><span></span> Athletes <span style="background:var(--accent-yellow);color:var(--black);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${allAthletes.length}</span></a>
                         <a href="#" class="tab"><span>🏆</span> Brackets</a>
                         <a href="#" class="tab"><span>⚔️</span> Matches</a>
                         <a href="#" class="tab"><span></span> Schedule</a>
@@ -460,7 +452,7 @@
             if (Object.keys(groupedAthletes).length === 0) {
                 athletesList.innerHTML = `
                     <div class="empty-state">
-                        <div class="icon">🔍</div>
+                        <div class="icon"></div>
                         <p>No athletes found</p>
                     </div>
                 `;
@@ -634,6 +626,7 @@
             updateEditWeightOptions(this.value, athlete?.gender || 'Male');
         });
 
+        // ✅ تم التعديل: إزالة weight_class
         document.getElementById('editForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const participantId = document.getElementById('editParticipantId').value;
@@ -649,10 +642,11 @@
             const weightSelect = document.getElementById('editWeight');
             const selectedWeight = weightSelect.options[weightSelect.selectedIndex];
 
+            // ✅ إزالة weight_class لأن العمود غير موجود في الجدول
             const updateData = {
                 age_group: selectedAge.dataset.name || selectedAge.textContent,
                 weight: parseFloat(selectedWeight.dataset.minWeight || 0),
-                weight_class: selectedWeight.value,
+                // weight_class: selectedWeight.value,  //  تم الحذف
                 weight_class_id: selectedWeight.dataset.weightId || null,
                 belt_level: document.getElementById('editBelt').value,
                 gi_type: document.getElementById('editGiType').value
