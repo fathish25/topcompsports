@@ -251,7 +251,7 @@
         let refAgeDivisions = [];
         let refWeightClasses = [];
         let refBeltLevels = [];
-        let athletesData = {}; // ✅ تخزين بيانات اللاعبين
+        let athletesData = {};
 
         window.onload = async function() {
             await checkUserStatus();
@@ -329,7 +329,6 @@
                     return;
                 }
 
-                // ✅ جلب المشاركين بدون JOIN
                 const { data: participants, error: participantsError } = await dbClient
                     .from('tournament_participants')
                     .select('*')
@@ -340,7 +339,6 @@
                     return;
                 }
 
-                // ✅ جلب بيانات اللاعبين من جدول athletes بشكل منفصل
                 const userIds = participants.map(p => p.user_id).filter(id => id);
                 let athletesMap = {};
                 
@@ -358,7 +356,6 @@
                     }
                 }
 
-                // ✅ دمج البيانات
                 allAthletes = participants.map(p => ({
                     ...p,
                     athleteData: athletesMap[p.user_id] || {}
@@ -437,7 +434,6 @@
         }
 
         function getAthleteDisplayData(athlete) {
-            // ✅ جلب البيانات من athleteData المخزنة
             const athleteData = athlete.athleteData || {};
             return {
                 name: athleteData.full_name || athlete.player_name || 'Unknown',
@@ -656,6 +652,7 @@
             updateEditWeightOptions(this.value, athlete?.gender || 'Male');
         });
 
+        // ✅ تم التعديل: إزالة weight_class من updateData
         document.getElementById('editForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const participantId = document.getElementById('editParticipantId').value;
@@ -671,10 +668,11 @@
             const weightSelect = document.getElementById('editWeight');
             const selectedWeight = weightSelect.options[weightSelect.selectedIndex];
 
+            // ✅ إزالة weight_class - استخدم weight_class_id فقط
             const updateData = {
                 age_group: selectedAge.dataset.name || selectedAge.textContent,
                 weight: parseFloat(selectedWeight.dataset.minWeight || 0),
-                weight_class: selectedWeight.value,
+                // weight_class: selectedWeight.value,  // ❌ تم الحذف - العمود غير موجود
                 weight_class_id: selectedWeight.dataset.weightId || null,
                 belt_level: document.getElementById('editBelt').value,
                 gi_type: document.getElementById('editGiType').value
