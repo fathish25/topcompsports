@@ -97,11 +97,11 @@
         <div class="nav-menu">
             <a class="nav-item" href="admin-dashboard.html">📊 لوحة التحكم</a>
             <a class="nav-item" href="admin-tournaments.html">🏆 البطولات</a>
-            <a class="nav-item active"> المستخدمون</a>
-            <a class="nav-item" href="admin-registrations.html">📝 التسجيلات</a>
-            <a class="nav-item" href="admin-organizations.html"> الجهات المنظمة</a>
-            <a class="nav-item" href="admin-reports.html"> التقارير</a>
-            <a class="nav-item" href="admin-settings.html">⚙️ الإعدادات</a>
+            <a class="nav-item active">👥 المستخدمون</a>
+            <a class="nav-item" href="admin-registrations.html"> التسجيلات</a>
+            <a class="nav-item" href="admin-organizations.html">🏢 الجهات المنظمة</a>
+            <a class="nav-item" href="admin-reports.html">📊 التقارير</a>
+            <a class="nav-item" href="admin-settings.html">️ الإعدادات</a>
             <a class="nav-item" onclick="logout()">🚪 تسجيل الخروج</a>
         </div>
     </div>
@@ -184,33 +184,33 @@
         </div>
     </div>
 
-    <!-- Modal إنشاء مستخدم -->
-    <div class="modal-overlay" id="createModal">
+    <!-- Modal إنشاء/تعديل مستخدم -->
+    <div class="modal-overlay" id="userModal">
         <div class="modal">
-            <h3 class="modal-title">إنشاء حساب جديد</h3>
+            <h3 class="modal-title" id="modalTitle">إنشاء حساب جديد</h3>
             <div class="form-group">
                 <label class="form-label">الاسم الكامل</label>
-                <input type="text" class="form-input" id="newUserName" placeholder="أدخل الاسم">
+                <input type="text" class="form-input" id="modalUserName" placeholder="أدخل الاسم">
             </div>
             <div class="form-group">
                 <label class="form-label">البريد الإلكتروني</label>
-                <input type="email" class="form-input" id="newUserEmail" placeholder="email@example.com">
+                <input type="email" class="form-input" id="modalUserEmail" placeholder="email@example.com">
             </div>
-            <div class="form-group">
+            <div class="form-group" id="passwordGroup">
                 <label class="form-label">كلمة المرور</label>
-                <input type="password" class="form-input" id="newUserPassword" placeholder="••••••••">
+                <input type="password" class="form-input" id="modalUserPassword" placeholder="••••••••">
             </div>
             <div class="form-group">
                 <label class="form-label">الدور</label>
-                <select class="form-select" id="newUserRole">
+                <select class="form-select" id="modalUserRole">
                     <option value="athlete">لاعب</option>
                     <option value="organizer">منظم</option>
                     <option value="coach">مدرب</option>
                 </select>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-success" onclick="createUser()">✅ إنشاء</button>
-                <button class="btn btn-danger" onclick="closeModal()"> إلغاء</button>
+                <button class="btn btn-success" onclick="saveUser()">✅ حفظ</button>
+                <button class="btn btn-danger" onclick="closeModal()">❌ إلغاء</button>
             </div>
         </div>
     </div>
@@ -223,6 +223,7 @@
         let allUsers = [];
         let currentPage = 1;
         const perPage = 20;
+        let editingUser = null;
 
         window.onload = async () => {
             await checkAuth();
@@ -236,44 +237,12 @@
             if (!admin) { window.location.href = 'index.html'; return; }
         }
 
-        // ✅ دالة لتحديد نوع المستخدم بشكل دقيق
-        async function determineUserType(userId) {
-            // التحقق من جدول اللاعبين
-            const { data: athlete } = await supabaseClient
-                .from('athletes')
-                .select('id')
-                .eq('user_id', userId)
-                .single();
-            
-            if (athlete) return 'athlete';
-            
-            // التحقق من جدول المدربين
-            const { data: coach } = await supabaseClient
-                .from('coaches')
-                .select('id')
-                .eq('user_id', userId)
-                .single();
-            
-            if (coach) return 'coach';
-            
-            // التحقق من جدول المنظمين
-            const { data: organizer } = await supabaseClient
-                .from('organizers')
-                .select('id')
-                .eq('user_id', userId)
-                .single();
-            
-            if (organizer) return 'organizer';
-            
-            return 'unknown';
-        }
-
         async function loadUsers() {
             const search = document.getElementById('searchUser').value.toLowerCase();
             const statusFilter = document.getElementById('filterStatus').value;
             const roleFilter = document.getElementById('filterRole').value;
 
-            // تحميل من جداول athletes, organizers, coaches
+            // ✅ جلب البيانات من الجداول الثلاثة
             const [athletesRes, organizersRes, coachesRes] = await Promise.all([
                 supabaseClient.from('athletes').select('*'),
                 supabaseClient.from('organizers').select('*'),
@@ -282,6 +251,7 @@
 
             let users = [];
 
+            // ✅ جلب اللاعبين
             if (athletesRes.data) {
                 athletesRes.data.forEach(a => {
                     users.push({
@@ -296,6 +266,7 @@
                 });
             }
 
+            // ✅ جلب المنظمين
             if (organizersRes.data) {
                 organizersRes.data.forEach(o => {
                     users.push({
@@ -310,6 +281,7 @@
                 });
             }
 
+            // ✅ جلب المدربين
             if (coachesRes.data) {
                 coachesRes.data.forEach(c => {
                     users.push({
@@ -372,6 +344,7 @@
                             <td>${u.created_at ? new Date(u.created_at).toLocaleDateString('ar-SA') : '-'}</td>
                             <td>
                                 <div class="action-btns">
+                                    <button class="btn btn-info" onclick="editUser('${u.id}', '${u.role}')" style="padding: 5px 10px; font-size: 12px;">✏️ تعديل</button>
                                     <button class="btn btn-warning" onclick="toggleStatus('${u.id}', '${u.role}', '${u.status}')" style="padding: 5px 10px; font-size: 12px;">
                                         ${u.status === 'suspended' ? '✅ تفعيل' : '⏸️ إيقاف'}
                                     </button>
@@ -383,7 +356,6 @@
                 }).join('');
             }
 
-            // Pagination
             const pagination = document.getElementById('pagination');
             if (totalPages > 1) {
                 pagination.innerHTML = Array.from({length: totalPages}, (_, i) => 
@@ -397,6 +369,22 @@
         function goToPage(page) {
             currentPage = page;
             renderPage();
+        }
+
+        // ✅ دالة التعديل
+        function editUser(id, role) {
+            const user = allUsers.find(u => u.id === id);
+            if (!user) return;
+
+            editingUser = { id, role };
+            document.getElementById('modalTitle').textContent = 'تعديل مستخدم';
+            document.getElementById('modalUserName').value = user.name;
+            document.getElementById('modalUserEmail').value = user.email;
+            document.getElementById('modalUserRole').value = role;
+            document.getElementById('modalUserPassword').value = '';
+            document.getElementById('passwordGroup').style.display = 'none';
+            
+            document.getElementById('userModal').classList.add('active');
         }
 
         async function toggleStatus(id, role, currentStatus) {
@@ -422,64 +410,91 @@
         }
 
         function showCreateModal() {
-            document.getElementById('createModal').classList.add('active');
+            editingUser = null;
+            document.getElementById('modalTitle').textContent = 'إنشاء حساب جديد';
+            document.getElementById('modalUserName').value = '';
+            document.getElementById('modalUserEmail').value = '';
+            document.getElementById('modalUserPassword').value = '';
+            document.getElementById('modalUserRole').value = 'athlete';
+            document.getElementById('passwordGroup').style.display = 'block';
+            document.getElementById('userModal').classList.add('active');
         }
 
         function closeModal() {
-            document.getElementById('createModal').classList.remove('active');
-            document.getElementById('newUserName').value = '';
-            document.getElementById('newUserEmail').value = '';
-            document.getElementById('newUserPassword').value = '';
+            document.getElementById('userModal').classList.remove('active');
+            editingUser = null;
         }
 
-        async function createUser() {
-            const name = document.getElementById('newUserName').value;
-            const email = document.getElementById('newUserEmail').value;
-            const password = document.getElementById('newUserPassword').value;
-            const role = document.getElementById('newUserRole').value;
+        // ✅ دالة الحفظ (إنشاء/تعديل)
+        async function saveUser() {
+            const name = document.getElementById('modalUserName').value;
+            const email = document.getElementById('modalUserEmail').value;
+            const password = document.getElementById('modalUserPassword').value;
+            const role = document.getElementById('modalUserRole').value;
 
-            if (!name || !email || !password) {
-                alert('الرجاء ملء جميع الحقول');
+            if (!name || !email) {
+                alert('الرجاء ملء الحقول المطلوبة');
                 return;
             }
 
-            // إنشاء المستخدم في Supabase Auth
-            const { data: userData, error: authError } = await supabaseClient.auth.admin.createUser({
-                email: email,
-                password: password,
-                email_confirm: true
-            });
-
-            if (authError) {
-                alert('خطأ في إنشاء الحساب: ' + authError.message);
+            if (!editingUser && !password) {
+                alert('الرجاء إدخال كلمة المرور');
                 return;
             }
 
-            // إضافة إلى الجدول المناسب
-            const table = role === 'athlete' ? 'athletes' : role === 'organizer' ? 'organizers' : 'coaches';
-            const insertData = {
-                user_id: userData.user.id,
-                email: email,
-                full_name: name,
-                status: 'active',
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            };
+            try {
+                if (editingUser) {
+                    // تعديل مستخدم موجود
+                    const table = role === 'athlete' ? 'athletes' : role === 'organizer' ? 'organizers' : 'coaches';
+                    const updateData = {
+                        full_name: name,
+                        email: email,
+                        updated_at: new Date().toISOString()
+                    };
+                    
+                    if (role === 'organizer') updateData.org_name = name;
+                    
+                    const { error } = await supabaseClient.from(table).update(updateData).eq('id', editingUser.id);
+                    if (error) throw error;
+                    
+                    alert('تم تعديل المستخدم بنجاح');
+                } else {
+                    // إنشاء مستخدم جديد
+                    const { data: userData, error: authError } = await supabaseClient.auth.admin.createUser({
+                        email: email,
+                        password: password,
+                        email_confirm: true
+                    });
 
-            if (role === 'organizer') {
-                insertData.org_name = name;
-                insertData.verification_status = 'approved';
+                    if (authError) throw authError;
+
+                    const table = role === 'athlete' ? 'athletes' : role === 'organizer' ? 'organizers' : 'coaches';
+                    const insertData = {
+                        user_id: userData.user.id,
+                        email: email,
+                        full_name: name,
+                        status: 'active',
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    };
+
+                    if (role === 'organizer') {
+                        insertData.org_name = name;
+                        insertData.verification_status = 'pending';
+                    }
+
+                    const { error: insertError } = await supabaseClient.from(table).insert(insertData);
+                    if (insertError) throw insertError;
+                    
+                    alert('تم إنشاء الحساب بنجاح!');
+                }
+
+                closeModal();
+                loadUsers();
+
+            } catch (error) {
+                alert('خطأ: ' + error.message);
             }
-
-            const { error: insertError } = await supabaseClient.from(table).insert(insertData);
-            if (insertError) {
-                alert('خطأ: ' + insertError.message);
-                return;
-            }
-
-            alert('تم إنشاء الحساب بنجاح!');
-            closeModal();
-            loadUsers();
         }
 
         function exportUsers() {
