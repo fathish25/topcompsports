@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - TopCompSports</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary-blue: #0066CC;
@@ -30,13 +31,20 @@
             background: var(--black); 
             color: var(--white); 
             position: fixed; 
-            right: 0; 
             top: 0; 
             height: 100vh; 
             overflow-y: auto;
             padding: 20px;
             z-index: 1000;
+            transition: all 0.3s;
         }
+        
+        /* RTL Support */
+        [dir="rtl"] .sidebar { right: 0; left: auto; }
+        [dir="ltr"] .sidebar { left: 0; right: auto; }
+        [dir="rtl"] .main-content { margin-right: 280px; margin-left: 0; }
+        [dir="ltr"] .main-content { margin-left: 280px; margin-right: 0; }
+        
         .logo { display: flex; align-items: center; gap: 15px; padding: 20px; border-bottom: 2px solid var(--medium-gray); margin-bottom: 30px; }
         .logo-icon { width: 50px; height: 50px; background: var(--accent-yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; color: var(--dark-blue); }
         .logo-text { font-size: 1.5rem; font-weight: 900; color: var(--white); }
@@ -47,12 +55,33 @@
         .role-badge { background: var(--accent-yellow); color: var(--black); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-top: 20px; display: inline-block; }
 
         /* Main Content */
-        .main-content { margin-right: 280px; padding: 30px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 20px; background: var(--white); border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .main-content { padding: 30px; transition: all 0.3s; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 20px; background: var(--white); border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); flex-wrap: wrap; gap: 15px; }
         .page-title { font-size: 2rem; font-weight: 900; color: var(--black); }
-        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-info { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--gradient-blue); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: bold; font-size: 1.2rem; }
         .btn-logout { background: var(--danger); color: var(--white); padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        /* Language Switcher */
+        .lang-switcher { display: flex; gap: 8px; background: var(--light-bg); padding: 5px; border-radius: 8px; }
+        .lang-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--black);
+            transition: all 0.3s;
+        }
+        .lang-btn.active {
+            background: var(--gradient-blue);
+            color: var(--white);
+        }
+        .lang-btn:hover:not(.active) {
+            background: rgba(0,0,0,0.05);
+        }
 
         /* Stats Grid */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; margin-bottom: 40px; }
@@ -65,10 +94,14 @@
             cursor: pointer;
             border-right: 4px solid var(--primary-blue);
         }
+        [dir="ltr"] .stat-card { border-right: none; border-left: 4px solid var(--primary-blue); }
         .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,102,204,0.15); }
         .stat-card.warning { border-right-color: var(--warning); }
+        [dir="ltr"] .stat-card.warning { border-right-color: transparent; border-left-color: var(--warning); }
         .stat-card.success { border-right-color: var(--success); }
+        [dir="ltr"] .stat-card.success { border-right-color: transparent; border-left-color: var(--success); }
         .stat-card.danger { border-right-color: var(--danger); }
+        [dir="ltr"] .stat-card.danger { border-right-color: transparent; border-left-color: var(--danger); }
         .stat-icon { font-size: 2.5rem; margin-bottom: 15px; }
         .stat-value { font-size: 2.5rem; font-weight: 900; color: var(--primary-blue); margin-bottom: 5px; }
         .stat-label { color: rgba(0,0,0,0.6); font-size: 0.95rem; }
@@ -98,6 +131,7 @@
         /* Tables */
         .data-table { width: 100%; border-collapse: collapse; }
         .data-table th { background: var(--light-bg); padding: 15px; text-align: right; font-weight: 700; color: var(--black); border-bottom: 2px solid var(--medium-gray); }
+        [dir="ltr"] .data-table th { text-align: left; }
         .data-table td { padding: 15px; border-bottom: 1px solid var(--light-bg); }
         .data-table tr:hover { background: var(--light-bg); }
         .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
@@ -120,8 +154,10 @@
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar { width: 100%; height: auto; position: relative; }
-            .main-content { margin-right: 0; padding: 20px; }
+            [dir="rtl"] .main-content, [dir="ltr"] .main-content { margin: 0; padding: 20px; }
             .stats-grid { grid-template-columns: 1fr; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .user-info { width: 100%; justify-content: space-between; }
         }
     </style>
 </head>
@@ -136,31 +172,43 @@
         <nav>
             <a href="admin-dashboard.html" class="nav-item active">
                 <span class="icon">📊</span>
-                <span>Dashboard</span>
+                <span data-en="Dashboard" data-ar="لوحة التحكم">Dashboard</span>
             </a>
             <a href="admin-users.html" class="nav-item">
+                <span class="icon">👥</span>
+                <span data-en="Users" data-ar="المستخدمون">Users</span>
+            </a>
+            <a href="admin-athletes.html" class="nav-item">
+                <span class="icon">🏃</span>
+                <span data-en="Athletes" data-ar="اللاعبون">Athletes</span>
+            </a>
+            <a href="admin-coaches.html" class="nav-item">
+                <span class="icon">🏋️</span>
+                <span data-en="Coaches" data-ar="المدربون">Coaches</span>
+            </a>
+            <a href="admin-teams.html" class="nav-item">
+                <span class="icon">🛡️</span>
+                <span data-en="Teams" data-ar="الفرق">Teams</span>
+            </a>
+            <a href="admin-organizers.html" class="nav-item">
                 <span class="icon"></span>
-                <span>Users</span>
+                <span data-en="Organizers" data-ar="المنظمون">Organizers</span>
             </a>
             <a href="admin-tournaments.html" class="nav-item">
                 <span class="icon">🏆</span>
-                <span>Tournaments</span>
-            </a>
-            <a href="admin-organizations.html" class="nav-item">
-                <span class="icon">🏢</span>
-                <span>Organizations</span>
+                <span data-en="Tournaments" data-ar="البطولات">Tournaments</span>
             </a>
             <a href="admin-registrations.html" class="nav-item">
                 <span class="icon">📝</span>
-                <span>Registrations</span>
+                <span data-en="Registrations" data-ar="التسجيلات">Registrations</span>
             </a>
             <a href="admin-reports.html" class="nav-item">
                 <span class="icon">📈</span>
-                <span>Reports</span>
+                <span data-en="Reports" data-ar="التقارير">Reports</span>
             </a>
             <a href="admin-settings.html" class="nav-item">
-                <span class="icon">⚙️</span>
-                <span>Settings</span>
+                <span class="icon">️</span>
+                <span data-en="Settings" data-ar="الإعدادات">Settings</span>
             </a>
         </nav>
 
@@ -170,11 +218,17 @@
     <!-- Main Content -->
     <main class="main-content">
         <div class="header">
-            <h1 class="page-title">Admin Dashboard</h1>
+            <h1 class="page-title" data-en="Admin Dashboard" data-ar="لوحة تحكم الأدمن">Admin Dashboard</h1>
             <div class="user-info">
+                <!-- Language Switcher -->
+                <div class="lang-switcher">
+                    <button class="lang-btn" id="btnEn" onclick="window.setLang('en')">EN</button>
+                    <button class="lang-btn" id="btnAr" onclick="window.setLang('ar')">عربي</button>
+                </div>
+                
                 <div class="user-avatar" id="userAvatar">A</div>
                 <span id="userName">Admin</span>
-                <button class="btn-logout" onclick="handleLogout()">Logout</button>
+                <button class="btn-logout" onclick="handleLogout()" data-en="Logout" data-ar="تسجيل الخروج">Logout</button>
             </div>
         </div>
 
@@ -183,59 +237,59 @@
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card" onclick="window.location.href='admin-users.html'">
-                <div class="stat-icon"></div>
+                <div class="stat-icon">👥</div>
                 <div class="stat-value" id="totalUsers">0</div>
-                <div class="stat-label">Total Users</div>
+                <div class="stat-label" data-en="Total Users" data-ar="إجمالي المستخدمين">Total Users</div>
             </div>
             <div class="stat-card success" onclick="window.location.href='admin-tournaments.html'">
                 <div class="stat-icon">🏆</div>
                 <div class="stat-value" id="totalTournaments">0</div>
-                <div class="stat-label">Tournaments</div>
+                <div class="stat-label" data-en="Tournaments" data-ar="البطولات">Tournaments</div>
             </div>
-            <div class="stat-card warning" onclick="window.location.href='admin-verification.html'">
-                <div class="stat-icon"></div>
+            <div class="stat-card warning" onclick="window.location.href='admin-organizers.html'">
+                <div class="stat-icon">⏳</div>
                 <div class="stat-value" id="pendingOrganizers">0</div>
-                <div class="stat-label">Pending Organizers</div>
+                <div class="stat-label" data-en="Pending Organizers" data-ar="منظمون معلقون">Pending Organizers</div>
             </div>
-            <div class="stat-card danger" onclick="window.location.href='admin-registrations.html'">
-                <div class="stat-icon"></div>
-                <div class="stat-value" id="totalRegistrations">0</div>
-                <div class="stat-label">Registrations</div>
+            <div class="stat-card danger" onclick="window.location.href='admin-teams.html'">
+                <div class="stat-icon">🛡️</div>
+                <div class="stat-value" id="totalTeams">0</div>
+                <div class="stat-label" data-en="Teams" data-ar="الفرق">Teams</div>
             </div>
         </div>
 
         <!-- Quick Actions -->
         <div class="quick-actions">
             <a href="admin-subadmins.html" class="action-card">
-                <div class="action-icon">👨‍💼</div>
-                <div class="action-title">Manage Sub-Admins</div>
-                <div class="action-desc">Create and manage admin accounts</div>
+                <div class="action-icon">👨‍</div>
+                <div class="action-title" data-en="Manage Sub-Admins" data-ar="إدارة الأدمن الفرعي">Manage Sub-Admins</div>
+                <div class="action-desc" data-en="Create and manage admin accounts" data-ar="إنشاء وإدارة حسابات الأدمن">Create and manage admin accounts</div>
             </a>
-            <a href="admin-verification.html" class="action-card">
+            <a href="admin-organizers.html" class="action-card">
                 <div class="action-icon">✅</div>
-                <div class="action-title">Verify Organizers</div>
-                <div class="action-desc">Approve organizer applications</div>
+                <div class="action-title" data-en="Verify Organizers" data-ar="التحقق من المنظمين">Verify Organizers</div>
+                <div class="action-desc" data-en="Approve organizer applications" data-ar="الموافقة على طلبات المنظمين">Approve organizer applications</div>
             </a>
             <a href="admin-tournaments.html" class="action-card">
                 <div class="action-icon">➕</div>
-                <div class="action-title">Create Tournament</div>
-                <div class="action-desc">Add new tournament</div>
+                <div class="action-title" data-en="Create Tournament" data-ar="إنشاء بطولة">Create Tournament</div>
+                <div class="action-desc" data-en="Add new tournament" data-ar="إضافة بطولة جديدة">Add new tournament</div>
             </a>
             <a href="admin-reports.html" class="action-card">
-                <div class="action-icon"></div>
-                <div class="action-title">View Reports</div>
-                <div class="action-desc">Analytics and statistics</div>
+                <div class="action-icon">📊</div>
+                <div class="action-title" data-en="View Reports" data-ar="عرض التقارير">View Reports</div>
+                <div class="action-desc" data-en="Analytics and statistics" data-ar="التحليلات والإحصائيات">Analytics and statistics</div>
             </a>
         </div>
 
         <!-- Pending Organizers -->
         <div class="section">
             <h2 class="section-title">
-                <span class="icon"></span>
-                Pending Organizer Verification
+                <span class="icon">⏳</span>
+                <span data-en="Pending Organizer Verification" data-ar="التحقق من المنظمين المعلقين">Pending Organizer Verification</span>
             </h2>
             <div id="pendingOrganizersList">
-                <div class="loading">Loading...</div>
+                <div class="loading" data-en="Loading..." data-ar="جاري التحميل...">Loading...</div>
             </div>
         </div>
 
@@ -243,10 +297,10 @@
         <div class="section">
             <h2 class="section-title">
                 <span class="icon">🕐</span>
-                Recent Activity
+                <span data-en="Recent Activity" data-ar="النشاط الأخير">Recent Activity</span>
             </h2>
             <div id="recentActivity">
-                <div class="loading">Loading...</div>
+                <div class="loading" data-en="Loading..." data-ar="جاري التحميل...">Loading...</div>
             </div>
         </div>
     </main>
@@ -257,12 +311,40 @@
         const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentAdmin = null;
+        let currentLang = localStorage.getItem('adminLang') || 'en';
 
-        window.onload = async function() {
-            await checkAuth();
-            await loadDashboardData();
+        // ========================================
+        // نظام الترجمة - Language System
+        // ========================================
+        
+        window.setLang = function(lang) {
+            // حفظ اللغة المختارة
+            currentLang = lang;
+            localStorage.setItem('adminLang', lang);
+            
+            // تحديث اتجاه الصفحة
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            // تحديث حالة الأزرار
+            document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+            document.getElementById('btnAr').classList.toggle('active', lang === 'ar');
+            
+            // ترجمة جميع العناصر التي تحتوي على data-en و data-ar
+            document.querySelectorAll('[data-en][data-ar]').forEach(el => {
+                el.textContent = lang === 'ar' ? el.dataset.ar : el.dataset.en;
+            });
+            
+            // تحديث عنوان الصفحة
+            document.title = lang === 'ar' ? 'لوحة تحكم الأدمن - TopCompSports' : 'Admin Dashboard - TopCompSports';
+            
+            console.log('✅ Language changed to:', lang);
         };
 
+        // ========================================
+        // التحقق من المصادقة
+        // ========================================
+        
         async function checkAuth() {
             const storedAdmin = localStorage.getItem('currentAdmin');
             if (!storedAdmin) {
@@ -292,38 +374,53 @@
                 
                 // Show role
                 const roleBadge = document.getElementById('adminRole');
-                const roleText = currentAdmin.role === 'super_admin' ? 'Super Admin' : 
-                                currentAdmin.role === 'admin' ? 'Admin' : 'Sub-Admin';
+                const roleText = currentAdmin.role === 'super_admin' ? 
+                    (currentLang === 'ar' ? 'سوبر أدمن' : 'Super Admin') : 
+                    currentAdmin.role === 'admin' ? 
+                    (currentLang === 'ar' ? 'أدمن' : 'Admin') : 
+                    (currentLang === 'ar' ? 'أدمن فرعي' : 'Sub-Admin');
                 roleBadge.textContent = roleText;
                 
-                // Check permissions
-                if (currentAdmin.role !== 'super_admin' && currentAdmin.role !== 'admin') {
-                    showAlert('You do not have permission to access this page.', 'error');
-                    setTimeout(() => window.location.href = 'admin-login.html', 2000);
-                }
             } catch (error) {
                 console.error('Auth error:', error);
                 window.location.href = 'admin-login.html';
             }
         }
 
+        // ========================================
+        // تحميل بيانات الداش بورد
+        // ========================================
+        
         async function loadDashboardData() {
             try {
-                // Load stats
                 await loadStats();
                 await loadPendingOrganizers();
                 await loadRecentActivity();
             } catch (error) {
                 console.error('Error loading dashboard:', error);
-                showAlert('Error loading dashboard data', 'error');
+                showAlert(currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading dashboard data', 'error');
             }
         }
 
+        // ========================================
+        // تحميل الإحصائيات
+        // ========================================
+        
         async function loadStats() {
-            // Total users
-            const { count: usersCount } = await dbClient
-                .from('users')
+            // Total users (athletes + coaches + organizers)
+            const { count: athletesCount } = await dbClient
+                .from('athletes')
                 .select('*', { count: 'exact', head: true });
+
+            const { count: coachesCount } = await dbClient
+                .from('coaches')
+                .select('*', { count: 'exact', head: true });
+
+            const { count: organizersCount } = await dbClient
+                .from('organizers')
+                .select('*', { count: 'exact', head: true });
+
+            const totalUsers = (athletesCount || 0) + (coachesCount || 0) + (organizersCount || 0);
 
             // Total tournaments
             const { count: tournamentsCount } = await dbClient
@@ -336,17 +433,21 @@
                 .select('*', { count: 'exact', head: true })
                 .eq('verification_status', 'pending');
 
-            // Total registrations
-            const { count: registrationsCount } = await dbClient
-                .from('tournament_participants')
+            // Total teams
+            const { count: teamsCount } = await dbClient
+                .from('teams')
                 .select('*', { count: 'exact', head: true });
 
-            document.getElementById('totalUsers').textContent = usersCount || 0;
+            document.getElementById('totalUsers').textContent = totalUsers || 0;
             document.getElementById('totalTournaments').textContent = tournamentsCount || 0;
             document.getElementById('pendingOrganizers').textContent = pendingCount || 0;
-            document.getElementById('totalRegistrations').textContent = registrationsCount || 0;
+            document.getElementById('totalTeams').textContent = teamsCount || 0;
         }
 
+        // ========================================
+        // تحميل المنظمين المعلقين
+        // ========================================
+        
         async function loadPendingOrganizers() {
             const { data: organizers } = await dbClient
                 .from('organizers')
@@ -358,7 +459,7 @@
             const container = document.getElementById('pendingOrganizersList');
             
             if (!organizers || organizers.length === 0) {
-                container.innerHTML = '<p style="text-align: center; padding: 40px; color: rgba(0,0,0,0.5);">No pending verifications</p>';
+                container.innerHTML = `<p style="text-align: center; padding: 40px; color: rgba(0,0,0,0.5);">${currentLang === 'ar' ? 'لا توجد طلبات معلقة' : 'No pending verifications'}</p>`;
                 return;
             }
 
@@ -366,11 +467,11 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Organization</th>
-                            <th>Submitted</th>
-                            <th>Actions</th>
+                            <th>${currentLang === 'ar' ? 'الاسم' : 'Name'}</th>
+                            <th>${currentLang === 'ar' ? 'البريد' : 'Email'}</th>
+                            <th>${currentLang === 'ar' ? 'المنظمة' : 'Organization'}</th>
+                            <th>${currentLang === 'ar' ? 'التاريخ' : 'Submitted'}</th>
+                            <th>${currentLang === 'ar' ? 'الإجراءات' : 'Actions'}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -379,10 +480,10 @@
                                 <td>${org.full_name}</td>
                                 <td>${org.email}</td>
                                 <td>${org.organization_name || 'N/A'}</td>
-                                <td>${new Date(org.created_at).toLocaleDateString()}</td>
+                                <td>${new Date(org.created_at).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</td>
                                 <td>
-                                    <button class="btn-action btn-approve" onclick="approveOrganizer('${org.id}')">Approve</button>
-                                    <button class="btn-action btn-reject" onclick="rejectOrganizer('${org.id}')">Reject</button>
+                                    <button class="btn-action btn-approve" onclick="approveOrganizer('${org.id}')">${currentLang === 'ar' ? 'قبول' : 'Approve'}</button>
+                                    <button class="btn-action btn-reject" onclick="rejectOrganizer('${org.id}')">${currentLang === 'ar' ? 'رفض' : 'Reject'}</button>
                                 </td>
                             </tr>
                         `).join('')}
@@ -391,8 +492,12 @@
             `;
         }
 
+        // ========================================
+        // الموافقة على المنظم
+        // ========================================
+        
         async function approveOrganizer(organizerId) {
-            if (!confirm('Are you sure you want to approve this organizer?')) return;
+            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من الموافقة على هذا المنظم؟' : 'Are you sure you want to approve this organizer?')) return;
 
             const { error } = await dbClient
                 .from('organizers')
@@ -403,17 +508,21 @@
                 .eq('id', organizerId);
 
             if (error) {
-                showAlert('Error approving organizer', 'error');
+                showAlert(currentLang === 'ar' ? 'خطأ في الموافقة' : 'Error approving organizer', 'error');
                 return;
             }
 
-            showAlert('Organizer approved successfully', 'success');
+            showAlert(currentLang === 'ar' ? 'تمت الموافقة بنجاح' : 'Organizer approved successfully', 'success');
             loadPendingOrganizers();
             loadStats();
         }
 
+        // ========================================
+        // رفض المنظم
+        // ========================================
+        
         async function rejectOrganizer(organizerId) {
-            if (!confirm('Are you sure you want to reject this organizer?')) return;
+            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من رفض هذا المنظم؟' : 'Are you sure you want to reject this organizer?')) return;
 
             const { error } = await dbClient
                 .from('organizers')
@@ -424,18 +533,22 @@
                 .eq('id', organizerId);
 
             if (error) {
-                showAlert('Error rejecting organizer', 'error');
+                showAlert(currentLang === 'ar' ? 'خطأ في الرفض' : 'Error rejecting organizer', 'error');
                 return;
             }
 
-            showAlert('Organizer rejected', 'success');
+            showAlert(currentLang === 'ar' ? 'تم الرفض بنجاح' : 'Organizer rejected', 'success');
             loadPendingOrganizers();
             loadStats();
         }
 
+        // ========================================
+        // تحميل النشاط الأخير
+        // ========================================
+        
         async function loadRecentActivity() {
             const { data: activity } = await dbClient
-                .from('activity_logs')
+                .from('admin_activity_logs')
                 .select('*')
                 .order('created_at', { ascending: false })
                 .limit(10);
@@ -443,7 +556,7 @@
             const container = document.getElementById('recentActivity');
             
             if (!activity || activity.length === 0) {
-                container.innerHTML = '<p style="text-align: center; padding: 40px; color: rgba(0,0,0,0.5);">No recent activity</p>';
+                container.innerHTML = `<p style="text-align: center; padding: 40px; color: rgba(0,0,0,0.5);">${currentLang === 'ar' ? 'لا يوجد نشاط حديث' : 'No recent activity'}</p>`;
                 return;
             }
 
@@ -451,19 +564,19 @@
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Action</th>
-                            <th>User</th>
-                            <th>Table</th>
-                            <th>Time</th>
+                            <th>${currentLang === 'ar' ? 'الإجراء' : 'Action'}</th>
+                            <th>${currentLang === 'ar' ? 'الأدمن' : 'Admin'}</th>
+                            <th>${currentLang === 'ar' ? 'الجدول' : 'Table'}</th>
+                            <th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${activity.map(log => `
                             <tr>
                                 <td>${log.action}</td>
-                                <td>${log.user_id || 'System'}</td>
+                                <td>${log.admin_email || 'System'}</td>
                                 <td>${log.table_name || 'N/A'}</td>
-                                <td>${new Date(log.created_at).toLocaleString()}</td>
+                                <td>${new Date(log.created_at).toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -471,6 +584,10 @@
             `;
         }
 
+        // ========================================
+        // عرض التنبيهات
+        // ========================================
+        
         function showAlert(message, type) {
             const alert = document.getElementById('alert');
             alert.className = `alert alert-${type} show`;
@@ -478,11 +595,32 @@
             setTimeout(() => alert.classList.remove('show'), 5000);
         }
 
+        // ========================================
+        // تسجيل الخروج
+        // ========================================
+        
         async function handleLogout() {
-            await dbClient.auth.signOut();
-            localStorage.removeItem('currentAdmin');
-            window.location.href = 'admin-login.html';
+            if (confirm(currentLang === 'ar' ? 'هل أنت متأكد من تسجيل الخروج؟' : 'Are you sure you want to logout?')) {
+                await dbClient.auth.signOut();
+                localStorage.removeItem('currentAdmin');
+                window.location.href = 'admin-login.html';
+            }
         }
+
+        // ========================================
+        // التهيئة عند تحميل الصفحة
+        // ========================================
+        
+        window.onload = async function() {
+            // تطبيق اللغة المحفوظة
+            window.setLang(currentLang);
+            
+            // التحقق من المصادقة
+            await checkAuth();
+            
+            // تحميل البيانات
+            await loadDashboardData();
+        };
     </script>
 </body>
 </html>
