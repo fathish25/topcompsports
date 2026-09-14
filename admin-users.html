@@ -97,10 +97,10 @@
         <div class="nav-menu">
             <a class="nav-item" href="admin-dashboard.html">📊 لوحة التحكم</a>
             <a class="nav-item" href="admin-tournaments.html">🏆 البطولات</a>
-            <a class="nav-item active">👥 المستخدمون</a>
+            <a class="nav-item active"> المستخدمون</a>
             <a class="nav-item" href="admin-registrations.html">📝 التسجيلات</a>
-            <a class="nav-item" href="admin-organizations.html">🏢 الجهات المنظمة</a>
-            <a class="nav-item" href="admin-reports.html">📊 التقارير</a>
+            <a class="nav-item" href="admin-organizations.html"> الجهات المنظمة</a>
+            <a class="nav-item" href="admin-reports.html"> التقارير</a>
             <a class="nav-item" href="admin-settings.html">⚙️ الإعدادات</a>
             <a class="nav-item" onclick="logout()">🚪 تسجيل الخروج</a>
         </div>
@@ -184,33 +184,33 @@
         </div>
     </div>
 
-    <!-- Modal إنشاء/تعديل مستخدم -->
-    <div class="modal-overlay" id="userModal">
+    <!-- Modal إنشاء مستخدم -->
+    <div class="modal-overlay" id="createModal">
         <div class="modal">
-            <h3 class="modal-title" id="modalTitle">إنشاء حساب جديد</h3>
+            <h3 class="modal-title">إنشاء حساب جديد</h3>
             <div class="form-group">
                 <label class="form-label">الاسم الكامل</label>
-                <input type="text" class="form-input" id="modalUserName" placeholder="أدخل الاسم">
+                <input type="text" class="form-input" id="newUserName" placeholder="أدخل الاسم">
             </div>
             <div class="form-group">
                 <label class="form-label">البريد الإلكتروني</label>
-                <input type="email" class="form-input" id="modalUserEmail" placeholder="email@example.com">
+                <input type="email" class="form-input" id="newUserEmail" placeholder="email@example.com">
             </div>
-            <div class="form-group" id="passwordGroup">
+            <div class="form-group">
                 <label class="form-label">كلمة المرور</label>
-                <input type="password" class="form-input" id="modalUserPassword" placeholder="••••••••">
+                <input type="password" class="form-input" id="newUserPassword" placeholder="••••••••">
             </div>
             <div class="form-group">
                 <label class="form-label">الدور</label>
-                <select class="form-select" id="modalUserRole">
+                <select class="form-select" id="newUserRole">
                     <option value="athlete">لاعب</option>
                     <option value="organizer">منظم</option>
                     <option value="coach">مدرب</option>
                 </select>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-success" onclick="saveUser()">✅ حفظ</button>
-                <button class="btn btn-danger" onclick="closeModal()">❌ إلغاء</button>
+                <button class="btn btn-success" onclick="createUser()">✅ إنشاء</button>
+                <button class="btn btn-danger" onclick="closeModal()"> إلغاء</button>
             </div>
         </div>
     </div>
@@ -223,7 +223,6 @@
         let allUsers = [];
         let currentPage = 1;
         const perPage = 20;
-        let editingUser = null;
 
         window.onload = async () => {
             await checkAuth();
@@ -237,101 +236,113 @@
             if (!admin) { window.location.href = 'index.html'; return; }
         }
 
+        // ✅ دالة لتحديد نوع المستخدم بشكل دقيق
+        async function determineUserType(userId) {
+            // التحقق من جدول اللاعبين
+            const { data: athlete } = await supabaseClient
+                .from('athletes')
+                .select('id')
+                .eq('user_id', userId)
+                .single();
+            
+            if (athlete) return 'athlete';
+            
+            // التحقق من جدول المدربين
+            const { data: coach } = await supabaseClient
+                .from('coaches')
+                .select('id')
+                .eq('user_id', userId)
+                .single();
+            
+            if (coach) return 'coach';
+            
+            // التحقق من جدول المنظمين
+            const { data: organizer } = await supabaseClient
+                .from('organizers')
+                .select('id')
+                .eq('user_id', userId)
+                .single();
+            
+            if (organizer) return 'organizer';
+            
+            return 'unknown';
+        }
+
         async function loadUsers() {
             const search = document.getElementById('searchUser').value.toLowerCase();
             const statusFilter = document.getElementById('filterStatus').value;
             const roleFilter = document.getElementById('filterRole').value;
 
-            try {
-                // جلب البيانات من الجداول الثلاثة
-                const [athletesRes, organizersRes, coachesRes] = await Promise.all([
-                    supabaseClient.from('athletes').select('*'),
-                    supabaseClient.from('organizers').select('*'),
-                    supabaseClient.from('coaches').select('*')
-                ]);
+            // تحميل من جداول athletes, organizers, coaches
+            const [athletesRes, organizersRes, coachesRes] = await Promise.all([
+                supabaseClient.from('athletes').select('*'),
+                supabaseClient.from('organizers').select('*'),
+                supabaseClient.from('coaches').select('*')
+            ]);
 
-                // 🔍 تنبيه تشخيصي لمعرفة ما يحدث بالضبط في قاعدة البيانات
-                let debugMessage = "📊 حالة التحميل من قاعدة البيانات:\n\n";
-                debugMessage += `✅ اللاعبون: ${athletesRes.data ? athletesRes.data.length : 0}\n`;
-                debugMessage += `✅ المنظمون: ${organizersRes.data ? organizersRes.data.length : 0}\n`;
-                debugMessage += `✅ المدربون: ${coachesRes.data ? coachesRes.data.length : 0}\n\n`;
+            let users = [];
 
-                if (organizersRes.error) {
-                    debugMessage += `⚠️ خطأ في جلب المنظمين: ${organizersRes.error.message}\n`;
-                }
-
-                let users = [];
-
-                if (athletesRes.data) {
-                    athletesRes.data.forEach(a => {
-                        users.push({
-                            id: a.id,
-                            user_id: a.user_id,
-                            name: a.full_name || a.name || '-',
-                            email: a.email || '-',
-                            role: 'athlete',
-                            status: a.status || 'active',
-                            created_at: a.created_at
-                        });
+            if (athletesRes.data) {
+                athletesRes.data.forEach(a => {
+                    users.push({
+                        id: a.id,
+                        user_id: a.user_id,
+                        name: a.full_name || a.name || '-',
+                        email: a.email || '-',
+                        role: 'athlete',
+                        status: a.status || 'active',
+                        created_at: a.created_at
                     });
-                }
-
-                if (organizersRes.data) {
-                    organizersRes.data.forEach(o => {
-                        users.push({
-                            id: o.id,
-                            user_id: o.user_id,
-                            name: o.full_name || o.org_name || '-',
-                            email: o.email || '-',
-                            role: 'organizer',
-                            status: o.status || 'active',
-                            created_at: o.created_at
-                        });
-                    });
-                }
-
-                if (coachesRes.data) {
-                    coachesRes.data.forEach(c => {
-                        users.push({
-                            id: c.id,
-                            user_id: c.user_id,
-                            name: c.full_name || c.name || '-',
-                            email: c.email || '-',
-                            role: 'coach',
-                            status: c.status || 'active',
-                            created_at: c.created_at
-                        });
-                    });
-                }
-
-                // تطبيق الفلاتر
-                if (search) {
-                    users = users.filter(u => u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search));
-                }
-                if (statusFilter) users = users.filter(u => u.status === statusFilter);
-                if (roleFilter) users = users.filter(u => u.role === roleFilter);
-
-                allUsers = users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-                // تحديث الإحصائيات
-                document.getElementById('statTotal').textContent = allUsers.length;
-                document.getElementById('statAthletes').textContent = allUsers.filter(u => u.role === 'athlete').length;
-                document.getElementById('statOrganizers').textContent = allUsers.filter(u => u.role === 'organizer').length;
-                document.getElementById('statCoaches').textContent = allUsers.filter(u => u.role === 'coach').length;
-
-                // إضافة نتيجة الفلترة للتنبيه
-                debugMessage += `📈 بعد تطبيق الفلاتر:\n`;
-                debugMessage += `المنظمون المعروضون: ${allUsers.filter(u => u.role === 'organizer').length}`;
-
-                // عرض التنبيه للمستخدم ليرى النتيجة بنفسه
-                alert(debugMessage);
-
-                renderPage();
-
-            } catch (error) {
-                console.error('❌ خطأ في تحميل المستخدمين:', error);
-                alert('❌ حدث خطأ غير متوقع: ' + error.message);
+                });
             }
+
+            if (organizersRes.data) {
+                organizersRes.data.forEach(o => {
+                    users.push({
+                        id: o.id,
+                        user_id: o.user_id,
+                        name: o.full_name || o.org_name || '-',
+                        email: o.email || '-',
+                        role: 'organizer',
+                        status: o.status || 'active',
+                        created_at: o.created_at
+                    });
+                });
+            }
+
+            if (coachesRes.data) {
+                coachesRes.data.forEach(c => {
+                    users.push({
+                        id: c.id,
+                        user_id: c.user_id,
+                        name: c.full_name || c.name || '-',
+                        email: c.email || '-',
+                        role: 'coach',
+                        status: c.status || 'active',
+                        created_at: c.created_at
+                    });
+                });
+            }
+
+            // تطبيق الفلاتر
+            if (search) {
+                users = users.filter(u => 
+                    u.name.toLowerCase().includes(search) || 
+                    u.email.toLowerCase().includes(search)
+                );
+            }
+            if (statusFilter) users = users.filter(u => u.status === statusFilter);
+            if (roleFilter) users = users.filter(u => u.role === roleFilter);
+
+            allUsers = users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            // تحديث الإحصائيات
+            document.getElementById('statTotal').textContent = allUsers.length;
+            document.getElementById('statAthletes').textContent = allUsers.filter(u => u.role === 'athlete').length;
+            document.getElementById('statOrganizers').textContent = allUsers.filter(u => u.role === 'organizer').length;
+            document.getElementById('statCoaches').textContent = allUsers.filter(u => u.role === 'coach').length;
+
+            renderPage();
         }
 
         function renderPage() {
@@ -361,7 +372,6 @@
                             <td>${u.created_at ? new Date(u.created_at).toLocaleDateString('ar-SA') : '-'}</td>
                             <td>
                                 <div class="action-btns">
-                                    <button class="btn btn-info" onclick="editUser('${u.id}', '${u.role}')" style="padding: 5px 10px; font-size: 12px;">✏️ تعديل</button>
                                     <button class="btn btn-warning" onclick="toggleStatus('${u.id}', '${u.role}', '${u.status}')" style="padding: 5px 10px; font-size: 12px;">
                                         ${u.status === 'suspended' ? '✅ تفعيل' : '⏸️ إيقاف'}
                                     </button>
@@ -373,6 +383,7 @@
                 }).join('');
             }
 
+            // Pagination
             const pagination = document.getElementById('pagination');
             if (totalPages > 1) {
                 pagination.innerHTML = Array.from({length: totalPages}, (_, i) => 
@@ -386,21 +397,6 @@
         function goToPage(page) {
             currentPage = page;
             renderPage();
-        }
-
-        function editUser(id, role) {
-            const user = allUsers.find(u => u.id === id);
-            if (!user) return;
-
-            editingUser = { id, role };
-            document.getElementById('modalTitle').textContent = 'تعديل مستخدم';
-            document.getElementById('modalUserName').value = user.name;
-            document.getElementById('modalUserEmail').value = user.email;
-            document.getElementById('modalUserRole').value = role;
-            document.getElementById('modalUserPassword').value = '';
-            document.getElementById('passwordGroup').style.display = 'none';
-            
-            document.getElementById('userModal').classList.add('active');
         }
 
         async function toggleStatus(id, role, currentStatus) {
@@ -426,88 +422,64 @@
         }
 
         function showCreateModal() {
-            editingUser = null;
-            document.getElementById('modalTitle').textContent = 'إنشاء حساب جديد';
-            document.getElementById('modalUserName').value = '';
-            document.getElementById('modalUserEmail').value = '';
-            document.getElementById('modalUserPassword').value = '';
-            document.getElementById('modalUserRole').value = 'athlete';
-            document.getElementById('passwordGroup').style.display = 'block';
-            document.getElementById('userModal').classList.add('active');
+            document.getElementById('createModal').classList.add('active');
         }
 
         function closeModal() {
-            document.getElementById('userModal').classList.remove('active');
-            editingUser = null;
+            document.getElementById('createModal').classList.remove('active');
+            document.getElementById('newUserName').value = '';
+            document.getElementById('newUserEmail').value = '';
+            document.getElementById('newUserPassword').value = '';
         }
 
-        async function saveUser() {
-            const name = document.getElementById('modalUserName').value;
-            const email = document.getElementById('modalUserEmail').value;
-            const password = document.getElementById('modalUserPassword').value;
-            const role = document.getElementById('modalUserRole').value;
+        async function createUser() {
+            const name = document.getElementById('newUserName').value;
+            const email = document.getElementById('newUserEmail').value;
+            const password = document.getElementById('newUserPassword').value;
+            const role = document.getElementById('newUserRole').value;
 
-            if (!name || !email) {
-                alert('الرجاء ملء الحقول المطلوبة');
+            if (!name || !email || !password) {
+                alert('الرجاء ملء جميع الحقول');
                 return;
             }
 
-            if (!editingUser && !password) {
-                alert('الرجاء إدخال كلمة المرور');
+            // إنشاء المستخدم في Supabase Auth
+            const { data: userData, error: authError } = await supabaseClient.auth.admin.createUser({
+                email: email,
+                password: password,
+                email_confirm: true
+            });
+
+            if (authError) {
+                alert('خطأ في إنشاء الحساب: ' + authError.message);
                 return;
             }
 
-            try {
-                if (editingUser) {
-                    const table = role === 'athlete' ? 'athletes' : role === 'organizer' ? 'organizers' : 'coaches';
-                    const updateData = {
-                        full_name: name,
-                        email: email,
-                        updated_at: new Date().toISOString()
-                    };
-                    
-                    if (role === 'organizer') updateData.org_name = name;
-                    
-                    const { error } = await supabaseClient.from(table).update(updateData).eq('id', editingUser.id);
-                    if (error) throw error;
-                    
-                    alert('تم تعديل المستخدم بنجاح');
-                } else {
-                    const { data: userData, error: authError } = await supabaseClient.auth.admin.createUser({
-                        email: email,
-                        password: password,
-                        email_confirm: true
-                    });
+            // إضافة إلى الجدول المناسب
+            const table = role === 'athlete' ? 'athletes' : role === 'organizer' ? 'organizers' : 'coaches';
+            const insertData = {
+                user_id: userData.user.id,
+                email: email,
+                full_name: name,
+                status: 'active',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
 
-                    if (authError) throw authError;
-
-                    const table = role === 'athlete' ? 'athletes' : role === 'organizer' ? 'organizers' : 'coaches';
-                    const insertData = {
-                        user_id: userData.user.id,
-                        email: email,
-                        full_name: name,
-                        status: 'active',
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    };
-
-                    if (role === 'organizer') {
-                        insertData.org_name = name;
-                        insertData.verification_status = 'pending';
-                    }
-
-                    const { error: insertError } = await supabaseClient.from(table).insert(insertData);
-                    if (insertError) throw insertError;
-                    
-                    alert('تم إنشاء الحساب بنجاح!');
-                }
-
-                closeModal();
-                loadUsers();
-
-            } catch (error) {
-                alert('خطأ: ' + error.message);
+            if (role === 'organizer') {
+                insertData.org_name = name;
+                insertData.verification_status = 'approved';
             }
+
+            const { error: insertError } = await supabaseClient.from(table).insert(insertData);
+            if (insertError) {
+                alert('خطأ: ' + insertError.message);
+                return;
+            }
+
+            alert('تم إنشاء الحساب بنجاح!');
+            closeModal();
+            loadUsers();
         }
 
         function exportUsers() {
