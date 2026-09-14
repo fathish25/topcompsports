@@ -98,10 +98,10 @@
             <a class="nav-item" href="admin-dashboard.html">📊 لوحة التحكم</a>
             <a class="nav-item" href="admin-tournaments.html">🏆 البطولات</a>
             <a class="nav-item active">👥 المستخدمون</a>
-            <a class="nav-item" href="admin-registrations.html"> التسجيلات</a>
+            <a class="nav-item" href="admin-registrations.html">📝 التسجيلات</a>
             <a class="nav-item" href="admin-organizations.html">🏢 الجهات المنظمة</a>
             <a class="nav-item" href="admin-reports.html">📊 التقارير</a>
-            <a class="nav-item" href="admin-settings.html">️ الإعدادات</a>
+            <a class="nav-item" href="admin-settings.html">⚙️ الإعدادات</a>
             <a class="nav-item" onclick="logout()">🚪 تسجيل الخروج</a>
         </div>
     </div>
@@ -242,79 +242,96 @@
             const statusFilter = document.getElementById('filterStatus').value;
             const roleFilter = document.getElementById('filterRole').value;
 
-            // ✅ جلب البيانات من الجداول الثلاثة
-            const [athletesRes, organizersRes, coachesRes] = await Promise.all([
-                supabaseClient.from('athletes').select('*'),
-                supabaseClient.from('organizers').select('*'),
-                supabaseClient.from('coaches').select('*')
-            ]);
+            try {
+                // جلب البيانات من الجداول الثلاثة
+                const [athletesRes, organizersRes, coachesRes] = await Promise.all([
+                    supabaseClient.from('athletes').select('*'),
+                    supabaseClient.from('organizers').select('*'),
+                    supabaseClient.from('coaches').select('*')
+                ]);
 
-            let users = [];
+                // 🔍 تنبيه تشخيصي لمعرفة ما يحدث بالضبط في قاعدة البيانات
+                let debugMessage = "📊 حالة التحميل من قاعدة البيانات:\n\n";
+                debugMessage += `✅ اللاعبون: ${athletesRes.data ? athletesRes.data.length : 0}\n`;
+                debugMessage += `✅ المنظمون: ${organizersRes.data ? organizersRes.data.length : 0}\n`;
+                debugMessage += `✅ المدربون: ${coachesRes.data ? coachesRes.data.length : 0}\n\n`;
 
-            // ✅ جلب اللاعبين
-            if (athletesRes.data) {
-                athletesRes.data.forEach(a => {
-                    users.push({
-                        id: a.id,
-                        user_id: a.user_id,
-                        name: a.full_name || a.name || '-',
-                        email: a.email || '-',
-                        role: 'athlete',
-                        status: a.status || 'active',
-                        created_at: a.created_at
+                if (organizersRes.error) {
+                    debugMessage += `⚠️ خطأ في جلب المنظمين: ${organizersRes.error.message}\n`;
+                }
+
+                let users = [];
+
+                if (athletesRes.data) {
+                    athletesRes.data.forEach(a => {
+                        users.push({
+                            id: a.id,
+                            user_id: a.user_id,
+                            name: a.full_name || a.name || '-',
+                            email: a.email || '-',
+                            role: 'athlete',
+                            status: a.status || 'active',
+                            created_at: a.created_at
+                        });
                     });
-                });
-            }
+                }
 
-            // ✅ جلب المنظمين
-            if (organizersRes.data) {
-                organizersRes.data.forEach(o => {
-                    users.push({
-                        id: o.id,
-                        user_id: o.user_id,
-                        name: o.full_name || o.org_name || '-',
-                        email: o.email || '-',
-                        role: 'organizer',
-                        status: o.status || 'active',
-                        created_at: o.created_at
+                if (organizersRes.data) {
+                    organizersRes.data.forEach(o => {
+                        users.push({
+                            id: o.id,
+                            user_id: o.user_id,
+                            name: o.full_name || o.org_name || '-',
+                            email: o.email || '-',
+                            role: 'organizer',
+                            status: o.status || 'active',
+                            created_at: o.created_at
+                        });
                     });
-                });
-            }
+                }
 
-            // ✅ جلب المدربين
-            if (coachesRes.data) {
-                coachesRes.data.forEach(c => {
-                    users.push({
-                        id: c.id,
-                        user_id: c.user_id,
-                        name: c.full_name || c.name || '-',
-                        email: c.email || '-',
-                        role: 'coach',
-                        status: c.status || 'active',
-                        created_at: c.created_at
+                if (coachesRes.data) {
+                    coachesRes.data.forEach(c => {
+                        users.push({
+                            id: c.id,
+                            user_id: c.user_id,
+                            name: c.full_name || c.name || '-',
+                            email: c.email || '-',
+                            role: 'coach',
+                            status: c.status || 'active',
+                            created_at: c.created_at
+                        });
                     });
-                });
+                }
+
+                // تطبيق الفلاتر
+                if (search) {
+                    users = users.filter(u => u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search));
+                }
+                if (statusFilter) users = users.filter(u => u.status === statusFilter);
+                if (roleFilter) users = users.filter(u => u.role === roleFilter);
+
+                allUsers = users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+                // تحديث الإحصائيات
+                document.getElementById('statTotal').textContent = allUsers.length;
+                document.getElementById('statAthletes').textContent = allUsers.filter(u => u.role === 'athlete').length;
+                document.getElementById('statOrganizers').textContent = allUsers.filter(u => u.role === 'organizer').length;
+                document.getElementById('statCoaches').textContent = allUsers.filter(u => u.role === 'coach').length;
+
+                // إضافة نتيجة الفلترة للتنبيه
+                debugMessage += `📈 بعد تطبيق الفلاتر:\n`;
+                debugMessage += `المنظمون المعروضون: ${allUsers.filter(u => u.role === 'organizer').length}`;
+
+                // عرض التنبيه للمستخدم ليرى النتيجة بنفسه
+                alert(debugMessage);
+
+                renderPage();
+
+            } catch (error) {
+                console.error('❌ خطأ في تحميل المستخدمين:', error);
+                alert('❌ حدث خطأ غير متوقع: ' + error.message);
             }
-
-            // تطبيق الفلاتر
-            if (search) {
-                users = users.filter(u => 
-                    u.name.toLowerCase().includes(search) || 
-                    u.email.toLowerCase().includes(search)
-                );
-            }
-            if (statusFilter) users = users.filter(u => u.status === statusFilter);
-            if (roleFilter) users = users.filter(u => u.role === roleFilter);
-
-            allUsers = users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-            // تحديث الإحصائيات
-            document.getElementById('statTotal').textContent = allUsers.length;
-            document.getElementById('statAthletes').textContent = allUsers.filter(u => u.role === 'athlete').length;
-            document.getElementById('statOrganizers').textContent = allUsers.filter(u => u.role === 'organizer').length;
-            document.getElementById('statCoaches').textContent = allUsers.filter(u => u.role === 'coach').length;
-
-            renderPage();
         }
 
         function renderPage() {
@@ -371,7 +388,6 @@
             renderPage();
         }
 
-        // ✅ دالة التعديل
         function editUser(id, role) {
             const user = allUsers.find(u => u.id === id);
             if (!user) return;
@@ -425,7 +441,6 @@
             editingUser = null;
         }
 
-        // ✅ دالة الحفظ (إنشاء/تعديل)
         async function saveUser() {
             const name = document.getElementById('modalUserName').value;
             const email = document.getElementById('modalUserEmail').value;
@@ -444,7 +459,6 @@
 
             try {
                 if (editingUser) {
-                    // تعديل مستخدم موجود
                     const table = role === 'athlete' ? 'athletes' : role === 'organizer' ? 'organizers' : 'coaches';
                     const updateData = {
                         full_name: name,
@@ -459,7 +473,6 @@
                     
                     alert('تم تعديل المستخدم بنجاح');
                 } else {
-                    // إنشاء مستخدم جديد
                     const { data: userData, error: authError } = await supabaseClient.auth.admin.createUser({
                         email: email,
                         password: password,
