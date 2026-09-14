@@ -8,11 +8,11 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; min-height: 100vh; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; }
+        .container { max-width: 900px; margin: 0 auto; }
         .header { background: rgba(21, 29, 43, 0.95); padding: 30px; border-radius: 16px; margin-bottom: 30px; text-align: center; border: 2px solid #f1c40f; }
         .header h1 { color: #f1c40f; font-size: 2rem; margin-bottom: 10px; }
         .section { background: #151d2b; border-radius: 12px; padding: 25px; margin-bottom: 20px; border: 1px solid #2a3548; }
-        .section-title { font-size: 1.3rem; font-weight: bold; color: #f1c40f; margin-bottom: 20px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; }
+        .section-title { font-size: 1.3rem; font-weight: bold; color: #f1c40f; margin-bottom: 20px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 8px; font-weight: 600; }
         .form-group input, .form-group select { width: 100%; background: #1a1f2e; border: 2px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; font-size: 1rem; }
@@ -22,6 +22,10 @@
         .btn-primary { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241,196,15,0.3); }
         .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; margin-top: 10px; }
+        .btn-add { background: linear-gradient(135deg, #10b981, #059669); color: #fff; margin-top: 15px; }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16,185,129,0.3); }
+        .btn-delete { background: rgba(239,68,68,0.2); color: #ef4444; padding: 8px 16px; font-size: 0.85rem; width: auto; }
+        .btn-delete:hover { background: rgba(239,68,68,0.3); }
         .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; text-align: center; }
         .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
         .alert-error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #ef4444; }
@@ -32,27 +36,49 @@
         .info-value { color: #fff; font-weight: bold; }
         .readonly-field { background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.7) !important; cursor: not-allowed; }
         .loading { text-align: center; padding: 20px; color: rgba(255,255,255,0.6); }
-        @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+        
+        /* تنسيق التسجيلات الحالية */
+        .existing-registrations { margin-top: 20px; }
+        .registration-card { background: rgba(241,196,15,0.05); border: 1px solid rgba(241,196,15,0.2); border-radius: 8px; padding: 15px; margin-bottom: 10px; }
+        .registration-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .registration-card-title { font-weight: bold; color: #f1c40f; }
+        .registration-card-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; font-size: 0.9rem; }
+        .registration-card-item { color: rgba(255,255,255,0.8); }
+        .registration-card-item span { color: #fff; font-weight: 600; }
+        
+        @media (max-width: 600px) { 
+            .form-row { grid-template-columns: 1fr; }
+            .registration-card-details { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🏆 التسجيل في البطولة</h1>
-            <p style="color: rgba(255,255,255,0.7);">قم بتحديث بياناتك الخاصة بالبطولة أدناه</p>
+            <p style="color: rgba(255,255,255,0.7);">قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة</p>
         </div>
 
         <div id="alert" class="alert"></div>
 
         <div class="section">
-            <div class="section-title">👤 بياناتك الشخصية (من الحساب)</div>
+            <div class="section-title"> بياناتك الشخصية (من الحساب)</div>
             <div id="playerInfo" class="player-info">
                 <div class="loading">جاري تحميل البيانات...</div>
             </div>
         </div>
 
+        <!-- التسجيلات الحالية -->
+        <div class="section" id="existingRegistrationsSection" style="display: none;">
+            <div class="section-title">
+                <span>📋 تسجيلاتك الحالية في البطولة</span>
+                <span id="registrationsCount" style="background: rgba(241,196,15,0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;"></span>
+            </div>
+            <div id="existingRegistrations" class="existing-registrations"></div>
+        </div>
+
         <div class="section">
-            <div class="section-title"> بيانات المشاركة في البطولة (قابل للتعديل)</div>
+            <div class="section-title">📝 بيانات المشاركة في البطولة (قابل للتعديل)</div>
             <form id="tournamentForm">
                 <div class="form-row">
                     <div class="form-group">
@@ -98,7 +124,7 @@
                     <input type="number" id="ranking" placeholder="0 = غير مصنف | 1-10 = محلي | 1-100 = دولي" min="0" value="0">
                 </div>
 
-                <button type="submit" class="btn btn-primary">✅ تأكيد التسجيل في البطولة</button>
+                <button type="submit" class="btn btn-primary">✅ إضافة تسجيل جديد</button>
                 <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">← العودة للصفحة الرئيسية</button>
             </form>
         </div>
@@ -117,6 +143,8 @@
         let ageDivisions = [];
         let beltLevels = [];
         let availableDivisionIds = [];
+        let existingRegistrations = [];
+        let currentUserId = null;
 
         async function loadPlayerData(userId) {
             try {
@@ -201,6 +229,24 @@
                 .eq('is_active', true)
                 .order('name');
             
+            return data || [];
+        }
+
+        async function loadExistingRegistrations() {
+            const { data, error } = await supabaseClient
+                .from('tournament_participants')
+                .select('*')
+                .eq('user_id', currentUserId)
+                .eq('tournament_id', tournamentId)
+                .order('created_at', { ascending: false });
+            
+            if (error) {
+                console.error('Error loading existing registrations:', error);
+                return [];
+            }
+            
+            existingRegistrations = data || [];
+            displayExistingRegistrations();
             return data || [];
         }
 
@@ -353,6 +399,72 @@
             }
         }
 
+        function displayPlayerInfo() {
+            const infoDiv = document.getElementById('playerInfo');
+            if (!currentPlayer) {
+                infoDiv.innerHTML = '<div class="loading">خطأ في تحميل البيانات</div>';
+                return;
+            }
+            
+            infoDiv.innerHTML = `
+                <h3>👤 ${currentPlayer.full_name || 'لاعب'}</h3>
+                <div class="info-row"><span class="info-label">البريد الإلكتروني:</span><span class="info-value">${currentPlayer.email || 'غير متوفر'}</span></div>
+                <div class="info-row"><span class="info-label">الجنس:</span><span class="info-value">${currentPlayer.gender === 'Male' ? 'ذكر' : currentPlayer.gender === 'Female' ? 'أنثى' : currentPlayer.gender || 'غير محدد'}</span></div>
+                <div class="info-row"><span class="info-label">الدولة:</span><span class="info-value">${currentPlayer.country || 'غير محدد'}</span></div>
+            `;
+        }
+
+        function displayExistingRegistrations() {
+            const container = document.getElementById('existingRegistrations');
+            const section = document.getElementById('existingRegistrationsSection');
+            const countLabel = document.getElementById('registrationsCount');
+            
+            if (existingRegistrations.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            countLabel.textContent = `${existingRegistrations.length} تسجيل`;
+            
+            container.innerHTML = existingRegistrations.map((reg, index) => `
+                <div class="registration-card">
+                    <div class="registration-card-header">
+                        <div class="registration-card-title">تسجيل #${index + 1}</div>
+                        <button type="button" class="btn btn-delete" onclick="deleteRegistration('${reg.id}')">🗑️ حذف</button>
+                    </div>
+                    <div class="registration-card-details">
+                        <div class="registration-card-item">الفئة: <span>${reg.age_group || '-'}</span></div>
+                        <div class="registration-card-item">الوزن: <span>${reg.weight || 0} كجم</span></div>
+                        <div class="registration-card-item">الحزام: <span>${reg.belt_level || '-'}</span></div>
+                        <div class="registration-card-item">النوع: <span>${reg.gi_type || '-'}</span></div>
+                        <div class="registration-card-item">الفريق: <span>${reg.team || '-'}</span></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function deleteRegistration(registrationId) {
+            if (!confirm('هل أنت متأكد من حذف هذا التسجيل؟')) {
+                return;
+            }
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('tournament_participants')
+                    .delete()
+                    .eq('id', registrationId);
+                
+                if (error) throw error;
+                
+                showAlert('success', '✅ تم حذف التسجيل بنجاح!');
+                await loadExistingRegistrations();
+            } catch (error) {
+                console.error('Error deleting registration:', error);
+                showAlert('error', '❌ خطأ في الحذف: ' + error.message);
+            }
+        }
+
         window.onload = async () => {
             const urlParams = new URLSearchParams(window.location.search);
             tournamentId = urlParams.get('tournament_id');
@@ -369,6 +481,7 @@
                 return;
             }
 
+            currentUserId = user.id;
             console.log('🚀 Loading data from new tables...');
 
             await loadPlayerData(user.id);
@@ -383,38 +496,24 @@
             teamsList = await loadTeams();
             populateTeams();
             
+            // تحميل التسجيلات الحالية
+            await loadExistingRegistrations();
+            
             console.log('✅ All data loaded from new tables');
         };
 
-        function displayPlayerInfo() {
-            const infoDiv = document.getElementById('playerInfo');
-            if (!currentPlayer) {
-                infoDiv.innerHTML = '<div class="loading">خطأ في تحميل البيانات</div>';
-                return;
-            }
-            
-            infoDiv.innerHTML = `
-                <h3>👤 ${currentPlayer.full_name || 'لاعب'}</h3>
-                <div class="info-row"><span class="info-label">البريد الإلكتروني:</span><span class="info-value">${currentPlayer.email || 'غير متوفر'}</span></div>
-                <div class="info-row"><span class="info-label">الجنس:</span><span class="info-value">${currentPlayer.gender === 'Male' ? 'ذكر' : currentPlayer.gender === 'Female' ? 'أنثى' : currentPlayer.gender || 'غير محدد'}</span></div>
-                <div class="info-row"><span class="info-label">الدولة:</span><span class="info-value">${currentPlayer.country || 'غير محدد'}</span></div>
-            `;
-        }
-
-        // ✅ تم التعديل: إزالة weight_class وإبقاء weight_class_id فقط
+        // ✅ تم التعديل: السماح بتسجيلات متعددة
         document.getElementById('tournamentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const { data: { user } } = await supabaseClient.auth.getUser();
             const weightSelect = document.getElementById('weight');
             const selectedWeightOption = weightSelect.options[weightSelect.selectedIndex];
             const ageGroupSelect = document.getElementById('ageGroup');
             const selectedDivision = ageDivisions.find(d => d.id === ageGroupSelect.value);
             
-            // ✅ إزالة weight_class لأن العمود غير موجود في الجدول
             const formData = {
                 tournament_id: tournamentId,
-                user_id: user.id,
+                user_id: currentUserId,
                 player_name: currentPlayer.full_name,
                 age_group: selectedDivision?.name || '',
                 gender: currentPlayer.gender,
@@ -426,31 +525,32 @@
                 ranking: parseInt(document.getElementById('ranking').value) || 0
             };
 
-            console.log('Submitting:', formData);
+            console.log('Submitting new registration:', formData);
 
             try {
-                const { data: existing } = await supabaseClient
+                // ✅ دائماً إنشاء تسجيل جديد (بدون التحقق من وجود تسجيل سابق)
+                const { data, error } = await supabaseClient
                     .from('tournament_participants')
-                    .select('id')
-                    .eq('user_id', user.id)
-                    .eq('tournament_id', tournamentId)
-                    .single();
-
-                let error;
-                if (existing) {
-                    const res = await supabaseClient.from('tournament_participants').update(formData).eq('id', existing.id);
-                    error = res.error;
-                } else {
-                    const res = await supabaseClient.from('tournament_participants').insert([formData]);
-                    error = res.error;
-                }
+                    .insert([formData])
+                    .select();
                 
                 if (error) throw error;
-                showAlert('success', '✅ تم التسجيل في البطولة بنجاح! سيتم توجيهك...');
-                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+                
+                showAlert('success', '✅ تم إضافة التسجيل بنجاح!');
+                
+                // إعادة تعيين النموذج
+                document.getElementById('tournamentForm').reset();
+                
+                // إعادة تحميل التسجيلات الحالية
+                await loadExistingRegistrations();
+                
+                // إعادة تحميل القوائم
+                populateAgeDivisions();
+                populateBeltLevels();
+                populateTeams();
 
             } catch (error) {
-                console.error('❌ Registration error:', error);
+                console.error(' Registration error:', error);
                 showAlert('error', '❌ خطأ في التسجيل: ' + error.message);
             }
         });
@@ -459,6 +559,7 @@
             const alert = document.getElementById('alert');
             alert.className = `alert alert-${type} show`;
             alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 5000);
         }
     </script>
 </body>
