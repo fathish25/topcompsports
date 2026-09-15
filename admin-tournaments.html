@@ -1,104 +1,41 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Management - TopCompSports Admin</title>
+    <title>إدارة البطولات - TopCompSports Admin</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg-dark: #0a0e17; --bg-card: #151d2b; --bg-input: rgba(255,255,255,0.05);
-            --primary: #2563EB; --accent: #f1c40f; --accent-dark: #d4a017;
-            --text-main: #ffffff; --text-muted: rgba(255,255,255,0.7);
-            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
-        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-dark); color: var(--text-main); min-height: 100vh; }
-        
-        .sidebar { width: 280px; background: rgba(21, 29, 43, 0.98); border-left: 2px solid var(--primary); position: fixed; height: 100vh; padding: 20px; right: 0; overflow-y: auto; z-index: 100; }
-        [dir="ltr"] .sidebar { right: auto; left: 0; border-left: none; border-right: 2px solid var(--primary); }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; }
+        .sidebar { width: 280px; background: rgba(21, 29, 43, 0.98); border-left: 2px solid #2563EB; position: fixed; height: 100vh; padding: 20px; right: 0; }
         .logo { display: flex; align-items: center; gap: 15px; padding: 20px; margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.1); }
-        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--accent), var(--accent-dark)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: var(--bg-dark); }
+        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #f1c40f, #d4a017); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: #0a0e17; }
         .logo-text { font-size: 22px; font-weight: bold; }
         .nav-menu { display: flex; flex-direction: column; gap: 10px; }
-        .nav-item { padding: 15px 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; font-size: 15px; text-decoration: none; color: var(--text-main); }
+        .nav-item { padding: 15px 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; font-size: 15px; }
         .nav-item:hover { background: rgba(255,255,255,0.05); }
-        .nav-item.active { background: linear-gradient(135deg, var(--primary), #1d4ed8); }
-        
+        .nav-item.active { background: linear-gradient(135deg, #2563EB, #1d4ed8); }
         .main-content { margin-right: 280px; padding: 40px; }
-        [dir="ltr"] .main-content { margin-right: 0; margin-left: 280px; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
         .page-title { font-size: 32px; font-weight: bold; }
-        .header-actions { display: flex; align-items: center; gap: 15px; }
-        
-        .lang-switcher { display: flex; gap: 10px; }
-        .lang-btn { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .lang-btn.active { background: var(--primary); color: var(--text-main); }
-        
-        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: var(--bg-dark); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3); }
-        .btn-danger { background: linear-gradient(135deg, var(--danger), #dc2626); color: var(--text-main); }
-        .btn-success { background: linear-gradient(135deg, var(--success), #059669); color: var(--text-main); }
-        .btn-info { background: linear-gradient(135deg, var(--primary), #1d4ed8); color: var(--text-main); }
-        .btn-sm { padding: 6px 12px; font-size: 12px; }
-
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
-        .stat-value { font-size: 32px; font-weight: bold; color: var(--accent); }
-        .stat-label { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
-
-        .section { background: var(--bg-card); border-radius: 16px; padding: 30px; margin-bottom: 30px; }
-        .section-title { font-size: 24px; font-weight: bold; margin-bottom: 25px; color: var(--accent); }
-        .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .form-input, .form-select { background: var(--bg-input); border: 2px solid rgba(255,255,255,0.1); color: var(--text-main); padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; }
-        .form-input:focus, .form-select:focus { outline: none; border-color: var(--accent); }
-        .form-label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 13px; }
-        select.form-select option { background-color: var(--bg-card) !important; color: var(--text-main) !important; }
-
+        .section { background: #151d2b; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
+        .section-title { font-size: 24px; font-weight: bold; margin-bottom: 25px; color: #f1c40f; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
-        [dir="ltr"] th, [dir="ltr"] td { text-align: left; }
-        th { background: rgba(241, 196, 15, 0.1); color: var(--accent); font-weight: bold; }
+        th, td { padding: 15px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { background: rgba(241, 196, 15, 0.1); color: #f1c40f; font-weight: bold; }
         tr:hover { background: rgba(255,255,255,0.03); }
-        
-        .status-badge { padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; }
-        .status-active { background: rgba(16, 185, 129, 0.2); color: var(--success); }
-        .status-upcoming { background: rgba(37, 99, 235, 0.2); color: var(--primary); }
-        .status-completed { background: rgba(107, 114, 128, 0.2); color: #9ca3af; }
-        .status-cancelled { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
-        .status-pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
-
-        .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .modal-overlay.active { display: flex; }
-        .modal { background: var(--bg-card); border-radius: 16px; padding: 30px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.1); }
-        .modal-title { font-size: 22px; font-weight: bold; color: var(--accent); }
-        .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
-        .close-modal:hover { color: var(--text-main); }
-        
-        .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .detail-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
-        .detail-label { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
-        .detail-value { font-weight: 600; color: var(--text-main); }
-
-        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; }
-        .alert.show { display: block; }
-        .alert-error { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger); color: var(--danger); }
-        .alert-info { background: rgba(37, 99, 235, 0.2); border: 1px solid var(--primary); color: var(--primary); }
-
-        @media (max-width: 1024px) {
-            .sidebar { width: 100%; position: relative; height: auto; }
-            .main-content { margin-right: 0; margin-left: 0; padding: 20px; }
-            .filters { grid-template-columns: 1fr; }
-            .stats-row { grid-template-columns: 1fr; }
-            table { display: block; overflow-x: auto; white-space: nowrap; }
-            .details-grid { grid-template-columns: 1fr; }
-        }
+        .status-badge { padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .status-active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .status-upcoming { background: rgba(37, 99, 235, 0.2); color: #2563EB; }
+        .status-completed { background: rgba(107, 114, 128, 0.2); color: #6b7280; }
+        .filters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .form-input, .form-select { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -108,101 +45,60 @@
             <div class="logo-text">TopCompSports</div>
         </div>
         <div class="nav-menu">
-            <a class="nav-item" href="admin-dashboard.html"><i class="fas fa-chart-line"></i> <span data-en="Dashboard" data-ar="لوحة التحكم">Dashboard</span></a>
-            <a class="nav-item" href="admin-users.html"><i class="fas fa-users"></i> <span data-en="Users" data-ar="المستخدمون">Users</span></a>
-            <a class="nav-item" href="admin-athletes.html"><i class="fas fa-running"></i> <span data-en="Athletes" data-ar="اللاعبون">Athletes</span></a>
-            <a class="nav-item" href="admin-coaches.html"><i class="fas fa-chalkboard-teacher"></i> <span data-en="Coaches" data-ar="المدربون">Coaches</span></a>
-            <a class="nav-item" href="admin-teams.html"><i class="fas fa-shield-alt"></i> <span data-en="Teams" data-ar="الفرق">Teams</span></a>
-            <a class="nav-item" href="admin-organizations.html"><i class="fas fa-building"></i> <span data-en="Organizers" data-ar="المنظمون">Organizers</span></a>
-            <a class="nav-item active" href="admin-tournaments.html"><i class="fas fa-trophy"></i> <span data-en="Tournaments" data-ar="البطولات">Tournaments</span></a>
-            <a class="nav-item" href="admin-reports.html"><i class="fas fa-chart-bar"></i> <span data-en="Reports" data-ar="التقارير">Reports</span></a>
-            <a class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span data-en="Logout" data-ar="تسجيل الخروج">Logout</span></a>
+            <div class="nav-item" onclick="window.location.href='admin-dashboard.html'">📊 لوحة التحكم</div>
+            <div class="nav-item active">🏆 البطولات</div>
+            <div class="nav-item" onclick="window.location.href='admin-users.html'">👥 المستخدمين</div>
+            <div class="nav-item" onclick="window.location.href='admin-registrations.html'">📝 التسجيلات</div>
+            <div class="nav-item" onclick="window.location.href='admin-dashboard.html#adminsSection'">المسؤولون</div>
+            <div class="nav-item" onclick="window.location.href='admin-organizations.html'">🏢 الجهات المنظمة</div>
+            <div class="nav-item" onclick="window.location.href='admin-reports.html'">📈 التقارير</div>
+            <div class="nav-item" onclick="window.location.href='admin-settings.html'">⚙️ الإعدادات</div>
+            <div class="nav-item" onclick="logout()">🚪 تسجيل الخروج</div>
         </div>
     </div>
 
     <div class="main-content">
         <div class="header">
-            <h1 class="page-title" data-en="Tournament Management" data-ar="إدارة البطولات">Tournament Management</h1>
-            <div class="header-actions">
-                <div class="lang-switcher">
-                    <button class="lang-btn active" onclick="window.setLang('en')">EN</button>
-                    <button class="lang-btn" onclick="window.setLang('ar')">AR</button>
-                </div>
-                <button class="btn btn-primary" onclick="createTournament()"><i class="fas fa-plus"></i> <span data-en="Create Tournament" data-ar="إنشاء بطولة">Create Tournament</span></button>
-            </div>
-        </div>
-
-        <div id="alert" class="alert"></div>
-
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-value" id="statTotal">0</div>
-                <div class="stat-label" data-en="Total Tournaments" data-ar="إجمالي البطولات">Total Tournaments</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statActive">0</div>
-                <div class="stat-label" data-en="Active / Upcoming" data-ar="نشطة / قادمة">Active / Upcoming</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="statPending">0</div>
-                <div class="stat-label" data-en="Pending Approval" data-ar="في انتظار الموافقة">Pending Approval</div>
-            </div>
+            <h1 class="page-title">إدارة البطولات</h1>
+            <button class="btn btn-primary" onclick="createTournament()">➕ إنشاء بطولة جديدة</button>
         </div>
 
         <div class="section">
-            <h2 class="section-title" data-en="Tournaments List" data-ar="قائمة البطولات">Tournaments List</h2>
+            <h2 class="section-title">قائمة البطولات</h2>
             
             <div class="filters">
-                <div>
-                    <label class="form-label" data-en="Search" data-ar="بحث">Search</label>
-                    <input type="text" class="form-input" id="searchTournament" data-placeholder-en="Search by name or location..." data-placeholder-ar="البحث بالاسم أو الموقع..." placeholder="Search by name or location..." onkeyup="loadTournaments()">
-                </div>
-                <div>
-                    <label class="form-label" data-en="Status" data-ar="الحالة">Status</label>
-                    <select class="form-select" id="filterStatus" onchange="loadTournaments()">
-                        <option value="" data-en="All Statuses" data-ar="جميع الحالات">All Statuses</option>
-                        <option value="active" data-en="Active" data-ar="نشطة">Active</option>
-                        <option value="upcoming" data-en="Upcoming" data-ar="قادمة">Upcoming</option>
-                        <option value="completed" data-en="Completed" data-ar="مكتملة">Completed</option>
-                        <option value="cancelled" data-en="Cancelled" data-ar="ملغاة">Cancelled</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="form-label" data-en="Sport" data-ar="الرياضة">Sport</label>
-                    <select class="form-select" id="filterSport" onchange="loadTournaments()">
-                        <option value="" data-en="All Sports" data-ar="جميع الرياضات">All Sports</option>
-                        <option value="bjj-gi">BJJ (Gi)</option>
-                        <option value="bjj-no-gi">BJJ (No Gi)</option>
-                        <option value="grappling">Grappling</option>
-                    </select>
-                </div>
+                <input type="text" class="form-input" id="searchTournament" placeholder="البحث بالاسم أو المدينة..." onkeyup="loadTournaments()">
+                <select class="form-select" id="filterStatus" onchange="loadTournaments()">
+                    <option value="">جميع الحالات</option>
+                    <option value="active">نشطة</option>
+                    <option value="upcoming">قادمة</option>
+                    <option value="completed">مكتملة</option>
+                    <option value="cancelled">ملغاة</option>
+                </select>
+                <select class="form-select" id="filterSport" onchange="loadTournaments()">
+                    <option value="">جميع الرياضات</option>
+                    <option value="bjj-gi">BJJ (Gi)</option>
+                    <option value="bjj-no-gi">BJJ (No Gi)</option>
+                    <option value="grappling">Grappling</option>
+                </select>
             </div>
 
             <table>
                 <thead>
                     <tr>
-                        <th data-en="Name" data-ar="الاسم">Name</th>
-                        <th data-en="Date" data-ar="التاريخ">Date</th>
-                        <th data-en="Location" data-ar="الموقع">Location</th>
-                        <th data-en="Organizer" data-ar="المنظم">Organizer</th>
-                        <th data-en="Status" data-ar="الحالة">Status</th>
-                        <th data-en="Actions" data-ar="الإجراءات">Actions</th>
+                        <th>الاسم</th>
+                        <th>التاريخ</th>
+                        <th>الموقع</th>
+                        <th>الرياضة</th>
+                        <th>الحالة</th>
+                        <th>المشاركين</th>
+                        <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="tournamentsTable">
-                    <tr><td colspan="6" style="text-align: center;" data-en="Loading..." data-ar="جاري التحميل...">Loading...</td></tr>
+                    <tr><td colspan="7" style="text-align: center;">جاري التحميل...</td></tr>
                 </tbody>
             </table>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="viewModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title" data-en="Tournament Details" data-ar="تفاصيل البطولة">Tournament Details</h3>
-                <button class="close-modal" onclick="closeViewModal()">&times;</button>
-            </div>
-            <div id="viewModalContent" class="details-grid"></div>
         </div>
     </div>
 
@@ -211,164 +107,75 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        let allTournaments = [];
-        let currentLang = localStorage.getItem('selectedLanguage') || 'en';
-
         window.onload = async () => {
             await checkAuth();
-            window.setLang(currentLang);
             await loadTournaments();
-        };
-
-        window.setLang = function(lang) {
-            currentLang = lang;
-            localStorage.setItem('selectedLanguage', lang);
-            document.documentElement.lang = lang;
-            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if ((lang === 'en' && btn.textContent.trim() === 'EN') || (lang === 'ar' && btn.textContent.trim() === 'AR')) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            document.querySelectorAll('[data-en][data-ar]').forEach(el => {
-                el.textContent = lang === 'ar' ? el.dataset.ar : el.dataset.en;
-            });
-            document.querySelectorAll('[data-placeholder-en][data-placeholder-ar]').forEach(el => {
-                el.placeholder = lang === 'ar' ? el.dataset.placeholderAr : el.dataset.placeholderEn;
-            });
         };
 
         async function checkAuth() {
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (!user) { window.location.href = 'admin-login.html'; return; }
+            
             const { data: admin } = await supabaseClient.from('admin_profiles').select('*').eq('id', user.id).maybeSingle();
-            if (!admin) { window.location.href = 'index.html'; return; }
+            if (!admin) { alert('غير مصرح'); window.location.href = 'index.html'; return; }
         }
 
         async function loadTournaments() {
-            const search = document.getElementById('searchTournament').value.toLowerCase();
+            const search = document.getElementById('searchTournament').value;
             const status = document.getElementById('filterStatus').value;
             const sport = document.getElementById('filterSport').value;
 
-            try {
-                // ✅ استعلام محسن مع معالجة الأخطاء
-                console.log('🔍 Loading tournaments...');
-                
-                let query = supabaseClient
-                    .from('tournaments')
-                    .select('*, organizers(full_name, org_name)')
-                    .order('created_at', { ascending: false });
-                
-                if (status) query = query.eq('status', status);
-                if (sport) query = query.eq('sport_type', sport);
-                
-                const { data, error } = await query;
+            let query = supabaseClient.from('tournaments').select('*');
+            
+            if (status) query = query.eq('status', status);
+            if (sport) query = query.eq('sport_type', sport);
+            
+            const { data, error } = await query.order('created_at', { ascending: false });
 
-                if (error) {
-                    console.error('❌ Database Error:', error);
-                    showAlert('error', `Error: ${error.message}`);
-                    document.getElementById('tournamentsTable').innerHTML = 
-                        `<tr><td colspan="6" style="text-align: center; color: var(--danger);">
-                            <i class="fas fa-exclamation-triangle"></i> 
-                            ${currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data'}
-                        </td></tr>`;
-                    return;
-                }
+            if (error) { console.error(error); return; }
 
-                console.log('✅ Data loaded:', data);
-                allTournaments = data || [];
-
-                let filtered = allTournaments;
-                if (search) {
-                    filtered = filtered.filter(t => 
-                        (t.name && t.name.toLowerCase().includes(search)) ||
-                        (t.location && t.location.toLowerCase().includes(search))
-                    );
-                }
-
-                // تحديث الإحصائيات
-                document.getElementById('statTotal').textContent = allTournaments.length;
-                document.getElementById('statActive').textContent = allTournaments.filter(t => t.status === 'active' || t.status === 'upcoming').length;
-                document.getElementById('statPending').textContent = allTournaments.filter(t => t.requires_approval).length;
-
-                const tbody = document.getElementById('tournamentsTable');
-                
-                if (!filtered || filtered.length === 0) {
-                    const msg = allTournaments.length === 0 ? 
-                        (currentLang === 'ar' ? 'لا توجد بطولات. اضغط "إنشاء بطولة" لإضافة واحدة.' : 'No tournaments found. Click "Create Tournament" to add one.') :
-                        (currentLang === 'ar' ? 'لا توجد نتائج مطابقة للبحث' : 'No results match your search');
-                    
-                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">
-                        <i class="fas fa-info-circle"></i> ${msg}
-                    </td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = filtered.map(t => {
-                    const statusClass = t.status === 'active' ? 'status-active' : 
-                                       t.status === 'completed' ? 'status-completed' : 
-                                       t.status === 'cancelled' ? 'status-cancelled' : 'status-upcoming';
-                    
-                    const statusTextMap = {
-                        'active': currentLang === 'ar' ? 'نشطة' : 'Active',
-                        'upcoming': currentLang === 'ar' ? 'قادمة' : 'Upcoming',
-                        'completed': currentLang === 'ar' ? 'مكتملة' : 'Completed',
-                        'cancelled': currentLang === 'ar' ? 'ملغاة' : 'Cancelled'
-                    };
-                    const statusText = statusTextMap[t.status] || t.status;
-                    const organizerName = t.organizers?.org_name || t.organizers?.full_name || (currentLang === 'ar' ? 'غير محدد' : 'N/A');
-
-                    return `
-                        <tr>
-                            <td><strong>${t.name || (currentLang === 'ar' ? 'بدون اسم' : 'No Name')}</strong></td>
-                            <td>${t.event_date ? new Date(t.event_date).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US') : (currentLang === 'ar' ? 'غير محدد' : 'TBD')}</td>
-                            <td>${t.location || '-'}</td>
-                            <td>${organizerName}</td>
-                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                            <td>
-                                <div class="action-btns">
-                                    <button class="btn btn-info btn-sm" onclick="viewTournament('${t.id}')"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-success btn-sm" onclick="editTournament('${t.id}')"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteTournament('${t.id}')"><i class="fas fa-trash"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-
-            } catch (err) {
-                console.error('❌ Unexpected Error:', err);
-                showAlert('error', `Unexpected error: ${err.message}`);
+            const tbody = document.getElementById('tournamentsTable');
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا توجد بطولات</td></tr>';
+                return;
             }
+
+            let filtered = data;
+            if (search) {
+                filtered = data.filter(t => 
+                    (t.name && t.name.toLowerCase().includes(search.toLowerCase())) ||
+                    (t.location && t.location.toLowerCase().includes(search.toLowerCase()))
+                );
+            }
+
+            tbody.innerHTML = filtered.map(t => {
+                const statusClass = t.status === 'active' ? 'status-active' : 
+                                   t.status === 'completed' ? 'status-completed' : 
+                                   t.status === 'cancelled' ? 'status-cancelled' : 'status-upcoming';
+                const statusText = {
+                    'active': 'نشطة',
+                    'upcoming': 'قادمة',
+                    'completed': 'مكتملة',
+                    'cancelled': 'ملغاة'
+                }[t.status] || t.status;
+
+                return `
+                    <tr>
+                        <td>${t.name || 'بدون اسم'}</td>
+                        <td>${t.event_date || 'غير محدد'}</td>
+                        <td>${t.location || '-'}</td>
+                        <td>${t.sport_type || '-'}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>${t.max_participants || '∞'}</td>
+                        <td>
+                            <button class="btn btn-success" onclick="editTournament('${t.id}')" style="padding: 5px 10px; margin-left: 5px;">✏️ تعديل</button>
+                            <button class="btn btn-danger" onclick="deleteTournament('${t.id}')" style="padding: 5px 10px;">🗑️ حذف</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
-
-        function viewTournament(id) {
-            const t = allTournaments.find(tour => tour.id === id);
-            if (!t) return;
-
-            const organizerName = t.organizers?.org_name || t.organizers?.full_name || '-';
-            const approvalStatus = t.requires_approval ? 
-                `<span class="status-badge status-pending">${currentLang === 'ar' ? 'في انتظار الموافقة' : 'Pending Approval'}</span>` : 
-                `<span class="status-badge status-active">${currentLang === 'ar' ? 'موافق عليه' : 'Approved'}</span>`;
-
-            document.getElementById('viewModalContent').innerHTML = `
-                <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'اسم البطولة' : 'Tournament Name'}</div><div class="detail-value">${t.name || '-'}</div></div>
-                <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الرياضة' : 'Sport'}</div><div class="detail-value">${t.sport_type || '-'}</div></div>
-                <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'التاريخ' : 'Date'}</div><div class="detail-value">${t.event_date ? new Date(t.event_date).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US') : '-'}</div></div>
-                <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الموقع' : 'Location'}</div><div class="detail-value">${t.location || '-'}</div></div>
-                <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'المنظم' : 'Organizer'}</div><div class="detail-value">${organizerName}</div></div>
-                <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الحالة' : 'Status'}</div><div class="detail-value">${t.status || '-'}</div></div>
-                <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'أقصى عدد مشاركين' : 'Max Participants'}</div><div class="detail-value">${t.max_participants || '∞'}</div></div>
-                <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'حالة الموافقة' : 'Approval Status'}</div><div class="detail-value">${approvalStatus}</div></div>
-                ${t.description ? `<div class="detail-item" style="grid-column: 1 / -1;"><div class="detail-label">${currentLang === 'ar' ? 'الوصف' : 'Description'}</div><div class="detail-value" style="font-weight: normal;">${t.description}</div></div>` : ''}
-            `;
-            document.getElementById('viewModal').classList.add('active');
-        }
-
-        function closeViewModal() { document.getElementById('viewModal').classList.remove('active'); }
 
         function createTournament() {
             window.location.href = 'create-tournament.html';
@@ -379,22 +186,13 @@
         }
 
         async function deleteTournament(id) {
-            const confirmMsg = currentLang === 'ar' ? 'هل أنت متأكد من حذف هذه البطولة؟' : 'Are you sure you want to delete this tournament?';
-            if (!confirm(confirmMsg)) return;
+            if (!confirm('هل أنت متأكد من حذف هذه البطولة؟')) return;
             
             const { error } = await supabaseClient.from('tournaments').delete().eq('id', id);
-            if (error) { alert('Error: ' + error.message); return; }
+            if (error) { alert('خطأ: ' + error.message); return; }
             
-            const successMsg = currentLang === 'ar' ? 'تم الحذف بنجاح' : 'Deleted successfully';
-            alert(successMsg);
+            alert('تم الحذف بنجاح');
             loadTournaments();
-        }
-
-        function showAlert(type, message) {
-            const alert = document.getElementById('alert');
-            alert.className = `alert alert-${type} show`;
-            alert.textContent = message;
-            setTimeout(() => alert.classList.remove('show'), 5000);
         }
 
         async function logout() {
