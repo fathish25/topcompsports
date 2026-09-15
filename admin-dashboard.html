@@ -191,7 +191,7 @@
                 <span data-en="Teams" data-ar="الفرق">Teams</span>
             </a>
             <a href="admin-organizers.html" class="nav-item">
-                <span class="icon"></span>
+                <span class="icon">🏢</span>
                 <span data-en="Organizers" data-ar="المنظمون">Organizers</span>
             </a>
             <a href="admin-tournaments.html" class="nav-item">
@@ -207,7 +207,7 @@
                 <span data-en="Reports" data-ar="التقارير">Reports</span>
             </a>
             <a href="admin-settings.html" class="nav-item">
-                <span class="icon">️</span>
+                <span class="icon">⚙️</span>
                 <span data-en="Settings" data-ar="الإعدادات">Settings</span>
             </a>
         </nav>
@@ -246,7 +246,7 @@
                 <div class="stat-value" id="totalTournaments">0</div>
                 <div class="stat-label" data-en="Tournaments" data-ar="البطولات">Tournaments</div>
             </div>
-            <div class="stat-card warning" onclick="window.location.href='admin-organizers.html'">
+            <div class="stat-card warning" onclick="window.location.href='admin-organizers.html?filter=pending'">
                 <div class="stat-icon">⏳</div>
                 <div class="stat-value" id="pendingOrganizers">0</div>
                 <div class="stat-label" data-en="Pending Organizers" data-ar="منظمون معلقون">Pending Organizers</div>
@@ -258,19 +258,19 @@
             </div>
         </div>
 
-        <!-- Quick Actions -->
+        <!-- ✅ Quick Actions (تم إصلاح الروابط هنا فقط) -->
         <div class="quick-actions">
-            <a href="admin-subadmins.html" class="action-card">
-                <div class="action-icon">👨‍</div>
+            <a href="admin-subadmin-create.html" class="action-card">
+                <div class="action-icon">👨‍💼</div>
                 <div class="action-title" data-en="Manage Sub-Admins" data-ar="إدارة الأدمن الفرعي">Manage Sub-Admins</div>
                 <div class="action-desc" data-en="Create and manage admin accounts" data-ar="إنشاء وإدارة حسابات الأدمن">Create and manage admin accounts</div>
             </a>
-            <a href="admin-organizers.html" class="action-card">
+            <a href="admin-organizers.html?filter=pending" class="action-card">
                 <div class="action-icon">✅</div>
                 <div class="action-title" data-en="Verify Organizers" data-ar="التحقق من المنظمين">Verify Organizers</div>
                 <div class="action-desc" data-en="Approve organizer applications" data-ar="الموافقة على طلبات المنظمين">Approve organizer applications</div>
             </a>
-            <a href="admin-tournaments.html" class="action-card">
+            <a href="admin-tournaments.html?action=create" class="action-card">
                 <div class="action-icon">➕</div>
                 <div class="action-title" data-en="Create Tournament" data-ar="إنشاء بطولة">Create Tournament</div>
                 <div class="action-desc" data-en="Add new tournament" data-ar="إضافة بطولة جديدة">Add new tournament</div>
