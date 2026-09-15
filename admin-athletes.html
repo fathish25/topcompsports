@@ -63,9 +63,12 @@
         th { background: var(--light-bg); color: var(--black); font-weight: 700; }
         tr:hover { background: rgba(0,102,204,0.03); }
         
-        .status-badge, .belt-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .status-badge, .belt-badge, .verification-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
         .status-active { background: #D1FAE5; color: #065F46; }
         .status-suspended { background: #FEE2E2; color: #991B1B; }
+        .verification-pending { background: #FEF3C7; color: #92400E; }
+        .verification-verified { background: #D1FAE5; color: #065F46; }
+        .verification-rejected { background: #FEE2E2; color: #991B1B; }
         .belt-white { background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; }
         .belt-blue { background: #dbeafe; color: #1e40af; }
         .belt-purple { background: #f3e8ff; color: #6b21a8; }
@@ -89,21 +92,40 @@
         .image-box img { width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; border: 2px solid var(--light-bg); background: var(--light-bg); }
         .image-box p { margin-top: 8px; font-size: 13px; color: rgba(0,0,0,0.6); font-weight: 600; }
         .image-box .no-image { 
-            width: 100%; 
-            height: 200px; 
+            width: 100%; height: 200px; 
             background: var(--light-bg); 
             border-radius: 8px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: rgba(0,0,0,0.4);
-            font-size: 3rem;
+            display: flex; align-items: center; justify-content: center; 
+            color: rgba(0,0,0,0.4); font-size: 3rem;
         }
 
         .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
         .detail-item { background: var(--light-bg); padding: 12px; border-radius: 8px; }
         .detail-label { font-size: 12px; color: rgba(0,0,0,0.6); margin-bottom: 5px; }
         .detail-value { font-weight: 600; color: var(--black); }
+
+        /* Upload Section */
+        .upload-section { 
+            background: var(--light-bg); 
+            border: 2px dashed var(--primary-blue); 
+            border-radius: 8px; 
+            padding: 20px; 
+            text-align: center; 
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-section:hover { background: rgba(0,102,204,0.05); }
+        .upload-section input[type="file"] { display: none; }
+        .upload-section i { font-size: 2rem; color: var(--primary-blue); margin-bottom: 10px; }
+        .upload-section p { color: rgba(0,0,0,0.6); font-size: 14px; }
+        .upload-preview { 
+            max-width: 100%; 
+            max-height: 150px; 
+            margin-top: 10px; 
+            border-radius: 8px;
+            display: none;
+        }
 
         .alert { padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
         .alert.show { display: block; }
@@ -186,11 +208,12 @@
                         <th data-en="Belt" data-ar="الحزام">Belt</th>
                         <th data-en="Weight" data-ar="الوزن">Weight</th>
                         <th data-en="Status" data-ar="الحالة">Status</th>
+                        <th data-en="Verification" data-ar="التحقق">Verification</th>
                         <th data-en="Actions" data-ar="الإجراءات">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="athletesTable">
-                    <tr><td colspan="6" style="text-align: center;" data-en="Loading..." data-ar="جاري التحميل...">Loading...</td></tr>
+                    <tr><td colspan="7" style="text-align: center;" data-en="Loading..." data-ar="جاري التحميل...">Loading...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -216,6 +239,34 @@
             </div>
             <form id="editForm" onsubmit="saveEdit(event)">
                 <input type="hidden" id="editId">
+                
+                <!-- Upload Section -->
+                <div style="background: #FEF3C7; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--warning);">
+                    <strong data-en="Upload Photos" data-ar="رفع الصور">Upload Photos</strong>
+                    <p style="font-size: 13px; margin-top: 5px; color: rgba(0,0,0,0.7);" data-en="Upload profile photo and ID document for this athlete" data-ar="ارفع صورة البروفايل وصورة الهوية لهذا اللاعب">Upload profile photo and ID document for this athlete</p>
+                </div>
+                
+                <div class="details-grid">
+                    <div class="form-group">
+                        <label class="form-label" data-en="Profile Photo" data-ar="صورة البروفايل">Profile Photo</label>
+                        <div class="upload-section" onclick="document.getElementById('profilePhotoInput').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p data-en="Click to upload profile photo" data-ar="اضغط لرفع صورة البروفايل">Click to upload profile photo</p>
+                            <input type="file" id="profilePhotoInput" accept="image/*" onchange="previewImage(this, 'profilePhotoPreview')">
+                            <img id="profilePhotoPreview" class="upload-preview" alt="Preview">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="ID Document" data-ar="صورة الهوية">ID Document</label>
+                        <div class="upload-section" onclick="document.getElementById('idDocumentInput').click()">
+                            <i class="fas fa-id-card"></i>
+                            <p data-en="Click to upload ID document" data-ar="اضغط لرفع صورة الهوية">Click to upload ID document</p>
+                            <input type="file" id="idDocumentInput" accept="image/*" onchange="previewImage(this, 'idDocumentPreview')">
+                            <img id="idDocumentPreview" class="upload-preview" alt="Preview">
+                        </div>
+                    </div>
+                </div>
+
                 <div class="details-grid">
                     <div class="form-group">
                         <label class="form-label" data-en="Full Name" data-ar="الاسم الكامل">Full Name</label>
@@ -321,6 +372,8 @@
         let allAthletes = [];
         let currentLang = localStorage.getItem('selectedLanguage') || 'en';
         let suspendTargetId = null;
+        let profilePhotoFile = null;
+        let idDocumentFile = null;
 
         window.onload = async () => {
             await checkAuth();
@@ -405,10 +458,16 @@
             return '';
         }
 
+        function getVerificationClass(status) {
+            if (status === 'verified') return 'verification-verified';
+            if (status === 'rejected') return 'verification-rejected';
+            return 'verification-pending';
+        }
+
         function renderTable() {
             const tbody = document.getElementById('athletesTable');
             if (allAthletes.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;" data-en="No athletes found" data-ar="لا يوجد لاعبون">No athletes found</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;" data-en="No athletes found" data-ar="لا يوجد لاعبون">No athletes found</td></tr>`;
                 return;
             }
 
@@ -416,6 +475,12 @@
                 const statusClass = a.is_suspended ? 'status-suspended' : 'status-active';
                 const statusText = a.is_suspended ? (currentLang === 'ar' ? 'موقوف' : 'Suspended') : (currentLang === 'ar' ? 'نشط' : 'Active');
                 const beltClass = getBeltClass(a.belt_level);
+                const verificationClass = getVerificationClass(a.verification_status);
+                const verificationText = {
+                    'verified': currentLang === 'ar' ? 'موثق' : 'Verified',
+                    'rejected': currentLang === 'ar' ? 'مرفوض' : 'Rejected',
+                    'pending': currentLang === 'ar' ? 'قيد الانتظار' : 'Pending'
+                }[a.verification_status] || 'Pending';
 
                 return `
                     <tr>
@@ -424,6 +489,7 @@
                         <td><span class="belt-badge ${beltClass}">${a.belt_level || '-'}</span></td>
                         <td>${a.weight ? a.weight + ' kg' : '-'}</td>
                         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td><span class="verification-badge ${verificationClass}">${verificationText}</span></td>
                         <td>
                             <div class="action-btns">
                                 <button class="btn btn-info btn-sm" onclick="viewAthlete('${a.id}')" title="${currentLang === 'ar' ? 'عرض التفاصيل' : 'View Details'}"><i class="fas fa-eye"></i></button>
@@ -444,6 +510,11 @@
             if (!a) return;
 
             const statusText = a.is_suspended ? (currentLang === 'ar' ? 'موقوف' : 'Suspended') : (currentLang === 'ar' ? 'نشط' : 'Active');
+            const verificationText = {
+                'verified': currentLang === 'ar' ? 'موثق' : 'Verified',
+                'rejected': currentLang === 'ar' ? 'مرفوض' : 'Rejected',
+                'pending': currentLang === 'ar' ? 'قيد الانتظار' : 'Pending'
+            }[a.verification_status] || 'Pending';
             const reasonText = a.suspension_reason ? `<p style="color: var(--danger); margin-top: 10px;"><strong>${currentLang === 'ar' ? 'سبب التعليق:' : 'Suspension Reason:'}</strong> ${a.suspension_reason}</p>` : '';
 
             document.getElementById('viewModalContent').innerHTML = `
@@ -461,7 +532,7 @@
                     <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'التصنيف' : 'Ranking'}</div><div class="detail-value">${a.ranking || '-'}</div></div>
                     <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الفئة العمرية' : 'Age Division'}</div><div class="detail-value">${a.age_division || '-'}</div></div>
                     <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'فئة الوزن' : 'Weight Class'}</div><div class="detail-value">${a.weight_class || '-'}</div></div>
-                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'حالة التحقق' : 'Verification Status'}</div><div class="detail-value">${a.verification_status || 'pending'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'حالة التحقق' : 'Verification Status'}</div><div class="detail-value"><span class="verification-badge ${getVerificationClass(a.verification_status)}">${verificationText}</span></div></div>
                     <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الحالة' : 'Status'}</div><div class="detail-value">${statusText}</div></div>
                     <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'تاريخ التعليق' : 'Suspended At'}</div><div class="detail-value">${a.suspended_at ? new Date(a.suspended_at).toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US') : '-'}</div></div>
                 </div>
@@ -495,11 +566,63 @@
             document.getElementById('viewModal').classList.add('active');
         }
 
+        function previewImage(input, previewId) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById(previewId);
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+                
+                if (previewId === 'profilePhotoPreview') {
+                    profilePhotoFile = file;
+                } else {
+                    idDocumentFile = file;
+                }
+            }
+        }
+
+        async function uploadImage(file, bucket, folder) {
+            if (!file) return null;
+            
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${folder}/${Date.now()}.${fileExt}`;
+            
+            const { data, error } = await supabaseClient.storage
+                .from(bucket)
+                .upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+            
+            if (error) {
+                console.error('Upload error:', error);
+                throw error;
+            }
+            
+            const { data: { publicUrl } } = supabaseClient.storage
+                .from(bucket)
+                .getPublicUrl(fileName);
+            
+            return publicUrl;
+        }
+
         function editAthlete(id) {
             const a = allAthletes.find(athlete => athlete.id === id);
             if (!a) return;
 
-            console.log('Editing athlete:', a); // For debugging
+            console.log('Editing athlete:', a);
+
+            profilePhotoFile = null;
+            idDocumentFile = null;
+            
+            document.getElementById('profilePhotoPreview').style.display = 'none';
+            document.getElementById('idDocumentPreview').style.display = 'none';
+            document.getElementById('profilePhotoInput').value = '';
+            document.getElementById('idDocumentInput').value = '';
 
             document.getElementById('editId').value = a.id || '';
             document.getElementById('editFullName').value = a.full_name || '';
@@ -542,6 +665,17 @@
             };
 
             try {
+                // Upload images if selected
+                if (profilePhotoFile) {
+                    const profileUrl = await uploadImage(profilePhotoFile, 'athlete-photos', 'profiles');
+                    updateData.profile_photo_url = profileUrl;
+                }
+                
+                if (idDocumentFile) {
+                    const idUrl = await uploadImage(idDocumentFile, 'athlete-photos', 'documents');
+                    updateData.id_document_url = idUrl;
+                }
+
                 const { error } = await supabaseClient
                     .from('athletes')
                     .update(updateData)
@@ -636,7 +770,7 @@
 
         function exportAthletes() {
             if (allAthletes.length === 0) return;
-            const headers = ['Name', 'Email', 'Phone', 'Belt', 'Weight', 'Country', 'City', 'Gender', 'Status', 'Created At'];
+            const headers = ['Name', 'Email', 'Phone', 'Belt', 'Weight', 'Country', 'City', 'Gender', 'Status', 'Verification', 'Created At'];
             const rows = allAthletes.map(a => [
                 a.full_name, 
                 a.email, 
@@ -646,7 +780,8 @@
                 a.country || '', 
                 a.city || '',
                 a.gender || '',
-                a.is_suspended ? 'Suspended' : 'Active', 
+                a.is_suspended ? 'Suspended' : 'Active',
+                a.verification_status || 'pending',
                 a.created_at
             ]);
             const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
