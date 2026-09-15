@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Management - TopCompSports Admin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0066CC; --dark-blue: #003366; --accent-yellow: #FFB800;
+            --black: #0A0A0A; --dark-gray: #1A1A1A; --medium-gray: #2A2A2A;
+            --white: #FFFFFF; --light-bg: #F5F7FA;
+            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            --success: #10B981; --danger: #EF4444; --warning: #F59E0B;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); color: var(--black); min-height: 100vh; }
+        
+        .sidebar { width: 280px; background: var(--black); color: var(--white); position: fixed; right: 0; top: 0; height: 100vh; overflow-y: auto; padding: 20px; z-index: 1000; }
+        [dir="ltr"] .sidebar { right: auto; left: 0; }
+        .logo { display: flex; align-items: center; gap: 15px; padding: 20px; border-bottom: 2px solid var(--medium-gray); margin-bottom: 30px; }
+        .logo-icon { width: 50px; height: 50px; background: var(--accent-yellow); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; color: var(--dark-blue); }
+        .logo-text { font-size: 1.5rem; font-weight: 900; color: var(--white); }
+        .nav-item { padding: 15px 20px; margin-bottom: 8px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--white); }
+        .nav-item:hover { background: var(--medium-gray); }
+        .nav-item.active { background: var(--gradient-blue); }
+        
+        .main-content { margin-right: 280px; padding: 30px; }
+        [dir="ltr"] .main-content { margin-right: 0; margin-left: 280px; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding: 20px; background: var(--white); border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); flex-wrap: wrap; gap: 15px; }
+        .page-title { font-size: 2rem; font-weight: 900; color: var(--black); }
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        
+        .lang-switcher { display: flex; gap: 10px; }
+        .lang-btn { background: transparent; border: 2px solid var(--primary-blue); color: var(--primary-blue); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .lang-btn.active { background: var(--primary-blue); color: var(--white); }
+        
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: var(--gradient-blue); color: var(--white); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.3); }
+        .btn-danger { background: var(--danger); color: var(--white); }
+        .btn-success { background: var(--success); color: var(--white); }
+        .btn-warning { background: var(--warning); color: var(--black); }
+        .btn-info { background: var(--primary-blue); color: var(--white); }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--white); border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-right: 4px solid var(--primary-blue); }
+        [dir="ltr"] .stat-card { border-right: none; border-left: 4px solid var(--primary-blue); }
+        .stat-value { font-size: 2rem; font-weight: bold; color: var(--primary-blue); }
+        .stat-label { color: rgba(0,0,0,0.6); font-size: 14px; margin-top: 5px; }
+
+        .section { background: var(--white); border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .form-input, .form-select { background: var(--light-bg); border: 2px solid transparent; color: var(--black); padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: var(--primary-blue); background: var(--white); }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: right; border-bottom: 1px solid var(--light-bg); font-size: 14px; }
+        [dir="ltr"] th, [dir="ltr"] td { text-align: left; }
+        th { background: var(--light-bg); color: var(--black); font-weight: 700; }
+        tr:hover { background: rgba(0,102,204,0.03); }
+        
+        .status-badge, .approval-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .status-active { background: #D1FAE5; color: #065F46; }
+        .status-suspended { background: #FEE2E2; color: #991B1B; }
+        .status-inactive { background: #E5E7EB; color: #4B5563; }
+        .approval-pending { background: #FEF3C7; color: #92400E; }
+        .approval-approved { background: #D1FAE5; color: #065F46; }
+
+        .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--white); border-radius: 16px; padding: 30px; max-width: 900px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--light-bg); padding-bottom: 15px; }
+        .modal-title { font-size: 1.5rem; font-weight: 900; color: var(--black); }
+        .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--black); }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; margin-bottom: 8px; color: rgba(0,0,0,0.7); font-size: 14px; font-weight: 600; }
+        
+        .team-images { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; margin-bottom: 20px; }
+        .image-box { text-align: center; }
+        .image-box img { width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; border: 2px solid var(--light-bg); background: var(--light-bg); cursor: pointer; }
+        .image-box p { margin-top: 8px; font-size: 13px; color: rgba(0,0,0,0.6); font-weight: 600; }
+        .image-box .no-image { 
+            width: 100%; height: 150px; 
+            background: var(--light-bg); 
+            border-radius: 8px; 
+            display: flex; align-items: center; justify-content: center; 
+            color: rgba(0,0,0,0.4); font-size: 3rem;
+        }
+
+        .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+        .detail-item { background: var(--light-bg); padding: 12px; border-radius: 8px; }
+        .detail-label { font-size: 12px; color: rgba(0,0,0,0.6); margin-bottom: 5px; }
+        .detail-value { font-weight: 600; color: var(--black); }
+
+        .coach-card { background: var(--gradient-blue); color: var(--white); padding: 15px; border-radius: 10px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; }
+        .coach-avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--accent-yellow); display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--dark-blue); font-weight: bold; }
+        
+        .members-list { background: var(--light-bg); padding: 15px; border-radius: 8px; margin-top: 15px; }
+        .member-item { padding: 10px; background: var(--white); border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .member-item:last-child { margin-bottom: 0; }
+
+        .alert { padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
+        .alert.show { display: block; }
+        .alert-success { background: #D1FAE5; color: #065F46; }
+        .alert-error { background: #FEE2E2; color: #991B1B; }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .main-content { margin-right: 0; margin-left: 0; padding: 20px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .filters { grid-template-columns: 1fr; }
+            table { display: block; overflow-x: auto; }
+            .team-images { grid-template-columns: 1fr; }
+            .details-grid { grid-template-columns: 1fr; }
+            .modal { max-width: 95%; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-icon">T</div>
+            <div class="logo-text">TopCompSports</div>
+        </div>
+        <nav>
+            <a href="admin-dashboard.html" class="nav-item"><i class="fas fa-chart-line"></i> <span data-en="Dashboard" data-ar="لوحة التحكم">Dashboard</span></a>
+            <a href="admin-users.html" class="nav-item"><i class="fas fa-users"></i> <span data-en="Users" data-ar="المستخدمون">Users</span></a>
+            <a href="admin-athletes.html" class="nav-item"><i class="fas fa-running"></i> <span data-en="Athletes" data-ar="اللاعبون">Athletes</span></a>
+            <a href="admin-athlete-documents.html" class="nav-item"><i class="fas fa-id-card"></i> <span data-en="Athlete Documents" data-ar="وثائق اللاعبين">Athlete Documents</span></a>
+            <a href="admin-coaches.html" class="nav-item"><i class="fas fa-chalkboard-teacher"></i> <span data-en="Coaches" data-ar="المدربون">Coaches</span></a>
+            <a href="admin-teams.html" class="nav-item active"><i class="fas fa-shield-alt"></i> <span data-en="Teams" data-ar="الفرق">Teams</span></a>
+            <a href="admin-organizations.html" class="nav-item"><i class="fas fa-building"></i> <span data-en="Organizers" data-ar="المنظمون">Organizers</span></a>
+            <a href="admin-tournaments.html" class="nav-item"><i class="fas fa-trophy"></i> <span data-en="Tournaments" data-ar="البطولات">Tournaments</span></a>
+            <a href="admin-reports.html" class="nav-item"><i class="fas fa-chart-bar"></i> <span data-en="Reports" data-ar="التقارير">Reports</span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1 class="page-title" data-en="Team Management" data-ar="إدارة الفرق">Team Management</h1>
+            <div class="header-actions">
+                <div class="lang-switcher">
+                    <button class="lang-btn active" onclick="window.setLang('en')">EN</button>
+                    <button class="lang-btn" onclick="window.setLang('ar')">AR</button>
+                </div>
+                <button class="btn btn-info" onclick="exportTeams()"><i class="fas fa-download"></i> CSV</button>
+            </div>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <div class="stats-row">
+            <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label" data-en="Total Teams" data-ar="إجمالي الفرق">Total Teams</div></div>
+            <div class="stat-card"><div class="stat-value" id="statActive">0</div><div class="stat-label" data-en="Active Teams" data-ar="فرق نشطة">Active Teams</div></div>
+            <div class="stat-card"><div class="stat-value" id="statPending">0</div><div class="stat-label" data-en="Pending Approval" data-ar="في انتظار الموافقة">Pending Approval</div></div>
+            <div class="stat-card"><div class="stat-value" id="statSuspended">0</div><div class="stat-label" data-en="Suspended" data-ar="معلقة">Suspended</div></div>
+        </div>
+
+        <div class="section">
+            <div class="filters">
+                <input type="text" class="form-input" id="searchTeam" data-placeholder-en="Search by team name..." data-placeholder-ar="بحث باسم الفريق..." placeholder="Search by team name..." onkeyup="loadTeams()">
+                <select class="form-select" id="filterCountry" onchange="loadTeams()">
+                    <option value="" data-en="All Countries" data-ar="جميع الدول">All Countries</option>
+                </select>
+                <select class="form-select" id="filterStatus" onchange="loadTeams()">
+                    <option value="" data-en="All Statuses" data-ar="جميع الحالات">All Statuses</option>
+                    <option value="active" data-en="Active" data-ar="نشط">Active</option>
+                    <option value="inactive" data-en="Inactive" data-ar="غير نشط">Inactive</option>
+                    <option value="suspended" data-en="Suspended" data-ar="معلق">Suspended</option>
+                </select>
+                <select class="form-select" id="filterApproval" onchange="loadTeams()">
+                    <option value="" data-en="All Approvals" data-ar="جميع حالات الموافقة">All Approvals</option>
+                    <option value="pending" data-en="Pending" data-ar="في الانتظار">Pending</option>
+                    <option value="approved" data-en="Approved" data-ar="موافق عليه">Approved</option>
+                </select>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th data-en="Team Name" data-ar="اسم الفريق">Team Name</th>
+                        <th data-en="Coach" data-ar="المدرب">Coach</th>
+                        <th data-en="Country" data-ar="الدولة">Country</th>
+                        <th data-en="City" data-ar="المدينة">City</th>
+                        <th data-en="Status" data-ar="الحالة">Status</th>
+                        <th data-en="Approval" data-ar="الموافقة">Approval</th>
+                        <th data-en="Actions" data-ar="الإجراءات">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="teamsTable">
+                    <tr><td colspan="7" style="text-align: center;" data-en="Loading..." data-ar="جاري التحميل...">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- View Details Modal -->
+    <div class="modal-overlay" id="viewModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" data-en="Team Details" data-ar="تفاصيل الفريق">Team Details</h3>
+                <button class="close-modal" onclick="closeViewModal()">&times;</button>
+            </div>
+            <div id="viewModalContent"></div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" data-en="Edit Team" data-ar="تعديل بيانات الفريق">Edit Team</h3>
+                <button class="close-modal" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm" onsubmit="saveEdit(event)">
+                <input type="hidden" id="editId">
+                <div class="details-grid">
+                    <div class="form-group">
+                        <label class="form-label" data-en="Team Name" data-ar="اسم الفريق">Team Name</label>
+                        <input type="text" class="form-input" id="editName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Email" data-ar="البريد الإلكتروني">Email</label>
+                        <input type="email" class="form-input" id="editEmail">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Phone" data-ar="الهاتف">Phone</label>
+                        <input type="text" class="form-input" id="editPhone">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Founded Year" data-ar="سنة التأسيس">Founded Year</label>
+                        <input type="number" min="1900" max="2030" class="form-input" id="editFoundedYear">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Country" data-ar="الدولة">Country</label>
+                        <input type="text" class="form-input" id="editCountry">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="City" data-ar="المدينة">City</label>
+                        <input type="text" class="form-input" id="editCity">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Address" data-ar="العنوان">Address</label>
+                        <input type="text" class="form-input" id="editAddress">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Person in Charge" data-ar="المسؤول">Person in Charge</label>
+                        <input type="text" class="form-input" id="editPersonInCharge">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Website" data-ar="الموقع الإلكتروني">Website</label>
+                        <input type="url" class="form-input" id="editWebsite">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Sports (comma separated)" data-ar="الرياضات (مفصولة بفاصلة)">Sports</label>
+                        <input type="text" class="form-input" id="editSports" placeholder="MMA, BJJ, Boxing">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-en="Description" data-ar="الوصف">Description</label>
+                    <textarea class="form-input" id="editDescription" rows="3"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-success" style="flex: 1;"><i class="fas fa-save"></i> <span data-en="Save" data-ar="حفظ">Save</span></button>
+                    <button type="button" class="btn btn-warning" style="flex: 1;" onclick="closeEditModal()"><i class="fas fa-times"></i> <span data-en="Cancel" data-ar="إلغاء">Cancel</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Suspend Modal -->
+    <div class="modal-overlay" id="suspendModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" data-en="Suspend Team" data-ar="تعليق الفريق">Suspend Team</h3>
+                <button class="close-modal" onclick="closeSuspendModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label" data-en="Reason for Suspension (Required)" data-ar="سبب التعليق (إلزامي)">Reason for Suspension (Required)</label>
+                <textarea class="form-input" id="suspendReason" rows="4" data-placeholder-en="Enter the reason..." data-placeholder-ar="أدخل السبب..."></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-danger" style="flex: 1;" onclick="confirmSuspend()" data-en="Confirm Suspend" data-ar="تأكيد التعليق">Confirm Suspend</button>
+                <button class="btn btn-warning" style="flex: 1;" onclick="closeSuspendModal()" data-en="Cancel" data-ar="إلغاء">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let allTeams = [];
+        let allCoaches = [];
+        let currentLang = localStorage.getItem('selectedLanguage') || 'en';
+        let suspendTargetId = null;
+
+        window.onload = async () => {
+            await checkAuth();
+            window.setLang(currentLang);
+            await loadCoaches();
+            await loadTeams();
+        };
+
+        window.setLang = function(lang) {
+            currentLang = lang;
+            localStorage.setItem('selectedLanguage', lang);
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((lang === 'en' && btn.textContent.trim() === 'EN') || (lang === 'ar' && btn.textContent.trim() === 'AR')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            document.querySelectorAll('[data-en][data-ar]').forEach(el => {
+                el.textContent = lang === 'ar' ? el.dataset.ar : el.dataset.en;
+            });
+            document.querySelectorAll('[data-placeholder-en][data-placeholder-ar]').forEach(el => {
+                el.placeholder = lang === 'ar' ? el.dataset.placeholderAr : el.dataset.placeholderEn;
+            });
+        };
+
+        async function checkAuth() {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) { window.location.href = 'admin-login.html'; return; }
+            const { data: admin } = await supabaseClient.from('admin_profiles').select('*').eq('id', user.id).maybeSingle();
+            if (!admin) { window.location.href = 'index.html'; return; }
+        }
+
+        async function loadCoaches() {
+            try {
+                const { data } = await supabaseClient.from('coaches').select('id, full_name');
+                allCoaches = data || [];
+            } catch (e) {
+                console.warn('Could not load coaches:', e);
+            }
+        }
+
+        async function loadTeams() {
+            const search = document.getElementById('searchTeam').value.toLowerCase();
+            const countryFilter = document.getElementById('filterCountry').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+            const approvalFilter = document.getElementById('filterApproval').value;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('teams')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+
+                let teams = data || [];
+
+                if (search) {
+                    teams = teams.filter(t => t.name && t.name.toLowerCase().includes(search));
+                }
+                if (countryFilter) teams = teams.filter(t => t.country === countryFilter);
+                if (statusFilter) {
+                    teams = teams.filter(t => {
+                        if (statusFilter === 'suspended') return t.is_suspended;
+                        if (statusFilter === 'active') return t.is_active && !t.is_suspended;
+                        if (statusFilter === 'inactive') return !t.is_active && !t.is_suspended;
+                        return true;
+                    });
+                }
+                if (approvalFilter) {
+                    teams = teams.filter(t => {
+                        if (approvalFilter === 'pending') return t.requires_approval;
+                        if (approvalFilter === 'approved') return !t.requires_approval;
+                        return true;
+                    });
+                }
+
+                allTeams = teams;
+
+                // تحديث فلتر الدول
+                updateCountryFilter(teams);
+
+                document.getElementById('statTotal').textContent = allTeams.length;
+                document.getElementById('statActive').textContent = allTeams.filter(t => t.is_active && !t.is_suspended).length;
+                document.getElementById('statPending').textContent = allTeams.filter(t => t.requires_approval).length;
+                document.getElementById('statSuspended').textContent = allTeams.filter(t => t.is_suspended).length;
+
+                renderTable();
+            } catch (error) {
+                console.error('Error loading teams:', error);
+                showAlert(currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data', 'error');
+            }
+        }
+
+        function updateCountryFilter(teams) {
+            const countries = [...new Set(teams.map(t => t.country).filter(Boolean))];
+            const select = document.getElementById('filterCountry');
+            const currentValue = select.value;
+            select.innerHTML = `<option value="" data-en="All Countries" data-ar="جميع الدول">${currentLang === 'ar' ? 'جميع الدول' : 'All Countries'}</option>`;
+            countries.forEach(c => {
+                const option = document.createElement('option');
+                option.value = c;
+                option.textContent = c;
+                select.appendChild(option);
+            });
+            select.value = currentValue;
+        }
+
+        function getCoachName(coachId) {
+            const coach = allCoaches.find(c => c.id === coachId);
+            return coach ? coach.full_name : '-';
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('teamsTable');
+            if (allTeams.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;" data-en="No teams found" data-ar="لا توجد فرق">No teams found</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = allTeams.map(t => {
+                let statusClass = 'status-inactive';
+                let statusText = currentLang === 'ar' ? 'غير نشط' : 'Inactive';
+                if (t.is_suspended) {
+                    statusClass = 'status-suspended';
+                    statusText = currentLang === 'ar' ? 'معلق' : 'Suspended';
+                } else if (t.is_active) {
+                    statusClass = 'status-active';
+                    statusText = currentLang === 'ar' ? 'نشط' : 'Active';
+                }
+
+                const approvalClass = t.requires_approval ? 'approval-pending' : 'approval-approved';
+                const approvalText = t.requires_approval ? (currentLang === 'ar' ? 'في الانتظار' : 'Pending') : (currentLang === 'ar' ? 'موافق' : 'Approved');
+
+                return `
+                    <tr>
+                        <td><strong>${t.name || '-'}</strong></td>
+                        <td>${getCoachName(t.coach_id)}</td>
+                        <td>${t.country || '-'}</td>
+                        <td>${t.city || '-'}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td><span class="approval-badge ${approvalClass}">${approvalText}</span></td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn btn-info btn-sm" onclick="viewTeam('${t.id}')" title="${currentLang === 'ar' ? 'عرض التفاصيل' : 'View Details'}"><i class="fas fa-eye"></i></button>
+                                <button class="btn btn-primary btn-sm" onclick="editTeam('${t.id}')" title="${currentLang === 'ar' ? 'تعديل' : 'Edit'}"><i class="fas fa-edit"></i></button>
+                                ${t.requires_approval ? `<button class="btn btn-success btn-sm" onclick="approveTeam('${t.id}')" title="${currentLang === 'ar' ? 'موافقة' : 'Approve'}"><i class="fas fa-check"></i></button>` : ''}
+                                <button class="btn ${t.is_suspended ? 'btn-success' : 'btn-warning'} btn-sm" onclick="${t.is_suspended ? `activateTeam('${t.id}')` : `openSuspendModal('${t.id}')`}" title="${t.is_suspended ? (currentLang === 'ar' ? 'تنشيط' : 'Activate') : (currentLang === 'ar' ? 'تعليق' : 'Suspend')}">
+                                    ${t.is_suspended ? (currentLang === 'ar' ? 'تنشيط' : 'Activate') : (currentLang === 'ar' ? 'تعليق' : 'Suspend')}
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteTeam('${t.id}')" title="${currentLang === 'ar' ? 'حذف' : 'Delete'}"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function viewTeam(id) {
+            const t = allTeams.find(team => team.id === id);
+            if (!t) return;
+
+            console.log('👁️ Viewing team:', t);
+
+            let statusText = currentLang === 'ar' ? 'غير نشط' : 'Inactive';
+            if (t.is_suspended) statusText = currentLang === 'ar' ? 'معلق' : 'Suspended';
+            else if (t.is_active) statusText = currentLang === 'ar' ? 'نشط' : 'Active';
+
+            const approvalText = t.requires_approval ? (currentLang === 'ar' ? 'في انتظار الموافقة' : 'Pending Approval') : (currentLang === 'ar' ? 'موافق عليه' : 'Approved');
+            const reasonText = t.suspension_reason ? `<p style="color: var(--danger); margin-top: 10px;"><strong>${currentLang === 'ar' ? 'سبب التعليق:' : 'Suspension Reason:'}</strong> ${t.suspension_reason}</p>` : '';
+
+            // جلب المدرب
+            let coachHtml = '';
+            try {
+                if (t.coach_id) {
+                    const { data: coach } = await supabaseClient
+                        .from('coaches')
+                        .select('*')
+                        .eq('id', t.coach_id)
+                        .maybeSingle();
+                    
+                    if (coach) {
+                        coachHtml = `
+                            <div class="coach-card">
+                                <div class="coach-avatar">${(coach.full_name || 'C').charAt(0).toUpperCase()}</div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: bold; font-size: 1.1rem;">${coach.full_name || '-'}</div>
+                                    <div style="opacity: 0.9; font-size: 0.9rem;">${coach.email || '-'}</div>
+                                    <div style="opacity: 0.8; font-size: 0.85rem; margin-top: 5px;">
+                                        <i class="fas fa-phone"></i> ${coach.phone || '-'} | 
+                                        <i class="fas fa-map-marker-alt"></i> ${coach.city || '-'}, ${coach.country || '-'}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not load coach:', e);
+            }
+
+            // جلب أعضاء الفريق
+            let membersHtml = '';
+            try {
+                const { data: members } = await supabaseClient
+                    .from('athletes')
+                    .select('id, full_name, email, belt_level')
+                    .eq('team_id', t.id);
+                
+                if (members && members.length > 0) {
+                    membersHtml = `
+                        <h4 style="margin-top: 20px; margin-bottom: 10px;"><i class="fas fa-users"></i> ${currentLang === 'ar' ? 'أعضاء الفريق' : 'Team Members'} (${members.length})</h4>
+                        <div class="members-list">
+                            ${members.map(m => `
+                                <div class="member-item">
+                                    <div>
+                                        <strong>${m.full_name || '-'}</strong>
+                                        <div style="font-size: 12px; color: rgba(0,0,0,0.6);">${m.email || '-'}</div>
+                                    </div>
+                                    <span class="belt-badge" style="background: var(--light-bg); padding: 4px 10px; border-radius: 12px; font-size: 11px;">${m.belt_level || '-'}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    membersHtml = `<p style="margin-top: 20px; color: rgba(0,0,0,0.5);"><i class="fas fa-info-circle"></i> ${currentLang === 'ar' ? 'لا يوجد أعضاء' : 'No members'}</p>`;
+                }
+            } catch (e) {
+                console.warn('Could not load members:', e);
+            }
+
+            const logoHtml = t.logo_url ? 
+                `<img src="${t.logo_url}" alt="Logo" onclick="window.open('${t.logo_url}', '_blank')">` :
+                `<div class="no-image"><i class="fas fa-shield-alt"></i></div>`;
+
+            const coverHtml = t.cover_url ? 
+                `<img src="${t.cover_url}" alt="Cover" onclick="window.open('${t.cover_url}', '_blank')">` :
+                `<div class="no-image" style="height: 100px;"><i class="fas fa-image"></i></div>`;
+
+            const sportsHtml = t.sports && t.sports.length > 0 ? t.sports.join(', ') : '-';
+
+            document.getElementById('viewModalContent').innerHTML = `
+                <div class="team-images">
+                    <div class="image-box">
+                        ${logoHtml}
+                        <p>${currentLang === 'ar' ? 'شعار الفريق' : 'Team Logo'}</p>
+                    </div>
+                    <div class="image-box">
+                        ${coverHtml}
+                        <p>${currentLang === 'ar' ? 'صورة الغلاف' : 'Cover Image'}</p>
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom: 10px;"><i class="fas fa-info-circle"></i> ${currentLang === 'ar' ? 'معلومات الفريق' : 'Team Information'}</h4>
+                <div class="details-grid">
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'اسم الفريق' : 'Team Name'}</div><div class="detail-value">${t.name || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'البريد' : 'Email'}</div><div class="detail-value">${t.email || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الهاتف' : 'Phone'}</div><div class="detail-value">${t.phone || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'سنة التأسيس' : 'Founded Year'}</div><div class="detail-value">${t.founded_year || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الدولة' : 'Country'}</div><div class="detail-value">${t.country || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'المدينة' : 'City'}</div><div class="detail-value">${t.city || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'العنوان' : 'Address'}</div><div class="detail-value">${t.address || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'المسؤول' : 'Person in Charge'}</div><div class="detail-value">${t.person_in_charge || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الموقع' : 'Website'}</div><div class="detail-value">${t.website ? `<a href="${t.website}" target="_blank">${t.website}</a>` : '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الرياضات' : 'Sports'}</div><div class="detail-value">${sportsHtml}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الحالة' : 'Status'}</div><div class="detail-value">${statusText}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الموافقة' : 'Approval'}</div><div class="detail-value">${approvalText}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'تاريخ الإنشاء' : 'Created At'}</div><div class="detail-value">${t.created_at ? new Date(t.created_at).toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US') : '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'تاريخ التعليق' : 'Suspended At'}</div><div class="detail-value">${t.suspended_at ? new Date(t.suspended_at).toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US') : '-'}</div></div>
+                </div>
+                ${t.description ? `<div class="detail-item" style="margin-bottom: 15px;"><div class="detail-label">${currentLang === 'ar' ? 'الوصف' : 'Description'}</div><div class="detail-value" style="font-weight: normal;">${t.description}</div></div>` : ''}
+                ${reasonText}
+
+                <h4 style="margin-top: 20px; margin-bottom: 10px;"><i class="fas fa-chalkboard-teacher"></i> ${currentLang === 'ar' ? 'المدرب' : 'Coach'}</h4>
+                ${coachHtml || `<p style="color: rgba(0,0,0,0.5);"><i class="fas fa-info-circle"></i> ${currentLang === 'ar' ? 'لا يوجد مدرب مرتبط' : 'No coach assigned'}</p>`}
+
+                ${membersHtml}
+            `;
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        function editTeam(id) {
+            const t = allTeams.find(team => team.id === id);
+            if (!t) return;
+
+            console.log('✏️ Editing team:', t);
+
+            document.getElementById('editId').value = t.id || '';
+            document.getElementById('editName').value = t.name || '';
+            document.getElementById('editEmail').value = t.email || '';
+            document.getElementById('editPhone').value = t.phone || '';
+            document.getElementById('editFoundedYear').value = t.founded_year || '';
+            document.getElementById('editCountry').value = t.country || '';
+            document.getElementById('editCity').value = t.city || '';
+            document.getElementById('editAddress').value = t.address || '';
+            document.getElementById('editPersonInCharge').value = t.person_in_charge || '';
+            document.getElementById('editWebsite').value = t.website || '';
+            document.getElementById('editSports').value = Array.isArray(t.sports) ? t.sports.join(', ') : (t.sports || '');
+            document.getElementById('editDescription').value = t.description || '';
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        async function saveEdit(e) {
+            e.preventDefault();
+            
+            const sportsValue = document.getElementById('editSports').value;
+            const sportsArray = sportsValue ? sportsValue.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+            const updateData = {
+                name: document.getElementById('editName').value,
+                email: document.getElementById('editEmail').value,
+                phone: document.getElementById('editPhone').value,
+                founded_year: parseInt(document.getElementById('editFoundedYear').value) || null,
+                country: document.getElementById('editCountry').value,
+                city: document.getElementById('editCity').value,
+                address: document.getElementById('editAddress').value,
+                person_in_charge: document.getElementById('editPersonInCharge').value,
+                website: document.getElementById('editWebsite').value,
+                sports: sportsArray,
+                description: document.getElementById('editDescription').value,
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                const { error } = await supabaseClient
+                    .from('teams')
+                    .update(updateData)
+                    .eq('id', document.getElementById('editId').value);
+
+                if (error) throw error;
+
+                showAlert(currentLang === 'ar' ? '✅ تم التعديل بنجاح' : '✅ Team updated successfully', 'success');
+                closeEditModal();
+                loadTeams();
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        function closeViewModal() { document.getElementById('viewModal').classList.remove('active'); }
+        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
+
+        async function approveTeam(id) {
+            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من الموافقة على هذا الفريق؟' : 'Are you sure you want to approve this team?')) return;
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                const { error } = await supabaseClient.from('teams').update({
+                    requires_approval: false,
+                    is_active: true,
+                    approved_by: user?.id,
+                    approved_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                }).eq('id', id);
+
+                if (error) throw error;
+
+                showAlert(currentLang === 'ar' ? '✅ تمت الموافقة على الفريق' : '✅ Team approved successfully', 'success');
+                loadTeams();
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        function openSuspendModal(id) {
+            suspendTargetId = id;
+            document.getElementById('suspendReason').value = '';
+            document.getElementById('suspendModal').classList.add('active');
+        }
+
+        function closeSuspendModal() { 
+            document.getElementById('suspendModal').classList.remove('active'); 
+            suspendTargetId = null;
+        }
+
+        async function confirmSuspend() {
+            const reason = document.getElementById('suspendReason').value.trim();
+            if (!reason) {
+                alert(currentLang === 'ar' ? 'يرجى إدخال سبب التعليق' : 'Please enter a reason for suspension');
+                return;
+            }
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                const { error } = await supabaseClient.from('teams').update({
+                    is_suspended: true,
+                    is_active: false,
+                    suspension_reason: reason,
+                    suspended_by: user?.id,
+                    suspended_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                }).eq('id', suspendTargetId);
+
+                if (error) throw error;
+
+                showAlert(currentLang === 'ar' ? '✅ تم تعليق الفريق بنجاح' : '✅ Team suspended successfully', 'success');
+                closeSuspendModal();
+                loadTeams();
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function activateTeam(id) {
+            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من تنشيط هذا الفريق؟' : 'Are you sure you want to activate this team?')) return;
+
+            try {
+                const { error } = await supabaseClient.from('teams').update({
+                    is_suspended: false,
+                    is_active: true,
+                    suspension_reason: null,
+                    suspended_by: null,
+                    suspended_at: null,
+                    updated_at: new Date().toISOString()
+                }).eq('id', id);
+
+                if (error) throw error;
+
+                showAlert(currentLang === 'ar' ? '✅ تم تنشيط الفريق بنجاح' : '✅ Team activated successfully', 'success');
+                loadTeams();
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteTeam(id) {
+            if (!confirm(currentLang === 'ar' ? '⚠️ هل أنت متأكد من حذف هذا الفريق؟ هذا الإجراء لا يمكن التراجع عنه!' : '⚠️ Are you sure you want to delete this team? This action cannot be undone!')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('teams')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                showAlert(currentLang === 'ar' ? '✅ تم حذف الفريق بنجاح' : '✅ Team deleted successfully', 'success');
+                loadTeams();
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        function exportTeams() {
+            if (allTeams.length === 0) return;
+            const headers = ['Name', 'Coach', 'Country', 'City', 'Email', 'Phone', 'Founded Year', 'Status', 'Approval', 'Created At'];
+            const rows = allTeams.map(t => [
+                t.name, 
+                getCoachName(t.coach_id),
+                t.country || '', 
+                t.city || '',
+                t.email || '',
+                t.phone || '',
+                t.founded_year || '',
+                t.is_suspended ? 'Suspended' : (t.is_active ? 'Active' : 'Inactive'),
+                t.requires_approval ? 'Pending' : 'Approved',
+                t.created_at
+            ]);
+            const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+            
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `teams_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 4000);
+        }
+    </script>
+</body>
+</html>
