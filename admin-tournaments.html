@@ -7,7 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ✅ الحفاظ التام على متغيرات الألوان والتصميم الأصلي */
         :root {
             --bg-dark: #0a0e17; --bg-card: #151d2b; --bg-input: rgba(255,255,255,0.05);
             --primary: #2563EB; --accent: #f1c40f; --accent-dark: #d4a017;
@@ -46,7 +45,6 @@
         .btn-info { background: linear-gradient(135deg, var(--primary), #1d4ed8); color: var(--text-main); }
         .btn-sm { padding: 6px 12px; font-size: 12px; }
 
-        /* ✅ إضافة صف الإحصائيات لتحسين التجربة (مطابق للتصميم الأصلي) */
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
         .stat-value { font-size: 32px; font-weight: bold; color: var(--accent); }
@@ -75,7 +73,6 @@
 
         .action-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 
-        /* ✅ نافذة عرض التفاصيل (إضافة جديدة متوافقة مع التصميم) */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
         .modal-overlay.active { display: flex; }
         .modal { background: var(--bg-card); border-radius: 16px; padding: 30px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
@@ -88,6 +85,11 @@
         .detail-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
         .detail-label { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
         .detail-value { font-weight: 600; color: var(--text-main); }
+
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; }
+        .alert.show { display: block; }
+        .alert-error { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger); color: var(--danger); }
+        .alert-info { background: rgba(37, 99, 235, 0.2); border: 1px solid var(--primary); color: var(--primary); }
 
         @media (max-width: 1024px) {
             .sidebar { width: 100%; position: relative; height: auto; }
@@ -130,7 +132,8 @@
             </div>
         </div>
 
-        <!-- ✅ إضافة صف الإحصائيات لتحسين واجهة المستخدم -->
+        <div id="alert" class="alert"></div>
+
         <div class="stats-row">
             <div class="stat-card">
                 <div class="stat-value" id="statTotal">0</div>
@@ -193,7 +196,6 @@
         </div>
     </div>
 
-    <!-- ✅ نافذة عرض التفاصيل (إضافة جديدة) -->
     <div class="modal-overlay" id="viewModal">
         <div class="modal">
             <div class="modal-header">
@@ -218,7 +220,6 @@
             await loadTournaments();
         };
 
-        // ✅ نظام الترجمة الموحد
         window.setLang = function(lang) {
             currentLang = lang;
             localStorage.setItem('selectedLanguage', lang);
@@ -252,70 +253,96 @@
             const status = document.getElementById('filterStatus').value;
             const sport = document.getElementById('filterSport').value;
 
-            // ✅ تحسين الاستعلام لجلب بيانات المنظم المرتبط
-            let query = supabaseClient
-                .from('tournaments')
-                .select('*, organizers(full_name, org_name)')
-                .order('created_at', { ascending: false });
-            
-            if (status) query = query.eq('status', status);
-            if (sport) query = query.eq('sport_type', sport);
-            
-            const { data, error } = await query;
-            if (error) { console.error(error); return; }
-
-            allTournaments = data || [];
-
-            let filtered = allTournaments;
-            if (search) {
-                filtered = filtered.filter(t => 
-                    (t.name && t.name.toLowerCase().includes(search)) ||
-                    (t.location && t.location.toLowerCase().includes(search))
-                );
-            }
-
-            // تحديث الإحصائيات
-            document.getElementById('statTotal').textContent = allTournaments.length;
-            document.getElementById('statActive').textContent = allTournaments.filter(t => t.status === 'active' || t.status === 'upcoming').length;
-            document.getElementById('statPending').textContent = allTournaments.filter(t => t.requires_approval).length;
-
-            const tbody = document.getElementById('tournamentsTable');
-            if (!filtered || filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;" data-en="No tournaments found" data-ar="لا توجد بطولات">No tournaments found</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = filtered.map(t => {
-                const statusClass = t.status === 'active' ? 'status-active' : 
-                                   t.status === 'completed' ? 'status-completed' : 
-                                   t.status === 'cancelled' ? 'status-cancelled' : 'status-upcoming';
+            try {
+                // ✅ استعلام محسن مع معالجة الأخطاء
+                console.log('🔍 Loading tournaments...');
                 
-                const statusTextMap = {
-                    'active': currentLang === 'ar' ? 'نشطة' : 'Active',
-                    'upcoming': currentLang === 'ar' ? 'قادمة' : 'Upcoming',
-                    'completed': currentLang === 'ar' ? 'مكتملة' : 'Completed',
-                    'cancelled': currentLang === 'ar' ? 'ملغاة' : 'Cancelled'
-                };
-                const statusText = statusTextMap[t.status] || t.status;
-                const organizerName = t.organizers?.org_name || t.organizers?.full_name || (currentLang === 'ar' ? 'غير محدد' : 'N/A');
+                let query = supabaseClient
+                    .from('tournaments')
+                    .select('*, organizers(full_name, org_name)')
+                    .order('created_at', { ascending: false });
+                
+                if (status) query = query.eq('status', status);
+                if (sport) query = query.eq('sport_type', sport);
+                
+                const { data, error } = await query;
 
-                return `
-                    <tr>
-                        <td><strong>${t.name || (currentLang === 'ar' ? 'بدون اسم' : 'No Name')}</strong></td>
-                        <td>${t.event_date ? new Date(t.event_date).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US') : (currentLang === 'ar' ? 'غير محدد' : 'TBD')}</td>
-                        <td>${t.location || '-'}</td>
-                        <td>${organizerName}</td>
-                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn btn-info btn-sm" onclick="viewTournament('${t.id}')"><i class="fas fa-eye"></i></button>
-                                <button class="btn btn-success btn-sm" onclick="editTournament('${t.id}')"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteTournament('${t.id}')"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+                if (error) {
+                    console.error('❌ Database Error:', error);
+                    showAlert('error', `Error: ${error.message}`);
+                    document.getElementById('tournamentsTable').innerHTML = 
+                        `<tr><td colspan="6" style="text-align: center; color: var(--danger);">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            ${currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data'}
+                        </td></tr>`;
+                    return;
+                }
+
+                console.log('✅ Data loaded:', data);
+                allTournaments = data || [];
+
+                let filtered = allTournaments;
+                if (search) {
+                    filtered = filtered.filter(t => 
+                        (t.name && t.name.toLowerCase().includes(search)) ||
+                        (t.location && t.location.toLowerCase().includes(search))
+                    );
+                }
+
+                // تحديث الإحصائيات
+                document.getElementById('statTotal').textContent = allTournaments.length;
+                document.getElementById('statActive').textContent = allTournaments.filter(t => t.status === 'active' || t.status === 'upcoming').length;
+                document.getElementById('statPending').textContent = allTournaments.filter(t => t.requires_approval).length;
+
+                const tbody = document.getElementById('tournamentsTable');
+                
+                if (!filtered || filtered.length === 0) {
+                    const msg = allTournaments.length === 0 ? 
+                        (currentLang === 'ar' ? 'لا توجد بطولات. اضغط "إنشاء بطولة" لإضافة واحدة.' : 'No tournaments found. Click "Create Tournament" to add one.') :
+                        (currentLang === 'ar' ? 'لا توجد نتائج مطابقة للبحث' : 'No results match your search');
+                    
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">
+                        <i class="fas fa-info-circle"></i> ${msg}
+                    </td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = filtered.map(t => {
+                    const statusClass = t.status === 'active' ? 'status-active' : 
+                                       t.status === 'completed' ? 'status-completed' : 
+                                       t.status === 'cancelled' ? 'status-cancelled' : 'status-upcoming';
+                    
+                    const statusTextMap = {
+                        'active': currentLang === 'ar' ? 'نشطة' : 'Active',
+                        'upcoming': currentLang === 'ar' ? 'قادمة' : 'Upcoming',
+                        'completed': currentLang === 'ar' ? 'مكتملة' : 'Completed',
+                        'cancelled': currentLang === 'ar' ? 'ملغاة' : 'Cancelled'
+                    };
+                    const statusText = statusTextMap[t.status] || t.status;
+                    const organizerName = t.organizers?.org_name || t.organizers?.full_name || (currentLang === 'ar' ? 'غير محدد' : 'N/A');
+
+                    return `
+                        <tr>
+                            <td><strong>${t.name || (currentLang === 'ar' ? 'بدون اسم' : 'No Name')}</strong></td>
+                            <td>${t.event_date ? new Date(t.event_date).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US') : (currentLang === 'ar' ? 'غير محدد' : 'TBD')}</td>
+                            <td>${t.location || '-'}</td>
+                            <td>${organizerName}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn btn-info btn-sm" onclick="viewTournament('${t.id}')"><i class="fas fa-eye"></i></button>
+                                    <button class="btn btn-success btn-sm" onclick="editTournament('${t.id}')"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteTournament('${t.id}')"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error('❌ Unexpected Error:', err);
+                showAlert('error', `Unexpected error: ${err.message}`);
+            }
         }
 
         function viewTournament(id) {
@@ -361,6 +388,13 @@
             const successMsg = currentLang === 'ar' ? 'تم الحذف بنجاح' : 'Deleted successfully';
             alert(successMsg);
             loadTournaments();
+        }
+
+        function showAlert(type, message) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => alert.classList.remove('show'), 5000);
         }
 
         async function logout() {
