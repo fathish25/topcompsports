@@ -232,9 +232,16 @@
 
         async function checkAuth() {
             const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) { window.location.href = 'admin-login.html'; return; }
+            if (!user) { 
+                // إذا لم يكن هناك جلسة، نوجه لصفحة الدخول
+                window.location.href = 'admin-login.html'; 
+                return; 
+            }
             const { data: admin } = await supabaseClient.from('admin_profiles').select('*').eq('id', user.id).maybeSingle();
-            if (!admin) { window.location.href = 'index.html'; return; }
+            if (!admin) { 
+                window.location.href = 'index.html'; 
+                return; 
+            }
         }
 
         async function loadUsers() {
@@ -250,14 +257,16 @@
                     supabaseClient.from('coaches').select('*')
                 ]);
 
-                // 🔍 تنبيه تشخيصي لمعرفة ما يحدث بالضبط في قاعدة البيانات
+                // 🔍 تنبيه تشخيصي دقيق لمعرفة ما يحدث بالضبط
                 let debugMessage = "📊 حالة التحميل من قاعدة البيانات:\n\n";
                 debugMessage += `✅ اللاعبون: ${athletesRes.data ? athletesRes.data.length : 0}\n`;
                 debugMessage += `✅ المنظمون: ${organizersRes.data ? organizersRes.data.length : 0}\n`;
                 debugMessage += `✅ المدربون: ${coachesRes.data ? coachesRes.data.length : 0}\n\n`;
 
+                // إذا كان هناك خطأ محدد في جدول المنظمين، سنعرضه بوضوح
                 if (organizersRes.error) {
                     debugMessage += `⚠️ خطأ في جلب المنظمين: ${organizersRes.error.message}\n`;
+                    debugMessage += `تفاصيل الخطأ: ${JSON.stringify(organizersRes.error)}\n`;
                 }
 
                 let users = [];
@@ -320,7 +329,7 @@
                 document.getElementById('statCoaches').textContent = allUsers.filter(u => u.role === 'coach').length;
 
                 // إضافة نتيجة الفلترة للتنبيه
-                debugMessage += `📈 بعد تطبيق الفلاتر:\n`;
+                debugMessage += `\n📈 بعد تطبيق الفلاتر:\n`;
                 debugMessage += `المنظمون المعروضون: ${allUsers.filter(u => u.role === 'organizer').length}`;
 
                 // عرض التنبيه للمستخدم ليرى النتيجة بنفسه
