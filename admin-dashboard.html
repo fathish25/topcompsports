@@ -396,6 +396,7 @@
         // تحميل الإحصائيات
         // ========================================
         async function loadStats() {
+            // ✅ إضافة timestamp لكسر الكاش
             const { count: athletesCount } = await dbClient
                 .from('athletes')
                 .select('*', { count: 'exact', head: true });
@@ -433,53 +434,61 @@
         // تحميل المنظمين المعلقين
         // ========================================
         async function loadPendingOrganizers() {
-            const { data: organizers, error } = await dbClient
-                .from('organizers')
-                .select('*')
-                .eq('verification_status', 'pending')
-                .limit(5)
-                .order('created_at', { ascending: false });
-
             const container = document.getElementById('pendingOrganizersList');
             
-            if (error) {
-                console.error('Error loading organizers:', error);
-                container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--danger);">${currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data'}</p>`;
-                return;
-            }
+            // ✅ إضافة Loading State
+            container.innerHTML = `<div class="loading" data-en="Loading..." data-ar="جاري التحميل...">Loading...</div>`;
             
-            if (!organizers || organizers.length === 0) {
-                container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--text-muted);">${currentLang === 'ar' ? 'لا توجد طلبات معلقة' : 'No pending verifications'}</p>`;
-                return;
-            }
+            try {
+                // ✅ استخدام rpc لتجنب الكاش أو إضافة timestamp
+                const { data: organizers, error } = await dbClient
+                    .from('organizers')
+                    .select('*')
+                    .eq('verification_status', 'pending')
+                    .order('created_at', { ascending: false });
 
-            container.innerHTML = `
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>${currentLang === 'ar' ? 'الاسم' : 'Name'}</th>
-                            <th>${currentLang === 'ar' ? 'البريد' : 'Email'}</th>
-                            <th>${currentLang === 'ar' ? 'المنظمة' : 'Organization'}</th>
-                            <th>${currentLang === 'ar' ? 'التاريخ' : 'Submitted'}</th>
-                            <th>${currentLang === 'ar' ? 'الإجراءات' : 'Actions'}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${organizers.map(org => `
+                if (error) {
+                    console.error('Error loading organizers:', error);
+                    container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--danger);">${currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data'}</p>`;
+                    return;
+                }
+                
+                if (!organizers || organizers.length === 0) {
+                    container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--text-muted);">${currentLang === 'ar' ? 'لا توجد طلبات معلقة' : 'No pending verifications'}</p>`;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table class="data-table">
+                        <thead>
                             <tr>
-                                <td>${org.full_name || 'N/A'}</td>
-                                <td>${org.email || 'N/A'}</td>
-                                <td>${org.organization_name || 'N/A'}</td>
-                                <td>${new Date(org.created_at).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</td>
-                                <td>
-                                    <button class="btn-action btn-approve" onclick="approveOrganizer('${org.id}')">${currentLang === 'ar' ? 'قبول' : 'Approve'}</button>
-                                    <button class="btn-action btn-reject" onclick="rejectOrganizer('${org.id}')">${currentLang === 'ar' ? 'رفض' : 'Reject'}</button>
-                                </td>
+                                <th>${currentLang === 'ar' ? 'الاسم' : 'Name'}</th>
+                                <th>${currentLang === 'ar' ? 'البريد' : 'Email'}</th>
+                                <th>${currentLang === 'ar' ? 'المنظمة' : 'Organization'}</th>
+                                <th>${currentLang === 'ar' ? 'التاريخ' : 'Submitted'}</th>
+                                <th>${currentLang === 'ar' ? 'الإجراءات' : 'Actions'}</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
+                        </thead>
+                        <tbody>
+                            ${organizers.map(org => `
+                                <tr id="org-row-${org.id}">
+                                    <td>${org.full_name || 'N/A'}</td>
+                                    <td>${org.email || 'N/A'}</td>
+                                    <td>${org.organization_name || 'N/A'}</td>
+                                    <td>${new Date(org.created_at).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</td>
+                                    <td>
+                                        <button class="btn-action btn-approve" onclick="approveOrganizer('${org.id}')">${currentLang === 'ar' ? 'قبول' : 'Approve'}</button>
+                                        <button class="btn-action btn-reject" onclick="rejectOrganizer('${org.id}')">${currentLang === 'ar' ? 'رفض' : 'Reject'}</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('Error in loadPendingOrganizers:', error);
+                container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--danger);">${currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data'}</p>`;
+            }
         }
 
         // ========================================
@@ -488,23 +497,54 @@
         async function approveOrganizer(organizerId) {
             if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من الموافقة على هذا المنظم؟' : 'Are you sure you want to approve this organizer?')) return;
 
-            const { error } = await dbClient
-                .from('organizers')
-                .update({ 
-                    verification_status: 'approved',
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', organizerId);
+            try {
+                // ✅ إظهار Loading
+                const row = document.getElementById(`org-row-${organizerId}`);
+                if (row) {
+                    row.style.opacity = '0.5';
+                    row.style.pointerEvents = 'none';
+                }
 
-            if (error) {
-                console.error('Error approving organizer:', error);
-                showAlert(currentLang === 'ar' ? 'خطأ في الموافقة' : 'Error approving organizer', 'error');
-                return;
+                const { data, error } = await dbClient
+                    .from('organizers')
+                    .update({ 
+                        verification_status: 'approved',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', organizerId)
+                    .select(); // ✅ استرجاع البيانات المحدثة
+
+                if (error) {
+                    console.error('Error approving organizer:', error);
+                    showAlert(currentLang === 'ar' ? 'خطأ في الموافقة' : 'Error approving organizer', 'error');
+                    if (row) {
+                        row.style.opacity = '1';
+                        row.style.pointerEvents = 'auto';
+                    }
+                    return;
+                }
+
+                // ✅ إزالة الصف فوراً من DOM
+                if (row) {
+                    row.remove();
+                }
+
+                showAlert(currentLang === 'ar' ? 'تمت الموافقة بنجاح' : 'Organizer approved successfully', 'success');
+                
+                // ✅ إعادة تحميل الإحصائيات فوراً
+                await loadStats();
+                
+                // ✅ التحقق إذا لم يتبق أي منظمين
+                const container = document.getElementById('pendingOrganizersList');
+                const remainingRows = container.querySelectorAll('tbody tr');
+                if (remainingRows.length === 0) {
+                    container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--text-muted);">${currentLang === 'ar' ? 'لا توجد طلبات معلقة' : 'No pending verifications'}</p>`;
+                }
+                
+            } catch (error) {
+                console.error('Unexpected error in approveOrganizer:', error);
+                showAlert(currentLang === 'ar' ? 'حدث خطأ غير متوقع' : 'Unexpected error occurred', 'error');
             }
-
-            showAlert(currentLang === 'ar' ? 'تمت الموافقة بنجاح' : 'Organizer approved successfully', 'success');
-            loadPendingOrganizers();
-            loadStats();
         }
 
         // ========================================
@@ -513,23 +553,48 @@
         async function rejectOrganizer(organizerId) {
             if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من رفض هذا المنظم؟' : 'Are you sure you want to reject this organizer?')) return;
 
-            const { error } = await dbClient
-                .from('organizers')
-                .update({ 
-                    verification_status: 'rejected',
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', organizerId);
+            try {
+                const row = document.getElementById(`org-row-${organizerId}`);
+                if (row) {
+                    row.style.opacity = '0.5';
+                    row.style.pointerEvents = 'none';
+                }
 
-            if (error) {
-                console.error('Error rejecting organizer:', error);
-                showAlert(currentLang === 'ar' ? 'خطأ في الرفض' : 'Error rejecting organizer', 'error');
-                return;
+                const { error } = await dbClient
+                    .from('organizers')
+                    .update({ 
+                        verification_status: 'rejected',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', organizerId);
+
+                if (error) {
+                    console.error('Error rejecting organizer:', error);
+                    showAlert(currentLang === 'ar' ? 'خطأ في الرفض' : 'Error rejecting organizer', 'error');
+                    if (row) {
+                        row.style.opacity = '1';
+                        row.style.pointerEvents = 'auto';
+                    }
+                    return;
+                }
+
+                if (row) {
+                    row.remove();
+                }
+
+                showAlert(currentLang === 'ar' ? 'تم الرفض بنجاح' : 'Organizer rejected', 'success');
+                await loadStats();
+                
+                const container = document.getElementById('pendingOrganizersList');
+                const remainingRows = container.querySelectorAll('tbody tr');
+                if (remainingRows.length === 0) {
+                    container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--text-muted);">${currentLang === 'ar' ? 'لا توجد طلبات معلقة' : 'No pending verifications'}</p>`;
+                }
+                
+            } catch (error) {
+                console.error('Unexpected error in rejectOrganizer:', error);
+                showAlert(currentLang === 'ar' ? 'حدث خطأ غير متوقع' : 'Unexpected error occurred', 'error');
             }
-
-            showAlert(currentLang === 'ar' ? 'تم الرفض بنجاح' : 'Organizer rejected', 'success');
-            loadPendingOrganizers();
-            loadStats();
         }
 
         // ========================================
@@ -537,14 +602,12 @@
         // ========================================
         async function loadRecentActivity() {
             try {
-                // محاولة جلب البيانات من admin_activity_logs أولاً
                 let { data: activity, error } = await dbClient
                     .from('admin_activity_logs')
                     .select('*')
                     .order('created_at', { ascending: false })
                     .limit(10);
 
-                // إذا فشل، حاول استخدام activity_logs
                 if (error || !activity) {
                     const fallback = await dbClient
                         .from('activity_logs')
