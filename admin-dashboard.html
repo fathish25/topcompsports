@@ -180,7 +180,6 @@
                 <span class="icon"><i class="fas fa-running"></i></span>
                 <span data-en="Athletes" data-ar="اللاعبون">Athletes</span>
             </a>
-            <!-- ✅ إضافة جديدة: رابط وثائق اللاعبين -->
             <a href="admin-athlete-documents.html" class="nav-item">
                 <span class="icon"><i class="fas fa-id-card"></i></span>
                 <span data-en="Athlete Documents" data-ar="وثائق اللاعبين">Athlete Documents</span>
@@ -245,7 +244,7 @@
                 <div class="stat-value" id="totalTournaments">0</div>
                 <div class="stat-label" data-en="Tournaments" data-ar="البطولات">Tournaments</div>
             </div>
-            <div class="stat-card warning" onclick="window.location.href='admin-organizers.html?filter=pending'">
+            <div class="stat-card warning" onclick="window.location.href='admin-organizations.html?filter=pending'">
                 <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
                 <div class="stat-value" id="pendingOrganizers">0</div>
                 <div class="stat-label" data-en="Pending Organizers" data-ar="منظمون في الانتظار">Pending Organizers</div>
@@ -264,12 +263,11 @@
                 <div class="action-title" data-en="Manage Sub-Admins" data-ar="إدارة الأدمن الفرعي">Manage Sub-Admins</div>
                 <div class="action-desc" data-en="Create and manage admin accounts" data-ar="إنشاء وإدارة حسابات الأدمن">Create and manage admin accounts</div>
             </a>
-            <a href="admin-organizers.html?filter=pending" class="action-card">
+            <a href="admin-organizations.html?filter=pending" class="action-card">
                 <div class="action-icon"><i class="fas fa-check-circle"></i></div>
                 <div class="action-title" data-en="Verify Organizers" data-ar="التحقق من المنظمين">Verify Organizers</div>
                 <div class="action-desc" data-en="Approve organizer applications" data-ar="الموافقة على طلبات المنظمين">Approve organizer applications</div>
             </a>
-            <!-- ✅ إضافة جديدة: بطاقة التحقق من وثائق اللاعبين -->
             <a href="admin-athlete-documents.html" class="action-card">
                 <div class="action-icon"><i class="fas fa-id-card"></i></div>
                 <div class="action-title" data-en="Verify Athletes" data-ar="التحقق من اللاعبين">Verify Athletes</div>
@@ -395,7 +393,7 @@
         }
 
         // ========================================
-        // تحميل الإحصائيات (✅ لم يتم تغيير أي استعلام)
+        // تحميل الإحصائيات
         // ========================================
         async function loadStats() {
             const { count: athletesCount } = await dbClient
@@ -435,7 +433,7 @@
         // تحميل المنظمين المعلقين
         // ========================================
         async function loadPendingOrganizers() {
-            const { data: organizers } = await dbClient
+            const { data: organizers, error } = await dbClient
                 .from('organizers')
                 .select('*')
                 .eq('verification_status', 'pending')
@@ -443,6 +441,12 @@
                 .order('created_at', { ascending: false });
 
             const container = document.getElementById('pendingOrganizersList');
+            
+            if (error) {
+                console.error('Error loading organizers:', error);
+                container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--danger);">${currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data'}</p>`;
+                return;
+            }
             
             if (!organizers || organizers.length === 0) {
                 container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--text-muted);">${currentLang === 'ar' ? 'لا توجد طلبات معلقة' : 'No pending verifications'}</p>`;
@@ -463,8 +467,8 @@
                     <tbody>
                         ${organizers.map(org => `
                             <tr>
-                                <td>${org.full_name}</td>
-                                <td>${org.email}</td>
+                                <td>${org.full_name || 'N/A'}</td>
+                                <td>${org.email || 'N/A'}</td>
                                 <td>${org.organization_name || 'N/A'}</td>
                                 <td>${new Date(org.created_at).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</td>
                                 <td>
@@ -493,6 +497,7 @@
                 .eq('id', organizerId);
 
             if (error) {
+                console.error('Error approving organizer:', error);
                 showAlert(currentLang === 'ar' ? 'خطأ في الموافقة' : 'Error approving organizer', 'error');
                 return;
             }
@@ -517,6 +522,7 @@
                 .eq('id', organizerId);
 
             if (error) {
+                console.error('Error rejecting organizer:', error);
                 showAlert(currentLang === 'ar' ? 'خطأ في الرفض' : 'Error rejecting organizer', 'error');
                 return;
             }
@@ -530,41 +536,59 @@
         // تحميل النشاط الأخير
         // ========================================
         async function loadRecentActivity() {
-            const { data: activity } = await dbClient
-                .from('admin_activity_logs')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(10);
+            try {
+                // محاولة جلب البيانات من admin_activity_logs أولاً
+                let { data: activity, error } = await dbClient
+                    .from('admin_activity_logs')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
 
-            const container = document.getElementById('recentActivity');
-            
-            if (!activity || activity.length === 0) {
-                container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--text-muted);">${currentLang === 'ar' ? 'لا يوجد نشاط حديث' : 'No recent activity'}</p>`;
-                return;
-            }
+                // إذا فشل، حاول استخدام activity_logs
+                if (error || !activity) {
+                    const fallback = await dbClient
+                        .from('activity_logs')
+                        .select('*')
+                        .order('created_at', { ascending: false })
+                        .limit(10);
+                    
+                    activity = fallback.data;
+                }
 
-            container.innerHTML = `
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>${currentLang === 'ar' ? 'الإجراء' : 'Action'}</th>
-                            <th>${currentLang === 'ar' ? 'الأدمن' : 'Admin'}</th>
-                            <th>${currentLang === 'ar' ? 'الجدول' : 'Table'}</th>
-                            <th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${activity.map(log => `
+                const container = document.getElementById('recentActivity');
+                
+                if (!activity || activity.length === 0) {
+                    container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--text-muted);">${currentLang === 'ar' ? 'لا يوجد نشاط حديث' : 'No recent activity'}</p>`;
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table class="data-table">
+                        <thead>
                             <tr>
-                                <td>${log.action}</td>
-                                <td>${log.admin_email || 'System'}</td>
-                                <td>${log.table_name || 'N/A'}</td>
-                                <td>${new Date(log.created_at).toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</td>
+                                <th>${currentLang === 'ar' ? 'الإجراء' : 'Action'}</th>
+                                <th>${currentLang === 'ar' ? 'الأدمن' : 'Admin'}</th>
+                                <th>${currentLang === 'ar' ? 'الجدول' : 'Table'}</th>
+                                <th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
+                        </thead>
+                        <tbody>
+                            ${activity.map(log => `
+                                <tr>
+                                    <td>${log.action || log.event || 'N/A'}</td>
+                                    <td>${log.admin_email || log.user_email || 'System'}</td>
+                                    <td>${log.table_name || log.entity || 'N/A'}</td>
+                                    <td>${new Date(log.created_at).toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('Error loading activity:', error);
+                const container = document.getElementById('recentActivity');
+                container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--text-muted);">${currentLang === 'ar' ? 'لا يوجد نشاط حديث' : 'No recent activity'}</p>`;
+            }
         }
 
         // ========================================
@@ -582,7 +606,11 @@
         // ========================================
         async function handleLogout() {
             if (confirm(currentLang === 'ar' ? 'هل أنت متأكد من تسجيل الخروج؟' : 'Are you sure you want to logout?')) {
-                await dbClient.auth.signOut();
+                try {
+                    await dbClient.auth.signOut();
+                } catch (e) {
+                    console.error('Logout error:', e);
+                }
                 localStorage.removeItem('currentAdmin');
                 window.location.href = 'admin-login.html';
             }
