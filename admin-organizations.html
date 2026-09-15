@@ -8,22 +8,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-dark: #0a0e17;
-            --bg-card: #151d2b;
-            --bg-input: rgba(255,255,255,0.05);
-            --primary: #2563EB;
-            --accent: #f1c40f;
-            --accent-dark: #d4a017;
-            --text-main: #ffffff;
-            --text-muted: rgba(255,255,255,0.7);
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
+            --bg-dark: #0a0e17; --bg-card: #151d2b; --bg-input: rgba(255,255,255,0.05);
+            --primary: #2563EB; --accent: #f1c40f; --accent-dark: #d4a017;
+            --text-main: #ffffff; --text-muted: rgba(255,255,255,0.7);
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-dark); color: var(--text-main); min-height: 100vh; }
         
-        /* Sidebar */
         .sidebar { width: 280px; background: rgba(21, 29, 43, 0.98); border-left: 2px solid var(--primary); position: fixed; height: 100vh; padding: 20px; right: 0; overflow-y: auto; z-index: 100; }
         [dir="ltr"] .sidebar { right: auto; left: 0; border-left: none; border-right: 2px solid var(--primary); }
         .logo { display: flex; align-items: center; gap: 15px; padding: 20px; margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.1); }
@@ -34,7 +26,6 @@
         .nav-item:hover { background: rgba(255,255,255,0.05); }
         .nav-item.active { background: linear-gradient(135deg, var(--primary), #1d4ed8); }
         
-        /* Main Content */
         .main-content { margin-right: 280px; padding: 40px; }
         [dir="ltr"] .main-content { margin-right: 0; margin-left: 280px; }
         
@@ -54,13 +45,11 @@
         .btn-warning { background: linear-gradient(135deg, var(--warning), #d97706); color: var(--text-main); }
         .btn-sm { padding: 6px 12px; font-size: 12px; }
 
-        /* Stats */
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
         .stat-value { font-size: 32px; font-weight: bold; color: var(--accent); }
         .stat-label { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
 
-        /* Section & Filters */
         .section { background: var(--bg-card); border-radius: 16px; padding: 30px; margin-bottom: 30px; }
         .section-title { font-size: 24px; font-weight: bold; margin-bottom: 25px; color: var(--accent); }
         .filters { display: grid; grid-template-columns: 2fr 1fr auto; gap: 15px; margin-bottom: 25px; align-items: end; }
@@ -69,7 +58,6 @@
         .form-label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 13px; }
         select.form-select option { background-color: var(--bg-card) !important; color: var(--text-main) !important; }
 
-        /* Cards */
         .org-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 15px; transition: all 0.3s; }
         .org-card:hover { border-color: var(--primary); background: rgba(37, 99, 235, 0.05); }
         .org-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
@@ -85,7 +73,6 @@
         .status-pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
         .status-suspended { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
 
-        /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
         .modal-overlay.active { display: flex; }
         .modal { background: var(--bg-card); border-radius: 16px; padding: 30px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
@@ -259,6 +246,14 @@
         window.onload = async () => {
             await checkAuth();
             window.setLang(currentLang);
+            
+            // ✅ إضافة دعم قراءة معامل الرابط (URL Parameter)
+            const urlParams = new URLSearchParams(window.location.search);
+            const filterParam = urlParams.get('filter');
+            if (filterParam === 'pending') {
+                document.getElementById('filterStatus').value = 'pending';
+            }
+            
             await loadOrganizations();
         };
 
@@ -299,17 +294,12 @@
                 .select('id, user_id, full_name, org_name, email, country, city, phone, verification_status, is_suspended, suspension_reason, profile_photo_url, id_document_url, created_at')
                 .order('created_at', { ascending: false });
 
-            if (error) {
-                console.error('Error:', error);
-                return;
-            }
+            if (error) { console.error('Error:', error); return; }
 
             allOrganizations = (data || []).map(org => {
-                // Normalize status for easier filtering
                 let status = 'pending';
                 if (org.is_suspended) status = 'suspended';
                 else if (org.verification_status === 'approved') status = 'verified';
-                
                 return { ...org, status };
             });
 
@@ -334,8 +324,7 @@
             }
 
             listDiv.innerHTML = filtered.map(org => {
-                const statusClass = org.status === 'verified' ? 'status-verified' : 
-                                   org.status === 'suspended' ? 'status-suspended' : 'status-pending';
+                const statusClass = org.status === 'verified' ? 'status-verified' : org.status === 'suspended' ? 'status-suspended' : 'status-pending';
                 const statusText = { verified: currentLang === 'ar' ? 'مُتحقق منها' : 'Verified', suspended: currentLang === 'ar' ? 'موقوفة' : 'Suspended', pending: currentLang === 'ar' ? 'قيد الانتظار' : 'Pending' }[org.status];
                 const name = org.org_name || org.full_name || (currentLang === 'ar' ? 'بدون اسم' : 'No Name');
 
@@ -367,7 +356,6 @@
         function viewOrganization(id) {
             const org = allOrganizations.find(o => o.id === id);
             if (!org) return;
-
             const statusText = { verified: currentLang === 'ar' ? 'مُتحقق منها' : 'Verified', suspended: currentLang === 'ar' ? 'موقوفة' : 'Suspended', pending: currentLang === 'ar' ? 'قيد الانتظار' : 'Pending' }[org.status];
             const reasonText = org.suspension_reason ? `<p style="color: var(--danger); margin-top: 10px;"><strong>${currentLang === 'ar' ? 'سبب التعليق:' : 'Suspension Reason:'}</strong> ${org.suspension_reason}</p>` : '';
 
@@ -430,19 +418,8 @@
                 const { data: { session } } = await supabaseClient.auth.getSession();
                 const response = await fetch(`${SUPABASE_URL}/functions/v1/create-regular-user`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.access_token}`
-                    },
-                    body: JSON.stringify({ 
-                        email, 
-                        password, 
-                        full_name: orgName, 
-                        role: 'organizer', 
-                        org_name: orgName,
-                        country,
-                        city
-                    })
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
+                    body: JSON.stringify({ email, password, full_name: orgName, role: 'organizer', org_name: orgName, country, city })
                 });
                 
                 const result = await response.json();
@@ -461,11 +438,7 @@
 
         async function verifyOrganization(id) {
             if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من التحقق من هذه الجهة؟' : 'Are you sure you want to verify this organizer?')) return;
-            
-            const { error } = await supabaseClient.from('organizers').update({ 
-                verification_status: 'approved' 
-            }).eq('id', id);
-            
+            const { error } = await supabaseClient.from('organizers').update({ verification_status: 'approved' }).eq('id', id);
             if (error) { alert('Error: ' + error.message); return; }
             alert(currentLang === 'ar' ? 'تم التحقق بنجاح' : 'Verified successfully');
             loadOrganizations();
@@ -473,18 +446,9 @@
 
         async function confirmSuspend() {
             const reason = document.getElementById('suspendReason').value.trim();
-            if (!reason) {
-                alert(currentLang === 'ar' ? 'يرجى إدخال سبب التعليق' : 'Please enter a reason for suspension');
-                return;
-            }
-
-            const { error } = await supabaseClient.from('organizers').update({
-                is_suspended: true,
-                suspension_reason: reason
-            }).eq('id', suspendTargetId);
-
+            if (!reason) { alert(currentLang === 'ar' ? 'يرجى إدخال سبب التعليق' : 'Please enter a reason for suspension'); return; }
+            const { error } = await supabaseClient.from('organizers').update({ is_suspended: true, suspension_reason: reason }).eq('id', suspendTargetId);
             if (error) { alert('Error: ' + error.message); return; }
-            
             alert(currentLang === 'ar' ? '✅ تم تعليق الجهة بنجاح' : '✅ Organizer suspended successfully');
             closeSuspendModal();
             loadOrganizations();
@@ -492,24 +456,16 @@
 
         async function activateOrganization(id) {
             if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من تنشيط هذه الجهة؟' : 'Are you sure you want to activate this organizer?')) return;
-
-            const { error } = await supabaseClient.from('organizers').update({
-                is_suspended: false,
-                suspension_reason: null
-            }).eq('id', id);
-
+            const { error } = await supabaseClient.from('organizers').update({ is_suspended: false, suspension_reason: null }).eq('id', id);
             if (error) { alert('Error: ' + error.message); return; }
-            
             alert(currentLang === 'ar' ? '✅ تم تنشيط الجهة بنجاح' : '✅ Organizer activated successfully');
             loadOrganizations();
         }
 
         async function deleteOrganization(id) {
-            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من حذف هذه الجهة المنظمة؟ هذا الإجراء لا يمكن التراجع عنه.' : 'Are you sure you want to delete this organizer? This action cannot be undone.')) return;
-            
+            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من حذف هذه الجهة المنظمة؟' : 'Are you sure you want to delete this organizer?')) return;
             const { error } = await supabaseClient.from('organizers').delete().eq('id', id);
             if (error) { alert('Error: ' + error.message); return; }
-            
             alert(currentLang === 'ar' ? 'تم الحذف بنجاح' : 'Deleted successfully');
             loadOrganizations();
         }
