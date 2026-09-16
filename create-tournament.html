@@ -3,162 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Tournament - TopCompSports</title>
+    <title>Tournament Form - TopCompSports</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ✅ Dark Theme Variables - Matching Admin Dashboard Exactly */
         :root {
-            --primary-blue: #0066CC;
-            --dark-blue: #003366;
-            --accent-yellow: #FFB800;
-            --black: #0A0A0A;
-            --dark-gray: #1A1A1A;
-            --medium-gray: #2A2A2A;
-            --white: #FFFFFF;
-            --light-bg: #F5F7FA;
-            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
-            --success: #10B981;
-            --danger: #EF4444;
+            --bg-dark: #0a0e17;
+            --bg-card: #151d2b;
+            --bg-input: rgba(255,255,255,0.05);
+            --primary: #2563EB;
+            --accent: #f1c40f;
+            --accent-dark: #d4a017;
+            --text-main: #ffffff;
+            --text-muted: rgba(255,255,255,0.7);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); color: var(--black); min-height: 100vh; }
+        
+        /* ✅ Forced Dark Theme Overrides to guarantee dark mode */
+        html, body { 
+            background: var(--bg-dark) !important; 
+            color: var(--text-main) !important; 
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
 
         /* Header */
-        .header { background: var(--black); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-blue); position: sticky; top: 0; z-index: 1000; }
-        .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; }
-        .logo-svg { width: 50px; height: 50px; }
-        .logo-text { font-size: 28px; font-weight: bold; color: var(--primary-blue); }
-        .nav { display: flex; gap: 20px; align-items: center; }
-        .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; transition: all 0.3s; font-weight: 600; }
-        .nav a:hover { color: var(--accent-yellow); }
+        .header { 
+            background: var(--bg-card) !important; 
+            padding: 15px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid var(--primary); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            flex-wrap: wrap; 
+            gap: 15px; 
+        }
+        .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; text-decoration: none; color: var(--text-main); }
+        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), var(--accent-dark)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: var(--bg-dark); }
+        .logo-text { font-size: 22px; font-weight: bold; }
+        
+        .nav { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .nav a { color: var(--text-muted); text-decoration: none; padding: 8px 12px; border-radius: 6px; transition: all 0.3s; font-weight: 600; font-size: 0.9rem; }
+        .nav a:hover { color: var(--accent); background: rgba(255,255,255,0.05); }
+
+        .lang-switcher { display: flex; gap: 8px; background: var(--bg-input); padding: 5px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        .lang-btn { background: transparent; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); transition: all 0.3s; }
+        .lang-btn.active { background: var(--primary); color: var(--text-main); }
 
         /* Container */
         .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
         .page-header { margin-bottom: 30px; }
-        .page-header h1 { font-size: 2.5rem; font-weight: 900; color: var(--black); margin-bottom: 10px; }
-        .page-header p { color: rgba(0,0,0,0.6); font-size: 1.1rem; }
+        .page-header h1 { font-size: 2rem; font-weight: bold; color: var(--text-main); margin-bottom: 10px; }
+        .page-header p { color: var(--text-muted); font-size: 1rem; }
 
         /* Form Sections */
-        .form-section { background: var(--white); border-radius: 15px; padding: 30px; margin-bottom: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .section-title { font-size: 1.4rem; font-weight: 700; color: var(--black); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--primary-blue); display: flex; align-items: center; gap: 10px; }
-        .section-title .icon { font-size: 1.5rem; }
+        .form-section { 
+            background: var(--bg-card) !important; 
+            border-radius: 15px; 
+            padding: 30px; 
+            margin-bottom: 25px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+        }
+        .section-title { font-size: 1.3rem; font-weight: bold; color: var(--accent); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
 
         /* Form Groups */
         .form-group { margin-bottom: 20px; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--black); font-size: 0.95rem; }
+        .form-label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-main); font-size: 0.95rem; }
         .form-label .required { color: var(--danger); }
-        .form-input, .form-select, .form-textarea { width: 100%; padding: 12px 15px; border: 2px solid #E5E7EB; border-radius: 8px; font-size: 1rem; transition: all 0.3s; background: var(--white); }
-        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(0,102,204,0.1); }
+        .form-input, .form-select, .form-textarea { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid rgba(255,255,255,0.1); 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            transition: all 0.3s; 
+            background: var(--bg-input) !important; 
+            color: var(--text-main) !important; 
+        }
+        .form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
         .form-textarea { min-height: 100px; resize: vertical; }
-        .form-hint { font-size: 0.85rem; color: rgba(0,0,0,0.5); margin-top: 5px; }
+        .form-hint { font-size: 0.85rem; color: var(--text-muted); margin-top: 5px; }
 
         /* Divisions Section */
         .divisions-list { margin-top: 20px; }
-        .division-item { background: var(--light-bg); border: 2px solid #E5E7EB; border-radius: 10px; padding: 20px; margin-bottom: 15px; position: relative; transition: all 0.3s; }
-        .division-item:hover { border-color: var(--primary-blue); }
-        .division-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .division-number { background: var(--primary-blue); color: var(--white); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .btn-remove { background: var(--danger); color: var(--white); border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
-        .btn-remove:hover { background: #DC2626; }
+        .division-item { background: var(--bg-dark); border: 2px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; margin-bottom: 15px; position: relative; transition: all 0.3s; }
+        .division-item:hover { border-color: var(--primary); }
+        .division-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .division-number { background: var(--primary); color: var(--text-main); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9rem; }
+        .btn-remove { background: var(--danger); color: var(--text-main); border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 0.85rem; }
+        .btn-remove:hover { background: #dc2626; }
         .division-fields { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 15px; }
         .division-fields .form-group { margin-bottom: 0; }
 
         /* Checkbox Toggle */
         .toggle-group { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
-        .toggle-checkbox { width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary-blue); }
-        .toggle-label { font-weight: 600; color: var(--black); cursor: pointer; }
+        .toggle-checkbox { width: 20px; height: 20px; cursor: pointer; accent-color: var(--primary); }
+        .toggle-label { font-weight: 600; color: var(--text-main); cursor: pointer; }
 
         /* Buttons */
-        .btn { padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-primary { background: var(--primary-blue); color: var(--white); }
-        .btn-primary:hover { background: var(--dark-blue); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.3); }
-        .btn-secondary { background: var(--white); color: var(--primary-blue); border: 2px solid var(--primary-blue); }
-        .btn-secondary:hover { background: var(--primary-blue); color: var(--white); }
-        .btn-success { background: var(--success); color: var(--white); }
-        .btn-success:hover { background: #059669; }
-        .btn-add { background: var(--accent-yellow); color: var(--black); }
-        .btn-add:hover { background: #F59E0B; transform: translateY(-2px); }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; justify-content: center; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), #1d4ed8); color: var(--text-main); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37,99,235,0.3); }
+        .btn-secondary { background: var(--bg-input); color: var(--text-main); border: 2px solid rgba(255,255,255,0.2); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+        .btn-add { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: var(--bg-dark); }
+        .btn-add:hover { transform: translateY(-2px); }
 
-        .form-actions { display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px; }
+        .form-actions { display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px; flex-wrap: wrap; }
 
         /* Payment Settings */
-        .payment-toggle { display: flex; align-items: center; gap: 15px; padding: 20px; background: var(--light-bg); border-radius: 10px; margin-bottom: 20px; }
+        .payment-toggle { display: flex; align-items: center; gap: 15px; padding: 20px; background: var(--bg-dark); border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
         .switch { position: relative; display: inline-block; width: 60px; height: 30px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 30px; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.2); transition: .4s; border-radius: 30px; }
         .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--primary-blue); }
+        input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(30px); }
 
         /* Alert */
         .alert { padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; display: none; font-weight: 600; }
         .alert.show { display: block; }
-        .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #10B981; }
-        .alert-error { background: #FEE2E2; color: #991B1B; border: 1px solid #EF4444; }
+        .alert-success { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .alert-error { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
 
         /* Access Denied */
-        .access-denied {
-            text-align: center;
-            padding: 60px 20px;
-            background: var(--white);
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-        .access-denied-icon { font-size: 80px; color: var(--danger); margin-bottom: 20px; }
-        .access-denied h2 { font-size: 2rem; color: var(--black); margin-bottom: 15px; }
-        .access-denied p { color: rgba(0,0,0,0.6); font-size: 1.1rem; margin-bottom: 30px; }
+        .access-denied { text-align: center; padding: 60px 20px; background: var(--bg-card); border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-top: 40px; }
+        .access-denied-icon { font-size: 60px; color: var(--danger); margin-bottom: 20px; }
+        .access-denied h2 { font-size: 1.8rem; color: var(--text-main); margin-bottom: 15px; }
+        .access-denied p { color: var(--text-muted); font-size: 1rem; margin-bottom: 30px; }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .header { padding: 15px 20px; flex-direction: column; gap: 15px; }
-            .nav { flex-wrap: wrap; justify-content: center; }
+            .header { padding: 15px 20px; flex-direction: column; align-items: flex-start; }
+            .nav { width: 100%; justify-content: flex-start; }
             .container { padding: 0 15px; margin: 20px auto; }
             .form-row { grid-template-columns: 1fr; }
             .division-fields { grid-template-columns: 1fr; }
             .form-actions { flex-direction: column; }
-            .form-actions .btn { width: 100%; justify-content: center; }
+            .form-actions .btn { width: 100%; }
         }
     </style>
 </head>
 <body>
     <header class="header">
-        <div class="logo" onclick="window.location.href='index.html'">
-            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#0066CC;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#003366;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <circle cx="50" cy="50" r="45" fill="url(#logoGrad)" stroke="#FFB800" stroke-width="3"/>
-                <text x="50" y="65" font-family="Arial Black, sans-serif" font-size="45" font-weight="900" fill="#FFB800" text-anchor="middle">T</text>
-            </svg>
+        <a href="#" class="logo" id="logoLink">
+            <div class="logo-icon">T</div>
             <div class="logo-text">TopCompSports</div>
-        </div>
+        </a>
         <nav class="nav">
-            <a href="index.html">Home</a>
-            <a href="tournaments.html">Tournaments</a>
-            <a href="organizer-dashboard.html">Dashboard</a>
+            <a href="index.html" data-en="Home" data-ar="الرئيسية">Home</a>
+            <a href="tournaments.html" data-en="Tournaments" data-ar="البطولات">Tournaments</a>
+            <a href="#" id="dashboardLink" data-en="Dashboard" data-ar="لوحة التحكم">Dashboard</a>
         </nav>
+        <div class="lang-switcher">
+            <button class="lang-btn" id="btnEn" onclick="setLang('en')">EN</button>
+            <button class="lang-btn" id="btnAr" onclick="setLang('ar')">عربي</button>
+        </div>
     </header>
 
     <div class="container">
         <!-- Access Denied Message -->
         <div id="accessDenied" class="access-denied" style="display: none;">
-            <div class="access-denied-icon">🚫</div>
-            <h2>Access Denied</h2>
-            <p>Only organizers and administrators can create tournaments.</p>
-            <button class="btn btn-primary" onclick="window.location.href='index.html'">
-                ← Back to Home
+            <div class="access-denied-icon"><i class="fas fa-ban"></i></div>
+            <h2 data-en="Access Denied" data-ar="غير مصرح بالدخول">Access Denied</h2>
+            <p data-en="Only organizers and administrators can manage tournaments." data-ar="فقط المنظمون والمديرين يمكنهم إدارة البطولات.">Only organizers and administrators can manage tournaments.</p>
+            <button class="btn btn-primary" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i> <span data-en="Back" data-ar="عودة">Back</span>
             </button>
         </div>
 
-        <!-- Tournament Form (يظهر فقط للمنظمين) -->
+        <!-- Tournament Form -->
         <div id="tournamentFormContainer" style="display: none;">
             <div class="page-header">
-                <h1>Create New Tournament</h1>
-                <p>Fill in the details to create your tournament</p>
+                <h1 id="pageTitle" data-en="Create New Tournament" data-ar="إنشاء بطولة جديدة">Create New Tournament</h1>
+                <p data-en="Fill in the details to manage your tournament" data-ar="أدخل التفاصيل لإدارة بطولتك">Fill in the details to manage your tournament</p>
             </div>
 
             <div id="alert" class="alert"></div>
@@ -166,34 +194,31 @@
             <form id="tournamentForm">
                 <!-- Basic Information -->
                 <div class="form-section">
-                    <h2 class="section-title"><span class="icon">📋</span> Basic Information</h2>
+                    <h2 class="section-title"><i class="fas fa-clipboard-list"></i> <span data-en="Basic Information" data-ar="المعلومات الأساسية">Basic Information</span></h2>
                     
                     <div class="form-group">
-                        <label class="form-label">Tournament Name <span class="required">*</span></label>
-                        <input type="text" id="tournamentName" class="form-input" required placeholder="e.g., Cairo Open 2026">
+                        <label class="form-label"><span data-en="Tournament Name" data-ar="اسم البطولة">Tournament Name</span> <span class="required">*</span></label>
+                        <input type="text" id="tournamentName" class="form-input" required data-en-placeholder="e.g., Cairo Open 2026" data-ar-placeholder="مثال: القاهرة المفتوحة 2026" placeholder="e.g., Cairo Open 2026">
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Description</label>
-                        <textarea id="description" class="form-textarea" placeholder="Describe your tournament..."></textarea>
+                        <label class="form-label"><span data-en="Description" data-ar="الوصف">Description</span></label>
+                        <textarea id="description" class="form-textarea" data-en-placeholder="Describe your tournament..." data-ar-placeholder="صف بطولتك..."></textarea>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Sport Type <span class="required">*</span></label>
+                            <label class="form-label"><span data-en="Sport Type" data-ar="نوع الرياضة">Sport Type</span> <span class="required">*</span></label>
                             <select id="sportType" class="form-select" required>
-                                <option value="">Select sport...</option>
                                 <option value="BJJ">Brazilian Jiu-Jitsu (BJJ)</option>
                                 <option value="Gi">Gi Jiu-Jitsu</option>
                                 <option value="No-Gi">No-Gi Jiu-Jitsu</option>
                                 <option value="Grappling">Grappling</option>
                             </select>
                         </div>
-
                         <div class="form-group">
-                            <label class="form-label">Age Division <span class="required">*</span></label>
+                            <label class="form-label"><span data-en="Age Division" data-ar="الفئة العمرية">Age Division</span> <span class="required">*</span></label>
                             <select id="ageDivision" class="form-select" required>
-                                <option value="">Select division...</option>
                                 <option value="Kids">Kids (Under 16)</option>
                                 <option value="Youth">Youth (16-17)</option>
                                 <option value="Adult">Adult (18-29)</option>
@@ -205,12 +230,11 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Fight Duration (minutes) <span class="required">*</span></label>
+                            <label class="form-label"><span data-en="Fight Duration (minutes)" data-ar="مدة القتال (دقائق)">Fight Duration (minutes)</span> <span class="required">*</span></label>
                             <input type="number" id="fightDuration" class="form-input" min="1" max="30" required value="5">
                         </div>
-
                         <div class="form-group">
-                            <label class="form-label">Golden Score Duration (minutes)</label>
+                            <label class="form-label"><span data-en="Golden Score Duration (minutes)" data-ar="مدة النقاط الذهبية (دقائق)">Golden Score Duration (minutes)</span></label>
                             <input type="number" id="goldenScoreDuration" class="form-input" min="0" max="15" value="3">
                         </div>
                     </div>
@@ -218,25 +242,23 @@
 
                 <!-- Date & Location -->
                 <div class="form-section">
-                    <h2 class="section-title"><span class="icon">📅</span> Date & Location</h2>
+                    <h2 class="section-title"><i class="fas fa-calendar-alt"></i> <span data-en="Date & Location" data-ar="التاريخ والموقع">Date & Location</span></h2>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Event Start Date <span class="required">*</span></label>
+                            <label class="form-label"><span data-en="Event Start Date" data-ar="تاريخ بدء الحدث">Event Start Date</span> <span class="required">*</span></label>
                             <input type="date" id="eventStartDate" class="form-input" required>
                         </div>
-
                         <div class="form-group">
-                            <label class="form-label">Event End Date</label>
+                            <label class="form-label"><span data-en="Event End Date" data-ar="تاريخ انتهاء الحدث">Event End Date</span></label>
                             <input type="date" id="eventEndDate" class="form-input">
                         </div>
                     </div>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Country <span class="required">*</span></label>
+                            <label class="form-label"><span data-en="Country" data-ar="الدولة">Country</span> <span class="required">*</span></label>
                             <select id="country" class="form-select" required>
-                                <option value="">Select country...</option>
                                 <option value="Egypt">Egypt</option>
                                 <option value="UAE">UAE</option>
                                 <option value="Saudi Arabia">Saudi Arabia</option>
@@ -246,47 +268,45 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-
                         <div class="form-group">
-                            <label class="form-label">Location / Venue <span class="required">*</span></label>
-                            <input type="text" id="location" class="form-input" required placeholder="e.g., Cairo Stadium Arena">
+                            <label class="form-label"><span data-en="Location / Venue" data-ar="الموقع / المكان">Location / Venue</span> <span class="required">*</span></label>
+                            <input type="text" id="location" class="form-input" required data-en-placeholder="e.g., Cairo Stadium Arena" data-ar-placeholder="مثال: صالة استاد القاهرة">
                         </div>
                     </div>
                 </div>
 
                 <!-- Participants & Fees -->
                 <div class="form-section">
-                    <h2 class="section-title"><span class="icon">👥</span> Participants & Fees</h2>
+                    <h2 class="section-title"><i class="fas fa-users"></i> <span data-en="Participants & Fees" data-ar="المشاركون والرسوم">Participants & Fees</span></h2>
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Max Participants</label>
-                            <input type="number" id="maxParticipants" class="form-input" min="1" placeholder="e.g., 200">
+                            <label class="form-label"><span data-en="Max Participants" data-ar="أقصى عدد للمشاركين">Max Participants</span></label>
+                            <input type="number" id="maxParticipants" class="form-input" min="1" data-en-placeholder="e.g., 200" data-ar-placeholder="مثال: 200">
                         </div>
-
                         <div class="form-group">
-                            <label class="form-label">Base Registration Fee (USD)</label>
-                            <input type="number" id="registrationFee" class="form-input" min="0" step="0.01" placeholder="e.g., 50">
-                            <div class="form-hint">Base fee (can be overridden per division)</div>
+                            <label class="form-label"><span data-en="Base Registration Fee (USD)" data-ar="رسوم التسجيل الأساسية (USD)">Base Registration Fee (USD)</span></label>
+                            <input type="number" id="registrationFee" class="form-input" min="0" step="0.01" data-en-placeholder="e.g., 50" data-ar-placeholder="مثال: 50">
+                            <div class="form-hint" data-en="Base fee (can be overridden per division)" data-ar="الرسوم الأساسية (يمكن تعديلها لكل قسم)">Base fee (can be overridden per division)</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Divisions & Pricing -->
                 <div class="form-section">
-                    <h2 class="section-title"><span class="icon">🏆</span> Divisions & Pricing</h2>
-                    <p style="color: rgba(0,0,0,0.6); margin-bottom: 20px;">Add divisions for your tournament. You can add as many as you need.</p>
+                    <h2 class="section-title"><i class="fas fa-trophy"></i> <span data-en="Divisions & Pricing" data-ar="الأقسام والأسعار">Divisions & Pricing</span></h2>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;" data-en="Add divisions for your tournament. You can add as many as you need." data-ar="أضف أقساماً لبطولتك. يمكنك إضافة ما تشاء.">Add divisions for your tournament. You can add as many as you need.</p>
 
                     <div id="divisionsList" class="divisions-list"></div>
 
                     <button type="button" class="btn btn-add" onclick="addDivision()">
-                        <span>➕</span> Add Division
+                        <i class="fas fa-plus"></i> <span data-en="Add Division" data-ar="إضافة قسم">Add Division</span>
                     </button>
                 </div>
 
                 <!-- Payment Settings -->
                 <div class="form-section">
-                    <h2 class="section-title"><span class="icon">💳</span> Payment Settings</h2>
+                    <h2 class="section-title"><i class="fas fa-credit-card"></i> <span data-en="Payment Settings" data-ar="إعدادات الدفع">Payment Settings</span></h2>
 
                     <div class="payment-toggle">
                         <label class="switch">
@@ -294,25 +314,24 @@
                             <span class="slider"></span>
                         </label>
                         <div>
-                            <div class="toggle-label">Enable Online Payment</div>
-                            <div class="form-hint">Currently disabled - Cash payment only</div>
+                            <div class="toggle-label" data-en="Enable Online Payment" data-ar="تفعيل الدفع الإلكتروني">Enable Online Payment</div>
+                            <div class="form-hint" data-en="Currently disabled - Cash payment only" data-ar="معطل حالياً - الدفع نقداً فقط">Currently disabled - Cash payment only</div>
                         </div>
                     </div>
 
                     <div id="paymentOptions" style="display: none;">
                         <div class="form-row">
                             <div class="form-group">
-                                <label class="form-label">Payment Method</label>
+                                <label class="form-label" data-en="Payment Method" data-ar="طريقة الدفع">Payment Method</label>
                                 <select id="paymentMethod" class="form-select">
-                                    <option value="cash">Cash Only</option>
-                                    <option value="card">Credit/Debit Card</option>
-                                    <option value="bank">Bank Transfer</option>
-                                    <option value="both">Multiple Methods</option>
+                                    <option value="cash" data-en="Cash Only" data-ar="نقدي فقط">Cash Only</option>
+                                    <option value="card" data-en="Credit/Debit Card" data-ar="بطاقة ائتمان/خصم">Credit/Debit Card</option>
+                                    <option value="bank" data-en="Bank Transfer" data-ar="تحويل بنكي">Bank Transfer</option>
+                                    <option value="both" data-en="Multiple Methods" data-ar="طرق متعددة">Multiple Methods</option>
                                 </select>
                             </div>
-
                             <div class="form-group">
-                                <label class="form-label">Currency</label>
+                                <label class="form-label" data-en="Currency" data-ar="العملة">Currency</label>
                                 <select id="currency" class="form-select">
                                     <option value="USD">USD ($)</option>
                                     <option value="EUR">EUR (€)</option>
@@ -324,28 +343,29 @@
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label class="form-label">Early Bird Discount (%)</label>
+                                <label class="form-label" data-en="Early Bird Discount (%)" data-ar="خصم التسجيل المبكر (%)">Early Bird Discount (%)</label>
                                 <input type="number" id="earlyBirdDiscount" class="form-input" min="0" max="100" value="0">
                             </div>
-
                             <div class="form-group">
-                                <label class="form-label">Late Fee Percentage (%)</label>
+                                <label class="form-label" data-en="Late Fee Percentage (%)" data-ar="نسبة رسوم التأخير (%)">Late Fee Percentage (%)</label>
                                 <input type="number" id="lateFeePercentage" class="form-input" min="0" max="100" value="0">
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Refund Policy</label>
-                            <textarea id="refundPolicy" class="form-textarea" placeholder="Describe your refund policy..."></textarea>
+                            <label class="form-label" data-en="Refund Policy" data-ar="سياسة الاسترداد">Refund Policy</label>
+                            <textarea id="refundPolicy" class="form-textarea" data-en-placeholder="Describe your refund policy..." data-ar-placeholder="صف سياسة الاسترداد الخاصة بك..."></textarea>
                         </div>
                     </div>
                 </div>
 
                 <!-- Form Actions -->
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="window.location.href='organizer-dashboard.html'">Cancel</button>
+                    <button type="button" class="btn btn-secondary" onclick="goBack()">
+                        <i class="fas fa-times"></i> <span data-en="Cancel" data-ar="إلغاء">Cancel</span>
+                    </button>
                     <button type="submit" class="btn btn-primary" id="submitBtn">
-                        <span>✨</span> Create Tournament
+                        <i class="fas fa-save"></i> <span id="submitText" data-en="Create Tournament" data-ar="إنشاء البطولة">Create Tournament</span>
                     </button>
                 </div>
             </form>
@@ -358,85 +378,153 @@
         const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let divisionCount = 0;
+        let currentUserRole = null; // 'admin' or 'organizer'
+        let tournamentId = null;
+        let isEditMode = false;
+        let currentLang = localStorage.getItem('adminLang') || 'en';
 
-        // ===== التحقق من صلاحيات المستخدم عند تحميل الصفحة =====
+        // ==========================================
+        // 1. Language System
+        // ==========================================
+        function setLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('adminLang', lang);
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+            document.getElementById('btnAr').classList.toggle('active', lang === 'ar');
+            
+            document.querySelectorAll('[data-en][data-ar]').forEach(el => {
+                el.textContent = lang === 'ar' ? el.dataset.ar : el.dataset.en;
+            });
+            
+            document.querySelectorAll('[data-en-placeholder][data-ar-placeholder]').forEach(el => {
+                el.placeholder = lang === 'ar' ? el.dataset.arPlaceholder : el.dataset.enPlaceholder;
+            });
+
+            document.title = lang === 'ar' ? 'نموذج البطولة - TopCompSports' : 'Tournament Form - TopCompSports';
+        }
+
+        // ==========================================
+        // 2. Permission Check (Admin & Organizer)
+        // ==========================================
         async function checkUserPermissions() {
             try {
                 const { data: { user } } = await dbClient.auth.getUser();
-                
-                if (!user) {
-                    // غير مسجل دخول
-                    window.location.href = 'login.html';
+                if (!user) { window.location.href = 'admin-login.html'; return; }
+
+                // Check Admin first
+                const { data: admin } = await dbClient.from('admin_profiles').select('role').eq('id', user.id).maybeSingle();
+                if (admin && ['admin', 'super_admin'].includes(admin.role)) {
+                    currentUserRole = 'admin';
+                    document.getElementById('logoLink').href = 'admin-dashboard.html';
+                    document.getElementById('dashboardLink').href = 'admin-dashboard.html';
+                    showForm();
                     return;
                 }
 
-                // جلب نوع المستخدم من جدول users
-                const { data: userData, error } = await dbClient
-                    .from('users')
-                    .select('user_type')
-                    .eq('id', user.id)
-                    .single();
-
-                if (error || !userData) {
-                    console.error('Error fetching user data:', error);
-                    showAccessDenied();
+                // Check Organizer
+                const { data: userData } = await dbClient.from('users').select('user_type').eq('id', user.id).maybeSingle();
+                if (userData && ['organizer', 'admin', 'super_admin'].includes(userData.user_type)) {
+                    currentUserRole = 'organizer';
+                    document.getElementById('logoLink').href = 'index.html';
+                    document.getElementById('dashboardLink').href = 'organizer-dashboard.html';
+                    showForm();
                     return;
                 }
 
-                const userType = userData.user_type;
-                console.log('User type:', userType);
-
-                // السماح فقط للمنظمين والأدمن والسوبر أدمن
-                const allowedTypes = ['organizer', 'admin', 'super_admin'];
-                
-                if (!allowedTypes.includes(userType)) {
-                    console.log('Access denied for user type:', userType);
-                    showAccessDenied();
-                    return;
-                }
-
-                // المستخدم مصرح له - إظهار النموذج
-                document.getElementById('accessDenied').style.display = 'none';
-                document.getElementById('tournamentFormContainer').style.display = 'block';
-
+                showAccessDenied();
             } catch (error) {
                 console.error('Permission check error:', error);
                 showAccessDenied();
             }
         }
 
-        // إظهار رسالة رفض الوصول
         function showAccessDenied() {
             document.getElementById('accessDenied').style.display = 'block';
             document.getElementById('tournamentFormContainer').style.display = 'none';
         }
 
-        // Toggle payment options
+        function showForm() {
+            document.getElementById('accessDenied').style.display = 'none';
+            document.getElementById('tournamentFormContainer').style.display = 'block';
+            
+            // Check for Edit Mode (?id=...)
+            const urlParams = new URLSearchParams(window.location.search);
+            tournamentId = urlParams.get('id');
+            isEditMode = !!tournamentId;
+
+            if (isEditMode) {
+                document.getElementById('pageTitle').setAttribute('data-en', 'Edit Tournament');
+                document.getElementById('pageTitle').setAttribute('data-ar', 'تعديل البطولة');
+                document.getElementById('submitText').setAttribute('data-en', 'Update Tournament');
+                document.getElementById('submitText').setAttribute('data-ar', 'تحديث البطولة');
+                setLang(currentLang); // Refresh text
+                loadTournamentData(tournamentId);
+            } else {
+                addDivision(); // Add one empty division by default for new tournaments
+            }
+        }
+
+        // ==========================================
+        // 3. Load Data for Edit Mode
+        // ==========================================
+        async function loadTournamentData(id) {
+            try {
+                const { data, error } = await dbClient.from('tournaments').select('*').eq('id', id).single();
+                if (error || !data) throw new Error('Tournament not found');
+
+                document.getElementById('tournamentName').value = data.name || '';
+                document.getElementById('description').value = data.description || '';
+                document.getElementById('sportType').value = data.sport_type || 'BJJ';
+                document.getElementById('ageDivision').value = data.age_division || 'Adult';
+                document.getElementById('fightDuration').value = data.fight_duration || 5;
+                document.getElementById('goldenScoreDuration').value = data.golden_score_duration || 3;
+                document.getElementById('eventStartDate').value = data.event_start_date ? data.event_start_date.split('T')[0] : '';
+                document.getElementById('eventEndDate').value = data.event_end_date ? data.event_end_date.split('T')[0] : '';
+                document.getElementById('country').value = data.country || 'Egypt';
+                document.getElementById('location').value = data.location || '';
+                document.getElementById('maxParticipants').value = data.max_participants || '';
+                document.getElementById('registrationFee').value = data.registration_fee || 0;
+
+            } catch (error) {
+                console.error('Load error:', error);
+                showAlert(currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data', 'error');
+                goBack();
+            }
+        }
+
+        // ==========================================
+        // 4. Form Logic (Divisions & Payment)
+        // ==========================================
         document.getElementById('paymentEnabled').addEventListener('change', function() {
             document.getElementById('paymentOptions').style.display = this.checked ? 'block' : 'none';
         });
 
-        // Add division
         function addDivision() {
             divisionCount++;
             const divisionsList = document.getElementById('divisionsList');
+            const divName = currentLang === 'ar' ? 'مثال: جي للرجال البالغين' : 'e.g., Gi Adult Male';
             
             const divisionHTML = `
                 <div class="division-item" id="division-${divisionCount}">
                     <div class="division-header">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <div class="division-number">${divisionCount}</div>
-                            <strong>Division ${divisionCount}</strong>
+                            <strong>${currentLang === 'ar' ? 'قسم' : 'Division'} ${divisionCount}</strong>
                         </div>
-                        <button type="button" class="btn-remove" onclick="removeDivision(${divisionCount})">Remove</button>
+                        <button type="button" class="btn-remove" onclick="removeDivision(${divisionCount})">
+                            <i class="fas fa-trash"></i> ${currentLang === 'ar' ? 'حذف' : 'Remove'}
+                        </button>
                     </div>
                     <div class="division-fields">
                         <div class="form-group">
-                            <label class="form-label">Division Name <span class="required">*</span></label>
-                            <input type="text" class="form-input div-name" required placeholder="e.g., Gi Adult Male">
+                            <label class="form-label">${currentLang === 'ar' ? 'اسم القسم' : 'Division Name'} <span class="required">*</span></label>
+                            <input type="text" class="form-input div-name" required placeholder="${divName}">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Type <span class="required">*</span></label>
+                            <label class="form-label">${currentLang === 'ar' ? 'النوع' : 'Type'} <span class="required">*</span></label>
                             <select class="form-select div-type" required>
                                 <option value="Gi">Gi</option>
                                 <option value="No-Gi">No-Gi</option>
@@ -444,7 +532,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Age Group <span class="required">*</span></label>
+                            <label class="form-label">${currentLang === 'ar' ? 'الفئة العمرية' : 'Age Group'} <span class="required">*</span></label>
                             <select class="form-select div-age" required>
                                 <option value="Kids">Kids</option>
                                 <option value="Youth">Youth</option>
@@ -453,25 +541,23 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Price (USD) <span class="required">*</span></label>
+                            <label class="form-label">${currentLang === 'ar' ? 'السعر (USD)' : 'Price (USD)'} <span class="required">*</span></label>
                             <input type="number" class="form-input div-price" min="0" step="0.01" required value="0">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Max Players</label>
-                            <input type="number" class="form-input div-max" min="0" placeholder="Unlimited">
+                            <label class="form-label">${currentLang === 'ar' ? 'أقصى عدد' : 'Max Players'}</label>
+                            <input type="number" class="form-input div-max" min="0" placeholder="${currentLang === 'ar' ? 'غير محدود' : 'Unlimited'}">
                         </div>
                     </div>
                     <div class="toggle-group">
                         <input type="checkbox" class="toggle-checkbox div-active" id="active-${divisionCount}" checked>
-                        <label class="toggle-label" for="active-${divisionCount}">Active (visible to players)</label>
+                        <label class="toggle-label" for="active-${divisionCount}">${currentLang === 'ar' ? 'نشط (مرئي للاعبين)' : 'Active (visible to players)'}</label>
                     </div>
                 </div>
             `;
-            
             divisionsList.insertAdjacentHTML('beforeend', divisionHTML);
         }
 
-        // Remove division
         function removeDivision(id) {
             const division = document.getElementById(`division-${id}`);
             if (division) {
@@ -480,17 +566,15 @@
             }
         }
 
-        // Update division numbers
         function updateDivisionNumbers() {
             const divisions = document.querySelectorAll('.division-item');
             divisions.forEach((div, index) => {
                 div.querySelector('.division-number').textContent = index + 1;
-                div.querySelector('strong').textContent = `Division ${index + 1}`;
+                div.querySelector('strong').textContent = `${currentLang === 'ar' ? 'قسم' : 'Division'} ${index + 1}`;
             });
             divisionCount = divisions.length;
         }
 
-        // Show alert
         function showAlert(message, type) {
             const alert = document.getElementById('alert');
             alert.className = `alert alert-${type} show`;
@@ -498,51 +582,61 @@
             setTimeout(() => alert.classList.remove('show'), 5000);
         }
 
-        // Form submission
+        // ==========================================
+        // 5. Form Submission (Create or Update)
+        // ==========================================
         document.getElementById('tournamentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const submitBtn = document.getElementById('submitBtn');
+            const originalBtnText = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span></span> Creating...';
+            submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${currentLang === 'ar' ? 'جاري الحفظ...' : 'Saving...'}`;
 
             try {
-                // Get current user
                 const { data: { user } } = await dbClient.auth.getUser();
-                if (!user) {
-                    showAlert('Please login first', 'error');
-                    return;
-                }
+                if (!user) throw new Error('User not authenticated');
 
-                // 1. Create tournament
-                const tournamentData = {
-                    organizer_id: user.id,
+                const formData = {
                     name: document.getElementById('tournamentName').value,
                     description: document.getElementById('description').value,
                     sport_type: document.getElementById('sportType').value,
+                    age_division: document.getElementById('ageDivision').value,
+                    fight_duration: parseInt(document.getElementById('fightDuration').value) || 5,
+                    golden_score_duration: parseInt(document.getElementById('goldenScoreDuration').value) || 3,
                     event_start_date: document.getElementById('eventStartDate').value,
                     event_end_date: document.getElementById('eventEndDate').value || null,
+                    country: document.getElementById('country').value,
                     location: document.getElementById('location').value,
                     max_participants: parseInt(document.getElementById('maxParticipants').value) || null,
                     registration_fee: parseFloat(document.getElementById('registrationFee').value) || 0,
-                    status: 'upcoming'
+                    updated_at: new Date().toISOString()
                 };
 
-                const { data: tournament, error: tournamentError } = await dbClient
-                    .from('tournaments')
-                    .insert([tournamentData])
-                    .select()
-                    .single();
+                let tournamentIdToUse = tournamentId;
 
-                if (tournamentError) throw tournamentError;
+                if (isEditMode) {
+                    // UPDATE existing tournament
+                    const { error: updateError } = await dbClient.from('tournaments').update(formData).eq('id', tournamentId);
+                    if (updateError) throw updateError;
 
-                // 2. Save divisions
+                    // Safely delete old divisions and insert new ones
+                    await dbClient.from('tournament_divisions').delete().eq('tournament_id', tournamentId);
+                    await dbClient.from('tournament_payment_settings').delete().eq('tournament_id', tournamentId);
+                } else {
+                    // INSERT new tournament
+                    formData.organizer_id = user.id;
+                    formData.status = 'upcoming';
+                    const { data: newTournament, error: insertError } = await dbClient.from('tournaments').insert([formData]).select().single();
+                    if (insertError) throw insertError;
+                    tournamentIdToUse = newTournament.id;
+                }
+
+                // Save Divisions
                 const divisions = document.querySelectorAll('.division-item');
-                const divisionsData = [];
-                
-                divisions.forEach((div, index) => {
-                    divisionsData.push({
-                        tournament_id: tournament.id,
+                if (divisions.length > 0) {
+                    const divisionsData = Array.from(divisions).map((div, index) => ({
+                        tournament_id: tournamentIdToUse,
                         division_name: div.querySelector('.div-name').value,
                         gi_type: div.querySelector('.div-type').value,
                         age_group: div.querySelector('.div-age').value,
@@ -551,22 +645,16 @@
                         is_active: div.querySelector('.div-active').checked,
                         is_visible: div.querySelector('.div-active').checked,
                         sort_order: index
-                    });
-                });
+                    }));
 
-                if (divisionsData.length > 0) {
-                    const { error: divisionsError } = await dbClient
-                        .from('tournament_divisions')
-                        .insert(divisionsData);
-                    
-                    if (divisionsError) console.error('Divisions error:', divisionsError);
+                    const { error: divError } = await dbClient.from('tournament_divisions').insert(divisionsData);
+                    if (divError) console.error('Divisions save warning:', divError);
                 }
 
-                // 3. Save payment settings
-                const paymentEnabled = document.getElementById('paymentEnabled').checked;
+                // Save Payment Settings
                 const paymentData = {
-                    tournament_id: tournament.id,
-                    payment_enabled: paymentEnabled,
+                    tournament_id: tournamentIdToUse,
+                    payment_enabled: document.getElementById('paymentEnabled').checked,
                     payment_method: document.getElementById('paymentMethod').value,
                     currency: document.getElementById('currency').value,
                     early_bird_discount: parseFloat(document.getElementById('earlyBirdDiscount').value) || 0,
@@ -574,31 +662,36 @@
                     refund_policy: document.getElementById('refundPolicy').value || null
                 };
 
-                const { error: paymentError } = await dbClient
-                    .from('tournament_payment_settings')
-                    .insert([paymentData]);
-                
-                if (paymentError) console.error('Payment error:', paymentError);
+                const { error: payError } = await dbClient.from('tournament_payment_settings').insert([paymentData]);
+                if (payError) console.error('Payment settings save warning:', payError);
 
-                showAlert('Tournament created successfully!', 'success');
+                showAlert(currentLang === 'ar' ? 'تم الحفظ بنجاح!' : 'Saved successfully!', 'success');
                 
                 setTimeout(() => {
-                    window.location.href = 'organizer-dashboard.html';
-                }, 2000);
+                    goBack();
+                }, 1500);
 
             } catch (error) {
-                console.error('Error:', error);
-                showAlert('Error: ' + error.message, 'error');
+                console.error('Save error:', error);
+                showAlert(currentLang === 'ar' ? 'خطأ: ' + error.message : 'Error: ' + error.message, 'error');
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<span>✨</span> Create Tournament';
+                submitBtn.innerHTML = originalBtnText;
             }
         });
 
-        // Add one empty division by default
-        addDivision();
+        function goBack() {
+            if (currentUserRole === 'admin') {
+                window.location.href = 'admin-tournaments.html';
+            } else {
+                window.location.href = 'organizer-dashboard.html';
+            }
+        }
 
-        // التحقق من الصلاحيات عند تحميل الصفحة
-        window.onload = checkUserPermissions;
+        // Initialize
+        window.onload = () => {
+            setLang(currentLang);
+            checkUserPermissions();
+        };
     </script>
 </body>
 </html>
