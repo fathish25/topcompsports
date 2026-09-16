@@ -237,9 +237,17 @@
             font-weight: 600;
         }
 
-        .description-section p {
+        .description-section p, .description-section ul {
             color: var(--text-muted);
             line-height: 1.8;
+        }
+
+        .description-section ul {
+            padding-left: 20px;
+        }
+
+        .description-section li {
+            margin-bottom: 8px;
         }
 
         /* Sidebar */
@@ -344,6 +352,30 @@
             font-size: 0.9rem;
         }
 
+        /* Divisions Table */
+        .divisions-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .divisions-table th,
+        .divisions-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .divisions-table th {
+            background: rgba(241, 196, 15, 0.1);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .divisions-table tr:hover {
+            background: rgba(255,255,255,0.03);
+        }
+
         /* Loading & Error */
         .loading {
             text-align: center;
@@ -423,6 +455,13 @@
             .section-title {
                 font-size: 1.2rem;
             }
+            .divisions-table {
+                font-size: 0.9rem;
+            }
+            .divisions-table th,
+            .divisions-table td {
+                padding: 8px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -472,26 +511,13 @@
             <i class="fas fa-clipboard-list"></i>
             <span data-en="Information" data-ar="المعلومات">Information</span>
         </button>
-        <button class="nav-tab" onclick="switchTab('athletes')">
-            <i class="fas fa-users"></i>
-            <span data-en="Athletes" data-ar="اللاعبون">Athletes</span>
-            <span class="tab-badge" id="athletesCount">0</span>
-        </button>
-        <button class="nav-tab" onclick="switchTab('brackets')">
-            <i class="fas fa-bracket-curly"></i>
-            <span data-en="Brackets" data-ar="المباريات">Brackets</span>
-        </button>
-        <button class="nav-tab" onclick="switchTab('matches')">
-            <i class="fas fa-fist-raised"></i>
-            <span data-en="Matches" data-ar="النزالات">Matches</span>
+        <button class="nav-tab" onclick="switchTab('divisions')">
+            <i class="fas fa-trophy"></i>
+            <span data-en="Divisions" data-ar="الأقسام">Divisions</span>
         </button>
         <button class="nav-tab" onclick="switchTab('schedule')">
             <i class="fas fa-calendar-alt"></i>
             <span data-en="Schedule" data-ar="الجدول">Schedule</span>
-        </button>
-        <button class="nav-tab" onclick="switchTab('results')">
-            <i class="fas fa-trophy"></i>
-            <span data-en="Results" data-ar="النتائج">Results</span>
         </button>
     </div>
 
@@ -531,6 +557,13 @@
                     <p data-en="Loading..." data-ar="جاري التحميل...">Loading...</p>
                 </div>
             </div>
+
+            <div class="sidebar-card">
+                <h3 class="sidebar-title" data-en="Important Dates" data-ar="التواريخ المهمة">Important Dates</h3>
+                <div id="importantDates">
+                    <p data-en="Loading..." data-ar="جاري التحميل...">Loading...</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -542,6 +575,8 @@
         let currentLang = localStorage.getItem('lang') || 'en';
         let tournamentId = null;
         let tournamentData = null;
+        let divisionsData = [];
+        let paymentData = null;
 
         // Language System
         function setLang(lang) {
@@ -578,20 +613,46 @@
 
         async function loadTournamentDetails() {
             try {
-                const { data, error } = await dbClient
+                // Load tournament data
+                const { data: tournament, error: tournamentError } = await dbClient
                     .from('tournaments')
                     .select('*')
                     .eq('id', tournamentId)
                     .single();
 
-                if (error || !data) {
+                if (tournamentError || !tournament) {
                     showError(currentLang === 'ar' ? 'البطولة غير موجودة' : 'Tournament not found');
                     return;
                 }
 
-                tournamentData = data;
-                renderTournamentDetails();
+                tournamentData = tournament;
+
+                // Load divisions
+                const { data: divisions, error: divisionsError } = await dbClient
+                    .from('tournament_divisions')
+                    .select('*')
+                    .eq('tournament_id', tournamentId)
+                    .order('sort_order');
+
+                if (!divisionsError && divisions) {
+                    divisionsData = divisions;
+                }
+
+                // Load payment settings
+                const { data: payment, error: paymentError } = await dbClient
+                    .from('tournament_payment_settings')
+                    .select('*')
+                    .eq('tournament_id', tournamentId)
+                    .single();
+
+                if (!paymentError && payment) {
+                    paymentData = payment;
+                }
+
+                // Load organizer info
                 await loadOrganizerInfo();
+
+                renderTournamentDetails();
 
             } catch (error) {
                 console.error('Error loading tournament:', error);
@@ -663,7 +724,7 @@
             const availableSpots = tournamentData.max_participants ? 
                 tournamentData.max_participants - (tournamentData.current_participants || 0) : 'Unlimited';
 
-            // Render information tab
+            // Render information tab content
             const content = document.getElementById('tabContent');
             content.innerHTML = `
                 <div class="content-section">
@@ -815,13 +876,31 @@
             // Update sidebar
             document.getElementById('availableSpots').textContent = availableSpots;
             document.getElementById('locationText').textContent = locationText;
-            document.getElementById('athletesCount').textContent = tournamentData.current_participants || 0;
+            
+            // Update important dates in sidebar
+            const datesHtml = `
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;" data-en="Event Date" data-ar="تاريخ البطولة">Event Date</div>
+                    <div style="font-weight: 600; color: var(--text-main);">${dateStr}</div>
+                </div>
+                ${tournamentData.reg_regular_start ? `
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;" data-en="Regular Registration" data-ar="التسجيل العادي">Regular Registration</div>
+                    <div style="font-size: 0.9rem; color: var(--text-main);">${formatDate(tournamentData.reg_regular_start)} - ${formatDate(tournamentData.reg_regular_end)}</div>
+                </div>
+                ` : ''}
+                ${tournamentData.reg_late_start ? `
+                <div style="margin-bottom: 15px;">
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px;" data-en="Late Registration" data-ar="التسجيل المتأخر">Late Registration</div>
+                    <div style="font-size: 0.9rem; color: var(--text-main);">${formatDate(tournamentData.reg_late_start)} - ${formatDate(tournamentData.reg_late_end)}</div>
+                </div>
+                ` : ''}
+            `;
+            document.getElementById('importantDates').innerHTML = datesHtml;
 
             // Check if registration is open
             const registerBtn = document.getElementById('registerBtn');
-            if (tournamentData.status === 'upcoming' && availableSpots > 0 && availableSpots !== 'Unlimited') {
-                registerBtn.style.display = 'inline-flex';
-            } else if (availableSpots === 'Unlimited' && tournamentData.status === 'upcoming') {
+            if (tournamentData.status === 'upcoming' && (availableSpots > 0 || availableSpots === 'Unlimited')) {
                 registerBtn.style.display = 'inline-flex';
             } else {
                 registerBtn.style.display = 'none';
@@ -845,18 +924,86 @@
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
             event.target.closest('.nav-tab').classList.add('active');
 
-            if (tab !== 'information') {
-                const content = document.getElementById('tabContent');
+            if (tab === 'information') {
+                renderTournamentDetails();
+            } else if (tab === 'divisions') {
+                renderDivisionsTab();
+            } else if (tab === 'schedule') {
+                renderScheduleTab();
+            }
+        }
+
+        function renderDivisionsTab() {
+            const content = document.getElementById('tabContent');
+            
+            if (divisionsData.length === 0) {
                 content.innerHTML = `
                     <div class="content-section" style="text-align: center; padding: 60px 20px;">
-                        <i class="fas fa-tools" style="font-size: 3rem; margin-bottom: 15px; color: var(--primary);"></i>
-                        <h2 style="margin-bottom: 10px;">${currentLang === 'ar' ? 'قريباً' : 'Coming Soon'}</h2>
-                        <p style="color: var(--text-muted);">${currentLang === 'ar' ? 'هذا القسم قيد التطوير' : 'This section is under development'}</p>
+                        <i class="fas fa-trophy" style="font-size: 3rem; margin-bottom: 15px; color: var(--primary);"></i>
+                        <h2 style="margin-bottom: 10px;">${currentLang === 'ar' ? 'لا توجد أقسام' : 'No Divisions'}</h2>
+                        <p style="color: var(--text-muted);">${currentLang === 'ar' ? 'لم يتم إضافة أقسام بعد' : 'No divisions have been added yet'}</p>
                     </div>
                 `;
-            } else {
-                renderTournamentDetails();
+                return;
             }
+
+            content.innerHTML = `
+                <div class="content-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-trophy"></i>
+                        <span data-en="Tournament Divisions" data-ar="أقسام البطولة">Tournament Divisions</span>
+                    </h2>
+                    <div style="overflow-x: auto;">
+                        <table class="divisions-table">
+                            <thead>
+                                <tr>
+                                    <th data-en="Division" data-ar="القسم">Division</th>
+                                    <th data-en="Type" data-ar="النوع">Type</th>
+                                    <th data-en="Age Group" data-ar="الفئة العمرية">Age Group</th>
+                                    <th data-en="Price" data-ar="السعر">Price</th>
+                                    <th data-en="Status" data-ar="الحالة">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${divisionsData.map(div => `
+                                    <tr>
+                                        <td>${div.division_name || '-'}</td>
+                                        <td>${div.gi_type || '-'}</td>
+                                        <td>${div.age_group || '-'}</td>
+                                        <td>$${div.price || 0}</td>
+                                        <td>
+                                            <span style="padding: 4px 12px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; background: ${div.is_active ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}; color: ${div.is_active ? 'var(--success)' : 'var(--danger)'};">
+                                                ${div.is_active ? (currentLang === 'ar' ? 'نشط' : 'Active') : (currentLang === 'ar' ? 'غير نشط' : 'Inactive')}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderScheduleTab() {
+            const content = document.getElementById('tabContent');
+            content.innerHTML = `
+                <div class="content-section" style="text-align: center; padding: 60px 20px;">
+                    <i class="fas fa-calendar-alt" style="font-size: 3rem; margin-bottom: 15px; color: var(--primary);"></i>
+                    <h2 style="margin-bottom: 10px;">${currentLang === 'ar' ? 'الجدول الزمني' : 'Event Schedule'}</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 20px;">
+                        ${currentLang === 'ar' ? 'سيتم نشر الجدول قبل 48 ساعة من الحدث' : 'Schedule will be posted 48 hours before the event'}
+                    </p>
+                    <div style="background: var(--bg-input); padding: 20px; border-radius: 10px; margin-top: 20px;">
+                        <h3 style="margin-bottom: 15px; color: var(--text-main);">${currentLang === 'ar' ? 'معلومات عامة' : 'General Information'}</h3>
+                        <ul style="list-style: none; padding: 0; text-align: left; display: inline-block;">
+                            <li style="margin-bottom: 10px;"><i class="fas fa-check" style="color: var(--success); margin-right: 8px;"></i> ${currentLang === 'ar' ? 'الباب يفتح: 09:00' : 'Doors Open: 09:00'}</li>
+                            <li style="margin-bottom: 10px;"><i class="fas fa-check" style="color: var(--success); margin-right: 8px;"></i> ${currentLang === 'ar' ? 'بداية المنافسة: 10:00' : 'Competition Starts: 10:00'}</li>
+                            <li style="margin-bottom: 10px;"><i class="fas fa-check" style="color: var(--success); margin-right: 8px;"></i> ${currentLang === 'ar' ? 'التسجيل قبل 60 دقيقة من البدء' : 'Check-in 60 minutes before start'}</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
         }
 
         function registerForTournament() {
@@ -885,7 +1032,6 @@
         function contactOrganizer() {
             if (!tournamentData || !tournamentData.organizer_id) return;
             
-            // Load organizer email and open mailto
             dbClient.from('organizers').select('email').eq('id', tournamentData.organizer_id).single().then(({ data }) => {
                 if (data && data.email) {
                     window.location.href = `mailto:${data.email}`;
