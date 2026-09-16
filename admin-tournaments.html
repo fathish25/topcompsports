@@ -20,6 +20,7 @@
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
+            --info: #3b82f6;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -86,7 +87,8 @@
         .btn-danger { background: linear-gradient(135deg, var(--danger), #dc2626); color: #fff; }
         .btn-success { background: linear-gradient(135deg, var(--success), #059669); color: #fff; }
         .btn-warning { background: linear-gradient(135deg, var(--warning), #d97706); color: #fff; }
-        .btn-small { padding: 6px 12px; font-size: 12px; margin: 0 3px; }
+        .btn-info { background: linear-gradient(135deg, var(--info), #1d4ed8); color: #fff; }
+        .btn-small { padding: 6px 12px; font-size: 12px; margin: 2px; }
 
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 15px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); }
@@ -323,7 +325,7 @@
             tbody.innerHTML = filtered.map(t => {
                 const statusClass = getStatusClass(t.status);
                 const statusText = getStatusText(t.status);
-                const dateStr = t.event_date || t.tournament_date || '-';
+                const dateStr = t.event_date || t.tournament_date || t.event_start_date || '-';
 
                 return `
                     <tr>
@@ -334,6 +336,9 @@
                         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                         <td>${t.max_participants || '∞'}</td>
                         <td>
+                            <button class="btn btn-info btn-small" onclick="viewTournament('${t.id}')" title="${currentLang === 'ar' ? 'عرض' : 'View'}">
+                                <i class="fas fa-eye"></i> ${currentLang === 'ar' ? 'عرض' : 'View'}
+                            </button>
                             <button class="btn btn-success btn-small" onclick="editTournament('${t.id}')" title="${currentLang === 'ar' ? 'تعديل' : 'Edit'}">
                                 <i class="fas fa-edit"></i> ${currentLang === 'ar' ? 'تعديل' : 'Edit'}
                             </button>
@@ -390,6 +395,11 @@
 
         function createTournament() {
             window.location.href = 'create-tournament.html';
+        }
+
+        // ✅ زر العرض الجديد
+        function viewTournament(id) {
+            window.location.href = `tournament-details.html?tournament_id=${id}`;
         }
 
         function editTournament(id) {
