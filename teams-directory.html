@@ -8,26 +8,52 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-blue: #0066CC;
-            --dark-blue: #003366;
-            --accent-yellow: #FFB800;
-            --black: #0A0A0A;
-            --dark-gray: #1A1A1A;
-            --white: #FFFFFF;
-            --light-bg: #F8FAFC;
-            --gradient-blue: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+            --bg-dark: #0a0e17;
+            --bg-card: #151d2b;
+            --bg-input: rgba(255,255,255,0.05);
+            --primary: #2563EB;
+            --primary-light: #3b82f6;
+            --accent: #f1c40f;
+            --accent-dark: #d4a017;
+            --text-main: #ffffff;
+            --text-muted: rgba(255,255,255,0.7);
+            --border: rgba(255,255,255,0.1);
+            --border-light: rgba(255,255,255,0.2);
+            --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.3);
+            --shadow-card: 0 4px 20px rgba(0,0,0,0.4);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--light-bg); color: var(--black); min-height: 100vh; }
+        
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: var(--bg-dark); 
+            color: var(--text-main); 
+            min-height: 100vh;
+            line-height: 1.6;
+        }
 
+        /* خلفية متدرجة خفيفة لإضافة عمق */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 10% 20%, rgba(37,99,235,0.08) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(241,196,15,0.05) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Header */
         .main-header { 
-            background: var(--black); 
+            background: rgba(21, 29, 43, 0.95); 
+            backdrop-filter: blur(10px);
             padding: 12px 0; 
             position: sticky; 
             top: 0; 
             z-index: 1000; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
         .header-container { 
             max-width: 1400px; 
@@ -42,67 +68,81 @@
             align-items: center; 
             gap: 12px; 
             text-decoration: none; 
+            transition: transform 0.3s;
         }
+        .logo-section:hover { transform: scale(1.02); }
         .logo-icon { 
-            width: 40px; 
-            height: 40px; 
-            border-radius: 50%; 
-            overflow: hidden; 
-            background: var(--white); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            border: 2px solid var(--accent-yellow); 
+            width: 40px; height: 40px; border-radius: 50%; overflow: hidden; 
+            background: var(--bg-card); display: flex; align-items: center; justify-content: center; 
+            border: 2px solid var(--accent); 
+            box-shadow: 0 0 10px rgba(241,196,15,0.3);
         }
         .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
-        .logo-text { font-size: 22px; font-weight: bold; color: var(--white); }
+        .logo-text { font-size: 22px; font-weight: bold; color: var(--text-main); }
+        
         .nav-menu { display: flex; gap: 20px; align-items: center; }
         .nav-link { 
-            color: var(--white); 
-            text-decoration: none; 
-            font-weight: 500; 
-            padding: 8px 15px; 
-            border-radius: 5px; 
-            transition: all 0.3s; 
+            color: var(--text-muted); text-decoration: none; font-weight: 600; 
+            padding: 8px 15px; border-radius: 8px; transition: all 0.3s; 
         }
-        .nav-link:hover { color: var(--accent-yellow); }
+        .nav-link:hover { color: var(--accent); background: rgba(241,196,15,0.1); }
+        .nav-link.active { color: var(--accent); }
 
-        .container { 
-            max-width: 1400px; 
-            margin: 0 auto; 
-            padding: 40px 20px; 
-        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
 
+        /* Page Header */
         .page-header {
-            background: var(--gradient-blue);
-            padding: 40px;
+            background: linear-gradient(135deg, rgba(37,99,235,0.2) 0%, rgba(21,29,43,0.8) 100%);
+            border: 1px solid var(--border);
+            padding: 50px 40px;
             border-radius: 16px;
             margin-bottom: 40px;
-            color: var(--white);
+            color: var(--text-main);
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
-        .page-header h1 { font-size: 36px; margin-bottom: 10px; }
-        .page-header p { font-size: 16px; opacity: 0.9; }
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -10%;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(241,196,15,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .page-header h1 { font-size: 2.5rem; margin-bottom: 10px; position: relative; z-index: 1; }
+        .page-header h1 i { color: var(--accent); margin-right: 10px; }
+        .page-header p { font-size: 1.1rem; color: var(--text-muted); position: relative; z-index: 1; }
 
+        /* Search & Filter */
         .search-filter {
-            background: var(--white);
+            background: var(--bg-card);
             padding: 25px;
             border-radius: 12px;
             margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-card);
         }
         .search-box { display: flex; gap: 15px; flex-wrap: wrap; }
-        .search-input {
-            flex: 1; min-width: 250px; padding: 12px 20px;
-            border: 2px solid #E2E8F0; border-radius: 8px; font-size: 15px; transition: all 0.3s;
+        .search-input, .filter-select {
+            padding: 12px 20px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            color: var(--text-main);
+            transition: all 0.3s;
         }
-        .search-input:focus { outline: none; border-color: var(--primary-blue); }
-        .filter-select {
-            padding: 12px 20px; border: 2px solid #E2E8F0; border-radius: 8px;
-            font-size: 15px; background: var(--white); cursor: pointer;
+        .search-input { flex: 1; min-width: 250px; }
+        .search-input:focus, .filter-select:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.2); 
         }
-        .filter-select:focus { outline: none; border-color: var(--primary-blue); }
+        .filter-select { cursor: pointer; min-width: 200px; }
+        .filter-select option { background: var(--bg-card); color: var(--text-main); }
 
+        /* Teams Grid */
         .teams-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -110,90 +150,136 @@
             margin-bottom: 30px;
         }
 
+        /* Team Card */
         .team-card {
-            background: var(--white);
-            border: 2px solid #E2E8F0;
-            border-radius: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
             overflow: hidden;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+        .team-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(37,99,235,0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1;
         }
         .team-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-blue);
-            box-shadow: 0 10px 30px rgba(0,102,204,0.15);
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow), 0 15px 30px rgba(0,0,0,0.5);
         }
+        .team-card:hover::before { opacity: 1; }
 
         .team-cover {
             width: 100%; height: 140px;
-            background: var(--gradient-blue);
+            background: linear-gradient(135deg, var(--primary), var(--bg-dark));
             position: relative; overflow: hidden;
         }
-        .team-cover img { width: 100%; height: 100%; object-fit: cover; opacity: 0.4; }
+        .team-cover img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: transform 0.5s; }
+        .team-card:hover .team-cover img { transform: scale(1.1); }
+        .team-cover::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 60%;
+            background: linear-gradient(to top, var(--bg-card), transparent);
+        }
 
         .team-logo {
             width: 80px; height: 80px;
-            border-radius: 50%; border: 4px solid var(--white);
-            background: var(--white); position: absolute;
+            border-radius: 50%; border: 4px solid var(--bg-card);
+            background: var(--bg-dark); position: absolute;
             bottom: -40px; left: 20px; overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 2;
+            transition: transform 0.3s;
         }
+        .team-card:hover .team-logo { transform: scale(1.1); border-color: var(--accent); }
         .team-logo img { width: 100%; height: 100%; object-fit: cover; }
         .team-logo-placeholder {
             width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 32px; color: var(--primary-blue);
+            font-size: 32px; color: var(--primary-light);
+            background: rgba(37,99,235,0.1);
         }
 
-        .team-info { padding: 55px 20px 20px; flex: 1; display: flex; flex-direction: column; }
-        .team-name { font-size: 20px; font-weight: bold; color: var(--dark-blue); margin-bottom: 12px; }
+        .team-info { padding: 55px 20px 20px; flex: 1; display: flex; flex-direction: column; position: relative; z-index: 2; }
+        .team-name { font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 12px; }
         
-        .team-meta { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; color: #64748B; font-size: 14px; }
-        .team-meta-item { display: flex; align-items: center; gap: 8px; }
-        .team-meta-item i { color: var(--primary-blue); width: 18px; text-align: center; }
+        .team-meta { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; color: var(--text-muted); font-size: 0.9rem; }
+        .team-meta-item { display: flex; align-items: center; gap: 10px; }
+        .team-meta-item i { color: var(--accent); width: 18px; text-align: center; }
         
-        .team-sports { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
+        .team-sports { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
         .sport-tag {
-            background: rgba(0,102,204,0.1); color: var(--primary-blue);
-            padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;
+            background: rgba(37, 99, 235, 0.15); color: var(--primary-light);
+            padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+            border: 1px solid rgba(37, 99, 235, 0.3);
         }
 
         .team-coach {
-            display: flex; align-items: center; gap: 10px;
-            padding-top: 15px; margin-top: auto; border-top: 1px solid #E2E8F0;
+            display: flex; align-items: center; gap: 12px;
+            padding-top: 15px; margin-top: auto; border-top: 1px solid var(--border);
         }
         .coach-photo {
-            width: 36px; height: 36px; border-radius: 50%;
+            width: 40px; height: 40px; border-radius: 50%;
             background: var(--gradient-blue); display: flex;
             align-items: center; justify-content: center;
-            color: var(--white); font-weight: bold; font-size: 13px; flex-shrink: 0;
+            color: var(--text-main); font-weight: bold; font-size: 14px; flex-shrink: 0;
+            border: 2px solid var(--border-light);
+            overflow: hidden;
         }
-        .coach-photo img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .coach-photo img { width: 100%; height: 100%; object-fit: cover; }
         .coach-info { flex: 1; }
-        .coach-name { font-weight: 600; color: var(--dark-blue); font-size: 14px; }
-        .coach-label { font-size: 12px; color: #64748B; }
+        .coach-name { font-weight: 700; color: var(--text-main); font-size: 0.95rem; }
+        .coach-label { font-size: 0.8rem; color: var(--text-muted); }
 
         .btn-view-team {
             width: 100%; padding: 12px;
-            background: var(--gradient-blue); color: var(--white);
+            background: linear-gradient(135deg, var(--primary), #1d4ed8); color: var(--text-main);
             border: none; border-radius: 8px; font-weight: bold;
-            cursor: pointer; margin-top: 15px; transition: all 0.3s;
+            cursor: pointer; margin-top: 20px; transition: all 0.3s;
             display: flex; align-items: center; justify-content: center; gap: 8px;
+            position: relative; overflow: hidden;
         }
-        .btn-view-team:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.3); }
+        .btn-view-team::before {
+            content: '';
+            position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .btn-view-team:hover::before { left: 100%; }
+        .btn-view-team:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37,99,235,0.4); }
 
-        .empty-state { text-align: center; padding: 60px 20px; color: #64748B; }
-        .empty-state i { font-size: 64px; margin-bottom: 20px; opacity: 0.3; }
-        .loading { text-align: center; padding: 60px; }
-        .loading i { font-size: 48px; color: var(--primary-blue); animation: spin 1s linear infinite; }
+        /* Empty & Loading States */
+        .empty-state { text-align: center; padding: 80px 20px; color: var(--text-muted); grid-column: 1/-1; }
+        .empty-state i { font-size: 64px; margin-bottom: 20px; opacity: 0.3; color: var(--accent); }
+        .loading { text-align: center; padding: 80px; grid-column: 1/-1; }
+        .loading i { font-size: 48px; color: var(--primary); animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
+        /* Language Switcher */
+        .lang-switcher { display: flex; gap: 5px; background: var(--bg-input); padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
+        .lang-btn { padding: 6px 12px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 6px; font-weight: bold; font-size: 0.85rem; transition: all 0.3s; }
+        .lang-btn.active { background: var(--primary); color: var(--text-main); }
+
+        /* Responsive */
         @media (max-width: 768px) {
+            .header-container { flex-direction: column; gap: 15px; }
+            .nav-menu { flex-wrap: wrap; justify-content: center; gap: 10px; }
             .teams-grid { grid-template-columns: 1fr; }
-            .nav-menu { display: none; }
-            .page-header h1 { font-size: 28px; }
+            .page-header h1 { font-size: 1.8rem; }
+            .page-header { padding: 30px 20px; }
+            .search-box { flex-direction: column; }
+            .search-input, .filter-select { width: 100%; }
         }
     </style>
 </head>
@@ -202,28 +288,33 @@
     <header class="main-header">
         <div class="header-container">
             <a href="index.html" class="logo-section">
-                <div class="logo-icon"><img src="logo2.png" alt="Logo"></div>
+                <div class="logo-icon"><img src="logo2.png" alt="Logo" onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\'fas fa-shield-alt\' style=\'color:var(--accent); font-size:20px;\'></i>'"></div>
                 <div class="logo-text">TopCompSports</div>
             </a>
             <nav class="nav-menu">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="events.html" class="nav-link">Tournaments</a>
-                <a href="teams-directory.html" class="nav-link" style="color: var(--accent-yellow);">Teams</a>
+                <a href="index.html" class="nav-link" data-i18n="nav_home">Home</a>
+                <a href="tournaments.html" class="nav-link" data-i18n="nav_tournaments">Tournaments</a>
+                <a href="teams-directory.html" class="nav-link active" data-i18n="nav_teams">Teams</a>
+                
+                <div class="lang-switcher">
+                    <button class="lang-btn" onclick="changeLanguage('ar')" id="btn-ar">عربي</button>
+                    <button class="lang-btn active" onclick="changeLanguage('en')" id="btn-en">EN</button>
+                </div>
             </nav>
         </div>
     </header>
 
     <div class="container">
         <div class="page-header">
-            <h1><i class="fas fa-shield-alt"></i> Teams Directory</h1>
-            <p>Browse and discover all active teams</p>
+            <h1><i class="fas fa-shield-alt"></i> <span data-i18n="page_title">Teams Directory</span></h1>
+            <p data-i18n="page_subtitle">Browse and discover all active teams</p>
         </div>
 
         <div class="search-filter">
             <div class="search-box">
-                <input type="text" class="search-input" id="searchInput" placeholder="Search teams by name, city, or country...">
+                <input type="text" class="search-input" id="searchInput" data-i18n-placeholder="search_placeholder" placeholder="Search teams by name, city, or country...">
                 <select class="filter-select" id="countryFilter">
-                    <option value="">All Countries</option>
+                    <option value="" data-i18n="filter_all">All Countries</option>
                     <option value="Egypt">Egypt</option>
                     <option value="Saudi Arabia">Saudi Arabia</option>
                     <option value="UAE">UAE</option>
@@ -237,7 +328,7 @@
         <div class="teams-grid" id="teamsGrid">
             <div class="loading">
                 <i class="fas fa-spinner"></i>
-                <p>Loading teams...</p>
+                <p data-i18n="loading">Loading teams...</p>
             </div>
         </div>
     </div>
@@ -248,10 +339,54 @@
         
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let allTeams = [];
+        let currentLang = localStorage.getItem('lang') || 'en';
+
+        // Translations
+        const translations = {
+            en: {
+                nav_home: 'Home', nav_tournaments: 'Tournaments', nav_teams: 'Teams',
+                page_title: 'Teams Directory', page_subtitle: 'Browse and discover all active teams',
+                search_placeholder: 'Search teams by name, city, or country...',
+                filter_all: 'All Countries', loading: 'Loading teams...',
+                empty_title: 'No active teams found.', empty_desc: 'Try adjusting your search or filters.',
+                error_title: 'Error loading teams.', error_desc: 'Please try again later.',
+                members: 'members', head_coach: 'Head Coach', view_details: 'View Team Details'
+            },
+            ar: {
+                nav_home: 'الرئيسية', nav_tournaments: 'البطولات', nav_teams: 'الفرق',
+                page_title: 'دليل الفرق', page_subtitle: 'تصفح واكتشف جميع الفرق النشطة',
+                search_placeholder: 'ابحث عن الفرق بالاسم، المدينة، أو الدولة...',
+                filter_all: 'جميع الدول', loading: 'جاري تحميل الفرق...',
+                empty_title: 'لم يتم العثور على فرق نشطة.', empty_desc: 'حاول تعديل بحثك أو الفلاتر.',
+                error_title: 'خطأ في تحميل الفرق.', error_desc: 'يرجى المحاولة مرة أخرى لاحقاً.',
+                members: 'أعضاء', head_coach: 'المدرب الرئيسي', view_details: 'عرض تفاصيل الفريق'
+            }
+        };
+
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) el.textContent = translations[lang][key];
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[lang][key]) el.placeholder = translations[lang][key];
+            });
+            
+            // Re-render teams to update dynamic text
+            if (allTeams.length > 0) displayTeams(allTeams);
+        }
 
         async function loadTeams() {
             try {
-                // 1. جلب الفرق وبيانات المدرب
                 const { data: teams, error } = await supabaseClient
                     .from('teams')
                     .select(`
@@ -267,7 +402,6 @@
 
                 if (error) throw error;
                 
-                // 2. جلب عدد الأعضاء المعتمدين لكل فريق
                 const teamIds = teams.map(t => t.id);
                 let membersCount = {};
                 
@@ -285,7 +419,6 @@
                     }
                 }
                 
-                // 3. دمج البيانات
                 allTeams = teams.map(team => ({
                     ...team,
                     members_count: membersCount[team.id] || 0
@@ -295,10 +428,12 @@
 
             } catch (error) {
                 console.error('Error loading teams:', error);
+                const t = translations[currentLang];
                 document.getElementById('teamsGrid').innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-state">
                         <i class="fas fa-exclamation-triangle"></i>
-                        <p>Error loading teams. Please try again later.</p>
+                        <h3>${t.error_title}</h3>
+                        <p>${t.error_desc}</p>
                     </div>
                 `;
             }
@@ -306,12 +441,14 @@
 
         function displayTeams(teams) {
             const grid = document.getElementById('teamsGrid');
+            const t = translations[currentLang];
             
             if (!teams || teams.length === 0) {
                 grid.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-state">
                         <i class="fas fa-shield-alt"></i>
-                        <p>No active teams found.</p>
+                        <h3>${t.empty_title}</h3>
+                        <p>${t.empty_desc}</p
                     </div>
                 `;
                 return;
@@ -321,7 +458,7 @@
                 const coach = team.coach;
                 const coachInitials = coach?.full_name ? 
                     coach.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '?';
-                const sports = team.sports || [];
+                const sports = Array.isArray(team.sports) ? team.sports : (team.sports ? team.sports.split(',') : []);
                 
                 return `
                 <div class="team-card" onclick="window.location.href='team-public.html?id=${team.id}'">
@@ -343,12 +480,12 @@
                             </div>
                             <div class="team-meta-item">
                                 <i class="fas fa-users"></i>
-                                <span>${team.members_count} members</span>
+                                <span>${team.members_count} ${t.members}</span>
                             </div>
                         </div>
                         ${sports.length > 0 ? `
                         <div class="team-sports">
-                            ${sports.slice(0, 3).map(s => `<span class="sport-tag">${s}</span>`).join('')}
+                            ${sports.slice(0, 3).map(s => `<span class="sport-tag">${s.trim()}</span>`).join('')}
                             ${sports.length > 3 ? `<span class="sport-tag">+${sports.length - 3}</span>` : ''}
                         </div>
                         ` : ''}
@@ -363,13 +500,13 @@
                             </div>
                             <div class="coach-info">
                                 <div class="coach-name">${coach.full_name}</div>
-                                <div class="coach-label">Head Coach</div>
+                                <div class="coach-label">${t.head_coach}</div>
                             </div>
                         </div>
                         ` : ''}
                         
                         <button class="btn-view-team">
-                            <i class="fas fa-eye"></i> View Team Details
+                            <i class="fas fa-eye"></i> ${t.view_details}
                         </button>
                     </div>
                 </div>
@@ -377,7 +514,6 @@
             }).join('');
         }
 
-        // Search and filter functionality
         function filterTeams() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const countryFilter = document.getElementById('countryFilter').value;
@@ -386,7 +522,7 @@
             
             if (searchTerm) {
                 filtered = filtered.filter(team => 
-                    team.name.toLowerCase().includes(searchTerm) ||
+                    (team.name && team.name.toLowerCase().includes(searchTerm)) ||
                     (team.city && team.city.toLowerCase().includes(searchTerm)) ||
                     (team.country && team.country.toLowerCase().includes(searchTerm))
                 );
@@ -402,8 +538,10 @@
         document.getElementById('searchInput').addEventListener('input', filterTeams);
         document.getElementById('countryFilter').addEventListener('change', filterTeams);
 
-        // Initialize
-        window.onload = loadTeams;
+        window.onload = () => {
+            changeLanguage(currentLang);
+            loadTeams();
+        };
     </script>
 </body>
 </html>
