@@ -450,11 +450,12 @@
                             <th data-en="Experience" data-ar="الخبرة">Experience</th>
                             <th data-en="Status" data-ar="الحالة">Status</th>
                             <th data-en="Verification" data-ar="التحقق">Verification</th>
+                            <th data-en="Documents" data-ar="الوثائق">Documents</th>
                             <th data-en="Actions" data-ar="الإجراءات">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="coachesTable">
-                        <tr><td colspan="7" style="text-align: center;" data-en="Loading..." data-ar="جاري التحميل...">Loading...</td></tr>
+                        <tr><td colspan="8" style="text-align: center;" data-en="Loading..." data-ar="جاري التحميل...">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -747,7 +748,7 @@
         function renderTable() {
             const tbody = document.getElementById('coachesTable');
             if (allCoaches.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;" data-en="No coaches found" data-ar="لا يوجد مدربون">No coaches found</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;" data-en="No coaches found" data-ar="لا يوجد مدربون">No coaches found</td></tr>`;
                 return;
             }
 
@@ -767,6 +768,8 @@
                 const btnSuspend = currentLang === 'ar' ? 'تعليق' : 'Suspend';
                 const btnActivate = currentLang === 'ar' ? 'تنشيط' : 'Activate';
                 const btnDelete = currentLang === 'ar' ? 'حذف' : 'Delete';
+                const btnProfile = currentLang === 'ar' ? 'صورة البروفايل' : 'Profile Photo';
+                const btnID = currentLang === 'ar' ? 'الهوية' : 'ID Document';
 
                 return `
                     <tr>
@@ -776,6 +779,22 @@
                         <td>${c.experience_years ? c.experience_years + ' years' : '-'}</td>
                         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                         <td><span class="verification-badge ${verificationClass}">${verificationText}</span></td>
+                        <td>
+                            <div class="action-btns">
+                                ${c.profile_photo_url ? 
+                                    `<button class="btn btn-info btn-sm" onclick="window.open('${c.profile_photo_url}', '_blank')" title="${btnProfile}">
+                                        <i class="fas fa-user"></i> ${currentLang === 'ar' ? 'صورة' : 'Photo'}
+                                    </button>` : 
+                                    `<span style="color: var(--text-muted); font-size: 12px;">${currentLang === 'ar' ? 'لا توجد' : 'No photo'}</span>`
+                                }
+                                ${c.id_document_url ? 
+                                    `<button class="btn btn-warning btn-sm" onclick="window.open('${c.id_document_url}', '_blank')" title="${btnID}">
+                                        <i class="fas fa-id-card"></i> ${currentLang === 'ar' ? 'هوية' : 'ID'}
+                                    </button>` : 
+                                    `<span style="color: var(--text-muted); font-size: 12px;">${currentLang === 'ar' ? 'لا توجد' : 'No ID'}</span>`
+                                }
+                            </div>
+                        </td>
                         <td>
                             <div class="action-btns">
                                 <button class="btn btn-info btn-sm" onclick="viewCoach('${c.id}')" title="${btnView}"><i class="fas fa-eye"></i></button>
