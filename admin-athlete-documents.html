@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* =========================================
-           1. CORE THEME & SIDEBAR (Unified Dark)
+           CORE THEME & SIDEBAR
            ========================================= */
         :root {
             --bg-dark: #0a0e17; 
@@ -16,11 +16,9 @@
             --bg-input: rgba(255,255,255,0.05);
             --primary: #2563EB; 
             --accent: #f1c40f; 
-            --accent-dark: #d4a017;
             --text-main: #ffffff; 
             --text-muted: rgba(255,255,255,0.7);
             --success: #10b981; 
-            --warning: #f59e0b; 
             --danger: #ef4444;
         }
 
@@ -36,47 +34,44 @@
             overflow-y: auto;
             padding: 20px;
             z-index: 1000;
-            transition: all 0.3s;
             display: flex;
             flex-direction: column;
         }
-        [dir="rtl"] .sidebar { right: 0; left: auto; border-left: 2px solid var(--primary); border-right: none; }
-        [dir="ltr"] .sidebar { left: 0; right: auto; border-right: 2px solid var(--primary); border-left: none; }
+        [dir="rtl"] .sidebar { right: 0; left: auto; border-left: 2px solid var(--primary); }
+        [dir="ltr"] .sidebar { left: 0; right: auto; border-right: 2px solid var(--primary); }
         
-        .logo { display: flex; align-items: center; gap: 15px; padding: 20px; border-bottom: 2px solid rgba(255,255,255,0.1); margin-bottom: 30px; flex-shrink: 0; }
-        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--accent), var(--accent-dark)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: var(--bg-dark); }
+        .logo { display: flex; align-items: center; gap: 15px; padding: 20px; border-bottom: 2px solid rgba(255,255,255,0.1); margin-bottom: 30px; }
+        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--accent), #d4a017); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: var(--bg-dark); }
         .logo-text { font-size: 22px; font-weight: bold; color: var(--text-main); }
         
-        .sidebar nav { flex: 1; overflow-y: auto; }
+        .sidebar nav { flex: 1; }
         .nav-item { padding: 15px 20px; margin-bottom: 8px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-main); }
         .nav-item:hover { background: rgba(255,255,255,0.05); }
         .nav-item.active { background: linear-gradient(135deg, var(--primary), #1d4ed8); }
         .nav-item .icon { font-size: 1.3rem; width: 24px; text-align: center; }
         
-        .role-badge { background: var(--accent); color: var(--bg-dark); padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-top: auto; display: block; text-align: center; }
+        .role-badge { background: var(--accent); color: var(--bg-dark); padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-top: auto; text-align: center; }
 
-        .main-content { padding: 30px; transition: all 0.3s; }
-        [dir="rtl"] .main-content { margin-right: 280px; margin-left: 0; }
-        [dir="ltr"] .main-content { margin-left: 280px; margin-right: 0; }
+        .main-content { padding: 30px; }
+        [dir="rtl"] .main-content { margin-right: 280px; }
+        [dir="ltr"] .main-content { margin-left: 280px; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 20px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; flex-wrap: wrap; gap: 15px; }
-        .page-title { font-size: 2rem; font-weight: bold; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
-        .user-info { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #1d4ed8); display: flex; align-items: center; justify-content: center; color: var(--text-main); font-weight: bold; font-size: 1.2rem; }
-        .btn-logout { background: var(--danger); color: var(--text-main); padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
-        .btn-logout:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 20px; background: var(--bg-card); border-radius: 15px; flex-wrap: wrap; gap: 15px; }
+        .page-title { font-size: 2rem; font-weight: bold; display: flex; align-items: center; gap: 10px; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #1d4ed8); display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .btn-logout { background: var(--danger); color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
-        .lang-switcher { display: flex; gap: 8px; background: var(--bg-input); padding: 5px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
-        .lang-btn { background: transparent; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; color: var(--text-muted); transition: all 0.3s; }
-        .lang-btn.active { background: var(--primary); color: var(--text-main); }
-        .lang-btn:hover:not(.active) { color: var(--text-main); }
+        .lang-switcher { display: flex; gap: 5px; background: var(--bg-input); padding: 5px; border-radius: 8px; }
+        .lang-btn { padding: 8px 15px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 6px; font-weight: 600; }
+        .lang-btn.active { background: var(--primary); color: white; }
 
         /* =========================================
-           2. PAGE SPECIFIC STYLES (Original Layout)
+           IMPROVED LAYOUT
            ========================================= */
         .documents-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); 
             gap: 25px; 
         }
 
@@ -91,159 +86,159 @@
             display: flex; 
             align-items: center; 
             gap: 15px; 
-            margin-bottom: 20px; 
-            padding-bottom: 15px; 
-            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            margin-bottom: 25px; 
+            padding-bottom: 20px; 
+            border-bottom: 2px solid rgba(255,255,255,0.1); 
         }
         .avatar { 
-            width: 60px; 
-            height: 60px; 
+            width: 70px; 
+            height: 70px; 
             border-radius: 50%; 
             overflow: hidden; 
             background: linear-gradient(135deg, var(--primary), #1d4ed8); 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            font-size: 24px; 
-            color: white; 
-            font-weight: bold; 
+            font-size: 28px; 
+            font-weight: bold;
             flex-shrink: 0;
+            border: 3px solid var(--accent);
         }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .athlete-info h3 { font-size: 1.3rem; margin-bottom: 5px; color: var(--text-main); }
-        .athlete-info p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2px; }
+        .athlete-info h3 { font-size: 1.4rem; margin-bottom: 5px; color: var(--text-main); }
+        .athlete-info p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 3px; }
         
-        .document-section { margin-bottom: 20px; }
+        .documents-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .document-section { }
         .document-label { 
             font-weight: 600; 
-            margin-bottom: 10px; 
+            margin-bottom: 12px; 
             display: flex; 
             align-items: center; 
             gap: 8px; 
-            color: var(--text-muted);
+            color: var(--accent);
+            font-size: 0.95rem;
         }
-        .document-label i { color: var(--accent); }
         
         .document-preview { 
-            border: 2px dashed rgba(255,255,255,0.1); 
-            border-radius: 10px; 
+            border: 2px dashed rgba(255,255,255,0.2); 
+            border-radius: 12px; 
             padding: 15px; 
             text-align: center; 
             background: var(--bg-input);
-            min-height: 200px;
+            height: 220px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
         .document-preview:hover {
             border-color: var(--primary);
-            background: rgba(37, 99, 235, 0.05);
+            background: rgba(37, 99, 235, 0.1);
         }
         .document-preview img { 
             max-width: 100%; 
-            max-height: 300px; 
+            max-height: 180px; 
             border-radius: 8px; 
+            object-fit: contain;
         }
-        .document-preview .no-doc { color: var(--text-muted); font-size: 3rem; }
-        .document-preview .no-doc-text { margin-top: 10px; color: var(--text-muted); }
-        
-        .verify-btn { 
-            width: 100%; 
-            padding: 12px; 
-            background: var(--success); 
-            color: var(--text-main); 
-            border: none; 
-            border-radius: 8px; 
-            font-weight: bold; 
-            cursor: pointer;
-            transition: all 0.3s;
+        .document-preview .overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        .verify-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16,185,129,0.3); }
-        .verify-btn.verified { background: var(--primary); }
-        
-        .alert { padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
+        .document-preview:hover .overlay { opacity: 1; }
+        .document-preview .overlay i { font-size: 2.5rem; color: white; }
+
+        .document-preview .no-doc { color: var(--text-muted); font-size: 3rem; }
+        .document-preview .no-doc-text { margin-top: 10px; color: var(--text-muted); font-size: 0.9rem; }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: var(--bg-input);
+            border-radius: 10px;
+        }
+        .info-item { text-align: center; }
+        .info-item .label { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
+        .info-item .value { font-weight: 700; color: var(--text-main); font-size: 1.1rem; }
+
+        .action-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .btn { 
+            padding: 14px; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            font-size: 14px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+        }
+        .btn-verify { background: var(--success); color: white; }
+        .btn-verify:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16,185,129,0.4); }
+        .btn-reject { background: var(--danger); color: white; }
+        .btn-reject:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(239,68,68,0.4); }
+
+        .alert { padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; }
         .alert.show { display: block; }
         .alert-success { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
-        .alert-error { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
 
         @media (max-width: 1024px) {
-            .sidebar { width: 100%; height: auto; position: relative; border-left: none !important; border-right: none !important; border-bottom: 2px solid var(--primary); }
-            [dir="rtl"] .main-content, [dir="ltr"] .main-content { margin: 0; padding: 20px; }
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .main-content { margin: 0; padding: 20px; }
             .documents-grid { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 768px) {
-            .header { flex-direction: column; align-items: stretch; }
-            .user-info { justify-content: space-between; margin-top: 15px; }
+            .documents-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar (Unified) -->
     <aside class="sidebar">
         <div class="logo">
             <div class="logo-icon">T</div>
             <div class="logo-text">TopCompSports</div>
         </div>
-        
         <nav>
-            <a href="admin-dashboard.html" class="nav-item">
-                <span class="icon"><i class="fas fa-chart-line"></i></span>
-                <span data-en="Dashboard" data-ar="لوحة التحكم">Dashboard</span>
-            </a>
-            <a href="admin-users.html" class="nav-item">
-                <span class="icon"><i class="fas fa-users"></i></span>
-                <span data-en="Users" data-ar="المستخدمون">Users</span>
-            </a>
-            <a href="admin-athletes.html" class="nav-item">
-                <span class="icon"><i class="fas fa-running"></i></span>
-                <span data-en="Athletes" data-ar="اللاعبون">Athletes</span>
-            </a>
-            <a href="admin-athlete-documents.html" class="nav-item active">
-                <span class="icon"><i class="fas fa-id-card"></i></span>
-                <span data-en="Athlete Documents" data-ar="وثائق اللاعبين">Athlete Documents</span>
-            </a>
-            <a href="admin-coaches.html" class="nav-item">
-                <span class="icon"><i class="fas fa-chalkboard-teacher"></i></span>
-                <span data-en="Coaches" data-ar="المدربون">Coaches</span>
-            </a>
-            <a href="admin-teams.html" class="nav-item">
-                <span class="icon"><i class="fas fa-shield-alt"></i></span>
-                <span data-en="Teams" data-ar="الفرق">Teams</span>
-            </a>
-            <a href="admin-organizations.html" class="nav-item">
-                <span class="icon"><i class="fas fa-building"></i></span>
-                <span data-en="Organizers" data-ar="المنظمون">Organizers</span>
-            </a>
-            <a href="admin-tournaments.html" class="nav-item">
-                <span class="icon"><i class="fas fa-trophy"></i></span>
-                <span data-en="Tournaments" data-ar="البطولات">Tournaments</span>
-            </a>
-            <a href="admin-reports.html" class="nav-item">
-                <span class="icon"><i class="fas fa-chart-bar"></i></span>
-                <span data-en="Reports" data-ar="التقارير">Reports</span>
-            </a>
-            <a href="admin-settings.html" class="nav-item">
-                <span class="icon"><i class="fas fa-cog"></i></span>
-                <span data-en="Settings" data-ar="الإعدادات">Settings</span>
-            </a>
+            <a href="admin-dashboard.html" class="nav-item"><span class="icon"><i class="fas fa-chart-line"></i></span> <span data-en="Dashboard" data-ar="لوحة التحكم">Dashboard</span></a>
+            <a href="admin-users.html" class="nav-item"><span class="icon"><i class="fas fa-users"></i></span> <span data-en="Users" data-ar="المستخدمون">Users</span></a>
+            <a href="admin-athletes.html" class="nav-item"><span class="icon"><i class="fas fa-running"></i></span> <span data-en="Athletes" data-ar="اللاعبون">Athletes</span></a>
+            <a href="admin-athlete-documents.html" class="nav-item active"><span class="icon"><i class="fas fa-id-card"></i></span> <span data-en="Athlete Documents" data-ar="وثائق اللاعبين">Athlete Documents</span></a>
+            <a href="admin-coaches.html" class="nav-item"><span class="icon"><i class="fas fa-chalkboard-teacher"></i></span> <span data-en="Coaches" data-ar="المدربون">Coaches</span></a>
+            <a href="admin-teams.html" class="nav-item"><span class="icon"><i class="fas fa-shield-alt"></i></span> <span data-en="Teams" data-ar="الفرق">Teams</span></a>
+            <a href="admin-organizations.html" class="nav-item"><span class="icon"><i class="fas fa-building"></i></span> <span data-en="Organizers" data-ar="المنظمون">Organizers</span></a>
+            <a href="admin-tournaments.html" class="nav-item"><span class="icon"><i class="fas fa-trophy"></i></span> <span data-en="Tournaments" data-ar="البطولات">Tournaments</span></a>
+            <a href="admin-reports.html" class="nav-item"><span class="icon"><i class="fas fa-chart-bar"></i></span> <span data-en="Reports" data-ar="التقارير">Reports</span></a>
+            <a href="admin-settings.html" class="nav-item"><span class="icon"><i class="fas fa-cog"></i></span> <span data-en="Settings" data-ar="الإعدادات">Settings</span></a>
         </nav>
-
-        <div id="adminRole" class="role-badge" data-en="Loading..." data-ar="جاري التحميل...">Loading...</div>
+        <div class="role-badge" data-en="Super Admin" data-ar="سوبر أدمن">Super Admin</div>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
         <div class="header">
-            <h1 class="page-title">
-                <i class="fas fa-id-card" style="color: var(--accent);"></i>
-                <span data-en="Athlete Documents Verification" data-ar="التحقق من وثائق اللاعبين">Athlete Documents Verification</span>
-            </h1>
+            <h1 class="page-title"><i class="fas fa-id-card" style="color: var(--accent);"></i> <span data-en="Athlete Documents Verification" data-ar="التحقق من وثائق اللاعبين">Athlete Documents Verification</span></h1>
             <div class="user-info">
                 <div class="lang-switcher">
                     <button class="lang-btn" id="btnEn" onclick="window.setLang('en')">EN</button>
@@ -271,69 +266,26 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let currentLang = localStorage.getItem('adminLang') || 'en';
-        let currentAdmin = null;
 
-        // ==========================================
-        // 1. Language System
-        // ==========================================
         window.setLang = function(lang) {
             currentLang = lang;
             localStorage.setItem('adminLang', lang);
-            
             document.documentElement.lang = lang;
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            
             document.getElementById('btnEn').classList.toggle('active', lang === 'en');
             document.getElementById('btnAr').classList.toggle('active', lang === 'ar');
-            
             document.querySelectorAll('[data-en][data-ar]').forEach(el => {
                 el.textContent = lang === 'ar' ? el.dataset.ar : el.dataset.en;
             });
         };
 
-        // ==========================================
-        // 2. Auth Check
-        // ==========================================
-        async function checkAuth() {
-            const storedAdmin = localStorage.getItem('currentAdmin');
-            if (!storedAdmin) {
-                window.location.href = 'admin-login.html';
-                return;
-            }
+        window.onload = async () => {
+            window.setLang(currentLang);
+            await loadAthleteDocuments();
+        };
 
-            try {
-                currentAdmin = JSON.parse(storedAdmin);
-                const { data: admin } = await supabaseClient.from('admin_profiles').select('*').eq('id', currentAdmin.id).maybeSingle();
-
-                if (!admin) {
-                    localStorage.removeItem('currentAdmin');
-                    window.location.href = 'admin-login.html';
-                    return;
-                }
-
-                document.getElementById('userName').textContent = currentAdmin.full_name || 'Admin';
-                document.getElementById('userAvatar').textContent = (currentAdmin.full_name || 'A')[0].toUpperCase();
-                
-                const roleBadge = document.getElementById('adminRole');
-                const roleText = currentAdmin.role === 'super_admin' ? 
-                    (currentLang === 'ar' ? 'سوبر أدمن' : 'Super Admin') : 
-                    currentAdmin.role === 'admin' ? 
-                    (currentLang === 'ar' ? 'أدمن' : 'Admin') : 
-                    (currentLang === 'ar' ? 'أدمن فرعي' : 'Sub-Admin');
-                roleBadge.textContent = roleText;
-                
-            } catch (error) {
-                console.error('Auth error:', error);
-                window.location.href = 'admin-login.html';
-            }
-        }
-
-        // ==========================================
-        // 3. Database Logic (ORIGINAL - No Changes)
-        // ==========================================
         async function loadAthleteDocuments() {
             try {
-                // ✅ جلب جميع اللاعبين من جدول users مع الصور والوثائق
                 const { data: users, error } = await supabaseClient
                     .from('users')
                     .select('*')
@@ -349,7 +301,21 @@
                     return;
                 }
 
-                grid.innerHTML = users.map(user => `
+                grid.innerHTML = users.map(user => {
+                    const profileHtml = user.profile_picture_url ? 
+                        `<img src="${user.profile_picture_url}" alt="Profile">
+                         <div class="overlay"><i class="fas fa-search-plus"></i></div>` :
+                        `<div><div class="no-doc"><i class="fas fa-user"></i></div><div class="no-doc-text" data-en="No photo uploaded" data-ar="لم يتم رفع صورة">No photo uploaded</div></div>`;
+
+                    const idHtml = user.id_document_url ? 
+                        `<img src="${user.id_document_url}" alt="ID Document">
+                         <div class="overlay"><i class="fas fa-search-plus"></i></div>` :
+                        `<div><div class="no-doc"><i class="fas fa-id-card"></i></div><div class="no-doc-text" data-en="No ID uploaded" data-ar="لم يتم رفع الهوية">No ID uploaded</div></div>`;
+
+                    const profileClick = user.profile_picture_url ? `window.open('${user.profile_picture_url}', '_blank')` : '';
+                    const idClick = user.id_document_url ? `window.open('${user.id_document_url}', '_blank')` : '';
+
+                    return `
                     <div class="document-card">
                         <div class="card-header">
                             <div class="avatar">
@@ -365,58 +331,57 @@
                             </div>
                         </div>
 
-                        <div class="document-section">
-                            <div class="document-label">
-                                <i class="fas fa-user"></i>
-                                <span data-en="Profile Photo" data-ar="صورة البروفايل">Profile Photo</span>
+                        <div class="documents-row">
+                            <div class="document-section">
+                                <div class="document-label">
+                                    <i class="fas fa-user"></i>
+                                    <span data-en="Profile Photo" data-ar="صورة البروفايل">Profile Photo</span>
+                                </div>
+                                <div class="document-preview" onclick="${profileClick}">
+                                    ${profileHtml}
+                                </div>
                             </div>
-                            <div class="document-preview" onclick="${user.profile_picture_url ? `window.open('${user.profile_picture_url}', '_blank')` : ''}">
-                                ${user.profile_picture_url ? 
-                                    `<img src="${user.profile_picture_url}" alt="Profile Photo">` :
-                                    `<div><div class="no-doc"><i class="fas fa-user"></i></div><div class="no-doc-text" data-en="No photo uploaded" data-ar="لم يتم رفع صورة">No photo uploaded</div></div>`
-                                }
+
+                            <div class="document-section">
+                                <div class="document-label">
+                                    <i class="fas fa-id-card"></i>
+                                    <span data-en="ID Document" data-ar="وثيقة الهوية">ID Document</span>
+                                </div>
+                                <div class="document-preview" onclick="${idClick}">
+                                    ${idHtml}
+                                </div>
                             </div>
                         </div>
 
-                        <div class="document-section">
-                            <div class="document-label">
-                                <i class="fas fa-id-card"></i>
-                                <span data-en="ID Document" data-ar="وثيقة الهوية">ID Document</span>
+                        <div class="info-row">
+                            <div class="info-item">
+                                <div class="label" data-en="Date of Birth" data-ar="تاريخ الميلاد">Date of Birth</div>
+                                <div class="value">${user.date_of_birth ? new Date(user.date_of_birth).toLocaleDateString('en-GB') : 'N/A'}</div>
                             </div>
-                            <div class="document-preview" onclick="${user.id_document_url ? `window.open('${user.id_document_url}', '_blank')` : ''}">
-                                ${user.id_document_url ? 
-                                    `<img src="${user.id_document_url}" alt="ID Document">` :
-                                    `<div><div class="no-doc"><i class="fas fa-id-card"></i></div><div class="no-doc-text" data-en="No ID uploaded" data-ar="لم يتم رفع الهوية">No ID uploaded</div></div>`
-                                }
+                            <div class="info-item">
+                                <div class="label" data-en="Age" data-ar="العمر">Age</div>
+                                <div class="value">${calculateAge(user.date_of_birth)} years</div>
                             </div>
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
-                            <div style="background: var(--bg-input); padding: 10px; border-radius: 8px;">
-                                <div style="font-size: 12px; color: var(--text-muted);">${currentLang === 'ar' ? 'تاريخ الميلاد' : 'Date of Birth'}</div>
-                                <div style="font-weight: 600;">${user.date_of_birth ? new Date(user.date_of_birth).toLocaleDateString('en-GB') : 'N/A'}</div>
-                            </div>
-                            <div style="background: var(--bg-input); padding: 10px; border-radius: 8px;">
-                                <div style="font-size: 12px; color: var(--text-muted);">${currentLang === 'ar' ? 'العمر' : 'Age'}</div>
-                                <div style="font-weight: 600;">${calculateAge(user.date_of_birth)} years</div>
-                            </div>
+                        <div class="action-btns">
+                            <button class="btn btn-verify" onclick="verifyAthlete('${user.id}', '${user.verification_status}')">
+                                <i class="fas fa-check"></i> 
+                                <span data-en="Verify Athlete" data-ar="التحقق من اللاعب">Verify Athlete</span>
+                            </button>
+                            <button class="btn btn-reject" onclick="rejectAthlete('${user.id}')">
+                                <i class="fas fa-times"></i> 
+                                <span data-en="Reject" data-ar="رفض">Reject</span>
+                            </button>
                         </div>
-
-                        <button class="verify-btn ${user.verification_status === 'verified' ? 'verified' : ''}" 
-                                onclick="verifyAthlete('${user.id}', '${user.verification_status}')">
-                            <i class="fas fa-check-circle"></i> 
-                            ${user.verification_status === 'verified' ? 
-                                (currentLang === 'ar' ? '✓ موثق' : '✓ Verified') : 
-                                (currentLang === 'ar' ? 'التحقق من اللاعب' : 'Verify Athlete')}
-                        </button>
                     </div>
-                `).join('');
+                `}).join('');
 
                 window.setLang(currentLang);
 
             } catch (error) {
-                console.error('Error loading documents:', error);
-                showAlert(currentLang === 'ar' ? 'خطأ في تحميل الوثائق: ' + error.message : 'Error loading documents: ' + error.message, 'error');
+                console.error('Error:', error);
+                showAlert('Error: ' + error.message, 'error');
             }
         }
 
@@ -425,39 +390,40 @@
             const today = new Date();
             const birthDate = new Date(dateOfBirth);
             let age = today.getFullYear() - birthDate.getFullYear();
-            const monthDiff = today.getMonth() - birthDate.getMonth();
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
-            }
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
             return age;
         }
 
         async function verifyAthlete(userId, currentStatus) {
             const newStatus = currentStatus === 'verified' ? 'pending' : 'verified';
-            const action = newStatus === 'verified' ? 'verify' : 'unverify';
-            
-            if (!confirm(currentLang === 'ar' ? 
-                `هل أنت متأكد من ${action === 'verify' ? 'التحقق من' : 'إلغاء التحقق من'} هذا اللاعب؟` : 
-                `Are you sure you want to ${action} this athlete?`)) return;
+            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد؟' : 'Are you sure?')) return;
 
             try {
-                const { error } = await supabaseClient
-                    .from('users')
-                    .update({ 
-                        verification_status: newStatus,
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq('id', userId);
+                const { error } = await supabaseClient.from('users').update({ 
+                    verification_status: newStatus,
+                    updated_at: new Date().toISOString()
+                }).eq('id', userId);
 
                 if (error) throw error;
-
-                showAlert(newStatus === 'verified' ? 
-                    (currentLang === 'ar' ? '✅ تم التحقق من اللاعب بنجاح!' : '✅ Athlete verified successfully!') : 
-                    (currentLang === 'ar' ? '✅ تم إلغاء التحقق بنجاح!' : '✅ Athlete unverified successfully!'), 'success');
-                
+                showAlert(currentLang === 'ar' ? '✅ تم بنجاح' : '✅ Success!', 'success');
                 loadAthleteDocuments();
             } catch (error) {
-                showAlert((currentLang === 'ar' ? 'خطأ: ' : 'Error: ') + error.message, 'error');
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function rejectAthlete(userId) {
+            if (!confirm(currentLang === 'ar' ? 'هل تريد رفض هذا اللاعب؟' : 'Reject this athlete?')) return;
+            try {
+                await supabaseClient.from('users').update({ 
+                    verification_status: 'rejected',
+                    updated_at: new Date().toISOString()
+                }).eq('id', userId);
+                showAlert(currentLang === 'ar' ? '✅ تم الرفض' : '✅ Rejected', 'success');
+                loadAthleteDocuments();
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
             }
         }
 
@@ -465,29 +431,14 @@
             const alert = document.getElementById('alert');
             alert.className = `alert alert-${type} show`;
             alert.textContent = message;
-            setTimeout(() => alert.classList.remove('show'), 5000);
+            setTimeout(() => alert.classList.remove('show'), 4000);
         }
 
         async function handleLogout() {
-            if (confirm(currentLang === 'ar' ? 'هل أنت متأكد من تسجيل الخروج؟' : 'Are you sure you want to logout?')) {
-                try {
-                    await supabaseClient.auth.signOut();
-                } catch (e) {
-                    console.error('Logout error:', e);
-                }
-                localStorage.removeItem('currentAdmin');
-                window.location.href = 'admin-login.html';
-            }
+            await supabaseClient.auth.signOut();
+            localStorage.removeItem('currentAdmin');
+            window.location.href = 'admin-login.html';
         }
-
-        // ==========================================
-        // 4. Initialization
-        // ==========================================
-        window.onload = async () => {
-            window.setLang(currentLang);
-            await checkAuth();
-            await loadAthleteDocuments();
-        };
     </script>
 </body>
 </html>
