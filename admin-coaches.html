@@ -261,7 +261,8 @@
         
         .user-images { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
         .image-box { text-align: center; }
-        .image-box img { width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1); background: var(--bg-input); cursor: pointer; }
+        .image-box img { width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1); background: var(--bg-input); cursor: pointer; transition: transform 0.2s; }
+        .image-box img:hover { transform: scale(1.02); }
         .image-box p { margin-top: 8px; font-size: 13px; color: var(--text-muted); font-weight: 600; }
         .image-box .no-image { width: 100%; height: 200px; background: var(--bg-input); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 3rem; }
 
@@ -460,7 +461,7 @@
                 </table>
             </div>
 
-            <!-- Cards View (NEW) -->
+            <!-- Cards View -->
             <div id="cardsView" class="coaches-grid" style="display: none;">
                 <!-- Cards will be rendered here -->
             </div>
@@ -682,7 +683,7 @@
         }
 
         // ==========================================
-        // 4. Database Logic (Preserved)
+        // 4. Database Logic
         // ==========================================
         async function loadCoaches() {
             const search = document.getElementById('searchCoach').value.toLowerCase();
@@ -768,8 +769,8 @@
                 const btnSuspend = currentLang === 'ar' ? 'تعليق' : 'Suspend';
                 const btnActivate = currentLang === 'ar' ? 'تنشيط' : 'Activate';
                 const btnDelete = currentLang === 'ar' ? 'حذف' : 'Delete';
-                const btnProfile = currentLang === 'ar' ? 'صورة البروفايل' : 'Profile Photo';
-                const btnID = currentLang === 'ar' ? 'الهوية' : 'ID Document';
+                const btnProfile = currentLang === 'ar' ? 'عرض صورة البروفايل' : 'View Profile Photo';
+                const btnID = currentLang === 'ar' ? 'عرض صورة الهوية' : 'View ID Document';
 
                 return `
                     <tr>
@@ -810,16 +811,15 @@
             }).join('');
         }
 
-        // NEW: Render Cards View with Profile Photo and ID Document
         function renderCards() {
             const grid = document.getElementById('cardsView');
             if (allCoaches.length === 0) {
-                grid.innerHTML = `<div style="text-align: center; padding: 60px; color: var(--text-muted); grid-column: 1 / -1;">No coaches found</div>`;
+                grid.innerHTML = `<div style="text-align: center; padding: 60px; color: var(--text-muted); grid-column: 1 / -1;" data-en="No coaches found" data-ar="لا يوجد مدربون">No coaches found</div>`;
                 return;
             }
 
             grid.innerHTML = allCoaches.map(c => {
-                const verificationClass = c.verification_status === 'verified' ? 'status-verified' : (c.verification_status === 'rejected' ? 'status-rejected' : 'status-pending');
+                const verificationClass = c.verification_status === 'verified' ? 'verification-verified' : (c.verification_status === 'rejected' ? 'verification-rejected' : 'verification-pending');
                 const verificationText = c.verification_status === 'verified' ? 
                     (currentLang === 'ar' ? 'موثق' : 'Verified') : 
                     (c.verification_status === 'rejected' ? (currentLang === 'ar' ? 'مرفوض' : 'Rejected') : (currentLang === 'ar' ? 'قيد الانتظار' : 'Pending'));
@@ -867,7 +867,7 @@
                         <div class="document-section">
                             <div class="document-label">
                                 <i class="fas fa-id-card"></i>
-                                <span data-en="ID Document" data-ar="وثيقة الهوية">ID Document</span>
+                                <span data-en="ID Document" data-ar="صورة الهوية">ID Document</span>
                             </div>
                             <div class="document-preview" onclick="${idClick}">
                                 ${idHtml}
@@ -899,7 +899,6 @@
                 </div>
             `}).join('');
 
-            // Re-apply translations
             window.setLang(currentLang);
         }
 
@@ -1180,38 +1179,6 @@
             }
         }
 
-        function exportCoaches() {
-            if (allCoaches.length === 0) {
-                alert(currentLang === 'ar' ? 'لا توجد بيانات للتصدير' : 'No data to export');
-                return;
-            }
-            const headers = currentLang === 'ar' 
-                ? ['الاسم', 'البريد', 'الهاتف', 'الحزام', 'الخبرة', 'الدولة', 'المدينة', 'الجنس', 'اسم الفريق', 'الحالة', 'التحقق', 'تاريخ الإنشاء']
-                : ['Name', 'Email', 'Phone', 'Belt', 'Experience', 'Country', 'City', 'Gender', 'Team Name', 'Status', 'Verification', 'Created At'];
-                
-            const rows = allCoaches.map(c => [
-                c.full_name || '', 
-                c.email || '', 
-                c.phone || '', 
-                c.belt_level || '', 
-                c.experience_years || '', 
-                c.country || '', 
-                c.city || '',
-                c.gender || '',
-                c.team_name || '',
-                c.is_suspended ? (currentLang === 'ar' ? 'موقوف' : 'Suspended') : (currentLang === 'ar' ? 'نشط' : 'Active'),
-                c.verification_status || 'pending',
-                c.created_at || ''
-            ]);
-            const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-            
-            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `coaches_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-        }
-
         function showAlert(message, type) {
             const alert = document.getElementById('alert');
             alert.className = `alert alert-${type} show`;
@@ -1240,7 +1207,6 @@
             await loadCoaches();
         };
 
-        // Close modals on outside click
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', function(e) {
                 if (e.target === this) {
