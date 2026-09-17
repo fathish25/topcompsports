@@ -83,6 +83,10 @@
         .btn-warning { background: linear-gradient(135deg, var(--warning), #d97706); color: #fff; }
         .btn-info { background: linear-gradient(135deg, var(--primary), #1d4ed8); color: #fff; }
         .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-verify { background: var(--success); color: white; padding: 12px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; }
+        .btn-verify:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16,185,129,0.4); }
+        .btn-reject { background: var(--danger); color: white; padding: 12px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; }
+        .btn-reject:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(239,68,68,0.4); }
 
         .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; border-left: 4px solid var(--primary); }
@@ -90,7 +94,14 @@
         .stat-value { font-size: 2rem; font-weight: bold; color: var(--accent); }
         .stat-label { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
 
-        .section { background: var(--bg-card); border-radius: 15px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); }
+        .section { background: var(--bg-card); border-radius: 15px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px; }
+        .section-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 20px; color: var(--text-main); display: flex; align-items: center; justify-content: space-between; }
+        
+        .view-toggle { display: flex; gap: 10px; margin-bottom: 25px; }
+        .view-btn { padding: 8px 16px; border: 2px solid rgba(255,255,255,0.2); background: transparent; color: var(--text-muted); border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .view-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .view-btn:hover:not(.active) { border-color: var(--primary); color: var(--text-main); }
+
         .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .form-group { display: flex; flex-direction: column; gap: 8px; }
         .form-label { color: var(--text-muted); font-size: 14px; }
@@ -119,6 +130,126 @@
         .belt-black { background: rgba(31, 41, 55, 0.5); color: #f3f4f6; border: 1px solid rgba(255,255,255,0.2); }
 
         .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+        
+        /* =========================================
+           COACH CARDS (NEW - Like Documents Page)
+           ========================================= */
+        .coaches-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); 
+            gap: 25px; 
+        }
+
+        .coach-card { 
+            background: var(--bg-card); 
+            border-radius: 15px; 
+            padding: 25px; 
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin-bottom: 25px; 
+            padding-bottom: 20px; 
+            border-bottom: 2px solid rgba(255,255,255,0.1); 
+        }
+        .avatar { 
+            width: 70px; 
+            height: 70px; 
+            border-radius: 50%; 
+            overflow: hidden; 
+            background: linear-gradient(135deg, var(--primary), #1d4ed8); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 28px; 
+            font-weight: bold;
+            flex-shrink: 0;
+            border: 3px solid var(--accent);
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .coach-info h3 { font-size: 1.4rem; margin-bottom: 5px; color: var(--text-main); }
+        .coach-info p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 3px; }
+        
+        .documents-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .document-section { }
+        .document-label { 
+            font-weight: 600; 
+            margin-bottom: 12px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            color: var(--accent);
+            font-size: 0.95rem;
+        }
+        
+        .document-preview { 
+            border: 2px dashed rgba(255,255,255,0.2); 
+            border-radius: 12px; 
+            padding: 15px; 
+            text-align: center; 
+            background: var(--bg-input);
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .document-preview:hover {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.1);
+        }
+        .document-preview img { 
+            max-width: 100%; 
+            max-height: 180px; 
+            border-radius: 8px; 
+            object-fit: contain;
+        }
+        .document-preview .overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .document-preview:hover .overlay { opacity: 1; }
+        .document-preview .overlay i { font-size: 2.5rem; color: white; }
+
+        .document-preview .no-doc { color: var(--text-muted); font-size: 3rem; }
+        .document-preview .no-doc-text { margin-top: 10px; color: var(--text-muted); font-size: 0.9rem; }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: var(--bg-input);
+            border-radius: 10px;
+        }
+        .info-item { text-align: center; }
+        .info-item .label { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
+        .info-item .value { font-weight: 700; color: var(--text-main); font-size: 1.1rem; }
+
+        .action-btns-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
         
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
         .modal-overlay.active { display: flex; }
@@ -153,6 +284,7 @@
             [dir="rtl"] .main-content, [dir="ltr"] .main-content { margin: 0; padding: 20px; }
             .filters { grid-template-columns: 1fr; }
             .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .coaches-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 768px) {
             .stats-row { grid-template-columns: 1fr; }
@@ -163,6 +295,7 @@
             .user-images { grid-template-columns: 1fr; }
             .details-grid { grid-template-columns: 1fr; }
             .modal { max-width: 95%; padding: 20px; }
+            .documents-row { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -257,7 +390,20 @@
             </div>
         </div>
 
+        <!-- View Toggle Buttons -->
         <div class="section">
+            <div class="section-title">
+                <span data-en="Coaches List" data-ar="قائمة المدربين">Coaches List</span>
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="switchView('table')" id="btnTableView">
+                        <i class="fas fa-table"></i> <span data-en="Table View" data-ar="عرض الجدول">Table View</span>
+                    </button>
+                    <button class="view-btn" onclick="switchView('cards')" id="btnCardsView">
+                        <i class="fas fa-th-large"></i> <span data-en="Card View" data-ar="عرض البطاقات">Card View</span>
+                    </button>
+                </div>
+            </div>
+
             <div class="filters">
                 <div class="form-group">
                     <label class="form-label" data-en="Search" data-ar="بحث">Search</label>
@@ -293,7 +439,8 @@
                 </div>
             </div>
 
-            <div class="table-container">
+            <!-- Table View -->
+            <div id="tableView" class="table-container">
                 <table>
                     <thead>
                         <tr>
@@ -310,6 +457,11 @@
                         <tr><td colspan="7" style="text-align: center;" data-en="Loading..." data-ar="جاري التحميل...">Loading...</td></tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Cards View (NEW) -->
+            <div id="cardsView" class="coaches-grid" style="display: none;">
+                <!-- Cards will be rendered here -->
             </div>
         </div>
     </main>
@@ -448,6 +600,7 @@
         let currentLang = localStorage.getItem('adminLang') || 'en';
         let suspendTargetId = null;
         let currentAdmin = null;
+        let currentView = 'table'; // 'table' or 'cards'
 
         // ==========================================
         // 1. Language System (Unified)
@@ -471,12 +624,27 @@
             });
 
             if (allCoaches.length > 0) {
-                renderTable();
+                if (currentView === 'table') {
+                    renderTable();
+                } else {
+                    renderCards();
+                }
             }
         };
 
         // ==========================================
-        // 2. Auth Check (Unified)
+        // 2. View Switcher
+        // ==========================================
+        function switchView(view) {
+            currentView = view;
+            document.getElementById('btnTableView').classList.toggle('active', view === 'table');
+            document.getElementById('btnCardsView').classList.toggle('active', view === 'cards');
+            document.getElementById('tableView').style.display = view === 'table' ? 'block' : 'none';
+            document.getElementById('cardsView').style.display = view === 'cards' ? 'grid' : 'none';
+        }
+
+        // ==========================================
+        // 3. Auth Check (Unified)
         // ==========================================
         async function checkAuth() {
             const storedAdmin = localStorage.getItem('currentAdmin');
@@ -513,7 +681,7 @@
         }
 
         // ==========================================
-        // 3. Database Logic (Preserved)
+        // 4. Database Logic (Preserved)
         // ==========================================
         async function loadCoaches() {
             const search = document.getElementById('searchCoach').value.toLowerCase();
@@ -548,7 +716,11 @@
                 document.getElementById('statSuspended').textContent = allCoaches.filter(c => c.is_suspended).length;
                 document.getElementById('statVerified').textContent = allCoaches.filter(c => c.verification_status === 'verified').length;
 
-                renderTable();
+                if (currentView === 'table') {
+                    renderTable();
+                } else {
+                    renderCards();
+                }
             } catch (error) {
                 console.error('Error loading coaches:', error);
                 showAlert(currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data', 'error');
@@ -617,6 +789,109 @@
                     </tr>
                 `;
             }).join('');
+        }
+
+        // NEW: Render Cards View
+        function renderCards() {
+            const grid = document.getElementById('cardsView');
+            if (allCoaches.length === 0) {
+                grid.innerHTML = `<div style="text-align: center; padding: 60px; color: var(--text-muted); grid-column: 1 / -1;">No coaches found</div>`;
+                return;
+            }
+
+            grid.innerHTML = allCoaches.map(c => {
+                const verificationClass = c.verification_status === 'verified' ? 'status-verified' : (c.verification_status === 'rejected' ? 'status-rejected' : 'status-pending');
+                const verificationText = c.verification_status === 'verified' ? 
+                    (currentLang === 'ar' ? 'موثق' : 'Verified') : 
+                    (c.verification_status === 'rejected' ? (currentLang === 'ar' ? 'مرفوض' : 'Rejected') : (currentLang === 'ar' ? 'قيد الانتظار' : 'Pending'));
+
+                const profileHtml = c.profile_photo_url ? 
+                    `<img src="${c.profile_photo_url}" alt="Profile">
+                     <div class="overlay"><i class="fas fa-search-plus"></i></div>` :
+                    `<div><div class="no-doc"><i class="fas fa-user"></i></div><div class="no-doc-text" data-en="No photo" data-ar="لا توجد صورة">No photo</div></div>`;
+
+                const idHtml = c.id_document_url ? 
+                    `<img src="${c.id_document_url}" alt="ID Document">
+                     <div class="overlay"><i class="fas fa-search-plus"></i></div>` :
+                    `<div><div class="no-doc"><i class="fas fa-id-card"></i></div><div class="no-doc-text" data-en="No ID" data-ar="لا توجد هوية">No ID</div></div>`;
+
+                const profileClick = c.profile_photo_url ? `window.open('${c.profile_photo_url}', '_blank')` : '';
+                const idClick = c.id_document_url ? `window.open('${c.id_document_url}', '_blank')` : '';
+
+                return `
+                <div class="coach-card">
+                    <div class="card-header">
+                        <div class="avatar">
+                            ${c.profile_photo_url ? 
+                                `<img src="${c.profile_photo_url}" alt="${c.full_name}">` :
+                                (c.full_name || 'C').charAt(0).toUpperCase()
+                            }
+                        </div>
+                        <div class="coach-info">
+                            <h3>${c.full_name || 'Unknown'}</h3>
+                            <p>${c.email || ''}</p>
+                            <span class="status-badge ${verificationClass}">${verificationText}</span>
+                        </div>
+                    </div>
+
+                    <div class="documents-row">
+                        <div class="document-section">
+                            <div class="document-label">
+                                <i class="fas fa-user"></i>
+                                <span data-en="Profile Photo" data-ar="صورة البروفايل">Profile Photo</span>
+                            </div>
+                            <div class="document-preview" onclick="${profileClick}">
+                                ${profileHtml}
+                            </div>
+                        </div>
+
+                        <div class="document-section">
+                            <div class="document-label">
+                                <i class="fas fa-id-card"></i>
+                                <span data-en="ID Document" data-ar="وثيقة الهوية">ID Document</span>
+                            </div>
+                            <div class="document-preview" onclick="${idClick}">
+                                ${idHtml}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-item">
+                            <div class="label" data-en="Date of Birth" data-ar="تاريخ الميلاد">Date of Birth</div>
+                            <div class="value">${c.date_of_birth ? new Date(c.date_of_birth).toLocaleDateString('en-GB') : 'N/A'}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="label" data-en="Age" data-ar="العمر">Age</div>
+                            <div class="value">${calculateAge(c.date_of_birth)} years</div>
+                        </div>
+                    </div>
+
+                    <div class="action-btns-grid">
+                        <button class="btn btn-verify" onclick="verifyCoach('${c.id}', '${c.verification_status}')">
+                            <i class="fas fa-check"></i> 
+                            <span data-en="Verify Coach" data-ar="التحقق من المدرب">Verify Coach</span>
+                        </button>
+                        <button class="btn btn-reject" onclick="rejectCoach('${c.id}')">
+                            <i class="fas fa-times"></i> 
+                            <span data-en="Reject" data-ar="رفض">Reject</span>
+                        </button>
+                    </div>
+                </div>
+            `}).join('');
+
+            // Re-apply translations
+            window.setLang(currentLang);
+        }
+
+        function calculateAge(dateOfBirth) {
+            if (!dateOfBirth) return 'N/A';
+            const today = new Date();
+            const birthDate = new Date(dateOfBirth);
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+            return age;
         }
 
         async function viewCoach(id) {
@@ -854,6 +1129,38 @@
             }
         }
 
+        async function verifyCoach(coachId, currentStatus) {
+            const newStatus = currentStatus === 'verified' ? 'pending' : 'verified';
+            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد؟' : 'Are you sure?')) return;
+
+            try {
+                const { error } = await supabaseClient.from('coaches').update({ 
+                    verification_status: newStatus,
+                    updated_at: new Date().toISOString()
+                }).eq('id', coachId);
+
+                if (error) throw error;
+                showAlert(currentLang === 'ar' ? '✅ تم بنجاح' : '✅ Success!', 'success');
+                loadCoaches();
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function rejectCoach(coachId) {
+            if (!confirm(currentLang === 'ar' ? 'هل تريد رفض هذا المدرب؟' : 'Reject this coach?')) return;
+            try {
+                await supabaseClient.from('coaches').update({ 
+                    verification_status: 'rejected',
+                    updated_at: new Date().toISOString()
+                }).eq('id', coachId);
+                showAlert(currentLang === 'ar' ? '✅ تم الرفض' : '✅ Rejected', 'success');
+                loadCoaches();
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
         function exportCoaches() {
             if (allCoaches.length === 0) {
                 alert(currentLang === 'ar' ? 'لا توجد بيانات للتصدير' : 'No data to export');
@@ -906,7 +1213,7 @@
         }
 
         // ==========================================
-        // 4. Initialization
+        // 5. Initialization
         // ==========================================
         window.onload = async () => {
             window.setLang(currentLang);
