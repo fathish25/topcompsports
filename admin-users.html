@@ -1,49 +1,72 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة المستخدمين - TopCompSports Admin</title>
+    <title>Users Management - TopCompSports Admin</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; }
+        
         .sidebar { width: 280px; background: rgba(21, 29, 43, 0.98); border-left: 2px solid #2563EB; position: fixed; height: 100vh; padding: 20px; right: 0; overflow-y: auto; }
+        [dir="rtl"] .sidebar { border-left: none; border-right: 2px solid #2563EB; right: auto; left: 0; }
+        
         .logo { display: flex; align-items: center; gap: 15px; padding: 20px; margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.1); }
         .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #f1c40f, #d4a017); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: #0a0e17; }
         .logo-text { font-size: 22px; font-weight: bold; }
+        
         .nav-menu { display: flex; flex-direction: column; gap: 10px; }
         .nav-item { padding: 15px 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; font-size: 15px; text-decoration: none; color: #fff; }
         .nav-item:hover { background: rgba(255,255,255,0.05); }
         .nav-item.active { background: linear-gradient(135deg, #2563EB, #1d4ed8); }
+        
+        .lang-switcher { display: flex; gap: 5px; background: rgba(255,255,255,0.05); padding: 5px; border-radius: 8px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .lang-btn { padding: 8px 15px; border: none; background: transparent; color: rgba(255,255,255,0.7); cursor: pointer; border-radius: 6px; font-weight: bold; font-size: 13px; transition: all 0.3s; flex: 1; }
+        .lang-btn.active { background: #2563EB; color: #fff; }
+        .lang-btn:hover:not(.active) { color: #fff; background: rgba(255,255,255,0.05); }
+        
         .main-content { margin-right: 280px; padding: 40px; }
+        [dir="rtl"] .main-content { margin-right: 0; margin-left: 280px; }
+        
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
         .page-title { font-size: 32px; font-weight: bold; }
+        
         .section { background: #151d2b; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
         .section-title { font-size: 24px; font-weight: bold; margin-bottom: 25px; color: #f1c40f; }
+        
         .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 14px; }
         .btn-primary { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241,196,15,0.4); }
         .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(239,68,68,0.4); }
         .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16,185,129,0.4); }
         .btn-warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+        .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(245,158,11,0.4); }
         .btn-info { background: linear-gradient(135deg, #2563EB, #1d4ed8); color: #fff; }
+        .btn-info:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37,99,235,0.4); }
+        
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
+        [dir="rtl"] th, [dir="rtl"] td { text-align: right; }
         th { background: rgba(241, 196, 15, 0.1); color: #f1c40f; font-weight: bold; }
         tr:hover { background: rgba(255,255,255,0.03); }
+        
         .status-badge { padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; }
         .status-active { background: rgba(16, 185, 129, 0.2); color: #10b981; }
         .status-suspended { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
         .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        
         .role-badge { padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; }
         .role-athlete { background: rgba(37, 99, 235, 0.2); color: #60a5fa; }
         .role-organizer { background: rgba(16, 185, 129, 0.2); color: #10b981; }
         .role-coach { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+        
         .filters { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 15px; margin-bottom: 25px; align-items: end; }
         .form-input, .form-select { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; }
         .form-input:focus, .form-select:focus { outline: none; border-color: #f1c40f; }
         
-        /* ✅ إصلاح القوائم المنسدلة */
         select.form-select {
             background-color: #1a1f2e !important;
             color: #fff !important;
@@ -68,10 +91,14 @@
         .stat-card { background: #151d2b; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
         .stat-value { font-size: 32px; font-weight: bold; color: #f1c40f; }
         .stat-label { color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 5px; }
+        
         .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+        
         .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
-        .page-btn { padding: 8px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 6px; cursor: pointer; }
+        .page-btn { padding: 8px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 6px; cursor: pointer; transition: all 0.3s; }
+        .page-btn:hover { background: rgba(255,255,255,0.1); }
         .page-btn.active { background: #2563EB; }
+        
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal-overlay.active { display: flex; }
         .modal { background: #151d2b; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; }
@@ -80,11 +107,19 @@
         .form-label { display: block; margin-bottom: 8px; color: rgba(255,255,255,0.8); font-size: 14px; }
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
         .modal-actions .btn { flex: 1; }
+        
         @media (max-width: 1024px) {
             .sidebar { width: 100%; position: relative; height: auto; }
-            .main-content { margin-right: 0; }
+            [dir="ltr"] .main-content { margin-right: 0; }
+            [dir="rtl"] .main-content { margin-left: 0; }
             .filters { grid-template-columns: 1fr; }
             .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        
+        @media (max-width: 480px) {
+            .stats-row { grid-template-columns: 1fr; }
+            .action-btns { flex-direction: column; }
+            .action-btns .btn { width: 100%; }
         }
     </style>
 </head>
@@ -95,70 +130,75 @@
             <div class="logo-text">TopCompSports</div>
         </div>
         <div class="nav-menu">
-            <a class="nav-item" href="admin-dashboard.html">📊 لوحة التحكم</a>
-            <a class="nav-item" href="admin-tournaments.html">🏆 البطولات</a>
-            <a class="nav-item active">👥 المستخدمون</a>
-            <a class="nav-item" href="admin-registrations.html">📝 التسجيلات</a>
-            <a class="nav-item" href="admin-organizations.html">🏢 الجهات المنظمة</a>
-            <a class="nav-item" href="admin-reports.html">📊 التقارير</a>
-            <a class="nav-item" href="admin-settings.html">⚙️ الإعدادات</a>
-            <a class="nav-item" onclick="logout()">🚪 تسجيل الخروج</a>
+            <a class="nav-item" href="admin-dashboard.html">📊 <span data-i18n="nav_dashboard">Dashboard</span></a>
+            <a class="nav-item" href="admin-tournaments.html">🏆 <span data-i18n="nav_tournaments">Tournaments</span></a>
+            <a class="nav-item active">👥 <span data-i18n="nav_users">Users</span></a>
+            <a class="nav-item" href="admin-registrations.html">📝 <span data-i18n="nav_registrations">Registrations</span></a>
+            <a class="nav-item" href="admin-organizations.html">🏢 <span data-i18n="nav_organizations">Organizations</span></a>
+            <a class="nav-item" href="admin-reports.html"> <span data-i18n="nav_reports">Reports</span></a>
+            <a class="nav-item" href="admin-settings.html">⚙️ <span data-i18n="nav_settings">Settings</span></a>
+            <a class="nav-item" onclick="logout()">🚪 <span data-i18n="nav_logout">Logout</span></a>
+        </div>
+        
+        <div class="lang-switcher">
+            <button class="lang-btn" id="btn-ar" onclick="setLang('ar')">عربي</button>
+            <button class="lang-btn active" id="btn-en" onclick="setLang('en')">English</button>
         </div>
     </div>
 
     <div class="main-content">
         <div class="header">
-            <h1 class="page-title">إدارة المستخدمين</h1>
-            <button class="btn btn-primary" onclick="showCreateModal()">➕ إنشاء حساب جديد</button>
+            <h1 class="page-title" data-i18n="page_title">Users Management</h1>
+            <button class="btn btn-primary" onclick="showCreateModal()">➕ <span data-i18n="btn_create">Create New Account</span></button>
         </div>
 
         <div class="stats-row">
             <div class="stat-card">
                 <div class="stat-value" id="statTotal">0</div>
-                <div class="stat-label">إجمالي المستخدمين</div>
+                <div class="stat-label" data-i18n="stat_total">Total Users</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="statAthletes">0</div>
-                <div class="stat-label">اللاعبون</div>
+                <div class="stat-label" data-i18n="stat_athletes">Athletes</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="statOrganizers">0</div>
-                <div class="stat-label">المنظمون</div>
+                <div class="stat-label" data-i18n="stat_organizers">Organizers</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="statCoaches">0</div>
-                <div class="stat-label">المدربون</div>
+                <div class="stat-label" data-i18n="stat_coaches">Coaches</div>
             </div>
         </div>
 
         <div class="section">
-            <h2 class="section-title">قائمة المستخدمين</h2>
+            <h2 class="section-title" data-i18n="section_users_list">Users List</h2>
             
             <div class="filters">
                 <div>
-                    <label class="form-label">بحث</label>
-                    <input type="text" class="form-input" id="searchUser" placeholder="ابحث بالاسم أو البريد..." onkeyup="loadUsers()">
+                    <label class="form-label" data-i18n="filter_search">Search</label>
+                    <input type="text" class="form-input" id="searchUser" data-i18n-placeholder="search_placeholder" placeholder="Search by name or email..." onkeyup="loadUsers()">
                 </div>
                 <div>
-                    <label class="form-label">الحالة</label>
+                    <label class="form-label" data-i18n="filter_status">Status</label>
                     <select class="form-select" id="filterStatus" onchange="loadUsers()">
-                        <option value="">جميع الحالات</option>
-                        <option value="active">نشط</option>
-                        <option value="suspended">موقوف</option>
-                        <option value="pending">قيد الانتظار</option>
+                        <option value="" data-i18n="status_all">All Statuses</option>
+                        <option value="active" data-i18n="status_active">Active</option>
+                        <option value="suspended" data-i18n="status_suspended">Suspended</option>
+                        <option value="pending" data-i18n="status_pending">Pending</option>
                     </select>
                 </div>
                 <div>
-                    <label class="form-label">الدور</label>
+                    <label class="form-label" data-i18n="filter_role">Role</label>
                     <select class="form-select" id="filterRole" onchange="loadUsers()">
-                        <option value="">جميع الأدوار</option>
-                        <option value="athlete">لاعب</option>
-                        <option value="organizer">منظم</option>
-                        <option value="coach">مدرب</option>
+                        <option value="" data-i18n="role_all">All Roles</option>
+                        <option value="athlete" data-i18n="role_athlete">Athlete</option>
+                        <option value="organizer" data-i18n="role_organizer">Organizer</option>
+                        <option value="coach" data-i18n="role_coach">Coach</option>
                     </select>
                 </div>
                 <div>
-                    <label class="form-label">تصدير</label>
+                    <label class="form-label" data-i18n="filter_export">Export</label>
                     <button class="btn btn-info" onclick="exportUsers()" style="width: 100%;">📥 CSV</button>
                 </div>
             </div>
@@ -167,16 +207,16 @@
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>الاسم</th>
-                        <th>البريد الإلكتروني</th>
-                        <th>الدور</th>
-                        <th>الحالة</th>
-                        <th>تاريخ التسجيل</th>
-                        <th>الإجراءات</th>
+                        <th data-i18n="th_name">Name</th>
+                        <th data-i18n="th_email">Email</th>
+                        <th data-i18n="th_role">Role</th>
+                        <th data-i18n="th_status">Status</th>
+                        <th data-i18n="th_date">Registration Date</th>
+                        <th data-i18n="th_actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="usersTable">
-                    <tr><td colspan="7" style="text-align: center;">جاري التحميل...</td></tr>
+                    <tr><td colspan="7" style="text-align: center;" data-i18n="loading">Loading...</td></tr>
                 </tbody>
             </table>
 
@@ -184,33 +224,33 @@
         </div>
     </div>
 
-    <!-- Modal إنشاء/تعديل مستخدم -->
+    <!-- Create/Edit User Modal -->
     <div class="modal-overlay" id="userModal">
         <div class="modal">
-            <h3 class="modal-title" id="modalTitle">إنشاء حساب جديد</h3>
+            <h3 class="modal-title" id="modalTitle" data-i18n="modal_create_title">Create New Account</h3>
             <div class="form-group">
-                <label class="form-label">الاسم الكامل</label>
-                <input type="text" class="form-input" id="modalUserName" placeholder="أدخل الاسم">
+                <label class="form-label" data-i18n="label_fullname">Full Name</label>
+                <input type="text" class="form-input" id="modalUserName" data-i18n-placeholder="placeholder_name" placeholder="Enter name">
             </div>
             <div class="form-group">
-                <label class="form-label">البريد الإلكتروني</label>
+                <label class="form-label" data-i18n="label_email">Email</label>
                 <input type="email" class="form-input" id="modalUserEmail" placeholder="email@example.com">
             </div>
             <div class="form-group" id="passwordGroup">
-                <label class="form-label">كلمة المرور</label>
+                <label class="form-label" data-i18n="label_password">Password</label>
                 <input type="password" class="form-input" id="modalUserPassword" placeholder="••••••••">
             </div>
             <div class="form-group">
-                <label class="form-label">الدور</label>
+                <label class="form-label" data-i18n="label_role">Role</label>
                 <select class="form-select" id="modalUserRole">
-                    <option value="athlete">لاعب</option>
-                    <option value="organizer">منظم</option>
-                    <option value="coach">مدرب</option>
+                    <option value="athlete" data-i18n="role_athlete">Athlete</option>
+                    <option value="organizer" data-i18n="role_organizer">Organizer</option>
+                    <option value="coach" data-i18n="role_coach">Coach</option>
                 </select>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-success" onclick="saveUser()">✅ حفظ</button>
-                <button class="btn btn-danger" onclick="closeModal()">❌ إلغاء</button>
+                <button class="btn btn-success" onclick="saveUser()">✅ <span data-i18n="btn_save">Save</span></button>
+                <button class="btn btn-danger" onclick="closeModal()">❌ <span data-i18n="btn_cancel">Cancel</span></button>
             </div>
         </div>
     </div>
@@ -224,8 +264,119 @@
         let currentPage = 1;
         const perPage = 20;
         let editingUser = null;
+        let currentLang = localStorage.getItem('lang') || 'en';
+
+        // Translations
+        const translations = {
+            en: {
+                nav_dashboard: 'Dashboard', nav_tournaments: 'Tournaments', nav_users: 'Users',
+                nav_registrations: 'Registrations', nav_organizations: 'Organizations',
+                nav_reports: 'Reports', nav_settings: 'Settings', nav_logout: 'Logout',
+                page_title: 'Users Management', btn_create: 'Create New Account',
+                stat_total: 'Total Users', stat_athletes: 'Athletes', stat_organizers: 'Organizers', stat_coaches: 'Coaches',
+                section_users_list: 'Users List',
+                filter_search: 'Search', search_placeholder: 'Search by name or email...',
+                filter_status: 'Status', status_all: 'All Statuses', status_active: 'Active', status_suspended: 'Suspended', status_pending: 'Pending',
+                filter_role: 'Role', role_all: 'All Roles', role_athlete: 'Athlete', role_organizer: 'Organizer', role_coach: 'Coach',
+                filter_export: 'Export',
+                th_name: 'Name', th_email: 'Email', th_role: 'Role', th_status: 'Status', th_date: 'Registration Date', th_actions: 'Actions',
+                loading: 'Loading...', no_users: 'No users found',
+                modal_create_title: 'Create New Account', modal_edit_title: 'Edit User',
+                label_fullname: 'Full Name', placeholder_name: 'Enter name',
+                label_email: 'Email', label_password: 'Password', label_role: 'Role',
+                btn_save: 'Save', btn_cancel: 'Cancel',
+                alert_fill_required: 'Please fill in the required fields',
+                alert_fill_password: 'Please enter a password',
+                alert_success_create: 'Account created successfully!',
+                alert_success_update: 'User updated successfully',
+                alert_success_delete: 'Deleted successfully',
+                alert_confirm_delete: 'Are you sure you want to delete this user?',
+                alert_error: 'Error: ',
+                alert_suspended: 'User suspended',
+                alert_activated: 'User activated',
+                alert_no_data_export: 'No data to export',
+                status_text_active: 'Active', status_text_suspended: 'Suspended', status_text_pending: 'Pending',
+                role_text_athlete: 'Athlete', role_text_organizer: 'Organizer', role_text_coach: 'Coach',
+                btn_edit: '✏️ Edit', btn_activate: '✅ Activate', btn_suspend: '️ Suspend', btn_delete: '️ Delete'
+            },
+            ar: {
+                nav_dashboard: 'لوحة التحكم', nav_tournaments: 'البطولات', nav_users: 'المستخدمون',
+                nav_registrations: 'التسجيلات', nav_organizations: 'الجهات المنظمة',
+                nav_reports: 'التقارير', nav_settings: 'الإعدادات', nav_logout: 'تسجيل الخروج',
+                page_title: 'إدارة المستخدمين', btn_create: 'إنشاء حساب جديد',
+                stat_total: 'إجمالي المستخدمين', stat_athletes: 'اللاعبون', stat_organizers: 'المنظمون', stat_coaches: 'المدربون',
+                section_users_list: 'قائمة المستخدمين',
+                filter_search: 'بحث', search_placeholder: 'ابحث بالاسم أو البريد...',
+                filter_status: 'الحالة', status_all: 'جميع الحالات', status_active: 'نشط', status_suspended: 'موقوف', status_pending: 'قيد الانتظار',
+                filter_role: 'الدور', role_all: 'جميع الأدوار', role_athlete: 'لاعب', role_organizer: 'منظم', role_coach: 'مدرب',
+                filter_export: 'تصدير',
+                th_name: 'الاسم', th_email: 'البريد الإلكتروني', th_role: 'الدور', th_status: 'الحالة', th_date: 'تاريخ التسجيل', th_actions: 'الإجراءات',
+                loading: 'جاري التحميل...', no_users: 'لا يوجد مستخدمون',
+                modal_create_title: 'إنشاء حساب جديد', modal_edit_title: 'تعديل مستخدم',
+                label_fullname: 'الاسم الكامل', placeholder_name: 'أدخل الاسم',
+                label_email: 'البريد الإلكتروني', label_password: 'كلمة المرور', label_role: 'الدور',
+                btn_save: 'حفظ', btn_cancel: 'إلغاء',
+                alert_fill_required: 'الرجاء ملء الحقول المطلوبة',
+                alert_fill_password: 'الرجاء إدخال كلمة المرور',
+                alert_success_create: 'تم إنشاء الحساب بنجاح!',
+                alert_success_update: 'تم تعديل المستخدم بنجاح',
+                alert_success_delete: 'تم الحذف بنجاح',
+                alert_confirm_delete: 'هل أنت متأكد من حذف هذا المستخدم؟',
+                alert_error: 'خطأ: ',
+                alert_suspended: 'تم إيقاف المستخدم',
+                alert_activated: 'تم تفعيل المستخدم',
+                alert_no_data_export: 'لا توجد بيانات للتصدير',
+                status_text_active: 'نشط', status_text_suspended: 'موقوف', status_text_pending: 'قيد الانتظار',
+                role_text_athlete: 'لاعب', role_text_organizer: 'منظم', role_text_coach: 'مدرب',
+                btn_edit: '️ تعديل', btn_activate: '✅ تفعيل', btn_suspend: '⏸️ إيقاف', btn_delete: '🗑️ حذف'
+            }
+        };
+
+        function t(key) {
+            return translations[currentLang][key] || key;
+        }
+
+        function setLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            
+            // Update all data-i18n elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            
+            // Update all data-i18n-placeholder elements
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[lang][key]) {
+                    el.placeholder = translations[lang][key];
+                }
+            });
+            
+            // Update select options
+            document.querySelectorAll('select option[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+            
+            // Re-render table if data exists
+            if (allUsers.length > 0) {
+                renderPage();
+            }
+        }
 
         window.onload = async () => {
+            setLang(currentLang);
             await checkAuth();
             await loadUsers();
         };
@@ -233,7 +384,6 @@
         async function checkAuth() {
             const { data: { user } } = await supabaseClient.auth.getUser();
             if (!user) { 
-                // إذا لم يكن هناك جلسة، نوجه لصفحة الدخول
                 window.location.href = 'admin-login.html'; 
                 return; 
             }
@@ -250,24 +400,11 @@
             const roleFilter = document.getElementById('filterRole').value;
 
             try {
-                // جلب البيانات من الجداول الثلاثة
                 const [athletesRes, organizersRes, coachesRes] = await Promise.all([
                     supabaseClient.from('athletes').select('*'),
                     supabaseClient.from('organizers').select('*'),
                     supabaseClient.from('coaches').select('*')
                 ]);
-
-                // 🔍 تنبيه تشخيصي دقيق لمعرفة ما يحدث بالضبط
-                let debugMessage = "📊 حالة التحميل من قاعدة البيانات:\n\n";
-                debugMessage += `✅ اللاعبون: ${athletesRes.data ? athletesRes.data.length : 0}\n`;
-                debugMessage += `✅ المنظمون: ${organizersRes.data ? organizersRes.data.length : 0}\n`;
-                debugMessage += `✅ المدربون: ${coachesRes.data ? coachesRes.data.length : 0}\n\n`;
-
-                // إذا كان هناك خطأ محدد في جدول المنظمين، سنعرضه بوضوح
-                if (organizersRes.error) {
-                    debugMessage += `⚠️ خطأ في جلب المنظمين: ${organizersRes.error.message}\n`;
-                    debugMessage += `تفاصيل الخطأ: ${JSON.stringify(organizersRes.error)}\n`;
-                }
 
                 let users = [];
 
@@ -313,7 +450,7 @@
                     });
                 }
 
-                // تطبيق الفلاتر
+                // Apply filters
                 if (search) {
                     users = users.filter(u => u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search));
                 }
@@ -322,24 +459,17 @@
 
                 allUsers = users.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
-                // تحديث الإحصائيات
+                // Update statistics
                 document.getElementById('statTotal').textContent = allUsers.length;
                 document.getElementById('statAthletes').textContent = allUsers.filter(u => u.role === 'athlete').length;
                 document.getElementById('statOrganizers').textContent = allUsers.filter(u => u.role === 'organizer').length;
                 document.getElementById('statCoaches').textContent = allUsers.filter(u => u.role === 'coach').length;
 
-                // إضافة نتيجة الفلترة للتنبيه
-                debugMessage += `\n📈 بعد تطبيق الفلاتر:\n`;
-                debugMessage += `المنظمون المعروضون: ${allUsers.filter(u => u.role === 'organizer').length}`;
-
-                // عرض التنبيه للمستخدم ليرى النتيجة بنفسه
-                alert(debugMessage);
-
                 renderPage();
 
             } catch (error) {
-                console.error('❌ خطأ في تحميل المستخدمين:', error);
-                alert('❌ حدث خطأ غير متوقع: ' + error.message);
+                console.error('Error loading users:', error);
+                alert(t('alert_error') + error.message);
             }
         }
 
@@ -351,14 +481,16 @@
             const tbody = document.getElementById('usersTable');
             
             if (pageUsers.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا يوجد مستخدمون</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">${t('no_users')}</td></tr>`;
             } else {
                 tbody.innerHTML = pageUsers.map((u, i) => {
                     const statusClass = u.status === 'active' ? 'status-active' : 
                                        u.status === 'suspended' ? 'status-suspended' : 'status-pending';
-                    const statusText = { active: 'نشط', suspended: 'موقوف', pending: 'قيد الانتظار' }[u.status] || u.status;
+                    const statusText = t(`status_text_${u.status}`) || u.status;
                     const roleClass = `role-${u.role}`;
-                    const roleText = { athlete: 'لاعب', organizer: 'منظم', coach: 'مدرب' }[u.role] || u.role;
+                    const roleText = t(`role_text_${u.role}`) || u.role;
+                    const dateLocale = currentLang === 'ar' ? 'ar-SA' : 'en-US';
+                    const formattedDate = u.created_at ? new Date(u.created_at).toLocaleDateString(dateLocale) : '-';
 
                     return `
                         <tr>
@@ -367,14 +499,14 @@
                             <td>${u.email}</td>
                             <td><span class="role-badge ${roleClass}">${roleText}</span></td>
                             <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-                            <td>${u.created_at ? new Date(u.created_at).toLocaleDateString('ar-SA') : '-'}</td>
+                            <td>${formattedDate}</td>
                             <td>
                                 <div class="action-btns">
-                                    <button class="btn btn-info" onclick="editUser('${u.id}', '${u.role}')" style="padding: 5px 10px; font-size: 12px;">✏️ تعديل</button>
+                                    <button class="btn btn-info" onclick="editUser('${u.id}', '${u.role}')" style="padding: 5px 10px; font-size: 12px;">${t('btn_edit')}</button>
                                     <button class="btn btn-warning" onclick="toggleStatus('${u.id}', '${u.role}', '${u.status}')" style="padding: 5px 10px; font-size: 12px;">
-                                        ${u.status === 'suspended' ? '✅ تفعيل' : '⏸️ إيقاف'}
+                                        ${u.status === 'suspended' ? t('btn_activate') : t('btn_suspend')}
                                     </button>
-                                    <button class="btn btn-danger" onclick="deleteUser('${u.id}', '${u.role}')" style="padding: 5px 10px; font-size: 12px;">🗑️ حذف</button>
+                                    <button class="btn btn-danger" onclick="deleteUser('${u.id}', '${u.role}')" style="padding: 5px 10px; font-size: 12px;">${t('btn_delete')}</button>
                                 </div>
                             </td>
                         </tr>
@@ -402,7 +534,7 @@
             if (!user) return;
 
             editingUser = { id, role };
-            document.getElementById('modalTitle').textContent = 'تعديل مستخدم';
+            document.getElementById('modalTitle').textContent = t('modal_edit_title');
             document.getElementById('modalUserName').value = user.name;
             document.getElementById('modalUserEmail').value = user.email;
             document.getElementById('modalUserRole').value = role;
@@ -417,26 +549,26 @@
             const table = role === 'athlete' ? 'athletes' : role === 'organizer' ? 'organizers' : 'coaches';
             
             const { error } = await supabaseClient.from(table).update({ status: newStatus }).eq('id', id);
-            if (error) { alert('خطأ: ' + error.message); return; }
+            if (error) { alert(t('alert_error') + error.message); return; }
             
-            alert(newStatus === 'suspended' ? 'تم إيقاف المستخدم' : 'تم تفعيل المستخدم');
+            alert(newStatus === 'suspended' ? t('alert_suspended') : t('alert_activated'));
             loadUsers();
         }
 
         async function deleteUser(id, role) {
-            if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
+            if (!confirm(t('alert_confirm_delete'))) return;
             const table = role === 'athlete' ? 'athletes' : role === 'organizer' ? 'organizers' : 'coaches';
             
             const { error } = await supabaseClient.from(table).delete().eq('id', id);
-            if (error) { alert('خطأ: ' + error.message); return; }
+            if (error) { alert(t('alert_error') + error.message); return; }
             
-            alert('تم الحذف بنجاح');
+            alert(t('alert_success_delete'));
             loadUsers();
         }
 
         function showCreateModal() {
             editingUser = null;
-            document.getElementById('modalTitle').textContent = 'إنشاء حساب جديد';
+            document.getElementById('modalTitle').textContent = t('modal_create_title');
             document.getElementById('modalUserName').value = '';
             document.getElementById('modalUserEmail').value = '';
             document.getElementById('modalUserPassword').value = '';
@@ -457,12 +589,12 @@
             const role = document.getElementById('modalUserRole').value;
 
             if (!name || !email) {
-                alert('الرجاء ملء الحقول المطلوبة');
+                alert(t('alert_fill_required'));
                 return;
             }
 
             if (!editingUser && !password) {
-                alert('الرجاء إدخال كلمة المرور');
+                alert(t('alert_fill_password'));
                 return;
             }
 
@@ -480,7 +612,7 @@
                     const { error } = await supabaseClient.from(table).update(updateData).eq('id', editingUser.id);
                     if (error) throw error;
                     
-                    alert('تم تعديل المستخدم بنجاح');
+                    alert(t('alert_success_update'));
                 } else {
                     const { data: userData, error: authError } = await supabaseClient.auth.admin.createUser({
                         email: email,
@@ -508,22 +640,26 @@
                     const { error: insertError } = await supabaseClient.from(table).insert(insertData);
                     if (insertError) throw insertError;
                     
-                    alert('تم إنشاء الحساب بنجاح!');
+                    alert(t('alert_success_create'));
                 }
 
                 closeModal();
                 loadUsers();
 
             } catch (error) {
-                alert('خطأ: ' + error.message);
+                alert(t('alert_error') + error.message);
             }
         }
 
         function exportUsers() {
-            if (allUsers.length === 0) { alert('لا توجد بيانات للتصدير'); return; }
+            if (allUsers.length === 0) { alert(t('alert_no_data_export')); return; }
+            
+            const headers = currentLang === 'ar' 
+                ? ['الاسم', 'البريد', 'الدور', 'الحالة', 'تاريخ التسجيل']
+                : ['Name', 'Email', 'Role', 'Status', 'Registration Date'];
             
             const csv = [
-                ['الاسم', 'البريد', 'الدور', 'الحالة', 'تاريخ التسجيل'],
+                headers,
                 ...allUsers.map(u => [u.name, u.email, u.role, u.status, u.created_at])
             ].map(row => row.join(',')).join('\n');
 
