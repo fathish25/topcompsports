@@ -36,14 +36,16 @@
             overflow-y: auto;
             padding: 20px;
             z-index: 1000;
+            transition: all 0.3s;
             display: flex;
             flex-direction: column;
         }
-        [dir="rtl"] .sidebar { right: 0; left: auto; border-left: 2px solid var(--primary); }
-        [dir="ltr"] .sidebar { left: 0; right: auto; border-right: 2px solid var(--primary); }
+        [dir="rtl"] .sidebar { right: 0; left: auto; border-left: 2px solid var(--primary); border-right: none; }
+        [dir="ltr"] .sidebar { left: 0; right: auto; border-right: 2px solid var(--primary); border-left: none; }
         
-        .logo { display: flex; align-items: center; gap: 15px; padding: 20px; border-bottom: 2px solid rgba(255,255,255,0.1); margin-bottom: 30px; }
-        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--accent), var(--accent-dark)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: var(--bg-dark); }
+        .logo { display: flex; align-items: center; gap: 15px; padding: 20px; border-bottom: 2px solid rgba(255,255,255,0.1); margin-bottom: 30px; flex-shrink: 0; }
+        .logo img { width: 50px; height: 50px; object-fit: contain; border-radius: 12px; }
+        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--accent), var(--accent-dark)); border-radius: 12px; display: none; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: var(--bg-dark); }
         .logo-text { font-size: 22px; font-weight: bold; color: var(--text-main); }
         
         .sidebar nav { flex: 1; overflow-y: auto; }
@@ -52,209 +54,177 @@
         .nav-item.active { background: linear-gradient(135deg, var(--primary), #1d4ed8); }
         .nav-item .icon { font-size: 1.3rem; width: 24px; text-align: center; }
         
-        .role-badge { background: var(--accent); color: var(--bg-dark); padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-top: auto; text-align: center; }
+        .role-badge { background: var(--accent); color: var(--bg-dark); padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-top: auto; display: block; text-align: center; }
 
-        .main-content { padding: 30px; }
-        [dir="rtl"] .main-content { margin-right: 280px; }
-        [dir="ltr"] .main-content { margin-left: 280px; }
+        .main-content { padding: 30px; transition: all 0.3s; }
+        [dir="rtl"] .main-content { margin-right: 280px; margin-left: 0; }
+        [dir="ltr"] .main-content { margin-left: 280px; margin-right: 0; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 20px; background: var(--bg-card); border-radius: 15px; flex-wrap: wrap; gap: 15px; }
-        .page-title { font-size: 2rem; font-weight: bold; display: flex; align-items: center; gap: 10px; }
-        .user-info { display: flex; align-items: center; gap: 15px; }
-        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #1d4ed8); display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .btn-logout { background: var(--danger); color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 20px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; flex-wrap: wrap; gap: 15px; }
+        .page-title { font-size: 2rem; font-weight: bold; color: var(--text-main); }
+        .user-info { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #1d4ed8); display: flex; align-items: center; justify-content: center; color: var(--text-main); font-weight: bold; font-size: 1.2rem; }
+        .btn-logout { background: var(--danger); color: var(--text-main); padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+        .btn-logout:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); }
 
-        .lang-switcher { display: flex; gap: 5px; background: var(--bg-input); padding: 5px; border-radius: 8px; }
-        .lang-btn { padding: 8px 15px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 6px; font-weight: 600; }
-        .lang-btn.active { background: var(--primary); color: white; }
+        .lang-switcher { display: flex; gap: 8px; background: var(--bg-input); padding: 5px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        .lang-btn { background: transparent; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; color: var(--text-muted); transition: all 0.3s; }
+        .lang-btn.active { background: var(--primary); color: var(--text-main); }
+        .lang-btn:hover:not(.active) { color: var(--text-main); }
 
         /* =========================================
-           2. COACH CARDS LAYOUT (Like Documents)
+           2. PAGE SPECIFIC STYLES (Coaches)
            ========================================= */
-        .coaches-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr)); 
-            gap: 25px; 
-        }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: var(--bg-dark); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241,196,15,0.4); }
+        .btn-danger { background: linear-gradient(135deg, var(--danger), #dc2626); color: #fff; }
+        .btn-success { background: linear-gradient(135deg, var(--success), #059669); color: #fff; }
+        .btn-warning { background: linear-gradient(135deg, var(--warning), #d97706); color: #fff; }
+        .btn-info { background: linear-gradient(135deg, var(--primary), #1d4ed8); color: #fff; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
 
-        .coach-card { 
-            background: var(--bg-card); 
-            border-radius: 15px; 
-            padding: 25px; 
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; border-left: 4px solid var(--primary); }
+        [dir="rtl"] .stat-card { border-left: none; border-right: 4px solid var(--primary); }
+        .stat-value { font-size: 2rem; font-weight: bold; color: var(--accent); }
+        .stat-label { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
 
-        .card-header { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            margin-bottom: 25px; 
-            padding-bottom: 20px; 
-            border-bottom: 2px solid rgba(255,255,255,0.1); 
-        }
-        .avatar { 
-            width: 70px; 
-            height: 70px; 
-            border-radius: 50%; 
-            overflow: hidden; 
-            background: linear-gradient(135deg, var(--primary), #1d4ed8); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 28px; 
-            font-weight: bold;
-            flex-shrink: 0;
-            border: 3px solid var(--accent);
-        }
-        .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .coach-info h3 { font-size: 1.4rem; margin-bottom: 5px; color: var(--text-main); }
-        .coach-info p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 3px; }
+        .section { background: var(--bg-card); border-radius: 15px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); }
+        .filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-label { color: var(--text-muted); font-size: 14px; }
+        .form-input, .form-select, .form-textarea { background: var(--bg-input); border: 2px solid rgba(255,255,255,0.1); color: var(--text-main); padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); }
+        .form-textarea { min-height: 100px; resize: vertical; }
+        select.form-select option { background-color: var(--bg-card) !important; color: var(--text-main) !important; }
         
-        .status-badge { 
-            padding: 4px 10px; 
-            border-radius: 12px; 
-            font-size: 11px; 
-            font-weight: bold; 
-            display: inline-block; 
-            margin-top: 5px;
-        }
-        .status-pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
-        .status-verified { background: rgba(16, 185, 129, 0.2); color: var(--success); }
-        .status-rejected { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; color: var(--text-main); }
+        [dir="rtl"] th, [dir="rtl"] td { text-align: right; }
+        th { background: rgba(241, 196, 15, 0.1); color: var(--accent); font-weight: bold; }
+        tr:hover { background: rgba(255,255,255,0.03); }
         
-        .documents-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
+        .status-badge, .belt-badge, .verification-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .status-active { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .status-suspended { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .verification-pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .verification-verified { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .verification-rejected { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .belt-white { background: rgba(243, 244, 246, 0.2); color: #f3f4f6; border: 1px solid rgba(209, 213, 219, 0.3); }
+        .belt-blue { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+        .belt-purple { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
+        .belt-brown { background: rgba(180, 83, 9, 0.2); color: #fcd34d; }
+        .belt-black { background: rgba(31, 41, 55, 0.5); color: #f3f4f6; border: 1px solid rgba(255,255,255,0.2); }
 
-        .document-section { }
-        .document-label { 
-            font-weight: 600; 
-            margin-bottom: 12px; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            color: var(--accent);
-            font-size: 0.95rem;
-        }
+        .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
         
-        .document-preview { 
-            border: 2px dashed rgba(255,255,255,0.2); 
-            border-radius: 12px; 
-            padding: 15px; 
-            text-align: center; 
-            background: var(--bg-input);
-            height: 220px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        .document-preview:hover {
-            border-color: var(--primary);
-            background: rgba(37, 99, 235, 0.1);
-        }
-        .document-preview img { 
-            max-width: 100%; 
-            max-height: 180px; 
-            border-radius: 8px; 
-            object-fit: contain;
-        }
-        .document-preview .overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .document-preview:hover .overlay { opacity: 1; }
-        .document-preview .overlay i { font-size: 2.5rem; color: white; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--bg-card); border-radius: 16px; padding: 30px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        .modal-title { font-size: 1.5rem; font-weight: bold; color: var(--accent); }
+        .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); transition: color 0.3s; }
+        .close-modal:hover { color: var(--text-main); }
+        
+        .user-images { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .image-box { text-align: center; }
+        .image-box img { width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1); background: var(--bg-input); cursor: pointer; }
+        .image-box p { margin-top: 8px; font-size: 13px; color: var(--text-muted); font-weight: 600; }
+        .image-box .no-image { width: 100%; height: 200px; background: var(--bg-input); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 3rem; }
 
-        .document-preview .no-doc { color: var(--text-muted); font-size: 3rem; }
-        .document-preview .no-doc-text { margin-top: 10px; color: var(--text-muted); font-size: 0.9rem; }
+        .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+        .detail-item { background: var(--bg-input); padding: 12px; border-radius: 8px; }
+        .detail-label { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
+        .detail-value { font-weight: 600; color: var(--text-main); }
 
-        .info-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
-            padding: 15px;
-            background: var(--bg-input);
-            border-radius: 10px;
-        }
-        .info-item { text-align: center; }
-        .info-item .label { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
-        .info-item .value { font-weight: 700; color: var(--text-main); font-size: 1.1rem; }
+        .teams-list { background: var(--bg-input); padding: 15px; border-radius: 8px; margin-top: 15px; }
+        .team-item { padding: 10px; background: var(--bg-card); border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
+        .team-item:last-child { margin-bottom: 0; }
 
-        .action-btns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        .btn { 
-            padding: 14px; 
-            border: none; 
-            border-radius: 10px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: all 0.3s; 
-            font-size: 14px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 8px; 
-        }
-        .btn-verify { background: var(--success); color: white; }
-        .btn-verify:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16,185,129,0.4); }
-        .btn-reject { background: var(--danger); color: white; }
-        .btn-reject:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(239,68,68,0.4); }
-        .btn-secondary { background: var(--bg-input); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); }
-        .btn-secondary:hover { background: rgba(255,255,255,0.1); color: var(--text-main); }
-
-        .alert { padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; }
+        .alert { padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
         .alert.show { display: block; }
         .alert-success { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .alert-error { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
 
         @media (max-width: 1024px) {
-            .sidebar { width: 100%; height: auto; position: relative; }
-            .main-content { margin: 0; padding: 20px; }
-            .coaches-grid { grid-template-columns: 1fr; }
-            .documents-row { grid-template-columns: 1fr; }
+            .sidebar { width: 100%; height: auto; position: relative; border-left: none !important; border-right: none !important; border-bottom: 2px solid var(--primary); }
+            [dir="rtl"] .main-content, [dir="ltr"] .main-content { margin: 0; padding: 20px; }
+            .filters { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .stats-row { grid-template-columns: 1fr; }
+            .action-btns { flex-direction: column; }
+            .action-btns .btn { width: 100%; justify-content: center; }
+            .header { flex-direction: column; align-items: stretch; }
+            .user-info { justify-content: space-between; margin-top: 15px; }
+            .user-images { grid-template-columns: 1fr; }
+            .details-grid { grid-template-columns: 1fr; }
+            .modal { max-width: 95%; padding: 20px; }
         }
     </style>
 </head>
 <body>
+    <!-- Sidebar (Unified) -->
     <aside class="sidebar">
         <div class="logo">
+            <img src="logo2.png" alt="TopCompSports Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
             <div class="logo-icon">T</div>
             <div class="logo-text">TopCompSports</div>
         </div>
+        
         <nav>
-            <a href="admin-dashboard.html" class="nav-item"><span class="icon"><i class="fas fa-chart-line"></i></span> <span data-en="Dashboard" data-ar="لوحة التحكم">Dashboard</span></a>
-            <a href="admin-users.html" class="nav-item"><span class="icon"><i class="fas fa-users"></i></span> <span data-en="Users" data-ar="المستخدمون">Users</span></a>
-            <a href="admin-athletes.html" class="nav-item"><span class="icon"><i class="fas fa-running"></i></span> <span data-en="Athletes" data-ar="اللاعبون">Athletes</span></a>
-            <a href="admin-athlete-documents.html" class="nav-item"><span class="icon"><i class="fas fa-id-card"></i></span> <span data-en="Athlete Documents" data-ar="وثائق اللاعبين">Athlete Documents</span></a>
-            <a href="admin-coaches.html" class="nav-item active"><span class="icon"><i class="fas fa-chalkboard-teacher"></i></span> <span data-en="Coaches" data-ar="المدربون">Coaches</span></a>
-            <a href="admin-teams.html" class="nav-item"><span class="icon"><i class="fas fa-shield-alt"></i></span> <span data-en="Teams" data-ar="الفرق">Teams</span></a>
-            <a href="admin-organizations.html" class="nav-item"><span class="icon"><i class="fas fa-building"></i></span> <span data-en="Organizers" data-ar="المنظمون">Organizers</span></a>
-            <a href="admin-tournaments.html" class="nav-item"><span class="icon"><i class="fas fa-trophy"></i></span> <span data-en="Tournaments" data-ar="البطولات">Tournaments</span></a>
-            <a href="admin-reports.html" class="nav-item"><span class="icon"><i class="fas fa-chart-bar"></i></span> <span data-en="Reports" data-ar="التقارير">Reports</span></a>
-            <a href="admin-settings.html" class="nav-item"><span class="icon"><i class="fas fa-cog"></i></span> <span data-en="Settings" data-ar="الإعدادات">Settings</span></a>
+            <a href="admin-dashboard.html" class="nav-item">
+                <span class="icon"><i class="fas fa-chart-line"></i></span>
+                <span data-en="Dashboard" data-ar="لوحة التحكم">Dashboard</span>
+            </a>
+            <a href="admin-users.html" class="nav-item">
+                <span class="icon"><i class="fas fa-users"></i></span>
+                <span data-en="Users" data-ar="المستخدمون">Users</span>
+            </a>
+            <a href="admin-athletes.html" class="nav-item">
+                <span class="icon"><i class="fas fa-running"></i></span>
+                <span data-en="Athletes" data-ar="اللاعبون">Athletes</span>
+            </a>
+            <a href="admin-athlete-documents.html" class="nav-item">
+                <span class="icon"><i class="fas fa-id-card"></i></span>
+                <span data-en="Athlete Documents" data-ar="وثائق اللاعبين">Athlete Documents</span>
+            </a>
+            <a href="admin-coaches.html" class="nav-item active">
+                <span class="icon"><i class="fas fa-chalkboard-teacher"></i></span>
+                <span data-en="Coaches" data-ar="المدربون">Coaches</span>
+            </a>
+            <a href="admin-teams.html" class="nav-item">
+                <span class="icon"><i class="fas fa-shield-alt"></i></span>
+                <span data-en="Teams" data-ar="الفرق">Teams</span>
+            </a>
+            <a href="admin-organizations.html" class="nav-item">
+                <span class="icon"><i class="fas fa-building"></i></span>
+                <span data-en="Organizers" data-ar="المنظمون">Organizers</span>
+            </a>
+            <a href="admin-tournaments.html" class="nav-item">
+                <span class="icon"><i class="fas fa-trophy"></i></span>
+                <span data-en="Tournaments" data-ar="البطولات">Tournaments</span>
+            </a>
+            <a href="admin-reports.html" class="nav-item">
+                <span class="icon"><i class="fas fa-chart-bar"></i></span>
+                <span data-en="Reports" data-ar="التقارير">Reports</span>
+            </a>
+            <a href="admin-settings.html" class="nav-item">
+                <span class="icon"><i class="fas fa-cog"></i></span>
+                <span data-en="Settings" data-ar="الإعدادات">Settings</span>
+            </a>
         </nav>
-        <div class="role-badge" data-en="Super Admin" data-ar="سوبر أدمن">Super Admin</div>
+
+        <div id="adminRole" class="role-badge" data-en="Loading..." data-ar="جاري التحميل...">Loading...</div>
     </aside>
 
+    <!-- Main Content -->
     <main class="main-content">
         <div class="header">
-            <h1 class="page-title"><i class="fas fa-chalkboard-teacher" style="color: var(--accent);"></i> <span data-en="Coach Management" data-ar="إدارة المدربين">Coach Management</span></h1>
+            <h1 class="page-title" data-en="Coach Management" data-ar="إدارة المدربين">Coach Management</h1>
             <div class="user-info">
                 <div class="lang-switcher">
                     <button class="lang-btn" id="btnEn" onclick="window.setLang('en')">EN</button>
@@ -268,13 +238,206 @@
 
         <div id="alert" class="alert"></div>
 
-        <div class="coaches-grid" id="coachesGrid">
-            <div style="text-align: center; padding: 60px; color: var(--text-muted); grid-column: 1 / -1;">
-                <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 20px; color: var(--primary);"></i>
-                <p data-en="Loading coaches..." data-ar="جاري تحميل المدربين...">Loading coaches...</p>
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-label" data-en="Total Coaches" data-ar="إجمالي المدربين">Total Coaches</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statActive">0</div>
+                <div class="stat-label" data-en="Active" data-ar="نشطين">Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statSuspended">0</div>
+                <div class="stat-label" data-en="Suspended" data-ar="موقوفين">Suspended</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statVerified">0</div>
+                <div class="stat-label" data-en="Verified" data-ar="موثقين">Verified</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="filters">
+                <div class="form-group">
+                    <label class="form-label" data-en="Search" data-ar="بحث">Search</label>
+                    <input type="text" class="form-input" id="searchCoach" data-en-placeholder="Search by name or email..." data-ar-placeholder="بحث بالاسم أو البريد..." placeholder="Search by name or email..." onkeyup="loadCoaches()">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-en="Belt" data-ar="الحزام">Belt</label>
+                    <select class="form-select" id="filterBelt" onchange="loadCoaches()">
+                        <option value="" data-en="All Belts" data-ar="جميع الأحزمة">All Belts</option>
+                        <option value="White">White</option>
+                        <option value="Blue">Blue</option>
+                        <option value="Purple">Purple</option>
+                        <option value="Brown">Brown</option>
+                        <option value="Black">Black</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-en="Status" data-ar="الحالة">Status</label>
+                    <select class="form-select" id="filterStatus" onchange="loadCoaches()">
+                        <option value="" data-en="All Statuses" data-ar="جميع الحالات">All Statuses</option>
+                        <option value="active" data-en="Active" data-ar="نشط">Active</option>
+                        <option value="suspended" data-en="Suspended" data-ar="موقوف">Suspended</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-en="Verification" data-ar="التحقق">Verification</label>
+                    <select class="form-select" id="filterVerification" onchange="loadCoaches()">
+                        <option value="" data-en="All Verifications" data-ar="جميع حالات التحقق">All Verifications</option>
+                        <option value="pending" data-en="Pending" data-ar="قيد الانتظار">Pending</option>
+                        <option value="verified" data-en="Verified" data-ar="موثق">Verified</option>
+                        <option value="rejected" data-en="Rejected" data-ar="مرفوض">Rejected</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-en="Name" data-ar="الاسم">Name</th>
+                            <th data-en="Email" data-ar="البريد">Email</th>
+                            <th data-en="Belt" data-ar="الحزام">Belt</th>
+                            <th data-en="Experience" data-ar="الخبرة">Experience</th>
+                            <th data-en="Status" data-ar="الحالة">Status</th>
+                            <th data-en="Verification" data-ar="التحقق">Verification</th>
+                            <th data-en="Actions" data-ar="الإجراءات">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="coachesTable">
+                        <tr><td colspan="7" style="text-align: center;" data-en="Loading..." data-ar="جاري التحميل...">Loading...</td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
+
+    <!-- View Details Modal -->
+    <div class="modal-overlay" id="viewModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" data-en="Coach Details" data-ar="تفاصيل المدرب">Coach Details</h3>
+                <button class="close-modal" onclick="closeViewModal()">&times;</button>
+            </div>
+            <div id="viewModalContent"></div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" data-en="Edit Coach" data-ar="تعديل بيانات المدرب">Edit Coach</h3>
+                <button class="close-modal" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm" onsubmit="saveEdit(event)">
+                <input type="hidden" id="editId">
+                <div class="details-grid">
+                    <div class="form-group">
+                        <label class="form-label" data-en="Full Name" data-ar="الاسم الكامل">Full Name</label>
+                        <input type="text" class="form-input" id="editFullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Email" data-ar="البريد الإلكتروني">Email</label>
+                        <input type="email" class="form-input" id="editEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Phone" data-ar="الهاتف">Phone</label>
+                        <input type="text" class="form-input" id="editPhone">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Date of Birth" data-ar="تاريخ الميلاد">Date of Birth</label>
+                        <input type="date" class="form-input" id="editDOB">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Gender" data-ar="الجنس">Gender</label>
+                        <select class="form-select" id="editGender">
+                            <option value="Male" data-en="Male" data-ar="ذكر">Male</option>
+                            <option value="Female" data-en="Female" data-ar="أنثى">Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Belt Level" data-ar="الحزام">Belt Level</label>
+                        <select class="form-select" id="editBelt">
+                            <option value="White">White</option>
+                            <option value="Blue">Blue</option>
+                            <option value="Purple">Purple</option>
+                            <option value="Brown">Brown</option>
+                            <option value="Black">Black</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Experience Years" data-ar="سنوات الخبرة">Experience Years</label>
+                        <input type="number" min="0" class="form-input" id="editExperience">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Country" data-ar="الدولة">Country</label>
+                        <input type="text" class="form-input" id="editCountry">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="City" data-ar="المدينة">City</label>
+                        <input type="text" class="form-input" id="editCity">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Team Name" data-ar="اسم الفريق">Team Name</label>
+                        <input type="text" class="form-input" id="editTeamName">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Team Email" data-ar="بريد الفريق">Team Email</label>
+                        <input type="email" class="form-input" id="editTeamEmail">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Team Phone" data-ar="هاتف الفريق">Team Phone</label>
+                        <input type="text" class="form-input" id="editTeamPhone">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Team Address" data-ar="عنوان الفريق">Team Address</label>
+                        <input type="text" class="form-input" id="editTeamAddress">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-en="Verification Status" data-ar="حالة التحقق">Verification Status</label>
+                        <select class="form-select" id="editVerification">
+                            <option value="pending" data-en="Pending" data-ar="قيد الانتظار">Pending</option>
+                            <option value="verified" data-en="Verified" data-ar="موثق">Verified</option>
+                            <option value="rejected" data-en="Rejected" data-ar="مرفوض">Rejected</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" data-en="Bio" data-ar="السيرة الذاتية">Bio</label>
+                    <textarea class="form-textarea" id="editBio" rows="4"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-success" style="flex: 1; justify-content: center;">
+                        <i class="fas fa-save"></i> <span data-en="Save" data-ar="حفظ">Save</span>
+                    </button>
+                    <button type="button" class="btn btn-warning" style="flex: 1; justify-content: center;" onclick="closeEditModal()">
+                        <i class="fas fa-times"></i> <span data-en="Cancel" data-ar="إلغاء">Cancel</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Suspend Modal -->
+    <div class="modal-overlay" id="suspendModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" data-en="Suspend Coach" data-ar="تعليق المدرب">Suspend Coach</h3>
+                <button class="close-modal" onclick="closeSuspendModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label" data-en="Reason for Suspension (Required)" data-ar="سبب التعليق (إلزامي)">Reason for Suspension (Required)</label>
+                <textarea class="form-textarea" id="suspendReason" rows="4" data-en-placeholder="Enter the reason..." data-ar-placeholder="أدخل السبب..."></textarea>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-danger" style="flex: 1; justify-content: center;" onclick="confirmSuspend()" data-en="Confirm Suspend" data-ar="تأكيد التعليق">Confirm Suspend</button>
+                <button class="btn btn-warning" style="flex: 1; justify-content: center;" onclick="closeSuspendModal()" data-en="Cancel" data-ar="إلغاء">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
@@ -283,172 +446,444 @@
 
         let allCoaches = [];
         let currentLang = localStorage.getItem('adminLang') || 'en';
+        let suspendTargetId = null;
+        let currentAdmin = null;
 
+        // ==========================================
+        // 1. Language System (Unified)
+        // ==========================================
         window.setLang = function(lang) {
             currentLang = lang;
             localStorage.setItem('adminLang', lang);
+            
             document.documentElement.lang = lang;
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
             document.getElementById('btnEn').classList.toggle('active', lang === 'en');
             document.getElementById('btnAr').classList.toggle('active', lang === 'ar');
+            
             document.querySelectorAll('[data-en][data-ar]').forEach(el => {
                 el.textContent = lang === 'ar' ? el.dataset.ar : el.dataset.en;
             });
+            
+            document.querySelectorAll('[data-en-placeholder][data-ar-placeholder]').forEach(el => {
+                el.placeholder = lang === 'ar' ? el.dataset.arPlaceholder : el.dataset.enPlaceholder;
+            });
+
+            if (allCoaches.length > 0) {
+                renderTable();
+            }
         };
 
-        window.onload = async () => {
-            window.setLang(currentLang);
-            await loadCoaches();
-        };
+        // ==========================================
+        // 2. Auth Check (Unified)
+        // ==========================================
+        async function checkAuth() {
+            const storedAdmin = localStorage.getItem('currentAdmin');
+            if (!storedAdmin) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
 
-        async function loadCoaches() {
             try {
-                const { data: coaches, error } = await supabaseClient
+                currentAdmin = JSON.parse(storedAdmin);
+                const { data: admin } = await supabaseClient.from('admin_profiles').select('*').eq('id', currentAdmin.id).maybeSingle();
+
+                if (!admin) {
+                    localStorage.removeItem('currentAdmin');
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
+
+                document.getElementById('userName').textContent = currentAdmin.full_name || 'Admin';
+                document.getElementById('userAvatar').textContent = (currentAdmin.full_name || 'A')[0].toUpperCase();
+                
+                const roleBadge = document.getElementById('adminRole');
+                const roleText = currentAdmin.role === 'super_admin' ? 
+                    (currentLang === 'ar' ? 'سوبر أدمن' : 'Super Admin') : 
+                    currentAdmin.role === 'admin' ? 
+                    (currentLang === 'ar' ? 'أدمن' : 'Admin') : 
+                    (currentLang === 'ar' ? 'أدمن فرعي' : 'Sub-Admin');
+                roleBadge.textContent = roleText;
+                
+            } catch (error) {
+                console.error('Auth error:', error);
+                window.location.href = 'admin-login.html';
+            }
+        }
+
+        // ==========================================
+        // 3. Database Logic (Preserved)
+        // ==========================================
+        async function loadCoaches() {
+            const search = document.getElementById('searchCoach').value.toLowerCase();
+            const beltFilter = document.getElementById('filterBelt').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+            const verificationFilter = document.getElementById('filterVerification').value;
+
+            try {
+                const { data, error } = await supabaseClient
                     .from('coaches')
                     .select('*')
                     .order('created_at', { ascending: false });
                 
                 if (error) throw error;
 
-                const grid = document.getElementById('coachesGrid');
-                
-                if (!coaches || coaches.length === 0) {
-                    grid.innerHTML = '<div style="text-align: center; padding: 60px; color: var(--text-muted);">No coaches found</div>';
-                    return;
+                let coaches = data || [];
+
+                if (search) {
+                    coaches = coaches.filter(c => 
+                        (c.full_name && c.full_name.toLowerCase().includes(search)) || 
+                        (c.email && c.email.toLowerCase().includes(search))
+                    );
                 }
+                if (beltFilter) coaches = coaches.filter(c => c.belt_level === beltFilter);
+                if (statusFilter) coaches = coaches.filter(c => (c.is_suspended ? 'suspended' : 'active') === statusFilter);
+                if (verificationFilter) coaches = coaches.filter(c => c.verification_status === verificationFilter);
 
                 allCoaches = coaches;
 
-                grid.innerHTML = coaches.map(c => {
-                    const statusClass = c.verification_status === 'verified' ? 'status-verified' : (c.verification_status === 'rejected' ? 'status-rejected' : 'status-pending');
-                    const statusText = c.verification_status === 'verified' ? 
-                        (currentLang === 'ar' ? 'موثق' : 'Verified') : 
-                        (c.verification_status === 'rejected' ? (currentLang === 'ar' ? 'مرفوض' : 'Rejected') : (currentLang === 'ar' ? 'قيد الانتظار' : 'Pending'));
+                document.getElementById('statTotal').textContent = allCoaches.length;
+                document.getElementById('statActive').textContent = allCoaches.filter(c => !c.is_suspended).length;
+                document.getElementById('statSuspended').textContent = allCoaches.filter(c => c.is_suspended).length;
+                document.getElementById('statVerified').textContent = allCoaches.filter(c => c.verification_status === 'verified').length;
 
-                    const profileHtml = c.profile_photo_url ? 
-                        `<img src="${c.profile_photo_url}" alt="Profile">
-                         <div class="overlay"><i class="fas fa-search-plus"></i></div>` :
-                        `<div><div class="no-doc"><i class="fas fa-user"></i></div><div class="no-doc-text" data-en="No photo" data-ar="لا توجد صورة">No photo</div></div>`;
-
-                    const idHtml = c.id_document_url ? 
-                        `<img src="${c.id_document_url}" alt="ID Document">
-                         <div class="overlay"><i class="fas fa-search-plus"></i></div>` :
-                        `<div><div class="no-doc"><i class="fas fa-id-card"></i></div><div class="no-doc-text" data-en="No ID" data-ar="لا توجد هوية">No ID</div></div>`;
-
-                    const profileClick = c.profile_photo_url ? `window.open('${c.profile_photo_url}', '_blank')` : '';
-                    const idClick = c.id_document_url ? `window.open('${c.id_document_url}', '_blank')` : '';
-
-                    return `
-                    <div class="coach-card">
-                        <div class="card-header">
-                            <div class="avatar">
-                                ${c.profile_photo_url ? 
-                                    `<img src="${c.profile_photo_url}" alt="${c.full_name}">` :
-                                    (c.full_name || 'C').charAt(0).toUpperCase()
-                                }
-                            </div>
-                            <div class="coach-info">
-                                <h3>${c.full_name || 'Unknown'}</h3>
-                                <p>${c.email || ''}</p>
-                                <p>${c.phone || ''}</p>
-                                <span class="status-badge ${statusClass}">${statusText}</span>
-                            </div>
-                        </div>
-
-                        <div class="documents-row">
-                            <div class="document-section">
-                                <div class="document-label">
-                                    <i class="fas fa-user"></i>
-                                    <span data-en="Profile Photo" data-ar="صورة البروفايل">Profile Photo</span>
-                                </div>
-                                <div class="document-preview" onclick="${profileClick}">
-                                    ${profileHtml}
-                                </div>
-                            </div>
-
-                            <div class="document-section">
-                                <div class="document-label">
-                                    <i class="fas fa-id-card"></i>
-                                    <span data-en="ID Document" data-ar="وثيقة الهوية">ID Document</span>
-                                </div>
-                                <div class="document-preview" onclick="${idClick}">
-                                    ${idHtml}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="info-row">
-                            <div class="info-item">
-                                <div class="label" data-en="Date of Birth" data-ar="تاريخ الميلاد">Date of Birth</div>
-                                <div class="value">${c.date_of_birth ? new Date(c.date_of_birth).toLocaleDateString('en-GB') : 'N/A'}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="label" data-en="Age" data-ar="العمر">Age</div>
-                                <div class="value">${calculateAge(c.date_of_birth)} years</div>
-                            </div>
-                        </div>
-
-                        <div class="action-btns">
-                            <button class="btn btn-verify" onclick="verifyCoach('${c.id}', '${c.verification_status}')">
-                                <i class="fas fa-check"></i> 
-                                <span data-en="Verify Coach" data-ar="التحقق من المدرب">Verify Coach</span>
-                            </button>
-                            <button class="btn btn-reject" onclick="rejectCoach('${c.id}')">
-                                <i class="fas fa-times"></i> 
-                                <span data-en="Reject" data-ar="رفض">Reject</span>
-                            </button>
-                        </div>
-                    </div>
-                `}).join('');
-
-                window.setLang(currentLang);
-
+                renderTable();
             } catch (error) {
-                console.error('Error:', error);
-                showAlert('Error: ' + error.message, 'error');
+                console.error('Error loading coaches:', error);
+                showAlert(currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data', 'error');
             }
         }
 
-        function calculateAge(dateOfBirth) {
-            if (!dateOfBirth) return 'N/A';
-            const today = new Date();
-            const birthDate = new Date(dateOfBirth);
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const m = today.getMonth() - birthDate.getMonth();
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
-            return age;
+        function getBeltClass(belt) {
+            if (!belt) return '';
+            const b = belt.toLowerCase();
+            if (b === 'white') return 'belt-white';
+            if (b === 'blue') return 'belt-blue';
+            if (b === 'purple') return 'belt-purple';
+            if (b === 'brown') return 'belt-brown';
+            if (b === 'black') return 'belt-black';
+            return '';
         }
 
-        async function verifyCoach(coachId, currentStatus) {
-            const newStatus = currentStatus === 'verified' ? 'pending' : 'verified';
-            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد؟' : 'Are you sure?')) return;
+        function getVerificationClass(status) {
+            if (status === 'verified') return 'verification-verified';
+            if (status === 'rejected') return 'verification-rejected';
+            return 'verification-pending';
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('coachesTable');
+            if (allCoaches.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;" data-en="No coaches found" data-ar="لا يوجد مدربون">No coaches found</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = allCoaches.map(c => {
+                const statusClass = c.is_suspended ? 'status-suspended' : 'status-active';
+                const statusText = c.is_suspended ? (currentLang === 'ar' ? 'موقوف' : 'Suspended') : (currentLang === 'ar' ? 'نشط' : 'Active');
+                const beltClass = getBeltClass(c.belt_level);
+                const verificationClass = getVerificationClass(c.verification_status);
+                const verificationText = {
+                    'verified': currentLang === 'ar' ? 'موثق' : 'Verified',
+                    'rejected': currentLang === 'ar' ? 'مرفوض' : 'Rejected',
+                    'pending': currentLang === 'ar' ? 'قيد الانتظار' : 'Pending'
+                }[c.verification_status] || 'Pending';
+
+                const btnView = currentLang === 'ar' ? 'عرض' : 'View';
+                const btnEdit = currentLang === 'ar' ? 'تعديل' : 'Edit';
+                const btnSuspend = currentLang === 'ar' ? 'تعليق' : 'Suspend';
+                const btnActivate = currentLang === 'ar' ? 'تنشيط' : 'Activate';
+                const btnDelete = currentLang === 'ar' ? 'حذف' : 'Delete';
+
+                return `
+                    <tr>
+                        <td>${c.full_name || '-'}</td>
+                        <td>${c.email || '-'}</td>
+                        <td><span class="belt-badge ${beltClass}">${c.belt_level || '-'}</span></td>
+                        <td>${c.experience_years ? c.experience_years + ' years' : '-'}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td><span class="verification-badge ${verificationClass}">${verificationText}</span></td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn btn-info btn-sm" onclick="viewCoach('${c.id}')" title="${btnView}"><i class="fas fa-eye"></i></button>
+                                <button class="btn btn-primary btn-sm" onclick="editCoach('${c.id}')" title="${btnEdit}"><i class="fas fa-edit"></i></button>
+                                <button class="btn ${c.is_suspended ? 'btn-success' : 'btn-warning'} btn-sm" onclick="${c.is_suspended ? `activateCoach('${c.id}')` : `openSuspendModal('${c.id}')`}" title="${c.is_suspended ? btnActivate : btnSuspend}">
+                                    ${c.is_suspended ? btnActivate : btnSuspend}
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteCoach('${c.id}')" title="${btnDelete}"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function viewCoach(id) {
+            const c = allCoaches.find(coach => coach.id === id);
+            if (!c) return;
+
+            const statusText = c.is_suspended ? (currentLang === 'ar' ? 'موقوف' : 'Suspended') : (currentLang === 'ar' ? 'نشط' : 'Active');
+            const verificationText = {
+                'verified': currentLang === 'ar' ? 'موثق' : 'Verified',
+                'rejected': currentLang === 'ar' ? 'مرفوض' : 'Rejected',
+                'pending': currentLang === 'ar' ? 'قيد الانتظار' : 'Pending'
+            }[c.verification_status] || 'Pending';
+            const reasonText = c.suspension_reason ? `<p style="color: var(--danger); margin-top: 10px;"><strong>${currentLang === 'ar' ? 'سبب التعليق:' : 'Suspension Reason:'}</strong> ${c.suspension_reason}</p>` : '';
+
+            let teamsHtml = '';
+            try {
+                const { data: teams } = await supabaseClient
+                    .from('teams')
+                    .select('name, is_active')
+                    .eq('coach_id', c.id);
+                
+                if (teams && teams.length > 0) {
+                    teamsHtml = `
+                        <h4 style="margin-top: 20px; margin-bottom: 10px; color: var(--text-main);"><i class="fas fa-shield-alt"></i> ${currentLang === 'ar' ? 'الفرق التابعة' : 'Teams'}</h4>
+                        <div class="teams-list">
+                            ${teams.map(t => `
+                                <div class="team-item">
+                                    <span><i class="fas fa-shield-alt" style="color: var(--primary);"></i> ${t.name}</span>
+                                    <span class="status-badge ${t.is_active ? 'status-active' : 'status-suspended'}">
+                                        ${t.is_active ? (currentLang === 'ar' ? 'نشط' : 'Active') : (currentLang === 'ar' ? 'غير نشط' : 'Inactive')}
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    teamsHtml = `<p style="margin-top: 20px; color: var(--text-muted);"><i class="fas fa-info-circle"></i> ${currentLang === 'ar' ? 'لا توجد فرق تابعة' : 'No teams assigned'}</p>`;
+                }
+            } catch (e) {
+                console.warn('Could not load teams:', e);
+            }
+
+            const profilePhotoHtml = c.profile_photo_url ? 
+                `<img src="${c.profile_photo_url}" alt="Profile" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                 <div class="no-image" style="display:none;"><i class="fas fa-user"></i></div>` :
+                `<div class="no-image"><i class="fas fa-user"></i></div>`;
+
+            const idDocumentHtml = c.id_document_url ? 
+                `<img src="${c.id_document_url}" alt="ID Document" onclick="window.open('${c.id_document_url}', '_blank')" style="cursor: pointer;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                 <div class="no-image" style="display:none;"><i class="fas fa-id-card"></i></div>` :
+                `<div class="no-image"><i class="fas fa-id-card"></i></div>`;
+
+            const beltCertHtml = c.belt_certificate_url ? `
+                <div class="image-box">
+                    <img src="${c.belt_certificate_url}" alt="Belt Certificate" onclick="window.open('${c.belt_certificate_url}', '_blank')" style="cursor: pointer;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="no-image" style="display:none;"><i class="fas fa-certificate"></i></div>
+                    <p>${currentLang === 'ar' ? 'شهادة الحزام' : 'Belt Certificate'}</p>
+                </div>
+            ` : '';
+
+            document.getElementById('viewModalContent').innerHTML = `
+                <div class="details-grid">
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الاسم' : 'Name'}</div><div class="detail-value">${c.full_name || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'البريد' : 'Email'}</div><div class="detail-value">${c.email || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الهاتف' : 'Phone'}</div><div class="detail-value">${c.phone || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'تاريخ الميلاد' : 'Date of Birth'}</div><div class="detail-value">${c.date_of_birth ? new Date(c.date_of_birth).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US') : '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الجنس' : 'Gender'}</div><div class="detail-value">${c.gender || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الحزام' : 'Belt Level'}</div><div class="detail-value">${c.belt_level || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'سنوات الخبرة' : 'Experience Years'}</div><div class="detail-value">${c.experience_years ? c.experience_years + ' years' : '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الدولة' : 'Country'}</div><div class="detail-value">${c.country || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'المدينة' : 'City'}</div><div class="detail-value">${c.city || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'اسم الفريق' : 'Team Name'}</div><div class="detail-value">${c.team_name || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'بريد الفريق' : 'Team Email'}</div><div class="detail-value">${c.team_email || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'هاتف الفريق' : 'Team Phone'}</div><div class="detail-value">${c.team_phone || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'عنوان الفريق' : 'Team Address'}</div><div class="detail-value">${c.team_address || '-'}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'حالة التحقق' : 'Verification Status'}</div><div class="detail-value"><span class="verification-badge ${getVerificationClass(c.verification_status)}">${verificationText}</span></div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الحالة' : 'Status'}</div><div class="detail-value">${statusText}</div></div>
+                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'تاريخ التعليق' : 'Suspended At'}</div><div class="detail-value">${c.suspended_at ? new Date(c.suspended_at).toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US') : '-'}</div></div>
+                </div>
+                ${c.bio ? `<div class="detail-item" style="margin-bottom: 15px;"><div class="detail-label">${currentLang === 'ar' ? 'السيرة الذاتية' : 'Bio'}</div><div class="detail-value" style="font-weight: normal; white-space: pre-wrap;">${c.bio}</div></div>` : ''}
+                ${reasonText}
+                <div class="user-images">
+                    <div class="image-box">
+                        ${profilePhotoHtml}
+                        <p>${currentLang === 'ar' ? 'صورة البروفايل' : 'Profile Photo'}</p>
+                    </div>
+                    <div class="image-box">
+                        ${idDocumentHtml}
+                        <p>${currentLang === 'ar' ? 'صورة الهوية' : 'ID Document'}</p>
+                    </div>
+                    ${beltCertHtml}
+                </div>
+                ${teamsHtml}
+            `;
+            document.getElementById('viewModal').classList.add('active');
+        }
+
+        function editCoach(id) {
+            const c = allCoaches.find(coach => coach.id === id);
+            if (!c) return;
+
+            document.getElementById('editId').value = c.id || '';
+            document.getElementById('editFullName').value = c.full_name || '';
+            document.getElementById('editEmail').value = c.email || '';
+            document.getElementById('editPhone').value = c.phone || '';
+            document.getElementById('editDOB').value = c.date_of_birth ? c.date_of_birth.split('T')[0] : '';
+            document.getElementById('editGender').value = c.gender || 'Male';
+            document.getElementById('editBelt').value = c.belt_level || 'White';
+            document.getElementById('editExperience').value = c.experience_years || '';
+            document.getElementById('editCountry').value = c.country || '';
+            document.getElementById('editCity').value = c.city || '';
+            document.getElementById('editTeamName').value = c.team_name || '';
+            document.getElementById('editTeamEmail').value = c.team_email || '';
+            document.getElementById('editTeamPhone').value = c.team_phone || '';
+            document.getElementById('editTeamAddress').value = c.team_address || '';
+            document.getElementById('editVerification').value = c.verification_status || 'pending';
+            document.getElementById('editBio').value = c.bio || '';
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        async function saveEdit(e) {
+            e.preventDefault();
+            
+            const updateData = {
+                full_name: document.getElementById('editFullName').value,
+                email: document.getElementById('editEmail').value,
+                phone: document.getElementById('editPhone').value,
+                date_of_birth: document.getElementById('editDOB').value,
+                gender: document.getElementById('editGender').value,
+                belt_level: document.getElementById('editBelt').value,
+                experience_years: parseInt(document.getElementById('editExperience').value) || null,
+                country: document.getElementById('editCountry').value,
+                city: document.getElementById('editCity').value,
+                team_name: document.getElementById('editTeamName').value,
+                team_email: document.getElementById('editTeamEmail').value,
+                team_phone: document.getElementById('editTeamPhone').value,
+                team_address: document.getElementById('editTeamAddress').value,
+                verification_status: document.getElementById('editVerification').value,
+                bio: document.getElementById('editBio').value,
+                updated_at: new Date().toISOString()
+            };
 
             try {
-                const { error } = await supabaseClient.from('coaches').update({ 
-                    verification_status: newStatus,
-                    updated_at: new Date().toISOString()
-                }).eq('id', coachId);
+                const { error } = await supabaseClient
+                    .from('coaches')
+                    .update(updateData)
+                    .eq('id', document.getElementById('editId').value);
 
                 if (error) throw error;
-                showAlert(currentLang === 'ar' ? '✅ تم بنجاح' : '✅ Success!', 'success');
+
+                showAlert(currentLang === 'ar' ? '✅ تم التعديل بنجاح' : '✅ Coach updated successfully', 'success');
+                closeEditModal();
                 loadCoaches();
             } catch (error) {
                 showAlert('Error: ' + error.message, 'error');
             }
         }
 
-        async function rejectCoach(coachId) {
-            if (!confirm(currentLang === 'ar' ? 'هل تريد رفض هذا المدرب؟' : 'Reject this coach?')) return;
+        function closeViewModal() { document.getElementById('viewModal').classList.remove('active'); }
+        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
+
+        function openSuspendModal(id) {
+            suspendTargetId = id;
+            document.getElementById('suspendReason').value = '';
+            document.getElementById('suspendModal').classList.add('active');
+        }
+
+        function closeSuspendModal() { 
+            document.getElementById('suspendModal').classList.remove('active'); 
+            suspendTargetId = null;
+        }
+
+        async function confirmSuspend() {
+            const reason = document.getElementById('suspendReason').value.trim();
+            if (!reason) {
+                alert(currentLang === 'ar' ? 'يرجى إدخال سبب التعليق' : 'Please enter a reason for suspension');
+                return;
+            }
+
             try {
-                await supabaseClient.from('coaches').update({ 
-                    verification_status: 'rejected',
-                    updated_at: new Date().toISOString()
-                }).eq('id', coachId);
-                showAlert(currentLang === 'ar' ? '✅ تم الرفض' : '✅ Rejected', 'success');
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                const { error } = await supabaseClient.from('coaches').update({
+                    is_suspended: true,
+                    suspension_reason: reason,
+                    suspended_by: user ? user.id : null,
+                    suspended_at: new Date().toISOString()
+                }).eq('id', suspendTargetId);
+
+                if (error) throw error;
+
+                showAlert(currentLang === 'ar' ? '✅ تم تعليق المدرب بنجاح' : '✅ Coach suspended successfully', 'success');
+                closeSuspendModal();
                 loadCoaches();
             } catch (error) {
                 showAlert('Error: ' + error.message, 'error');
             }
+        }
+
+        async function activateCoach(id) {
+            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من تنشيط هذا المدرب؟' : 'Are you sure you want to activate this coach?')) return;
+
+            try {
+                const { error } = await supabaseClient.from('coaches').update({
+                    is_suspended: false,
+                    suspension_reason: null,
+                    suspended_by: null,
+                    suspended_at: null
+                }).eq('id', id);
+
+                if (error) throw error;
+
+                showAlert(currentLang === 'ar' ? '✅ تم تنشيط المدرب بنجاح' : '✅ Coach activated successfully', 'success');
+                loadCoaches();
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteCoach(id) {
+            if (!confirm(currentLang === 'ar' ? '⚠️ هل أنت متأكد من حذف هذا المدرب؟ هذا الإجراء لا يمكن التراجع عنه!' : '⚠️ Are you sure you want to delete this coach? This action cannot be undone!')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('coaches')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                showAlert(currentLang === 'ar' ? '✅ تم حذف المدرب بنجاح' : '✅ Coach deleted successfully', 'success');
+                loadCoaches();
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        function exportCoaches() {
+            if (allCoaches.length === 0) {
+                alert(currentLang === 'ar' ? 'لا توجد بيانات للتصدير' : 'No data to export');
+                return;
+            }
+            const headers = currentLang === 'ar' 
+                ? ['الاسم', 'البريد', 'الهاتف', 'الحزام', 'الخبرة', 'الدولة', 'المدينة', 'الجنس', 'اسم الفريق', 'الحالة', 'التحقق', 'تاريخ الإنشاء']
+                : ['Name', 'Email', 'Phone', 'Belt', 'Experience', 'Country', 'City', 'Gender', 'Team Name', 'Status', 'Verification', 'Created At'];
+                
+            const rows = allCoaches.map(c => [
+                c.full_name || '', 
+                c.email || '', 
+                c.phone || '', 
+                c.belt_level || '', 
+                c.experience_years || '', 
+                c.country || '', 
+                c.city || '',
+                c.gender || '',
+                c.team_name || '',
+                c.is_suspended ? (currentLang === 'ar' ? 'موقوف' : 'Suspended') : (currentLang === 'ar' ? 'نشط' : 'Active'),
+                c.verification_status || 'pending',
+                c.created_at || ''
+            ]);
+            const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+            
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `coaches_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
         }
 
         function showAlert(message, type) {
@@ -459,10 +894,34 @@
         }
 
         async function handleLogout() {
-            await supabaseClient.auth.signOut();
-            localStorage.removeItem('currentAdmin');
-            window.location.href = 'admin-login.html';
+            if (confirm(currentLang === 'ar' ? 'هل أنت متأكد من تسجيل الخروج؟' : 'Are you sure you want to logout?')) {
+                try {
+                    await supabaseClient.auth.signOut();
+                } catch (e) {
+                    console.error('Logout error:', e);
+                }
+                localStorage.removeItem('currentAdmin');
+                window.location.href = 'admin-login.html';
+            }
         }
+
+        // ==========================================
+        // 4. Initialization
+        // ==========================================
+        window.onload = async () => {
+            window.setLang(currentLang);
+            await checkAuth();
+            await loadCoaches();
+        };
+
+        // Close modals on outside click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
     </script>
 </body>
 </html>
