@@ -16,15 +16,87 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-dark); color: var(--text-main); min-height: 100vh; }
         
-        .sidebar { width: 280px; background: rgba(21, 29, 43, 0.98); border-left: 2px solid var(--primary); position: fixed; height: 100vh; padding: 20px; right: 0; overflow-y: auto; z-index: 100; }
+        .sidebar { 
+            width: 280px; 
+            background: rgba(21, 29, 43, 0.98); 
+            border-left: 2px solid var(--primary); 
+            position: fixed; 
+            height: 100vh; 
+            padding: 20px; 
+            right: 0; 
+            overflow-y: auto; 
+            z-index: 100; 
+            display: flex;
+            flex-direction: column;
+        }
         [dir="ltr"] .sidebar { right: auto; left: 0; border-left: none; border-right: 2px solid var(--primary); }
-        .logo { display: flex; align-items: center; gap: 15px; padding: 20px; margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.1); }
-        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--accent), var(--accent-dark)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: var(--bg-dark); }
-        .logo-text { font-size: 22px; font-weight: bold; }
-        .nav-menu { display: flex; flex-direction: column; gap: 10px; }
-        .nav-item { padding: 15px 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; font-size: 15px; text-decoration: none; color: var(--text-main); }
-        .nav-item:hover { background: rgba(255,255,255,0.05); }
-        .nav-item.active { background: linear-gradient(135deg, var(--primary), #1d4ed8); }
+        
+        .logo { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            padding: 20px; 
+            margin-bottom: 30px; 
+            border-bottom: 2px solid rgba(255,255,255,0.1); 
+        }
+        .logo-icon { 
+            width: 50px; 
+            height: 50px; 
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark)); 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 28px; 
+            font-weight: bold; 
+            color: var(--bg-dark); 
+        }
+        .logo-text { 
+            font-size: 22px; 
+            font-weight: bold; 
+        }
+        
+        .nav-menu { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+            flex: 1;
+        }
+        .nav-item { 
+            padding: 15px 20px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            font-size: 15px; 
+            text-decoration: none; 
+            color: var(--text-main); 
+        }
+        .nav-item:hover { 
+            background: rgba(255,255,255,0.05); 
+        }
+        .nav-item.active { 
+            background: linear-gradient(135deg, var(--primary), #1d4ed8); 
+        }
+        .nav-item .icon {
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .role-badge {
+            background: var(--accent);
+            color: var(--bg-dark);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-top: auto;
+            display: block;
+            text-align: center;
+        }
         
         .main-content { margin-right: 280px; padding: 40px; }
         [dir="ltr"] .main-content { margin-right: 0; margin-left: 280px; }
@@ -85,7 +157,6 @@
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
         .modal-actions .btn { flex: 1; justify-content: center; }
 
-        /* ✅ إضافات جديدة متوافقة مع التصميم الحالي */
         .user-images { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
         .image-box { text-align: center; }
         .image-box img { width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); cursor: pointer; }
@@ -114,14 +185,48 @@
             <div class="logo-text">TopCompSports</div>
         </div>
         <div class="nav-menu">
-            <a class="nav-item" href="admin-dashboard.html"><i class="fas fa-chart-line"></i> <span data-en="Dashboard" data-ar="لوحة التحكم">Dashboard</span></a>
-            <a class="nav-item" href="admin-users.html"><i class="fas fa-users"></i> <span data-en="Users" data-ar="المستخدمون">Users</span></a>
-            <a class="nav-item" href="admin-athletes.html"><i class="fas fa-running"></i> <span data-en="Athletes" data-ar="اللاعبون">Athletes</span></a>
-            <a class="nav-item" href="admin-coaches.html"><i class="fas fa-chalkboard-teacher"></i> <span data-en="Coaches" data-ar="المدربون">Coaches</span></a>
-            <a class="nav-item active" href="admin-organizations.html"><i class="fas fa-building"></i> <span data-en="Organizers" data-ar="الجهات المنظمة">Organizers</span></a>
-            <a class="nav-item" href="admin-tournaments.html"><i class="fas fa-trophy"></i> <span data-en="Tournaments" data-ar="البطولات">Tournaments</span></a>
-            <a class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span data-en="Logout" data-ar="تسجيل الخروج">Logout</span></a>
+            <a class="nav-item" href="admin-dashboard.html">
+                <span class="icon"><i class="fas fa-chart-line"></i></span>
+                <span data-en="Dashboard" data-ar="لوحة التحكم">Dashboard</span>
+            </a>
+            <a class="nav-item" href="admin-users.html">
+                <span class="icon"><i class="fas fa-users"></i></span>
+                <span data-en="Users" data-ar="المستخدمون">Users</span>
+            </a>
+            <a class="nav-item" href="admin-athletes.html">
+                <span class="icon"><i class="fas fa-running"></i></span>
+                <span data-en="Athletes" data-ar="اللاعبون">Athletes</span>
+            </a>
+            <a class="nav-item" href="admin-athlete-documents.html">
+                <span class="icon"><i class="fas fa-id-card"></i></span>
+                <span data-en="Athlete Documents" data-ar="وثائق اللاعبين">Athlete Documents</span>
+            </a>
+            <a class="nav-item" href="admin-coaches.html">
+                <span class="icon"><i class="fas fa-chalkboard-teacher"></i></span>
+                <span data-en="Coaches" data-ar="المدربون">Coaches</span>
+            </a>
+            <a class="nav-item" href="admin-teams.html">
+                <span class="icon"><i class="fas fa-shield-alt"></i></span>
+                <span data-en="Teams" data-ar="الفرق">Teams</span>
+            </a>
+            <a class="nav-item active" href="admin-organizations.html">
+                <span class="icon"><i class="fas fa-building"></i></span>
+                <span data-en="Organizers" data-ar="الجهات المنظمة">Organizers</span>
+            </a>
+            <a class="nav-item" href="admin-tournaments.html">
+                <span class="icon"><i class="fas fa-trophy"></i></span>
+                <span data-en="Tournaments" data-ar="البطولات">Tournaments</span>
+            </a>
+            <a class="nav-item" href="admin-reports.html">
+                <span class="icon"><i class="fas fa-chart-bar"></i></span>
+                <span data-en="Reports" data-ar="التقارير">Reports</span>
+            </a>
+            <a class="nav-item" href="admin-settings.html">
+                <span class="icon"><i class="fas fa-cog"></i></span>
+                <span data-en="Settings" data-ar="الإعدادات">Settings</span>
+            </a>
         </div>
+        <div class="role-badge" data-en="Super Admin" data-ar="سوبر أدمن">Super Admin</div>
     </div>
 
     <div class="main-content">
@@ -132,7 +237,10 @@
                     <button class="lang-btn active" onclick="window.setLang('en')">EN</button>
                     <button class="lang-btn" onclick="window.setLang('ar')">AR</button>
                 </div>
-                <button class="btn btn-primary" onclick="showCreateModal()"><i class="fas fa-plus"></i> <span data-en="Add Organizer" data-ar="إضافة جهة منظمة">Add Organizer</span></button>
+                <button class="btn btn-primary" onclick="showCreateModal()">
+                    <i class="fas fa-plus"></i> 
+                    <span data-en="Add Organizer" data-ar="إضافة جهة منظمة">Add Organizer</span>
+                </button>
             </div>
         </div>
 
@@ -170,7 +278,10 @@
                 </div>
                 <div>
                     <label class="form-label" data-en="Action" data-ar="إجراء">Action</label>
-                    <button class="btn btn-primary" onclick="loadOrganizations()" style="width: 100%;"><i class="fas fa-sync-alt"></i> <span data-en="Refresh" data-ar="تحديث">Refresh</span></button>
+                    <button class="btn btn-primary" onclick="loadOrganizations()" style="width: 100%;">
+                        <i class="fas fa-sync-alt"></i> 
+                        <span data-en="Refresh" data-ar="تحديث">Refresh</span>
+                    </button>
                 </div>
             </div>
 
@@ -225,13 +336,19 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-success" onclick="createOrganization()"><i class="fas fa-check"></i> <span data-en="Create" data-ar="إنشاء">Create</span></button>
-                <button class="btn btn-danger" onclick="closeCreateModal()"><i class="fas fa-times"></i> <span data-en="Cancel" data-ar="إلغاء">Cancel</span></button>
+                <button class="btn btn-success" onclick="createOrganization()">
+                    <i class="fas fa-check"></i> 
+                    <span data-en="Create" data-ar="إنشاء">Create</span>
+                </button>
+                <button class="btn btn-danger" onclick="closeCreateModal()">
+                    <i class="fas fa-times"></i> 
+                    <span data-en="Cancel" data-ar="إلغاء">Cancel</span>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Edit Modal (✅ جديد) -->
+    <!-- Edit Modal -->
     <div class="modal-overlay" id="editModal">
         <div class="modal">
             <div class="modal-header">
@@ -283,8 +400,14 @@
                     <textarea class="form-input" id="editBio" rows="3"></textarea>
                 </div>
                 <div class="modal-actions">
-                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> <span data-en="Save" data-ar="حفظ">Save</span></button>
-                    <button type="button" class="btn btn-danger" onclick="closeEditModal()"><i class="fas fa-times"></i> <span data-en="Cancel" data-ar="إلغاء">Cancel</span></button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> 
+                        <span data-en="Save" data-ar="حفظ">Save</span>
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="closeEditModal()">
+                        <i class="fas fa-times"></i> 
+                        <span data-en="Cancel" data-ar="إلغاء">Cancel</span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -302,8 +425,14 @@
                 <textarea class="form-input" id="suspendReason" rows="4" data-placeholder-en="Enter the reason..." data-placeholder-ar="أدخل السبب..."></textarea>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-warning" onclick="confirmSuspend()"><i class="fas fa-ban"></i> <span data-en="Confirm Suspend" data-ar="تأكيد التعليق">Confirm Suspend</span></button>
-                <button class="btn btn-danger" onclick="closeSuspendModal()"><i class="fas fa-times"></i> <span data-en="Cancel" data-ar="إلغاء">Cancel</span></button>
+                <button class="btn btn-warning" onclick="confirmSuspend()">
+                    <i class="fas fa-ban"></i> 
+                    <span data-en="Confirm Suspend" data-ar="تأكيد التعليق">Confirm Suspend</span>
+                </button>
+                <button class="btn btn-danger" onclick="closeSuspendModal()">
+                    <i class="fas fa-times"></i> 
+                    <span data-en="Cancel" data-ar="إلغاء">Cancel</span>
+                </button>
             </div>
         </div>
     </div>
@@ -362,7 +491,6 @@
             const search = document.getElementById('searchOrg').value.toLowerCase();
             const statusFilter = document.getElementById('filterStatus').value;
 
-            // ✅ تم إضافة website و bio لجعل نافذة العرض أكثر شمولاً
             const { data, error } = await supabaseClient
                 .from('organizers')
                 .select('id, user_id, full_name, org_name, email, country, city, phone, verification_status, is_suspended, suspension_reason, profile_photo_url, id_document_url, website, bio, created_at')
@@ -412,16 +540,34 @@
                             <span class="status-badge ${statusClass}">${statusText}</span>
                         </div>
                         <div class="org-info">
-                            <div class="info-item"><span class="info-label">📍</span><span class="info-value">${org.city || '-'}, ${org.country || '-'}</span></div>
+                            <div class="info-item"><span class="info-label"></span><span class="info-value">${org.city || '-'}, ${org.country || '-'}</span></div>
                             <div class="info-item"><span class="info-label">📞</span><span class="info-value">${org.phone || '-'}</span></div>
                             <div class="info-item"><span class="info-label">📅</span><span class="info-value">${org.created_at ? new Date(org.created_at).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US') : '-'}</span></div>
                         </div>
                         <div class="action-btns">
-                            <button class="btn btn-info btn-sm" onclick="viewOrganization('${org.id}')"><i class="fas fa-eye"></i> <span data-en="View" data-ar="عرض">View</span></button>
-                            <button class="btn btn-primary btn-sm" onclick="editOrganization('${org.id}')"><i class="fas fa-edit"></i> <span data-en="Edit" data-ar="تعديل">Edit</span></button>
-                            ${org.status !== 'verified' ? `<button class="btn btn-success btn-sm" onclick="verifyOrganization('${org.id}')"><i class="fas fa-check"></i> <span data-en="Verify" data-ar="تحقق">Verify</span></button>` : ''}
-                            ${org.status !== 'suspended' ? `<button class="btn btn-warning btn-sm" onclick="openSuspendModal('${org.id}')"><i class="fas fa-ban"></i> <span data-en="Suspend" data-ar="تعليق">Suspend</span></button>` : `<button class="btn btn-success btn-sm" onclick="activateOrganization('${org.id}')"><i class="fas fa-play"></i> <span data-en="Activate" data-ar="تنشيط">Activate</span></button>`}
-                            <button class="btn btn-danger btn-sm" onclick="deleteOrganization('${org.id}')"><i class="fas fa-trash"></i> <span data-en="Delete" data-ar="حذف">Delete</span></button>
+                            <button class="btn btn-info btn-sm" onclick="viewOrganization('${org.id}')">
+                                <i class="fas fa-eye"></i> 
+                                <span data-en="View" data-ar="عرض">View</span>
+                            </button>
+                            <button class="btn btn-primary btn-sm" onclick="editOrganization('${org.id}')">
+                                <i class="fas fa-edit"></i> 
+                                <span data-en="Edit" data-ar="تعديل">Edit</span>
+                            </button>
+                            ${org.status !== 'verified' ? `<button class="btn btn-success btn-sm" onclick="verifyOrganization('${org.id}')">
+                                <i class="fas fa-check"></i> 
+                                <span data-en="Verify" data-ar="تحقق">Verify</span>
+                            </button>` : ''}
+                            ${org.status !== 'suspended' ? `<button class="btn btn-warning btn-sm" onclick="openSuspendModal('${org.id}')">
+                                <i class="fas fa-ban"></i> 
+                                <span data-en="Suspend" data-ar="تعليق">Suspend</span>
+                            </button>` : `<button class="btn btn-success btn-sm" onclick="activateOrganization('${org.id}')">
+                                <i class="fas fa-play"></i> 
+                                <span data-en="Activate" data-ar="تنشيط">Activate</span>
+                            </button>`}
+                            <button class="btn btn-danger btn-sm" onclick="deleteOrganization('${org.id}')">
+                                <i class="fas fa-trash"></i> 
+                                <span data-en="Delete" data-ar="حذف">Delete</span>
+                            </button>
                         </div>
                     </div>
                 `;
