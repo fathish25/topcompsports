@@ -514,6 +514,12 @@
             justify-content: center;
             font-size: 24px;
             border: 2px solid var(--accent);
+            overflow: hidden;
+        }
+        .athlete-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .athlete-info {
             flex: 1;
@@ -807,6 +813,7 @@
         let currentLang = localStorage.getItem('lang') || 'en';
         let tournamentId = null;
         let currentTab = 'information';
+        let tournamentData = null;
 
         window.onload = async function() {
             checkUserStatus();
@@ -863,7 +870,10 @@
                 el.textContent = lang === 'ar' ? el.dataset.ar : el.dataset.en;
             });
             
-            loadTournamentDetails();
+            // Reload current tab data
+            if (currentTab !== 'information') {
+                loadTabData(currentTab);
+            }
         }
 
         function formatDate(dateStr) {
@@ -891,29 +901,47 @@
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            event.target.closest('.tab').classList.add('active');
             
-            // Update active content
+            // Find the clicked tab button and make it active
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                if (tab.getAttribute('onclick').includes(tabName)) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
             
+            // Show the active tab content
             const activeContent = document.getElementById(`${tabName}Tab`);
             if (activeContent) {
                 activeContent.classList.add('active');
+                // Load data for this tab
+                loadTabData(tabName);
             }
-            
-            // Load tab-specific data
-            if (tabName === 'athletes') {
-                loadAthletes();
-            } else if (tabName === 'brackets') {
-                loadBrackets();
-            } else if (tabName === 'matches') {
-                loadMatches();
-            } else if (tabName === 'schedule') {
-                loadSchedule();
-            } else if (tabName === 'results') {
-                loadResults();
+        }
+
+        // Load data for specific tab
+        function loadTabData(tabName) {
+            switch(tabName) {
+                case 'athletes':
+                    loadAthletes();
+                    break;
+                case 'brackets':
+                    loadBrackets();
+                    break;
+                case 'matches':
+                    loadMatches();
+                    break;
+                case 'schedule':
+                    loadSchedule();
+                    break;
+                case 'results':
+                    loadResults();
+                    break;
             }
         }
 
@@ -935,6 +963,9 @@
                     `;
                     return;
                 }
+
+                // Store tournament data for later use
+                tournamentData = tournament;
 
                 // 2. Get participant count
                 const { count: participantCount } = await dbClient
@@ -1082,10 +1113,10 @@
                             <span style="background:var(--accent);color:var(--bg-dark);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${participantCount}</span>
                         </button>
                         <button class="tab" onclick="switchTab('brackets')">
-                            <span>🏆</span> ${bracketsTab}
+                            <span></span> ${bracketsTab}
                         </button>
                         <button class="tab" onclick="switchTab('matches')">
-                            <span>⚔️</span> ${matchesTab}
+                            <span>️</span> ${matchesTab}
                         </button>
                         <button class="tab" onclick="switchTab('schedule')">
                             <span>📅</span> ${scheduleTab}
@@ -1140,7 +1171,7 @@
                                 </div>
                                 ${tournament.sport_type ? `
                                 <div class="info-meta-item">
-                                    <span></span>
+                                    <span>🏅</span>
                                     <strong data-en="Sport:" data-ar="الرياضة:">Sport:</strong>
                                     <span>${tournament.sport_type}</span>
                                 </div>
@@ -1193,7 +1224,7 @@
                         <div class="brackets-container">
                             <div id="bracketsContent">
                                 <div class="bracket-message">
-                                    <div class="icon">🏆</div>
+                                    <div class="icon"></div>
                                     <h3 data-en="Brackets Not Available Yet" data-ar="المجموعات غير متاحة بعد">Brackets Not Available Yet</h3>
                                     <p data-en="Brackets will be posted 48 hours before the tournament starts." data-ar="سيتم نشر المجموعات قبل 48 ساعة من بدء البطولة.">Brackets will be posted 48 hours before the tournament starts.</p>
                                 </div>
@@ -1240,6 +1271,11 @@
 
         // Load Athletes
         async function loadAthletes() {
+            const athletesList = document.getElementById('athletesList');
+            if (!athletesList) return;
+            
+            athletesList.innerHTML = '<div class="loading" data-en="Loading athletes..." data-ar="جاري تحميل اللاعبين...">Loading athletes...</div>';
+            
             try {
                 const { data: participants, error } = await dbClient
                     .from('tournament_participants')
@@ -1258,8 +1294,6 @@
                     `)
                     .eq('tournament_id', tournamentId);
 
-                const athletesList = document.getElementById('athletesList');
-                
                 if (error || !participants || participants.length === 0) {
                     athletesList.innerHTML = `
                         <div class="empty-state">
@@ -1277,7 +1311,7 @@
                     const country = athlete?.country || '-';
                     const avatar = athlete?.profile_photo_url 
                         ? `<img src="${athlete.profile_photo_url}" alt="${name}">`
-                        : '👤';
+                        : '';
 
                     return `
                         <div class="athlete-card">
@@ -1286,7 +1320,7 @@
                                 <div class="athlete-name">${name}</div>
                                 <div class="athlete-details">
                                     ${belt ? `<span>🥋 ${belt}</span>` : ''}
-                                    ${country ? `<span> • 📍 ${country}</span>` : ''}
+                                    ${country ? `<span> •  ${country}</span>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -1294,7 +1328,7 @@
                 }).join('');
             } catch (error) {
                 console.error('Error loading athletes:', error);
-                document.getElementById('athletesList').innerHTML = `
+                athletesList.innerHTML = `
                     <div class="empty-state">
                         <p data-en="Error loading athletes" data-ar="خطأ في تحميل اللاعبين">Error loading athletes</p>
                     </div>
@@ -1304,6 +1338,11 @@
 
         // Load Brackets
         async function loadBrackets() {
+            const bracketsContent = document.getElementById('bracketsContent');
+            if (!bracketsContent) return;
+            
+            bracketsContent.innerHTML = '<div class="loading" data-en="Loading brackets..." data-ar="جاري تحميل المجموعات...">Loading brackets...</div>';
+            
             try {
                 const { data: brackets, error } = await dbClient
                     .from('tournament_brackets')
@@ -1311,8 +1350,6 @@
                     .eq('tournament_id', tournamentId)
                     .eq('is_published', true);
 
-                const bracketsContent = document.getElementById('bracketsContent');
-                
                 if (error || !brackets || brackets.length === 0) {
                     bracketsContent.innerHTML = `
                         <div class="bracket-message">
@@ -1346,7 +1383,7 @@
                 `;
             } catch (error) {
                 console.error('Error loading brackets:', error);
-                document.getElementById('bracketsContent').innerHTML = `
+                bracketsContent.innerHTML = `
                     <div class="bracket-message">
                         <p data-en="Error loading brackets" data-ar="خطأ في تحميل المجموعات">Error loading brackets</p>
                     </div>
@@ -1356,6 +1393,11 @@
 
         // Load Matches
         async function loadMatches() {
+            const matchesList = document.getElementById('matchesList');
+            if (!matchesList) return;
+            
+            matchesList.innerHTML = '<div class="loading" data-en="Loading matches..." data-ar="جاري تحميل المباريات...">Loading matches...</div>';
+            
             try {
                 const { data: matches, error } = await dbClient
                     .from('tournament_matches')
@@ -1373,8 +1415,6 @@
                     .eq('tournament_id', tournamentId)
                     .order('scheduled_time', { ascending: true });
 
-                const matchesList = document.getElementById('matchesList');
-                
                 if (error || !matches || matches.length === 0) {
                     matchesList.innerHTML = `
                         <div class="empty-state">
@@ -1418,7 +1458,7 @@
                 }).join('');
             } catch (error) {
                 console.error('Error loading matches:', error);
-                document.getElementById('matchesList').innerHTML = `
+                matchesList.innerHTML = `
                     <div class="empty-state">
                         <p data-en="Error loading matches" data-ar="خطأ في تحميل المباريات">Error loading matches</p>
                     </div>
@@ -1428,6 +1468,11 @@
 
         // Load Schedule
         async function loadSchedule() {
+            const scheduleList = document.getElementById('scheduleList');
+            if (!scheduleList) return;
+            
+            scheduleList.innerHTML = '<div class="loading" data-en="Loading schedule..." data-ar="جاري تحميل الجدول...">Loading schedule...</div>';
+            
             try {
                 const { data: schedule, error } = await dbClient
                     .from('tournament_schedule')
@@ -1435,8 +1480,6 @@
                     .eq('tournament_id', tournamentId)
                     .order('start_time', { ascending: true });
 
-                const scheduleList = document.getElementById('scheduleList');
-                
                 if (error || !schedule || schedule.length === 0) {
                     // Fallback: Use matches as schedule
                     const { data: matches } = await dbClient
@@ -1477,7 +1520,7 @@
                 `).join('');
             } catch (error) {
                 console.error('Error loading schedule:', error);
-                document.getElementById('scheduleList').innerHTML = `
+                scheduleList.innerHTML = `
                     <div class="empty-state">
                         <p data-en="Error loading schedule" data-ar="خطأ في تحميل الجدول">Error loading schedule</p>
                     </div>
@@ -1487,6 +1530,11 @@
 
         // Load Results
         async function loadResults() {
+            const resultsList = document.getElementById('resultsList');
+            if (!resultsList) return;
+            
+            resultsList.innerHTML = '<div class="loading" data-en="Loading results..." data-ar="جاري تحميل النتائج...">Loading results...</div>';
+            
             try {
                 const { data: results, error } = await dbClient
                     .from('tournament_results')
@@ -1499,8 +1547,6 @@
                     `)
                     .eq('tournament_id', tournamentId);
 
-                const resultsList = document.getElementById('resultsList');
-                
                 if (error || !results || results.length === 0) {
                     resultsList.innerHTML = `
                         <div class="bracket-message">
@@ -1541,7 +1587,7 @@
                 `).join('');
             } catch (error) {
                 console.error('Error loading results:', error);
-                document.getElementById('resultsList').innerHTML = `
+                resultsList.innerHTML = `
                     <div class="bracket-message">
                         <p data-en="Error loading results" data-ar="خطأ في تحميل النتائج">Error loading results</p>
                     </div>
