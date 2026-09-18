@@ -206,7 +206,6 @@
         .tab { 
             padding: 15px 25px; 
             color: var(--text-muted); 
-            text-decoration: none; 
             font-weight: 600; 
             border-bottom: 3px solid transparent; 
             transition: all 0.3s; 
@@ -225,6 +224,14 @@
         .tab.active { 
             color: var(--accent); 
             border-bottom-color: var(--accent); 
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
         }
 
         /* Banner */
@@ -483,6 +490,198 @@
             color: var(--danger); 
         }
 
+        /* Athletes List */
+        .athletes-list {
+            display: grid;
+            gap: 15px;
+        }
+        .athlete-card {
+            background: var(--bg-input);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .athlete-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 2px solid var(--accent);
+        }
+        .athlete-info {
+            flex: 1;
+        }
+        .athlete-name {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 1.1rem;
+        }
+        .athlete-details {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Brackets */
+        .brackets-container {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            min-height: 400px;
+        }
+        .bracket-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .bracket-message .icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Matches */
+        .matches-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .match-card {
+            background: var(--bg-input);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .match-time {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .match-competitors {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        .competitor {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background: var(--bg-card);
+            border-radius: 8px;
+        }
+        .competitor-name {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .vs {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        /* Schedule */
+        .schedule-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .schedule-item {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: var(--bg-input);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+        .schedule-time {
+            min-width: 120px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .schedule-content {
+            flex: 1;
+        }
+        .schedule-title {
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 5px;
+        }
+        .schedule-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Results */
+        .results-grid {
+            display: grid;
+            gap: 20px;
+        }
+        .result-card {
+            background: var(--bg-input);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid var(--success);
+        }
+        .result-division {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        .result-podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .podium-place {
+            text-align: center;
+            padding: 20px;
+            background: var(--bg-card);
+            border-radius: 8px;
+            min-width: 150px;
+        }
+        .podium-place.first {
+            order: 2;
+            border-top: 4px solid var(--accent);
+            transform: translateY(-20px);
+        }
+        .podium-place.second {
+            order: 1;
+            border-top: 4px solid #94a3b8;
+        }
+        .podium-place.third {
+            order: 3;
+            border-top: 4px solid #b45309;
+        }
+        .podium-name {
+            font-weight: 700;
+            color: var(--text-main);
+            margin-top: 10px;
+        }
+        .podium-rank {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
         /* Loading & Empty */
         .loading { 
             text-align: center; 
@@ -531,6 +730,11 @@
             .banner-image { height: 250px; }
             .main-content { padding: 0 20px 40px; }
             .info-section { padding: 25px; }
+            .match-competitors { flex-direction: column; }
+            .result-podium { flex-direction: column; align-items: center; }
+            .podium-place.first { order: 1; transform: none; }
+            .podium-place.second { order: 2; }
+            .podium-place.third { order: 3; }
         }
 
         @media (max-width: 480px) {
@@ -566,33 +770,33 @@
         </div>
         
         <nav class="nav">
-            <a href="index.html">Home</a>
-            <a href="tournaments.html">Tournaments</a>
+            <a href="index.html" data-en="Home" data-ar="الرئيسية">Home</a>
+            <a href="tournaments.html" data-en="Tournaments" data-ar="البطولات">Tournaments</a>
             
             <div id="userSection" class="user-section" style="display: none;">
-                <a href="my-profile.html" style="color: var(--accent); text-decoration: none;">My Profile</a>
+                <a href="my-profile.html" data-en="My Profile" data-ar="ملفي">My Profile</a>
                 <div class="user-info" onclick="window.location.href='my-profile.html'">
                     <div class="user-avatar" id="userAvatar"><span>👤</span></div>
                     <span class="user-name" id="userName">User</span>
                 </div>
-                <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
+                <button class="btn btn-logout" onclick="handleLogout()" data-en="Logout" data-ar="تسجيل الخروج">Logout</button>
             </div>
             
-            <a href="login.html" id="loginBtn" class="btn btn-login">Login</a>
+            <a href="login.html" id="loginBtn" class="btn btn-login" data-en="Login" data-ar="تسجيل الدخول">Login</a>
             
             <div class="lang-switcher">
-                <button class="lang-btn" onclick="changeLanguage('ar')" id="btn-ar">عربي</button>
-                <button class="lang-btn active" onclick="changeLanguage('en')" id="btn-en">English</button>
+                <button class="lang-btn" onclick="changeLanguage('ar')" id="btn-ar" data-en="عربي" data-ar="عربي">عربي</button>
+                <button class="lang-btn active" onclick="changeLanguage('en')" id="btn-en" data-en="English" data-ar="English">English</button>
             </div>
         </nav>
     </header>
 
     <div id="tournamentContent">
-        <div class="loading">Loading tournament details...</div>
+        <div class="loading" data-en="Loading tournament details..." data-ar="جاري تحميل تفاصيل البطولة...">Loading tournament details...</div>
     </div>
 
     <footer class="footer">
-        <p>© 2026 TopCompSports - All rights reserved</p>
+        <p data-en="© 2026 TopCompSports - All rights reserved" data-ar="© 2026 TopCompSports - جميع الحقوق محفوظة">© 2026 TopCompSports - All rights reserved</p>
     </footer>
 
     <script>
@@ -602,6 +806,7 @@
 
         let currentLang = localStorage.getItem('lang') || 'en';
         let tournamentId = null;
+        let currentTab = 'information';
 
         window.onload = async function() {
             checkUserStatus();
@@ -612,7 +817,7 @@
                 document.getElementById('tournamentContent').innerHTML = `
                     <div class="empty-state">
                         <div class="icon"></div>
-                        <p>Tournament not found</p>
+                        <p data-en="Tournament not found" data-ar="البطولة غير موجودة">Tournament not found</p>
                     </div>
                 `;
                 return;
@@ -652,6 +857,12 @@
             document.getElementById('btn-en').classList.toggle('active', lang === 'en');
             document.documentElement.lang = lang;
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            // Update all elements with data-en and data-ar attributes
+            document.querySelectorAll('[data-en][data-ar]').forEach(el => {
+                el.textContent = lang === 'ar' ? el.dataset.ar : el.dataset.en;
+            });
+            
             loadTournamentDetails();
         }
 
@@ -662,6 +873,48 @@
             return date.toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', { 
                 year: 'numeric', month: 'long', day: 'numeric' 
             });
+        }
+
+        function formatTime(timeStr) {
+            if (!timeStr) return '--:--';
+            const date = new Date(timeStr);
+            return date.toLocaleTimeString(currentLang === 'ar' ? 'ar-SA' : 'en-US', { 
+                hour: '2-digit', minute: '2-digit' 
+            });
+        }
+
+        // Tab Switching Function
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            // Update active tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.closest('.tab').classList.add('active');
+            
+            // Update active content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            const activeContent = document.getElementById(`${tabName}Tab`);
+            if (activeContent) {
+                activeContent.classList.add('active');
+            }
+            
+            // Load tab-specific data
+            if (tabName === 'athletes') {
+                loadAthletes();
+            } else if (tabName === 'brackets') {
+                loadBrackets();
+            } else if (tabName === 'matches') {
+                loadMatches();
+            } else if (tabName === 'schedule') {
+                loadSchedule();
+            } else if (tabName === 'results') {
+                loadResults();
+            }
         }
 
         async function loadTournamentDetails() {
@@ -677,7 +930,7 @@
                     document.getElementById('tournamentContent').innerHTML = `
                         <div class="empty-state">
                             <div class="icon">❌</div>
-                            <p>Tournament not found</p>
+                            <p data-en="Tournament not found" data-ar="البطولة غير موجودة">Tournament not found</p>
                         </div>
                     `;
                     return;
@@ -722,7 +975,7 @@
                 document.getElementById('tournamentContent').innerHTML = `
                     <div class="empty-state">
                         <div class="icon">❌</div>
-                        <p>Error loading tournament details</p>
+                        <p data-en="Error loading tournament details" data-ar="خطأ في تحميل تفاصيل البطولة">Error loading tournament details</p>
                     </div>
                 `;
             }
@@ -746,15 +999,21 @@
                 ? `<img src="${bannerImage}" alt="${tournament.name}">`
                 : '';
 
+            const registerButtonText = currentLang === 'ar' ? 'سجل الآن' : 'Register Now';
+            const loginToRegisterText = currentLang === 'ar' ? 'سجل الدخول للتسجيل' : 'Login to Register';
+
             const registerButton = isLoggedIn
-                ? `<button class="btn-register" onclick="window.location.href='player-registration.html?tournament_id=${tournamentId}'">Register Now</button>`
-                : `<button class="btn-secondary" onclick="window.location.href='login.html?redirect=tournament-details.html?tournament_id=${tournamentId}'">Login to Register</button>`;
+                ? `<button class="btn-register" onclick="window.location.href='player-registration.html?tournament_id=${tournamentId}'">${registerButtonText}</button>`
+                : `<button class="btn-secondary" onclick="window.location.href='login.html?redirect=tournament-details.html?tournament_id=${tournamentId}'">${loginToRegisterText}</button>`;
 
             // Build entries list (Divisions)
+            const entriesText = currentLang === 'ar' ? 'التسجيلات' : 'Entries';
+            const divisionsText = currentLang === 'ar' ? 'سيتم الإعلان عنها قريباً' : 'Divisions will be announced soon';
+            
             const entriesHtml = divisions.length > 0
                 ? divisions.map(div => {
                     const price = div.price || 0;
-                    const priceText = price > 0 ? `$${price} USD` : 'Free';
+                    const priceText = price > 0 ? `$${price} USD` : (currentLang === 'ar' ? 'مجاني' : 'Free');
                     const details = [];
                     if (div.age_group) details.push(div.age_group);
                     if (div.belt_level) details.push(div.belt_level);
@@ -773,15 +1032,25 @@
                 }).join('')
                 : `<div style="text-align: center; padding: 30px; color: var(--text-muted);">
                      <div style="font-size: 3rem; margin-bottom: 10px;">🏆</div>
-                     <p>Divisions will be announced soon</p>
+                     <p>${divisionsText}</p>
                    </div>`;
 
             // Payment settings
             const paymentEnabled = paymentSettings?.payment_enabled || false;
-            const paymentMethod = paymentSettings?.payment_method || 'cash';
+            const onlinePaymentText = currentLang === 'ar' ? 'الدفع الإلكتروني متاح' : 'Online Payment Enabled';
+            const cashPaymentText = currentLang === 'ar' ? 'الدفع نقداً فقط' : 'Cash Payment Only';
+            
             const paymentBadge = paymentEnabled 
-                ? `<span class="payment-badge online">💳 Online Payment Enabled</span>`
-                : `<span class="payment-badge cash">💵 Cash Payment Only</span>`;
+                ? `<span class="payment-badge online">💳 ${onlinePaymentText}</span>`
+                : `<span class="payment-badge cash"> ${cashPaymentText}</span>`;
+
+            // Tab labels
+            const informationTab = currentLang === 'ar' ? 'المعلومات' : 'Information';
+            const athletesTab = currentLang === 'ar' ? 'اللاعبين' : 'Athletes';
+            const bracketsTab = currentLang === 'ar' ? 'المجموعات' : 'Brackets';
+            const matchesTab = currentLang === 'ar' ? 'المباريات' : 'Matches';
+            const scheduleTab = currentLang === 'ar' ? 'الجدول' : 'Schedule';
+            const resultsTab = currentLang === 'ar' ? 'النتائج' : 'Results';
 
             document.getElementById('tournamentContent').innerHTML = `
                 <!-- Tournament Header -->
@@ -805,12 +1074,25 @@
                 <!-- Tabs -->
                 <div class="tabs-container">
                     <div class="tabs">
-                        <button class="tab active"><span>📋</span> Information</button>
-                        <button class="tab"><span></span> Athletes <span style="background:var(--accent);color:var(--bg-dark);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${participantCount}</span></button>
-                        <button class="tab"><span>🏆</span> Brackets</button>
-                        <button class="tab"><span>⚔️</span> Matches</button>
-                        <button class="tab"><span>📅</span> Schedule</button>
-                        <button class="tab"><span></span> Results</button>
+                        <button class="tab active" onclick="switchTab('information')">
+                            <span>📋</span> ${informationTab}
+                        </button>
+                        <button class="tab" onclick="switchTab('athletes')">
+                            <span>👥</span> ${athletesTab} 
+                            <span style="background:var(--accent);color:var(--bg-dark);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${participantCount}</span>
+                        </button>
+                        <button class="tab" onclick="switchTab('brackets')">
+                            <span>🏆</span> ${bracketsTab}
+                        </button>
+                        <button class="tab" onclick="switchTab('matches')">
+                            <span>⚔️</span> ${matchesTab}
+                        </button>
+                        <button class="tab" onclick="switchTab('schedule')">
+                            <span>📅</span> ${scheduleTab}
+                        </button>
+                        <button class="tab" onclick="switchTab('results')">
+                            <span>🏅</span> ${resultsTab}
+                        </button>
                     </div>
                 </div>
 
@@ -821,159 +1103,450 @@
                 </div>
                 ` : ''}
 
-                <!-- Main Content -->
+                <!-- Tab Contents -->
                 <div class="main-content">
-                    <div class="info-section">
-                        <h2>Tournament Information</h2>
-                        
-                        <div class="info-meta">
-                            <div class="info-meta-item">
-                                <span></span>
-                                <strong>Date:</strong>
-                                <span>${dateDisplay}</span>
+                    <!-- Information Tab -->
+                    <div id="informationTab" class="tab-content active" style="grid-column: 1 / -1;">
+                        <div class="info-section">
+                            <h2 data-en="Tournament Information" data-ar="معلومات البطولة">Tournament Information</h2>
+                            
+                            <div class="info-meta">
+                                <div class="info-meta-item">
+                                    <span>📅</span>
+                                    <strong data-en="Date:" data-ar="التاريخ:">Date:</strong>
+                                    <span>${dateDisplay}</span>
+                                </div>
+                                <div class="info-meta-item">
+                                    <span>📍</span>
+                                    <strong data-en="Location:" data-ar="الموقع:">Location:</strong>
+                                    <span>${location}</span>
+                                </div>
+                                <div class="info-meta-item">
+                                    <span>👥</span>
+                                    <strong data-en="Participants:" data-ar="المشاركين:">Participants:</strong>
+                                    <span>${participantCount} / ${tournament.max_participants || (currentLang === 'ar' ? 'غير محدود' : 'Unlimited')}</span>
+                                </div>
+                                ${tournament.registration_fee > 0 ? `
+                                <div class="info-meta-item">
+                                    <span>💰</span>
+                                    <strong data-en="Base Fee:" data-ar="الرسوم الأساسية:">Base Fee:</strong>
+                                    <span>$${tournament.registration_fee} USD</span>
+                                </div>
+                                ` : ''}
+                                <div class="info-meta-item">
+                                    <span>💳</span>
+                                    <strong data-en="Payment:" data-ar="الدفع:">Payment:</strong>
+                                    ${paymentBadge}
+                                </div>
+                                ${tournament.sport_type ? `
+                                <div class="info-meta-item">
+                                    <span></span>
+                                    <strong data-en="Sport:" data-ar="الرياضة:">Sport:</strong>
+                                    <span>${tournament.sport_type}</span>
+                                </div>
+                                ` : ''}
                             </div>
-                            <div class="info-meta-item">
-                                <span>📍</span>
-                                <strong>Location:</strong>
-                                <span>${location}</span>
-                            </div>
-                            <div class="info-meta-item">
-                                <span>👥</span>
-                                <strong>Participants:</strong>
-                                <span>${participantCount} / ${tournament.max_participants || 'Unlimited'}</span>
-                            </div>
-                            ${tournament.registration_fee > 0 ? `
-                            <div class="info-meta-item">
-                                <span>💰</span>
-                                <strong>Base Fee:</strong>
-                                <span>$${tournament.registration_fee} USD</span>
-                            </div>
-                            ` : ''}
-                            <div class="info-meta-item">
-                                <span>💳</span>
-                                <strong>Payment:</strong>
-                                ${paymentBadge}
-                            </div>
-                            ${tournament.sport_type ? `
-                            <div class="info-meta-item">
-                                <span>🏅</span>
-                                <strong>Sport:</strong>
-                                <span>${tournament.sport_type}</span>
-                            </div>
-                            ` : ''}
+
+                            <h3 data-en="About This Tournament" data-ar="عن هذه البطولة">About This Tournament</h3>
+                            <p>${tournament.description || (currentLang === 'ar' ? 'لا يوجد وصف متاح' : 'No description available.')}</p>
+
+                            <h3 data-en="Registration Information" data-ar="معلومات التسجيل">Registration Information</h3>
+                            <p data-en="This tournament is pre-registration only. We do not take registrations after the deadline or registrations at the event!" data-ar="هذه البطولة بالتسجيل المسبق فقط. لا نقبل التسجيلات بعد الموعد النهائي أو التسجيل في الحدث!">This tournament is pre-registration only. We do not take registrations after the deadline or registrations at the event!</p>
+                            
+                            <ul style="margin: 15px 0; padding-left: 25px; color: var(--text-muted);">
+                                ${tournament.reg_regular_end ? `<li><strong data-en="Normal Registration:" data-ar="التسجيل العادي:">Normal Registration:</strong> ${currentLang === 'ar' ? 'سجل قبل' : 'Register before'} ${formatDate(tournament.reg_regular_end)}</li>` : ''}
+                                ${tournament.reg_late_end ? `<li><strong data-en="Late Registration:" data-ar="التسجيل المتأخر:">Late Registration:</strong> ${currentLang === 'ar' ? 'سجل قبل' : 'Register before'} ${formatDate(tournament.reg_late_end)}</li>` : ''}
+                            </ul>
+
+                            <h3 data-en="Rules and Policies" data-ar="القواعد والسياسات">Rules and Policies</h3>
+                            <p data-en="By registering for this tournament, you confirm that you have thoroughly reviewed the event information and that you agree to comply with all rules and policies." data-ar="من خلال التسجيل في هذه البطولة، فإنك تؤكد أنك قد راجعت معلومات الحدث بدقة وأنك توافق على الالتزام بجميع القواعد والسياسات.">By registering for this tournament, you confirm that you have thoroughly reviewed the event information and that you agree to comply with all rules and policies.</p>
+
+                            <h3 data-en="Format" data-ar="النظام">Format</h3>
+                            <p data-en="The tournament offers every competitor multiple matches per division regardless of wins and losses. Competitors can get as many as 4 to 6 matches per division!" data-ar="تقدم البطولة لكل منافس عدة مباريات لكل قسم بغض النظر عن الفوز والخسارة. يمكن للمنافسين الحصول على ما يصل إلى 4 إلى 6 مباريات لكل قسم!">The tournament offers every competitor multiple matches per division regardless of wins and losses. Competitors can get as many as 4 to 6 matches per division!</p>
+
+                            <h3 data-en="Weigh-Ins" data-ar="الموازنة">Weigh-Ins</h3>
+                            <p data-en="Competitors can weigh in as soon as the event doors open on the day they are competing up until 60 minutes prior to their division start time." data-ar="يمكن للمنافسين الموازنة بمجرد فتح أبواب الحدث في اليوم الذي يتنافسون فيه حتى 60 دقيقة قبل وقت بدء قسمهم.">Competitors can weigh in as soon as the event doors open on the day they are competing up until 60 minutes prior to their division start time.</p>
+
+                            <h3 data-en="Brackets and Schedule" data-ar="المجموعات والجدول">Brackets and Schedule</h3>
+                            <p data-en="The tournament's brackets and schedule will be posted 48 hours prior to the event." data-ar="سيتم نشر مجموعات البطولة والجدول قبل 48 ساعة من الحدث.">The tournament's brackets and schedule will be posted 48 hours prior to the event.</p>
+
+                            <h3 data-en="Capacity" data-ar="السعة">Capacity</h3>
+                            <p data-en="Each tournament has a set capacity limit and registration will close early if capacity is reached." data-ar="كل بطولة لها حد سعة محدد وسيتم إغلاق التسجيل مبكراً إذا تم الوصول إلى السعة.">Each tournament has a set capacity limit and registration will close early if capacity is reached.</p>
+
+                            <h3 data-en="Refund Policy" data-ar="سياسة الاسترداد">Refund Policy</h3>
+                            <p>${paymentSettings?.refund_policy || (currentLang === 'ar' ? 'استرداد كامل متاح حتى موعد التسجيل العادي. بعد هذا التاريخ، يتم عرض رصيد قسيمة كامل فقط.' : 'A full refund is available until the Normal Registration deadline. After this date, only a full coupon credit is offered.')}</p>
                         </div>
-
-                        <h3>About This Tournament</h3>
-                        <p>${tournament.description || 'No description available.'}</p>
-
-                        <h3>Registration Information</h3>
-                        <p>This tournament is pre-registration only. We do not take registrations after the deadline or registrations at the event!</p>
-                        
-                        <ul style="margin: 15px 0; padding-left: 25px; color: var(--text-muted);">
-                            ${tournament.reg_regular_end ? `<li><strong>Normal Registration:</strong> Register before ${formatDate(tournament.reg_regular_end)}</li>` : ''}
-                            ${tournament.reg_late_end ? `<li><strong>Late Registration:</strong> Register before ${formatDate(tournament.reg_late_end)}</li>` : ''}
-                        </ul>
-
-                        <h3>Rules and Policies</h3>
-                        <p>By registering for this tournament, you confirm that you have thoroughly reviewed the event information and that you agree to comply with all rules and policies.</p>
-
-                        <h3>Format</h3>
-                        <p>The tournament offers every competitor multiple matches per division regardless of wins and losses. Competitors can get as many as 4 to 6 matches per division!</p>
-
-                        <h3>Weigh-Ins</h3>
-                        <p>Competitors can weigh in as soon as the event doors open on the day they are competing up until 60 minutes prior to their division start time.</p>
-
-                        <h3>Brackets and Schedule</h3>
-                        <p>The tournament's brackets and schedule will be posted 48 hours prior to the event.</p>
-
-                        <h3>Capacity</h3>
-                        <p>Each tournament has a set capacity limit and registration will close early if capacity is reached.</p>
-
-                        <h3>Refund Policy</h3>
-                        <p>${paymentSettings?.refund_policy || 'A full refund is available until the Normal Registration deadline. After this date, only a full coupon credit is offered.'}</p>
                     </div>
 
-                    <div class="sidebar">
-                        <!-- Entries -->
-                        <div class="sidebar-card">
-                            <h3>Entries</h3>
-                            <div class="entries-list">
-                                ${entriesHtml}
+                    <!-- Athletes Tab -->
+                    <div id="athletesTab" class="tab-content" style="grid-column: 1 / -1;">
+                        <div class="info-section">
+                            <h2 data-en="Registered Athletes" data-ar="اللاعبين المسجلين">Registered Athletes</h2>
+                            <div id="athletesList" class="athletes-list">
+                                <div class="loading" data-en="Loading athletes..." data-ar="جاري تحميل اللاعبين...">Loading athletes...</div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Registration Dates -->
-                        <div class="sidebar-card">
-                            <h3>Registration</h3>
-                            <div class="registration-dates">
-                                ${tournament.reg_regular_start && tournament.reg_regular_end ? `
-                                <div class="reg-date-item">
-                                    <h4>Normal Registration</h4>
-                                    <p>${formatDate(tournament.reg_regular_start)} - ${formatDate(tournament.reg_regular_end)}</p>
-                                </div>
-                                ` : ''}
-                                ${tournament.reg_late_start && tournament.reg_late_end ? `
-                                <div class="reg-date-item late">
-                                    <h4>Late Registration</h4>
-                                    <p>${formatDate(tournament.reg_late_start)} - ${formatDate(tournament.reg_late_end)}</p>
-                                </div>
-                                ` : ''}
-                                <div class="reg-date-item">
-                                    <h4>Event Starts</h4>
-                                    <p>${formatDate(startDate)}</p>
+                    <!-- Brackets Tab -->
+                    <div id="bracketsTab" class="tab-content" style="grid-column: 1 / -1;">
+                        <div class="brackets-container">
+                            <div id="bracketsContent">
+                                <div class="bracket-message">
+                                    <div class="icon">🏆</div>
+                                    <h3 data-en="Brackets Not Available Yet" data-ar="المجموعات غير متاحة بعد">Brackets Not Available Yet</h3>
+                                    <p data-en="Brackets will be posted 48 hours before the tournament starts." data-ar="سيتم نشر المجموعات قبل 48 ساعة من بدء البطولة.">Brackets will be posted 48 hours before the tournament starts.</p>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Location -->
-                        <div class="sidebar-card">
-                            <h3>Location</h3>
-                            <div class="location-card">
-                                <p class="location-address">${location}</p>
-                                <div class="location-map" onclick="window.open('https://maps.google.com/?q=${encodeURIComponent(location)}', '_blank')">
-                                    <span>📍 View on Map</span>
-                                </div>
+                    <!-- Matches Tab -->
+                    <div id="matchesTab" class="tab-content" style="grid-column: 1 / -1;">
+                        <div class="info-section">
+                            <h2 data-en="Matches" data-ar="المباريات">Matches</h2>
+                            <div id="matchesList" class="matches-list">
+                                <div class="loading" data-en="Loading matches..." data-ar="جاري تحميل المباريات...">Loading matches...</div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Organizer -->
-                        ${organizer ? `
-                        <div class="sidebar-card">
-                            <h3>Organizer</h3>
-                            <div class="organizer-card">
-                                <div class="organizer-name">${organizer.full_name || organizer.organization_name || 'TopCompSports'}</div>
-                                <div class="organizer-info">${organizer.organization_type || 'Professional tournament management'}</div>
-                                <div class="contact-links">
-                                    ${organizer.email ? `<a href="mailto:${organizer.email}" class="contact-link"><span>️</span><span>Email</span></a>` : ''}
-                                    ${organizer.phone ? `<a href="tel:${organizer.phone}" class="contact-link"><span>📞</span><span>Phone</span></a>` : ''}
-                                    ${organizer.whatsapp ? `<a href="https://wa.me/${organizer.whatsapp.replace(/[^0-9]/g, '')}" target="_blank" class="contact-link"><span></span><span>WhatsApp</span></a>` : ''}
-                                    ${organizer.website ? `<a href="${organizer.website}" target="_blank" class="contact-link"><span>🌐</span><span>Website</span></a>` : ''}
-                                </div>
+                    <!-- Schedule Tab -->
+                    <div id="scheduleTab" class="tab-content" style="grid-column: 1 / -1;">
+                        <div class="info-section">
+                            <h2 data-en="Schedule" data-ar="الجدول الزمني">Schedule</h2>
+                            <div id="scheduleList" class="schedule-timeline">
+                                <div class="loading" data-en="Loading schedule..." data-ar="جاري تحميل الجدول...">Loading schedule...</div>
                             </div>
                         </div>
-                        ` : ''}
+                    </div>
 
-                        <!-- Cancel/Refund Policy -->
-                        <div class="sidebar-card">
-                            <h3>Cancel/Refund Policy</h3>
-                            <div class="registration-dates">
-                                ${tournament.reg_regular_end ? `
-                                <div class="reg-date-item">
-                                    <h4>Last chance to cancel</h4>
-                                    <p>${formatDate(tournament.reg_regular_end)}</p>
+                    <!-- Results Tab -->
+                    <div id="resultsTab" class="tab-content" style="grid-column: 1 / -1;">
+                        <div class="info-section">
+                            <h2 data-en="Results" data-ar="النتائج">Results</h2>
+                            <div id="resultsList" class="results-grid">
+                                <div class="bracket-message">
+                                    <div class="icon"></div>
+                                    <h3 data-en="Results Not Available Yet" data-ar="النتائج غير متاحة بعد">Results Not Available Yet</h3>
+                                    <p data-en="Results will be posted after the tournament ends." data-ar="سيتم نشر النتائج بعد انتهاء البطولة.">Results will be posted after the tournament ends.</p>
                                 </div>
-                                ` : ''}
-                                ${tournament.reg_late_end ? `
-                                <div class="reg-date-item">
-                                    <h4>Last chance to edit</h4>
-                                    <p>${formatDate(tournament.reg_late_end)}</p>
-                                </div>
-                                ` : ''}
                             </div>
                         </div>
                     </div>
                 </div>
             `;
+        }
+
+        // Load Athletes
+        async function loadAthletes() {
+            try {
+                const { data: participants, error } = await dbClient
+                    .from('tournament_participants')
+                    .select(`
+                        *,
+                        athletes (
+                            id,
+                            full_name,
+                            date_of_birth,
+                            gender,
+                            country,
+                            city,
+                            belt_level,
+                            profile_photo_url
+                        )
+                    `)
+                    .eq('tournament_id', tournamentId);
+
+                const athletesList = document.getElementById('athletesList');
+                
+                if (error || !participants || participants.length === 0) {
+                    athletesList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon"></div>
+                            <p data-en="No athletes registered yet" data-ar="لا يوجد لاعبين مسجلين بعد">No athletes registered yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                athletesList.innerHTML = participants.map(p => {
+                    const athlete = p.athletes;
+                    const name = athlete?.full_name || (currentLang === 'ar' ? 'غير معروف' : 'Unknown');
+                    const belt = athlete?.belt_level || '-';
+                    const country = athlete?.country || '-';
+                    const avatar = athlete?.profile_photo_url 
+                        ? `<img src="${athlete.profile_photo_url}" alt="${name}">`
+                        : '👤';
+
+                    return `
+                        <div class="athlete-card">
+                            <div class="athlete-avatar">${avatar}</div>
+                            <div class="athlete-info">
+                                <div class="athlete-name">${name}</div>
+                                <div class="athlete-details">
+                                    ${belt ? `<span>🥋 ${belt}</span>` : ''}
+                                    ${country ? `<span> • 📍 ${country}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading athletes:', error);
+                document.getElementById('athletesList').innerHTML = `
+                    <div class="empty-state">
+                        <p data-en="Error loading athletes" data-ar="خطأ في تحميل اللاعبين">Error loading athletes</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load Brackets
+        async function loadBrackets() {
+            try {
+                const { data: brackets, error } = await dbClient
+                    .from('tournament_brackets')
+                    .select('*')
+                    .eq('tournament_id', tournamentId)
+                    .eq('is_published', true);
+
+                const bracketsContent = document.getElementById('bracketsContent');
+                
+                if (error || !brackets || brackets.length === 0) {
+                    bracketsContent.innerHTML = `
+                        <div class="bracket-message">
+                            <div class="icon">🏆</div>
+                            <h3 data-en="Brackets Not Available Yet" data-ar="المجموعات غير متاحة بعد">Brackets Not Available Yet</h3>
+                            <p data-en="Brackets will be posted 48 hours before the tournament starts." data-ar="سيتم نشر المجموعات قبل 48 ساعة من بدء البطولة.">Brackets will be posted 48 hours before the tournament starts.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Render brackets (simplified view)
+                bracketsContent.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <h3 data-en="Tournament Brackets" data-ar="مجموعات البطولة">Tournament Brackets</h3>
+                        <p style="margin: 20px 0; color: var(--text-muted);">
+                            ${currentLang === 'ar' ? `عدد المجموعات: ${brackets.length}` : `Total Brackets: ${brackets.length}`}
+                        </p>
+                        <div style="display: grid; gap: 20px; margin-top: 30px;">
+                            ${brackets.map(b => `
+                                <div style="background: var(--bg-input); padding: 20px; border-radius: 10px;">
+                                    <strong style="color: var(--accent);">${b.division_name || b.bracket_name || '-'}</strong>
+                                    <p style="color: var(--text-muted); margin-top: 10px;">
+                                        ${currentLang === 'ar' ? 'الحالة: ' : 'Status: '} 
+                                        <span style="color: var(--success);">${b.status || 'Active'}</span>
+                                    </p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading brackets:', error);
+                document.getElementById('bracketsContent').innerHTML = `
+                    <div class="bracket-message">
+                        <p data-en="Error loading brackets" data-ar="خطأ في تحميل المجموعات">Error loading brackets</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load Matches
+        async function loadMatches() {
+            try {
+                const { data: matches, error } = await dbClient
+                    .from('tournament_matches')
+                    .select(`
+                        *,
+                        competitor1:competitor1_id (
+                            athlete_id,
+                            athletes (full_name, country)
+                        ),
+                        competitor2:competitor2_id (
+                            athlete_id,
+                            athletes (full_name, country)
+                        )
+                    `)
+                    .eq('tournament_id', tournamentId)
+                    .order('scheduled_time', { ascending: true });
+
+                const matchesList = document.getElementById('matchesList');
+                
+                if (error || !matches || matches.length === 0) {
+                    matchesList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">⚔️</div>
+                            <p data-en="No matches scheduled yet" data-ar="لا توجد مباريات مجدولة بعد">No matches scheduled yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                matchesList.innerHTML = matches.map(match => {
+                    const comp1 = match.competitor1?.athletes?.full_name || (currentLang === 'ar' ? 'منافس 1' : 'Competitor 1');
+                    const comp2 = match.competitor2?.athletes?.full_name || (currentLang === 'ar' ? 'منافس 2' : 'Competitor 2');
+                    const time = formatTime(match.scheduled_time);
+                    const division = match.division_name || '-';
+
+                    return `
+                        <div class="match-card">
+                            <div class="match-header">
+                                <span style="color: var(--text-muted);">${division}</span>
+                                <span class="match-time">🕐 ${time}</span>
+                            </div>
+                            <div class="match-competitors">
+                                <div class="competitor">
+                                    <div class="competitor-name">${comp1}</div>
+                                </div>
+                                <div class="vs">VS</div>
+                                <div class="competitor">
+                                    <div class="competitor-name">${comp2}</div>
+                                </div>
+                            </div>
+                            ${match.winner_id ? `
+                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                                    <span style="color: var(--success); font-weight: 700;">
+                                        ${currentLang === 'ar' ? 'الفائز: ' : 'Winner: '} ${match.winner_id === match.competitor1_id ? comp1 : comp2}
+                                    </span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading matches:', error);
+                document.getElementById('matchesList').innerHTML = `
+                    <div class="empty-state">
+                        <p data-en="Error loading matches" data-ar="خطأ في تحميل المباريات">Error loading matches</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load Schedule
+        async function loadSchedule() {
+            try {
+                const { data: schedule, error } = await dbClient
+                    .from('tournament_schedule')
+                    .select('*')
+                    .eq('tournament_id', tournamentId)
+                    .order('start_time', { ascending: true });
+
+                const scheduleList = document.getElementById('scheduleList');
+                
+                if (error || !schedule || schedule.length === 0) {
+                    // Fallback: Use matches as schedule
+                    const { data: matches } = await dbClient
+                        .from('tournament_matches')
+                        .select('division_name, scheduled_time')
+                        .eq('tournament_id', tournamentId)
+                        .order('scheduled_time', { ascending: true });
+
+                    if (matches && matches.length > 0) {
+                        scheduleList.innerHTML = matches.map((item, index) => `
+                            <div class="schedule-item">
+                                <div class="schedule-time">${formatTime(item.scheduled_time)}</div>
+                                <div class="schedule-content">
+                                    <div class="schedule-title">${item.division_name || (currentLang === 'ar' ? 'مباراة' : 'Match')} ${index + 1}</div>
+                                    <div class="schedule-desc">${currentLang === 'ar' ? 'مباراة بطولة' : 'Tournament Match'}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        scheduleList.innerHTML = `
+                            <div class="empty-state">
+                                <div class="icon">📅</div>
+                                <p data-en="No schedule available yet" data-ar="لا يوجد جدول متاح بعد">No schedule available yet</p>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+
+                scheduleList.innerHTML = schedule.map(item => `
+                    <div class="schedule-item">
+                        <div class="schedule-time">${formatTime(item.start_time)}</div>
+                        <div class="schedule-content">
+                            <div class="schedule-title">${item.title || item.event_name || '-'}</div>
+                            <div class="schedule-desc">${item.description || ''}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading schedule:', error);
+                document.getElementById('scheduleList').innerHTML = `
+                    <div class="empty-state">
+                        <p data-en="Error loading schedule" data-ar="خطأ في تحميل الجدول">Error loading schedule</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Load Results
+        async function loadResults() {
+            try {
+                const { data: results, error } = await dbClient
+                    .from('tournament_results')
+                    .select(`
+                        *,
+                        winner:winner_id (
+                            athlete_id,
+                            athletes (full_name, country)
+                        )
+                    `)
+                    .eq('tournament_id', tournamentId);
+
+                const resultsList = document.getElementById('resultsList');
+                
+                if (error || !results || results.length === 0) {
+                    resultsList.innerHTML = `
+                        <div class="bracket-message">
+                            <div class="icon"></div>
+                            <h3 data-en="Results Not Available Yet" data-ar="النتائج غير متاحة بعد">Results Not Available Yet</h3>
+                            <p data-en="Results will be posted after the tournament ends." data-ar="سيتم نشر النتائج بعد انتهاء البطولة.">Results will be posted after the tournament ends.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Group by division
+                const byDivision = {};
+                results.forEach(r => {
+                    const div = r.division_name || (currentLang === 'ar' ? 'قسم' : 'Division');
+                    if (!byDivision[div]) byDivision[div] = [];
+                    byDivision[div].push(r);
+                });
+
+                resultsList.innerHTML = Object.keys(byDivision).map(div => `
+                    <div class="result-card">
+                        <div class="result-division">${div}</div>
+                        <div class="result-podium">
+                            ${byDivision[div].slice(0, 3).map((r, index) => {
+                                const ranks = ['2', '1', '3'];
+                                const classes = ['second', 'first', 'third'];
+                                const athlete = r.winner?.athletes?.full_name || (currentLang === 'ar' ? 'غير معروف' : 'Unknown');
+                                
+                                return `
+                                    <div class="podium-place ${classes[index]}">
+                                        <div class="podium-rank">${ranks[index]}</div>
+                                        <div class="podium-name">${athlete}</div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading results:', error);
+                document.getElementById('resultsList').innerHTML = `
+                    <div class="bracket-message">
+                        <p data-en="Error loading results" data-ar="خطأ في تحميل النتائج">Error loading results</p>
+                    </div>
+                `;
+            }
         }
 
         async function handleLogout() {
