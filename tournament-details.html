@@ -187,7 +187,7 @@
             align-items: center; 
         }
 
-        /* Tabs - ✅ FIXED */
+        /* Tabs */
         .tabs-container { 
             background: var(--bg-card); 
             border-bottom: 2px solid rgba(255,255,255,0.1); 
@@ -645,7 +645,7 @@
             <div id="userSection" class="user-section" style="display: none;">
                 <a href="my-profile.html" style="color: var(--accent); text-decoration: none;">My Profile</a>
                 <div class="user-info" onclick="window.location.href='my-profile.html'">
-                    <div class="user-avatar" id="userAvatar"><span>👤</span></div>
+                    <div class="user-avatar" id="userAvatar"><span></span></div>
                     <span class="user-name" id="userName">User</span>
                 </div>
                 <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
@@ -729,12 +729,10 @@
             document.documentElement.lang = lang;
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
             
-            // Update all elements with data-en and data-ar attributes
             document.querySelectorAll('[data-en][data-ar]').forEach(el => {
                 el.textContent = lang === 'ar' ? el.dataset.ar : el.dataset.en;
             });
             
-            // Reload current tab data
             if (currentTab !== 'information') {
                 loadTabData(currentTab);
             }
@@ -759,7 +757,10 @@
             });
             
             // Add active class to clicked tab
-            event.target.closest('.tab').classList.add('active');
+            if (event && event.target) {
+                const clickedTab = event.target.closest('.tab');
+                if (clickedTab) clickedTab.classList.add('active');
+            }
             
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(content => {
@@ -783,7 +784,6 @@
                     loadAthletes();
                     break;
                 case 'brackets':
-                    // Show coming soon message
                     document.getElementById('bracketsContent').innerHTML = `
                         <div class="coming-soon">
                             <div class="icon">🏆</div>
@@ -834,21 +834,22 @@
                 if (tournamentError || !tournament) {
                     document.getElementById('tournamentContent').innerHTML = `
                         <div class="empty-state">
-                            <div class="icon"></div>
+                            <div class="icon">❌</div>
                             <p>Tournament not found</p>
                         </div>
                     `;
                     return;
                 }
 
-                // Store tournament data for later use
                 tournamentData = tournament;
 
                 // 2. Get participant count
-                const { count: participantCount } = await dbClient
+                const { count: countResult } = await dbClient
                     .from('tournament_participants')
                     .select('*', { count: 'exact', head: true })
                     .eq('tournament_id', tournamentId);
+                
+                participantCount = countResult || 0;
 
                 // 3. Get active and visible divisions
                 const { data: divisions } = await dbClient
@@ -877,7 +878,7 @@
                     organizer = orgData;
                 }
 
-                renderTournament(tournament, organizer, participantCount || 0, divisions || [], paymentSettings);
+                renderTournament(tournament, organizer, participantCount, divisions || [], paymentSettings);
             } catch (error) {
                 console.error('Error loading tournament:', error);
                 document.getElementById('tournamentContent').innerHTML = `
@@ -977,7 +978,7 @@
                             <span>🏆</span> Brackets
                         </button>
                         <button class="tab" onclick="switchTab('matches')">
-                            <span>⚔️</span> Matches
+                            <span>️</span> Matches
                         </button>
                         <button class="tab" onclick="switchTab('schedule')">
                             <span>📅</span> Schedule
@@ -1004,12 +1005,12 @@
                             
                             <div class="info-meta">
                                 <div class="info-meta-item">
-                                    <span>📅</span>
+                                    <span></span>
                                     <strong>Date:</strong>
                                     <span>${dateDisplay}</span>
                                 </div>
                                 <div class="info-meta-item">
-                                    <span></span>
+                                    <span>📍</span>
                                     <strong>Location:</strong>
                                     <span>${location}</span>
                                 </div>
@@ -1086,7 +1087,7 @@
                             <h2 data-en="Brackets" data-ar="المجموعات">Brackets</h2>
                             <div id="bracketsContent">
                                 <div class="coming-soon">
-                                    <div class="icon"></div>
+                                    <div class="icon">🏆</div>
                                     <h3>Coming Soon</h3>
                                     <p>Brackets will be posted 48 hours before the tournament starts</p>
                                 </div>
@@ -1128,7 +1129,7 @@
                             <h2 data-en="Results" data-ar="النتائج">Results</h2>
                             <div id="resultsContent">
                                 <div class="coming-soon">
-                                    <div class="icon">🏅</div>
+                                    <div class="icon"></div>
                                     <h3>Coming Soon</h3>
                                     <p>Results will be posted after the tournament ends</p>
                                 </div>
@@ -1139,7 +1140,7 @@
             `;
         }
 
-        // Load Athletes
+        // ✅ FIXED: Load Athletes - استعلام بسيط بدون علاقات معقدة
         async function loadAthletes() {
             const athletesList = document.getElementById('athletesList');
             if (!athletesList) return;
@@ -1147,23 +1148,18 @@
             athletesList.innerHTML = '<div class="loading">Loading athletes...</div>';
             
             try {
+                // ✅ استعلام بسيط - جلب كل الأعمدة مباشرة من tournament_participants
                 const { data: participants, error } = await dbClient
                     .from('tournament_participants')
-                    .select(`
-                        player_name,
-                        belt_level,
-                        gender,
-                        weight_class_name,
-                        user_id,
-                        athletes (
-                            full_name,
-                            country,
-                            profile_photo_url
-                        )
-                    `)
+                    .select('*')
                     .eq('tournament_id', tournamentId);
 
-                if (error || !participants || participants.length === 0) {
+                if (error) {
+                    console.error('Error loading athletes:', error);
+                    throw error;
+                }
+
+                if (!participants || participants.length === 0) {
                     athletesList.innerHTML = `
                         <div class="empty-state">
                             <div class="icon"></div>
@@ -1173,35 +1169,48 @@
                     return;
                 }
 
-                athletesList.innerHTML = participants.map(p => {
-                    const athlete = p.athletes;
-                    const name = athlete?.full_name || p.player_name || 'Unknown';
-                    const belt = p.belt_level || athlete?.belt_level || '-';
-                    const country = athlete?.country || '-';
-                    const weightClass = p.weight_class_name || '';
-                    const avatar = athlete?.profile_photo_url 
-                        ? `<img src="${athlete.profile_photo_url}" alt="${name}">`
-                        : '';
-
+                // ✅ عرض البيانات المتاحة مباشرة - يتكيف مع أي أعمدة موجودة
+                athletesList.innerHTML = participants.map((p, index) => {
+                    // محاولة الحصول على اسم اللاعب من أي عمود متاح
+                    const name = p.full_name || p.player_name || p.name || p.athlete_name || p.first_name || `Athlete ${index + 1}`;
+                    const belt = p.belt_level || p.belt || '';
+                    const country = p.country || '';
+                    const weightClass = p.weight_class || p.weight_class_name || p.division || '';
+                    const email = p.email || '';
+                    const phone = p.phone || '';
+                    const gender = p.gender || '';
+                    const ageGroup = p.age_group || p.age || '';
+                    const team = p.team_name || p.team || '';
+                    
+                    // بناء تفاصيل اللاعب
+                    let details = [];
+                    if (belt) details.push(`🥋 ${belt}`);
+                    if (weightClass) details.push(`⚖️ ${weightClass}`);
+                    if (gender) details.push(`${gender === 'male' ? '♂️' : '♀️'} ${gender}`);
+                    if (ageGroup) details.push(`📅 ${ageGroup}`);
+                    if (country) details.push(` ${country}`);
+                    if (team) details.push(`🏆 ${team}`);
+                    
                     return `
                         <div class="athlete-card">
-                            <div class="athlete-avatar">${avatar || '👤'}</div>
+                            <div class="athlete-avatar"></div>
                             <div class="athlete-info">
                                 <div class="athlete-name">${name}</div>
                                 <div class="athlete-details">
-                                    ${belt ? `<span> ${belt}</span>` : ''}
-                                    ${weightClass ? `<span> • ️ ${weightClass}</span>` : ''}
-                                    ${country ? `<span> • 📍 ${country}</span>` : ''}
+                                    ${details.length > 0 ? `<div>${details.join(' • ')}</div>` : ''}
+                                    ${email ? `<div style="font-size: 0.8rem; margin-top: 5px;">📧 ${email}</div>` : ''}
+                                    ${phone ? `<div style="font-size: 0.8rem;">📞 ${phone}</div>` : ''}
                                 </div>
                             </div>
                         </div>
                     `;
                 }).join('');
+                
             } catch (error) {
-                console.error('Error loading athletes:', error);
+                console.error('Error in loadAthletes:', error);
                 athletesList.innerHTML = `
                     <div class="empty-state">
-                        <p>Error loading athletes</p>
+                        <p>Error loading athletes: ${error.message}</p>
                     </div>
                 `;
             }
