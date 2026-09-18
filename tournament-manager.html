@@ -1,874 +1,2637 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Details - TopCompSports</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --primary-blue: #0066CC;
-            --dark-blue: #003366;
-            --accent-yellow: #FFB800;
-            --black: #0A0A0A;
-            --dark-gray: #1A1A1A;
-            --medium-gray: #2A2A2A;
-            --light-gray: #3A3A3A;
-            --white: #FFFFFF;
-            
-            --bg-dark: #0a0e17;
-            --bg-card: #151d2b;
-            --bg-input: rgba(255,255,255,0.05);
-            --text-main: #ffffff;
-            --text-muted: rgba(255,255,255,0.7);
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TopCompSports - Tournament Manager</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { 
+  font-family: 'Segoe UI', Tahoma, sans-serif; 
+  background: #0a0e17; 
+  color: #fff; 
+  min-height: 100vh;
+}
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-dark); color: var(--text-main); min-height: 100vh; }
-        img { max-width: 100%; height: auto; }
+.main-header {
+  background: #0a0e17;
+  border-bottom: 2px solid #1e3a8a;
+  padding: 15px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
 
-        /* Header */
-        .header { 
-            background: var(--black); 
-            padding: 15px 50px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 3px solid var(--primary-blue); 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
-        }
-        .logo { display: flex; align-items: center; gap: 15px; cursor: pointer; }
-        .logo-svg { width: 50px; height: 50px; }
-        .logo-text { font-size: 28px; font-weight: bold; color: var(--primary-blue); }
-        .nav { display: flex; gap: 30px; align-items: center; }
-        .nav a { color: var(--white); text-decoration: none; padding: 8px 15px; border-radius: 6px; transition: all 0.3s; font-weight: 600; }
-        .nav a:hover { color: var(--accent-yellow); }
+.header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
 
-        .user-section { display: flex; align-items: center; gap: 15px; }
-        .user-info { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-        .user-avatar { 
-            width: 40px; height: 40px; border-radius: 50%; overflow: hidden; 
-            border: 2px solid var(--accent-yellow); background: var(--medium-gray); 
-            display: flex; align-items: center; justify-content: center; font-size: 20px; 
-        }
-        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .user-name { font-weight: 600; color: var(--accent-yellow); }
-        
-        .btn { 
-            padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; 
-            cursor: pointer; transition: all 0.3s; font-size: 0.95rem; text-decoration: none; display: inline-block; 
-        }
-        .btn-logout { background: transparent; border: 2px solid var(--white); color: var(--white); }
-        .btn-logout:hover { background: var(--white); color: var(--black); }
-        .btn-login { background: var(--primary-blue); color: var(--white); }
-        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,102,204,0.4); }
-        .btn-register { 
-            background: var(--accent-yellow); color: var(--black); padding: 12px 30px; 
-            border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 1rem; 
-        }
-        .btn-register:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(255,184,0,0.4); }
-        .btn-secondary { 
-            background: transparent; color: var(--white); border: 2px solid var(--white); 
-            padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s; 
-        }
-        .btn-secondary:hover { background: var(--white); color: var(--black); }
+.logo-section { display: flex; align-items: center; gap: 15px; }
 
-        .lang-switcher { display: flex; gap: 5px; background: var(--medium-gray); padding: 5px; border-radius: 8px; }
-        .lang-btn { padding: 8px 15px; border: none; background: transparent; color: var(--white); cursor: pointer; border-radius: 6px; font-weight: bold; }
-        .lang-btn.active { background: var(--primary-blue); }
+.logo-icon {
+  width: 50px; height: 50px;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem; font-weight: bold;
+  color: #fbbf24;
+  border: 2px solid #fbbf24;
+}
 
-        /* Tournament Header */
-        .tournament-header { background: var(--black); padding: 30px 50px; border-bottom: 3px solid var(--primary-blue); }
-        .tournament-header-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
-        .tournament-title-section { display: flex; align-items: center; gap: 20px; }
-        .tournament-logo { width: 80px; height: 80px; border-radius: 12px; overflow: hidden; background: var(--medium-gray); }
-        .tournament-logo img { width: 100%; height: 100%; object-fit: cover; }
-        .tournament-title h1 { color: var(--white); font-size: 2rem; font-weight: 900; margin-bottom: 5px; }
-        .tournament-title p { color: rgba(255,255,255,0.7); font-size: 1rem; }
-        .tournament-actions { display: flex; gap: 15px; align-items: center; }
+.logo-text {
+  font-size: 1.8rem; font-weight: bold;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
-        /* Tabs - Original Styling Restored */
-        .tabs-container { 
-            background: var(--dark-gray); 
-            border-bottom: 1px solid var(--medium-gray); 
-            position: sticky; 
-            top: 73px; 
-            z-index: 999; 
-        }
-        .tabs { 
-            max-width: 1200px; 
-            margin: 0 auto; 
-            display: flex; 
-            gap: 5px; 
-            padding: 0 50px; 
-            overflow-x: auto; 
-        }
-        .tab { 
-            padding: 15px 25px; 
-            color: rgba(255,255,255,0.7); 
-            font-weight: 600; 
-            border-bottom: 3px solid transparent; 
-            transition: all 0.3s; 
-            white-space: nowrap; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            cursor: pointer; 
-            background: transparent;
-            border: none;
-            font-size: 1rem;
-            font-family: inherit;
-        }
-        .tab:hover { color: var(--white); }
-        .tab.active { color: var(--white); border-bottom-color: var(--accent-yellow); }
+.nav-menu { display: flex; gap: 30px; align-items: center; }
 
-        /* Tab Content */
-        .tab-content { display: none; animation: fadeIn 0.3s ease-in; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+.nav-link {
+  color: #fff; text-decoration: none;
+  font-weight: 500; padding: 8px 15px;
+  border-radius: 5px; transition: all 0.3s;
+}
 
-        /* Banner */
-        .banner { max-width: 1200px; margin: 40px auto; padding: 0 50px; }
-        .banner-image { width: 100%; height: 400px; border-radius: 15px; overflow: hidden; background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue)); }
-        .banner-image img { width: 100%; height: 100%; object-fit: cover; }
+.nav-link:hover { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+.nav-link.active { color: #fbbf24; }
 
-        /* Main Content */
-        .main-content { max-width: 1200px; margin: 0 auto; padding: 0 50px 60px; display: grid; grid-template-columns: 2fr 1fr; gap: 40px; }
+.user-section { display: flex; align-items: center; gap: 15px; }
 
-        /* Info Section */
-        .info-section { background: var(--bg-card); border-radius: 15px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); }
-        .info-section h2 { font-size: 1.8rem; font-weight: 900; color: var(--accent-yellow); margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.1); }
-        .info-section h3 { font-size: 1.3rem; font-weight: 700; color: var(--text-main); margin: 25px 0 15px; }
-        .info-section p { color: var(--text-muted); line-height: 1.8; margin-bottom: 15px; }
-        .info-meta { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
-        .info-meta-item { display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 1rem; }
-        .info-meta-item strong { color: var(--text-main); }
+.user-profile {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 15px;
+  background: rgba(251, 191, 36, 0.1);
+  border-radius: 25px; border: 1px solid #fbbf24;
+}
 
-        /* Sidebar */
-        .sidebar { display: flex; flex-direction: column; gap: 25px; }
-        .sidebar-card { background: var(--bg-card); border-radius: 15px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-card h3 { font-size: 1.2rem; font-weight: 700; color: var(--text-main); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid rgba(255,255,255,0.1); }
+.user-avatar {
+  width: 35px; height: 35px;
+  background: #1e293b; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid #fbbf24;
+}
 
-        /* Entries List */
-        .entries-list { display: flex; flex-direction: column; gap: 12px; }
-        .entry-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--bg-input); border-radius: 10px; transition: all 0.3s; border-left: 4px solid var(--primary-blue); }
-        .entry-item:hover { transform: translateX(5px); box-shadow: 0 4px 12px rgba(0,102,204,0.2); }
-        .entry-info { display: flex; flex-direction: column; gap: 4px; }
-        .entry-name { font-weight: 700; color: var(--text-main); font-size: 1rem; }
-        .entry-details { font-size: 0.85rem; color: var(--text-muted); }
-        .entry-price { color: var(--primary-blue); font-weight: 700; font-size: 1.1rem; white-space: nowrap; }
-        .entry-price.free { color: var(--success); }
+.user-name { color: #fbbf24; font-weight: 600; }
 
-        /* Registration Dates */
-        .registration-dates { display: flex; flex-direction: column; gap: 15px; }
-        .reg-date-item { padding: 15px; background: var(--bg-input); border-radius: 10px; border-left: 4px solid var(--primary-blue); }
-        .reg-date-item.late { border-left-color: var(--accent-yellow); }
-        .reg-date-item h4 { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 5px; }
-        .reg-date-item p { font-size: 1rem; color: var(--text-main); font-weight: 700; }
+.btn-logout {
+  padding: 8px 20px;
+  background: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
 
-        /* Location */
-        .location-card { display: flex; flex-direction: column; gap: 10px; }
-        .location-address { color: var(--text-muted); line-height: 1.6; }
-        .location-map { width: 100%; height: 200px; background: var(--bg-input); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; transition: all 0.3s; border: 2px solid rgba(255,255,255,0.1); }
-        .location-map:hover { background: var(--primary-blue); color: var(--white); }
+.btn-logout:hover { background: #fff; color: #0a0e17; }
 
-        /* Organizer */
-        .organizer-card { display: flex; flex-direction: column; gap: 12px; }
-        .organizer-name { font-weight: 700; color: var(--text-main); font-size: 1.1rem; }
-        .organizer-info { color: var(--text-muted); font-size: 0.9rem; }
-        .contact-links { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .contact-link { display: flex; align-items: center; gap: 10px; color: var(--primary-blue); text-decoration: none; padding: 10px; background: var(--bg-input); border-radius: 8px; transition: all 0.3s; }
-        .contact-link:hover { background: var(--primary-blue); color: var(--white); }
+.language-toggle {
+  display: flex;
+  background: #1e293b;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
 
-        /* Payment Badge */
-        .payment-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
-        .payment-badge.cash { background: rgba(255,184,0,0.2); color: var(--accent-yellow); }
-        .payment-badge.online { background: rgba(16,185,129,0.2); color: var(--success); }
+.lang-btn {
+  padding: 6px 15px;
+  border: none;
+  background: transparent;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
 
-        /* ✅ Brackets & Athletes Styles */
-        .athletes-list, .brackets-container { padding: 10px 0; }
-        .division-group { margin-bottom: 30px; }
-        .division-title { 
-            font-size: 1.3rem; font-weight: 900; color: var(--text-main); 
-            margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--primary-blue); 
-        }
-        .bracket-table { width: 100%; background: var(--bg-input); border-radius: 10px; overflow: hidden; margin-bottom: 15px; }
-        .bracket-table-header { 
-            display: grid; grid-template-columns: 2fr 2fr 2fr; background: var(--medium-gray); 
-            padding: 15px; font-weight: 700; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; 
-        }
-        .bracket-table-row { 
-            display: grid; grid-template-columns: 2fr 2fr 2fr; padding: 15px; 
-            border-bottom: 1px solid rgba(255,255,255,0.05); align-items: center; 
-        }
-        .bracket-table-row:last-child { border-bottom: none; }
-        .athlete-cell { display: flex; align-items: center; gap: 12px; }
-        .athlete-avatar, .athlete-avatar-small { 
-            width: 50px; height: 50px; border-radius: 50%; background: var(--primary-blue); 
-            display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; flex-shrink: 0;
-        }
-        .athlete-avatar-small { width: 40px; height: 40px; font-size: 1rem; }
-        .athlete-name-cell { font-weight: 700; color: var(--text-main); }
-        .academy-cell { color: var(--primary-blue); }
-        .registration-cell { font-size: 0.9rem; color: var(--text-muted); }
-        .gender-badge { 
-            display: inline-block; padding: 4px 10px; background: var(--primary-blue); 
-            color: var(--white); border-radius: 4px; font-size: 0.8rem; margin-bottom: 5px; 
-        }
-        .total-registrations { color: var(--text-muted); font-size: 0.9rem; margin-top: 10px; }
+.lang-btn.active { background: #3b82f6; color: #fff; }
 
-        /* Coming Soon Message */
-        .coming-soon { text-align: center; padding: 80px 20px; color: var(--text-muted); }
-        .coming-soon .icon { font-size: 5rem; margin-bottom: 20px; opacity: 0.5; }
-        .coming-soon h3 { color: var(--text-main); margin-bottom: 10px; }
+.tournament-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
-        /* Loading & Empty */
-        .loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 1.2rem; }
-        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
-        .empty-state .icon { font-size: 5rem; margin-bottom: 20px; opacity: 0.5; }
+.tournament-header {
+  background: #151d2b;
+  padding: 20px 25px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  border: 1px solid #2a3548;
+}
 
-        /* Footer */
-        .footer { background: var(--black); padding: 30px 50px; color: rgba(255,255,255,0.6); text-align: center; border-top: 1px solid var(--medium-gray); margin-top: 60px; }
+.tournament-title-section h1 { color: #fbbf24; font-size: 1.8rem; margin-bottom: 5px; }
+.tournament-subtitle { color: #8899aa; font-size: 0.9rem; }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .header { padding: 15px 30px; }
-            .tournament-header { padding: 30px 30px; }
-            .tabs { padding: 0 30px; }
-            .banner { padding: 0 30px; }
-            .main-content { padding: 0 30px 60px; grid-template-columns: 1fr; }
-        }
-        @media (max-width: 768px) {
-            .header { padding: 12px 20px; flex-direction: column; gap: 15px; }
-            .nav { flex-wrap: wrap; justify-content: center; gap: 10px; }
-            .tournament-header { padding: 20px; }
-            .tournament-title-section { flex-direction: column; align-items: flex-start; }
-            .tournament-title h1 { font-size: 1.5rem; }
-            .tabs { padding: 0 20px; overflow-x: auto; }
-            .banner { padding: 0 20px; }
-            .banner-image { height: 250px; }
-            .main-content { padding: 0 20px 40px; }
-            .info-section { padding: 25px; }
-            .bracket-table-header, .bracket-table-row { grid-template-columns: 1fr; gap: 10px; }
-        }
-        @media (max-width: 480px) {
-            .header { padding: 10px 15px; }
-            .logo-text { font-size: 22px; }
-            .tournament-header { padding: 15px; }
-            .tournament-title h1 { font-size: 1.3rem; }
-            .tournament-actions { flex-direction: column; width: 100%; }
-            .tournament-actions .btn { width: 100%; text-align: center; }
-            .tabs { padding: 0 15px; }
-            .banner { padding: 0 15px; }
-            .main-content { padding: 0 15px 30px; }
-            .info-section { padding: 20px; }
-            .sidebar-card { padding: 20px; }
-            .entry-item { flex-direction: column; align-items: flex-start; gap: 10px; }
-        }
-    </style>
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
+.action-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+
+.btn:hover { transform: translateY(-2px); }
+.btn-players { background: #3b82f6; color: #fff; }
+.btn-mats { background: #8b5cf6; color: #fff; }
+.btn-settings { background: #f59e0b; color: #000; }
+.btn-sync { background: #64748b; color: #fff; }
+.btn-clear-db { background: #ea580c; color: #fff; }
+.btn-export { background: #0ea5e9; color: #fff; }
+.btn-back { background: #6b7280; color: #fff; }
+.btn-info { background: #0ea5e9; color: #fff; }
+.btn-add { background: #22c55e; color: #fff; }
+.btn-new-tab { background: #8b5cf6; color: #fff; }
+
+.view { display: none; }
+.view.active { display: block; animation: fadeIn 0.3s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.section {
+  background: #1a1f2e;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 20px;
+  border: 1px solid #2a3548;
+}
+
+.section-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #fbbf24;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.player-count { color: #8899aa; font-size: 1rem; }
+.button-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+
+.table-container {
+  max-height: 600px;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid #2a3548;
+}
+
+table { width: 100%; border-collapse: collapse; }
+thead { position: sticky; top: 0; background: #151d2b; z-index: 10; }
+
+th {
+  background: #151d2b;
+  color: #8899aa;
+  padding: 12px;
+  text-align: left;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  border-bottom: 2px solid #2a3548;
+}
+
+td { padding: 10px; border-bottom: 1px solid #2a3548; }
+tr:hover { background: rgba(59, 130, 246, 0.05); }
+
+input, select {
+  background: #0f1724;
+  border: 1px solid #2a3548;
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  width: 100%;
+}
+
+input:focus, select:focus { outline: none; border-color: #fbbf24; }
+
+.btn-delete {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-delete:hover { background: #b91c1c; }
+
+.btn-proceed {
+  width: 100%;
+  padding: 15px;
+  background: #22c55e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-proceed:hover { background: #16a34a; }
+
+.mats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.mat-card {
+  background: #151d2b;
+  border: 2px solid #2a3548;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.category-tag {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 3px;
+}
+
+.bracket-container {
+  background: #0d1117;
+  border-radius: 12px;
+  padding: 30px;
+  overflow-x: auto;
+}
+
+.bracket-tree {
+  display: flex;
+  gap: 60px;
+  min-width: max-content;
+  padding: 20px;
+}
+
+.bracket-round {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  min-width: 220px;
+}
+
+.round-title {
+  text-align: center;
+  font-weight: bold;
+  color: #fbbf24;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: rgba(251, 191, 36, 0.1);
+  border-radius: 8px;
+  border: 2px solid rgba(251, 191, 36, 0.3);
+}
+
+.bracket-match {
+  background: #151d2b;
+  border: 2px solid #2a3548;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+  min-width: 200px;
+  transition: all 0.2s;
+}
+
+.bracket-match:hover { border-color: #fbbf24; transform: translateY(-2px); }
+.bracket-match.completed { border-color: #22c55e; }
+.bracket-match.suspended {
+  opacity: 0.5;
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.match-id { font-size: 0.7rem; color: #8899aa; text-align: center; margin-bottom: 6px; font-weight: bold; }
+
+.bracket-player {
+  padding: 7px 9px;
+  margin: 4px 0;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.bracket-player.red { background: rgba(220, 38, 38, 0.3); border-left: 4px solid #dc2626; }
+.bracket-player.blue { background: rgba(59, 130, 246, 0.3); border-left: 4px solid #3b82f6; }
+.bracket-player.winner { background: rgba(34, 197, 94, 0.4); font-weight: bold; }
+
+.play-btn {
+  width: 100%;
+  padding: 7px;
+  background: #22c55e;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 7px;
+  font-size: 0.85rem;
+}
+
+.play-btn:hover { background: #16a34a; }
+
+.edit-btn {
+  background: #f59e0b;
+  border: none;
+  padding: 4px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: #000;
+  font-weight: bold;
+}
+
+.edit-btn:hover { background: #d97706; }
+
+/* Match Queue Styles */
+.match-queue-item {
+  background: #151d2b;
+  border: 2px solid #2a3548;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.match-queue-item:hover {
+  border-color: #fbbf24;
+  transform: translateX(5px);
+}
+
+.match-queue-item.next-match {
+  border-color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.match-queue-info {
+  flex: 1;
+}
+
+.match-queue-players {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.match-queue-details {
+  font-size: 0.85rem;
+  color: #8899aa;
+}
+
+.match-queue-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Schedule Mode Toggle */
+.schedule-mode-toggle {
+  background: #151d2b;
+  border: 2px solid #2a3548;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.schedule-mode-toggle label {
+  color: #fbbf24;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 30px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #2a3548;
+  transition: .4s;
+  border-radius: 30px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: #22c55e;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(30px);
+}
+
+.scoreboard-container { background: #0d1117; border-radius: 12px; padding: 20px; }
+
+.sb-top-bar {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  padding: 15px;
+  background: #151d2b;
+  border-bottom: 2px solid #2a3548;
+  margin-bottom: 20px;
+}
+
+.sb-player-row {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 2px solid #2a3548;
+  gap: 15px;
+  background: #1a1f2e;
+}
+
+.sb-player-row.red { border-left: 5px solid #dc2626; }
+.sb-player-row.blue { border-left: 5px solid #3b82f6; }
+
+.sb-logo {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: #2a3548;
+  border: 2px solid #3a4558;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  color: #8899aa;
+}
+
+.sb-player-info { flex: 1; min-width: 0; }
+
+.sb-player-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  background: transparent;
+  border: none;
+  width: 100%;
+}
+
+.sb-team-name {
+  font-size: 0.9rem;
+  color: #8899aa;
+  background: transparent;
+  border: none;
+  width: 100%;
+}
+
+.sb-score-box {
+  width: 100px; height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  font-weight: bold;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.sb-score-box.red { background: #dc2626; }
+.sb-score-box.blue { background: #3b82f6; }
+
+.sb-timer-bar {
+  display: flex;
+  align-items: center;
+  background: #0d1117;
+  border-top: 3px solid #2a3548;
+  border-bottom: 3px solid #2a3548;
+  height: 80px;
+  margin: 20px 0;
+}
+
+.sb-timer {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #fbbf24;
+  padding: 0 30px;
+  text-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+}
+
+.sb-controls-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  background: #0d1117;
+  padding: 20px;
+}
+
+.sb-panel-header {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.sb-panel-header.red { color: #dc2626; border-bottom: 2px solid #dc2626; }
+.sb-panel-header.blue { color: #3b82f6; border-bottom: 2px solid #3b82f6; }
+
+.sb-counters { display: flex; gap: 10px; margin-bottom: 15px; justify-content: center; }
+
+.sb-counter {
+  background: #1e2a3a;
+  border-radius: 8px;
+  padding: 10px 20px;
+  text-align: center;
+  min-width: 120px;
+  border: 1px solid #2a3548;
+}
+
+.sb-counter .label { font-size: 0.85rem; font-weight: bold; margin-bottom: 3px; }
+.sb-counter .value { font-size: 1.8rem; font-weight: bold; }
+.sb-counter.adv .label, .sb-counter.adv .value { color: #fbbf24; }
+.sb-counter.pen .label, .sb-counter.pen .value { color: #ef4444; }
+
+.sb-points-grid, .sb-minus-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.sb-points-grid button, .sb-minus-grid button {
+  padding: 12px 5px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #fff;
+  background: #3a5a7a;
+}
+
+.sb-points-grid button:hover, .sb-minus-grid button:hover {
+  filter: brightness(1.2);
+  transform: translateY(-2px);
+}
+
+.sb-action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.sb-action-row button {
+  padding: 14px 8px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.95rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.sb-action-row .btn-adv { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #000; }
+.sb-action-row .btn-pen { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+.sb-undo-btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  background: #5a7a9a;
+  color: #fff;
+}
+
+.sb-bottom-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  background: #151d2b;
+  border-top: 3px solid #2a3548;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.sb-golden-time {
+  text-align: center;
+  padding: 15px;
+  background: rgba(251, 191, 36, 0.1);
+  border-radius: 8px;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sb-golden-time input {
+  width: 80px;
+  background: #0f1724;
+  border: 1px solid #fbbf24;
+  color: #fbbf24;
+  padding: 6px;
+  border-radius: 5px;
+  font-size: 1rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.sb-golden-time button {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #000;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.winner-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+}
+
+.winner-modal-content {
+  background: #1a1f2e;
+  border: 3px solid #fbbf24;
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+}
+
+.winner-btn {
+  padding: 18px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 15px;
+  color: #fff;
+  transition: all 0.2s;
+}
+
+.winner-btn:hover { transform: scale(1.02); }
+.winner-btn.red { background: linear-gradient(135deg, #dc2626, #991b1b); }
+.winner-btn.blue { background: linear-gradient(135deg, #3b82f6, #1e40af); }
+.winner-btn.draw { background: linear-gradient(135deg, #6b7280, #374151); }
+.winner-btn.cancel { background: transparent; color: #8899aa; border: 2px solid #6b7280; }
+
+@media (max-width: 968px) {
+  .header-container { flex-direction: column; }
+  .nav-menu { flex-wrap: wrap; justify-content: center; }
+  .tournament-header { flex-direction: column; align-items: flex-start; }
+  .action-buttons { width: 100%; }
+  .btn { flex: 1; min-width: 120px; justify-content: center; }
+  table { font-size: 0.85rem; }
+  th, td { padding: 8px 5px; }
+  .sb-controls-area { grid-template-columns: 1fr; }
+  .sb-top-bar { grid-template-columns: repeat(2, 1fr); }
+  .sb-score-box { width: 80px; height: 80px; font-size: 2.5rem; }
+  .sb-timer { font-size: 2rem; padding: 0 15px; }
+  .mats-grid { grid-template-columns: 1fr; }
+  .bracket-tree { flex-direction: column; gap: 20px; }
+}
+
+@media (max-width: 640px) {
+  .logo-text { font-size: 1.3rem; }
+  .nav-menu { gap: 15px; }
+  .user-section { flex-wrap: wrap; justify-content: center; }
+  .table-container { overflow-x: auto; }
+  table { min-width: 800px; }
+  .sb-top-bar { grid-template-columns: 1fr; }
+}
+</style>
 </head>
 <body>
-    <header class="header">
-        <div class="logo" onclick="window.location.href='index.html'">
-            <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#0066CC;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#003366;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <circle cx="50" cy="50" r="45" fill="url(#logoGrad)" stroke="#FFB800" stroke-width="3"/>
-                <text x="50" y="65" font-family="Arial Black, sans-serif" font-size="45" font-weight="900" fill="#FFB800" text-anchor="middle">T</text>
-            </svg>
-            <div class="logo-text">TopCompSports</div>
+
+<header class="main-header">
+  <div class="header-container">
+    <div class="logo-section">
+      <div class="logo-icon">T</div>
+      <div class="logo-text">TopCompSports</div>
+    </div>
+    
+    <nav class="nav-menu">
+      <a href="#" class="nav-link">Home</a>
+      <a href="#" class="nav-link">Tournaments</a>
+      <a href="#" class="nav-link active">My Profile</a>
+    </nav>
+    
+    <div class="user-section">
+      <div class="user-profile">
+        <div class="user-avatar"></div>
+        <span class="user-name">fffaaaaa</span>
+      </div>
+      <button class="btn-logout">Logout</button>
+      <div class="language-toggle">
+        <button class="lang-btn">عربي</button>
+        <button class="lang-btn active">English</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="tournament-container">
+  <div class="tournament-header">
+    <div class="tournament-title-section">
+      <h1> Tournament 2026 OZ</h1>
+      <div class="tournament-subtitle" id="subtitle">Step 1: Players Registration</div>
+      <div class="status-badge" id="dbStatus">
+        <span>✅</span>
+        <span>Connected to Database</span>
+      </div>
+    </div>
+    
+    <div class="action-buttons">
+      <button class="btn btn-players" onclick="showView('players')">👥 Players</button>
+      <button class="btn btn-mats" onclick="showView('mats')">🥋 Mats</button>
+      <button class="btn btn-settings" onclick="showView('settings')">⚙️ Settings</button>
+      <button class="btn btn-sync" onclick="syncWithDB()">🔄 Sync</button>
+      <button class="btn btn-export" onclick="exportToExcel()">📊 Export Excel</button>
+      <button class="btn btn-clear-db" onclick="clearTournamentPlayersDB()">⚠️ Clear DB Players</button>
+    </div>
+  </div>
+
+  <div id="view-players" class="view active">
+    <div class="section">
+      <div class="section-title">
+        <span>👥 Players Registration</span>
+        <span class="player-count" id="playerCount">0 / 200</span>
+      </div>
+      
+      <div class="button-group">
+        <button class="btn btn-add" onclick="addPlayer()">➕ Add Player</button>
+        <button class="btn btn-add" onclick="addPlayers(10)" style="background: #475569;">➕ Add 10</button>
+        <button class="btn btn-sync" onclick="syncWithDB()" style="background: #f59e0b; color: #000;">🔄 Sync with DB</button>
+      </div>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name *</th>
+              <th>Team</th>
+              <th>Age Group *</th>
+              <th>Gender *</th>
+              <th>Weight *</th>
+              <th>Belt *</th>
+              <th>Rank *</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="playersTable"></tbody>
+        </table>
+      </div>
+      
+      <button class="btn-proceed" onclick="showView('mats')">
+        <span>🥋</span>
+        <span>Proceed to Mats Setup →</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="view-mats" class="view">
+    <div class="section">
+      <div class="section-title">
+        <span>🥋 Mats Setup</span>
+        <button class="btn btn-back" onclick="showView('players')">← Back to Players</button>
+      </div>
+      
+      <div style="margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 8px;">
+        <label style="font-weight: bold; color: #fbbf24;">Number of Mats: </label>
+        <select id="matsCount" onchange="updateMats()" style="width: auto; display: inline-block; margin-left: 15px;">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+          <option value="8">8</option>
+        </select>
+      </div>
+      
+      <div id="matsGrid" class="mats-grid"></div>
+      
+      <button class="btn-proceed" onclick="showView('dashboard')">
+        <span>🏆</span>
+        <span>Open Mat Dashboard →</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="view-dashboard" class="view">
+    <div class="section">
+      <div class="section-title">
+        <span>📋 Mat Dashboard</span>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-new-tab" onclick="openCurrentMatInNewTab()">🪟 Open Mat in New Tab</button>
+          <button class="btn btn-back" onclick="showView('mats')">← Back to Mats</button>
+        </div>
+      </div>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; flex-wrap: wrap;">
+        <button class="btn btn-add active" onclick="switchDashboardTab('categories')" id="tab-categories-btn">📋 Categories</button>
+        <button class="btn btn-sync" onclick="switchDashboardTab('queue')" id="tab-queue-btn">📋 Queue</button>
+        <button class="btn btn-players" onclick="switchDashboardTab('callup')" id="tab-callup-btn">📢 Call-Up</button>
+        <button class="btn btn-mats" onclick="switchDashboardTab('standings')" id="tab-standings-btn">🏆 Standings</button>
+      </div>
+      
+      <div id="dashboard-categories" class="dashboard-tab active">
+        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Categories - Mat <span id="dashboardMatNumber">1</span></h3>
+        <div id="categoriesContainer" style="display: grid; gap: 15px;"></div>
+      </div>
+      
+      <div id="dashboard-queue" class="dashboard-tab" style="display: none;">
+        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Match Queue</h3>
+        
+        <!--  نظام إدارة المباريات -->
+        <div class="schedule-mode-toggle">
+          <div>
+            <label>🤖 Auto-Schedule Mode (Diverse Matches)</label>
+            <p style="color: #8899aa; font-size: 0.85rem; margin-top: 5px;">
+              Automatically selects matches to avoid consecutive fights for same player
+            </p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="autoScheduleToggle" onchange="toggleScheduleMode()">
+            <span class="toggle-slider"></span>
+          </label>
         </div>
         
-        <nav class="nav">
-            <a href="index.html">Home</a>
-            <a href="tournaments.html">Tournaments</a>
-            
-            <div id="userSection" class="user-section" style="display: none;">
-                <a href="my-profile.html" style="color: var(--accent-yellow); text-decoration: none;">My Profile</a>
-                <div class="user-info" onclick="window.location.href='my-profile.html'">
-                    <div class="user-avatar" id="userAvatar"><span>👤</span></div>
-                    <span class="user-name" id="userName">User</span>
-                </div>
-                <button class="btn btn-logout" onclick="handleLogout()">Logout</button>
-            </div>
-            
-            <a href="login.html" id="loginBtn" class="btn btn-login">Login</a>
-            
-            <div class="lang-switcher">
-                <button class="lang-btn" onclick="changeLanguage('ar')" id="btn-ar">عربي</button>
-                <button class="lang-btn active" onclick="changeLanguage('en')" id="btn-en">English</button>
-            </div>
-        </nav>
-    </header>
-
-    <div id="tournamentContent">
-        <div class="loading">Loading tournament details...</div>
+        <div id="queueContainer"></div>
+      </div>
+      
+      <div id="dashboard-callup" class="dashboard-tab" style="display: none;">
+        <h3 style="color: #fbbf24; margin-bottom: 20px;">📢 Call-Up System</h3>
+        <div id="callupContainer"></div>
+      </div>
+      
+      <div id="dashboard-standings" class="dashboard-tab" style="display: none;">
+        <h3 style="color: #fbbf24; margin-bottom: 20px;">🏆 Final Standings</h3>
+        <div id="standingsContainer"></div>
+      </div>
     </div>
+  </div>
 
-    <footer class="footer">
-        <p>© 2026 TopCompSports - All rights reserved</p>
-    </footer>
+  <div id="view-bracket" class="view">
+    <button class="btn btn-info" style="margin-bottom: 10px;" onclick="showView('dashboard')">← Back to Dashboard</button>
+    <div class="section">
+      <div class="section-title" id="bracketTitle">Bracket</div>
+      <div id="bracketContent" class="bracket-container"></div>
+    </div>
+  </div>
 
-    <script>
-        const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
-        const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <div id="view-scoreboard" class="view">
+    <div class="scoreboard-container">
+      <div class="sb-top-bar">
+        <div>
+          <label style="display: block; font-size: 0.75rem; color: #8899aa; margin-bottom: 5px;">Age Group</label>
+          <select id="sbAgeGroup" style="width: 100%;"></select>
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.75rem; color: #8899aa; margin-bottom: 5px;">Gender</label>
+          <select id="sbGender" style="width: 100%;"></select>
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.75rem; color: #8899aa; margin-bottom: 5px;">Weight</label>
+          <input type="text" id="sbWeight" placeholder="-56kg" style="width: 100%;">
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.75rem; color: #8899aa; margin-bottom: 5px;">Belt</label>
+          <select id="sbBelt" style="width: 100%;"></select>
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.75rem; color: #8899aa; margin-bottom: 5px;">Level</label>
+          <select id="sbLevel" style="width: 100%;">
+            <option>Professional</option>
+            <option>Amateur</option>
+          </select>
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.75rem; color: #8899aa; margin-bottom: 5px;">Round</label>
+          <select id="sbRound" style="width: 100%;">
+            <option>Elimination</option>
+            <option>Round of 32</option>
+            <option>Round of 16</option>
+            <option>Quarterfinals</option>
+            <option>Semifinals</option>
+            <option>Finals</option>
+          </select>
+        </div>
+      </div>
 
-        let currentLang = localStorage.getItem('lang') || 'en';
-        let tournamentId = null;
-        let currentTab = 'information';
+      <div class="sb-player-row red">
+        <div class="sb-logo" onclick="document.getElementById('logoRed').click()">
+          <img id="logoDisplayRed" style="display:none;">
+          <span id="logoPlaceholderRed">Logo</span>
+        </div>
+        <input type="file" id="logoRed" accept="image/*" style="display:none" onchange="handleLogoUpload('Red', this)">
+        <div class="sb-player-info">
+          <input type="text" class="sb-player-name" id="redName" placeholder="Red Player Name">
+          <input type="text" class="sb-team-name" id="redTeam" placeholder="Team Name">
+        </div>
+        <div class="sb-score-box red" id="redScore">0</div>
+      </div>
 
-        window.onload = async function() {
-            checkUserStatus();
-            const urlParams = new URLSearchParams(window.location.search);
-            tournamentId = urlParams.get('tournament_id');
-            
-            if (!tournamentId) {
-                document.getElementById('tournamentContent').innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">❌</div>
-                        <p>Tournament not found</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            await loadTournamentDetails();
-        };
+      <div class="sb-player-row blue">
+        <div class="sb-logo" onclick="document.getElementById('logoBlue').click()">
+          <img id="logoDisplayBlue" style="display:none;">
+          <span id="logoPlaceholderBlue">Logo</span>
+        </div>
+        <input type="file" id="logoBlue" accept="image/*" style="display:none" onchange="handleLogoUpload('Blue', this)">
+        <div class="sb-player-info">
+          <input type="text" class="sb-player-name" id="blueName" placeholder="Blue Player Name">
+          <input type="text" class="sb-team-name" id="blueTeam" placeholder="Team Name">
+        </div>
+        <div class="sb-score-box blue" id="blueScore">0</div>
+      </div>
 
-        function checkUserStatus() {
-            const storedUser = localStorage.getItem('currentUser');
-            if (storedUser) {
-                try {
-                    const userData = JSON.parse(storedUser);
-                    document.getElementById('userSection').style.display = 'flex';
-                    document.getElementById('loginBtn').style.display = 'none';
-                    document.getElementById('userName').textContent = userData.full_name || 'User';
-                    if (userData.profile_picture_url) {
-                        document.getElementById('userAvatar').innerHTML = `<img src="${userData.profile_picture_url}" alt="Profile">`;
-                    }
-                } catch (e) {
-                    showLoginButton();
-                }
-            } else {
-                showLoginButton();
-            }
-        }
+      <div class="sb-timer-bar">
+        <div style="flex: 1;"></div>
+        <div class="sb-timer" id="timer">02:00</div>
+        <div style="flex: 1;"></div>
+      </div>
 
-        function showLoginButton() {
-            document.getElementById('userSection').style.display = 'none';
-            document.getElementById('loginBtn').style.display = 'inline-block';
-        }
+      <div class="sb-controls-area">
+        <div>
+          <div class="sb-panel-header red">🔴 Red Player</div>
+          <div class="sb-counters">
+            <div class="sb-counter adv">
+              <div class="label">⭐ Advantage</div>
+              <div class="value" id="redAdv">0</div>
+            </div>
+            <div class="sb-counter pen">
+              <div class="label">🟥 Penalty</div>
+              <div class="value" id="redPen">0</div>
+            </div>
+          </div>
+          <div class="sb-points-grid">
+            <button onclick="addScore('red', 1)">+1</button>
+            <button onclick="addScore('red', 2)">+2</button>
+            <button onclick="addScore('red', 3)">+3</button>
+            <button onclick="addScore('red', 4)">+4</button>
+          </div>
+          <div class="sb-minus-grid">
+            <button onclick="subtractScore('red', 1)">-1</button>
+            <button onclick="subtractScore('red', 2)">-2</button>
+            <button onclick="subtractScore('red', 3)">-3</button>
+            <button onclick="subtractScore('red', 4)">-4</button>
+          </div>
+          <div class="sb-action-row">
+            <button class="btn-adv" onclick="addAdvantage('red')"><span>⭐</span><span>Advantage</span></button>
+            <button class="btn-pen" onclick="addPenalty('red')"><span>🟥</span><span>Penalty</span></button>
+          </div>
+          <button class="sb-undo-btn" onclick="undoAction('red')">↩️ Undo</button>
+        </div>
 
-        function changeLanguage(lang) {
-            localStorage.setItem('lang', lang);
-            currentLang = lang;
-            document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
-            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
-            document.documentElement.lang = lang;
-            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            loadTournamentDetails();
-        }
+        <div>
+          <div class="sb-panel-header blue"> Blue Player</div>
+          <div class="sb-counters">
+            <div class="sb-counter adv">
+              <div class="label">⭐ Advantage</div>
+              <div class="value" id="blueAdv">0</div>
+            </div>
+            <div class="sb-counter pen">
+              <div class="label">🟥 Penalty</div>
+              <div class="value" id="bluePen">0</div>
+            </div>
+          </div>
+          <div class="sb-points-grid">
+            <button onclick="addScore('blue', 1)">+1</button>
+            <button onclick="addScore('blue', 2)">+2</button>
+            <button onclick="addScore('blue', 3)">+3</button>
+            <button onclick="addScore('blue', 4)">+4</button>
+          </div>
+          <div class="sb-minus-grid">
+            <button onclick="subtractScore('blue', 1)">-1</button>
+            <button onclick="subtractScore('blue', 2)">-2</button>
+            <button onclick="subtractScore('blue', 3)">-3</button>
+            <button onclick="subtractScore('blue', 4)">-4</button>
+          </div>
+          <div class="sb-action-row">
+            <button class="btn-adv" onclick="addAdvantage('blue')"><span>⭐</span><span>Advantage</span></button>
+            <button class="btn-pen" onclick="addPenalty('blue')"><span>🟥</span><span>Penalty</span></button>
+          </div>
+          <button class="sb-undo-btn" onclick="undoAction('blue')">↩️ Undo</button>
+        </div>
+      </div>
 
-        function formatDate(dateStr) {
-            if (!dateStr) return currentLang === 'ar' ? 'غير محدد' : 'TBD';
-            const date = new Date(dateStr);
-            if (isNaN(date.getTime())) return currentLang === 'ar' ? 'غير محدد' : 'TBD';
-            return date.toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', { 
-                year: 'numeric', month: 'long', day: 'numeric' 
+      <div class="sb-golden-time">
+        <span>⚡ Golden Time:</span>
+        <input type="number" id="goldenTimeInput" value="1" min="1" max="10">
+        <span>minutes</span>
+        <button onclick="activateGoldenTime()">⚡ Activate Golden Time</button>
+      </div>
+
+      <div class="sb-bottom-bar">
+        <button class="btn btn-back" onclick="backToBracket()">← Back to Bracket</button>
+        <button class="btn btn-add" onclick="startTimer()">▶ Start</button>
+        <button class="btn btn-settings" onclick="pauseTimer()">⏸ Pause</button>
+        <button class="btn btn-players" onclick="finishMatch()">🏁 Finish</button>
+        <button class="btn btn-info" onclick="swapPlayers()">🔄 Swap</button>
+        <button class="btn btn-sync" onclick="resetScoreboard()">🔄 Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-settings" class="view">
+    <div class="section">
+      <div class="section-title">
+        <span>⚙️ Settings</span>
+        <button class="btn btn-back" onclick="showView('players')">← Back to Players</button>
+      </div>
+      <p style="color: #8899aa; text-align: center; padding: 40px;">Settings coming soon...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentTournamentId = null;
+let players = [];
+let mats = [];
+let categories = {};
+let currentMat = null;
+let currentCategory = null;
+let currentMatch = null;
+let dbConnected = false;
+
+let AGE_GROUPS = {};
+let WEIGHTS = {};
+let BELTS = [];
+let WEIGHT_MAP = {};
+let AGE_MAP = {};
+let BELT_MAP = {};
+
+let scoreboard = {
+  red: { score: 0, advantages: 0, penalties: 0, history: [], isDQ: false },
+  blue: { score: 0, advantages: 0, penalties: 0, history: [], isDQ: false }
+};
+let timerInterval = null;
+let timeLeft = 120;
+let isGoldenTime = false;
+let autoScheduleMode = false; //  وضع الجدولة التلقائية
+
+window.onload = async function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  currentTournamentId = urlParams.get('tournament_id') || 'db5ffa84-d0a4-4666-bbb2-7de0482a3d92';
+  await initializeApp();
+};
+
+async function initializeApp() {
+  try {
+    await loadReferenceData();
+    await loadPlayersFromDB();
+    await loadMats();
+    dbConnected = true;
+    updateDBStatus('✅ Connected to Database', '#22c55e');
+  } catch (error) {
+    console.error('Initialization error:', error);
+    updateDBStatus('❌ Connection Error', '#ef4444');
+  }
+}
+
+function updateDBStatus(message, color) {
+  const statusEl = document.getElementById('dbStatus');
+  if (statusEl) {
+    statusEl.innerHTML = `<span>${message.includes('✅') ? '✅' : '❌'}</span><span>${message.replace(/[✅❌]/g, '').trim()}</span>`;
+    statusEl.style.background = color === '#22c55e' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)';
+    statusEl.style.color = color;
+  }
+}
+
+async function loadReferenceData() {
+  try {
+    console.log('🔄 Loading reference data...');
+    
+    const { data: ageData, error: ageError } = await dbClient
+      .from('ajp_age_divisions')
+      .select('*')
+      .order('min_age');
+    
+    if (ageError) throw ageError;
+    
+    AGE_GROUPS = {};
+    AGE_MAP = {};
+    ageData.forEach(ag => {
+      AGE_GROUPS[ag.name] = {
+        id: ag.id,
+        age: `${ag.min_age}-${ag.max_age || '99'}`,
+        time: ag.fight_duration || 5,
+        goldenTime: ag.golden_score_duration || 1,
+        category: ag.category || (ag.min_age < 16 ? 'under16' : 'over16'),
+        min_age: ag.min_age,
+        max_age: ag.max_age
+      };
+      AGE_MAP[ag.id] = ag.name;
+    });
+    console.log(`✅ Loaded ${Object.keys(AGE_GROUPS).length} age divisions`);
+    
+    const { data: weightData, error: weightError } = await dbClient
+      .from('ajp_weight_classes')
+      .select('id, name, gender, min_weight, max_weight, age_division_id')
+      .order('min_weight');
+    
+    if (weightError) throw weightError;
+    
+    WEIGHTS = {};
+    WEIGHT_MAP = {};
+    const uniqueWeights = new Set();
+    
+    weightData.forEach(wc => {
+      const gender = wc.gender || 'Boys';
+      const ageGroupName = AGE_MAP[wc.age_division_id] || 'Amateur / Professional';
+      
+      if (!WEIGHTS[gender]) WEIGHTS[gender] = {};
+      if (!WEIGHTS[gender][ageGroupName]) WEIGHTS[gender][ageGroupName] = [];
+      
+      WEIGHTS[gender][ageGroupName].push({
+        id: wc.id,
+        name: wc.name,
+        min_weight: wc.min_weight,
+        max_weight: wc.max_weight
+      });
+      
+      if (!uniqueWeights.has(wc.name)) {
+        WEIGHT_MAP[wc.id] = wc.name;
+        uniqueWeights.add(wc.name);
+      }
+    });
+    console.log(`✅ Loaded ${weightData.length} weight classes (${uniqueWeights.size} unique)`);
+    
+    const { data: beltData, error: beltError } = await dbClient
+      .from('ajp_belt_levels')
+      .select('*')
+      .order('category, sort_order');
+    
+    if (beltError) throw beltError;
+    
+    BELTS = beltData.map(b => ({
+      id: b.id,
+      name: b.name,
+      category: b.category,
+      sort_order: b.sort_order
+    }));
+    
+    BELT_MAP = {};
+    beltData.forEach(b => { BELT_MAP[b.id] = b.name; });
+    console.log(`✅ Loaded ${BELTS.length} belt levels`);
+    
+    dbConnected = true;
+  } catch (error) {
+    console.error('❌ Error loading reference data:', error);
+  }
+}
+
+function getGenderOptions(ageGroup) {
+  const category = AGE_GROUPS[ageGroup]?.category;
+  if (category === 'under16' || ageGroup.includes('Kids') || ageGroup.includes('Junior') || ageGroup.includes('Teen')) {
+    return ['Boys', 'Girls'];
+  }
+  return ['Men', 'Women'];
+}
+
+function getWeightOptions(gender, ageGroup) {
+  if (WEIGHTS[gender] && WEIGHTS[gender][ageGroup]) {
+    return WEIGHTS[gender][ageGroup];
+  }
+  return [];
+}
+
+function getBeltOptions(ageGroup) {
+  return [...new Set(BELTS.map(b => b.name))];
+}
+
+function getFightTime(ageGroup) { return AGE_GROUPS[ageGroup]?.time || 5; }
+function getGoldenTime(ageGroup) { return AGE_GROUPS[ageGroup]?.goldenTime || 1; }
+
+function showView(viewName) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const selectedView = document.getElementById('view-' + viewName);
+  if (selectedView) selectedView.classList.add('active');
+  
+  const subtitles = {
+    players: 'Step 1: Players Registration',
+    mats: 'Step 2: Mats Setup',
+    dashboard: 'Mat Dashboard',
+    bracket: 'Bracket View',
+    scoreboard: 'Scoreboard',
+    settings: 'Settings'
+  };
+  
+  const subtitleEl = document.getElementById('subtitle');
+  if (subtitleEl) subtitleEl.innerText = subtitles[viewName] || '';
+  
+  if (viewName === 'mats') renderMats();
+  if (viewName === 'dashboard') switchDashboardTab('categories');
+}
+
+function switchDashboardTab(tabName) {
+  document.querySelectorAll('.dashboard-tab').forEach(tab => tab.style.display = 'none');
+  document.querySelectorAll('[id$="-btn"]').forEach(btn => btn.classList.remove('active'));
+  
+  document.getElementById(`dashboard-${tabName}`).style.display = 'block';
+  document.getElementById(`tab-${tabName}-btn`).classList.add('active');
+  
+  if (tabName === 'categories') renderCategories();
+  if (tabName === 'queue') renderQueue();
+  if (tabName === 'callup') renderCallUp();
+  if (tabName === 'standings') renderStandings();
+}
+
+async function loadPlayersFromDB() {
+  if (!currentTournamentId) return;
+  try {
+    const { data: playersData, error: playersError } = await dbClient
+      .from('ajp_tournament_participants')
+      .select('*')
+      .eq('tournament_id', currentTournamentId)
+      .order('ranking', { ascending: true });
+    
+    if (playersError) throw playersError;
+    console.log(`✅ Loaded ${playersData?.length || 0} players`);
+    
+    players = (playersData || []).map(p => ({
+      id: p.id,
+      name: p.player_name || '',
+      team: p.team || '',
+      ageGroup: AGE_MAP[p.age_group_id] || 'Amateur / Professional',
+      age_group_id: p.age_group_id,
+      gender: p.gender || 'Men',
+      weight_class_id: p.weight_class_id,
+      weight: WEIGHT_MAP[p.weight_class_id] || '',
+      belt_level_id: p.belt_level_id,
+      belt: BELT_MAP[p.belt_level_id] || 'White',
+      rank: p.ranking || 0,
+      is_suspended: p.is_suspended || false
+    }));
+    
+    console.log('✅ Players with weights:', players.filter(p => p.weight).length);
+    
+    renderPlayers();
+    updatePlayerCount();
+  } catch (error) {
+    console.error('❌ Error loading players:', error);
+    updateDBStatus('Error: ' + error.message, '#ef4444');
+  }
+}
+
+async function addPlayer() {
+  if (players.length >= 200) { alert('Maximum 200 players!'); return; }
+  
+  const firstAgeGroup = Object.keys(AGE_GROUPS)[0];
+  const ageGroupId = AGE_GROUPS[firstAgeGroup]?.id;
+  const gender = 'Boys';
+  const firstWeight = WEIGHTS[gender]?.[firstAgeGroup]?.[0];
+  const weightClassId = firstWeight?.id;
+  const firstBelt = BELTS[0];
+  const beltLevelId = firstBelt?.id;
+  
+  try {
+    const { data, error } = await dbClient
+      .from('ajp_tournament_participants')
+      .insert({
+        tournament_id: currentTournamentId,
+        player_name: 'New Player',
+        team: 'Free Player',
+        age_group_id: ageGroupId,
+        gender: gender,
+        weight_class_id: weightClassId,
+        belt_level_id: beltLevelId,
+        ranking: players.length + 1,
+        is_suspended: false
+      })
+      .select()
+      .single();
+    
+    if (error) throw error;
+    
+    players.push({
+      id: data.id,
+      name: data.player_name,
+      team: data.team || 'Free Player',
+      ageGroup: firstAgeGroup,
+      age_group_id: data.age_group_id,
+      gender: data.gender,
+      weight_class_id: data.weight_class_id,
+      weight: firstWeight?.name || '',
+      belt_level_id: data.belt_level_id,
+      belt: firstBelt?.name || 'White',
+      rank: data.ranking,
+      is_suspended: data.is_suspended || false
+    });
+    
+    renderPlayers();
+    updatePlayerCount();
+    showNotification('✅ Player added!');
+  } catch (error) {
+    console.error('❌ Error:', error);
+    alert('❌ Error: ' + error.message);
+  }
+}
+
+async function addPlayers(count) {
+  const newPlayers = [];
+  const firstAgeGroup = Object.keys(AGE_GROUPS)[0];
+  const ageGroupId = AGE_GROUPS[firstAgeGroup]?.id;
+  const gender = 'Boys';
+  const firstWeight = WEIGHTS[gender]?.[firstAgeGroup]?.[0];
+  const weightClassId = firstWeight?.id;
+  const firstBelt = BELTS[0];
+  const beltLevelId = firstBelt?.id;
+  
+  for (let i = 0; i < count && players.length < 200; i++) {
+    newPlayers.push({
+      tournament_id: currentTournamentId,
+      player_name: `Player ${players.length + i + 1}`,
+      team: 'Free Player',
+      age_group_id: ageGroupId,
+      gender: gender,
+      weight_class_id: weightClassId,
+      belt_level_id: beltLevelId,
+      ranking: players.length + i + 1,
+      is_suspended: false
+    });
+  }
+  
+  if (newPlayers.length === 0) { alert('Maximum 200 players reached!'); return; }
+  
+  try {
+    const { data, error } = await dbClient
+      .from('ajp_tournament_participants')
+      .insert(newPlayers)
+      .select();
+    
+    if (error) throw error;
+    
+    data.forEach(p => {
+      players.push({
+        id: p.id,
+        name: p.player_name,
+        team: p.team || 'Free Player',
+        ageGroup: firstAgeGroup,
+        age_group_id: p.age_group_id,
+        gender: p.gender,
+        weight_class_id: p.weight_class_id,
+        weight: firstWeight?.name || '',
+        belt_level_id: p.belt_level_id,
+        belt: firstBelt?.name || 'White',
+        rank: p.ranking,
+        is_suspended: p.is_suspended || false
+      });
+    });
+    
+    renderPlayers();
+    updatePlayerCount();
+    showNotification(`✅ Added ${data.length} players!`);
+  } catch (error) {
+    console.error('❌ Error:', error);
+    alert('❌ Error: ' + error.message);
+  }
+}
+
+async function updatePlayerField(index, field, value) {
+  const player = players[index];
+  player[field] = value;
+  
+  if (player.id) {
+    const fieldMap = { 
+      'name': 'player_name', 
+      'ageGroup': 'age_group_id', 
+      'belt': 'belt_level_id', 
+      'rank': 'ranking', 
+      'weight': 'weight_class_id', 
+      'gender': 'gender' 
+    };
+    const dbField = fieldMap[field] || field;
+    let dbValue = value;
+    
+    if (field === 'ageGroup') dbValue = AGE_GROUPS[value]?.id;
+    if (field === 'belt') {
+      const beltObj = BELTS.find(b => b.name === value);
+      dbValue = beltObj?.id;
+    }
+    
+    try {
+      const { error } = await dbClient
+        .from('ajp_tournament_participants')
+        .update({ [dbField]: dbValue })
+        .eq('id', player.id);
+      if (error) throw error;
+    } catch (error) { 
+      console.error('❌ Error:', error);
+    }
+  }
+  
+  if (field === 'ageGroup' || field === 'gender') renderPlayers();
+}
+
+async function deletePlayer(index) {
+  if (!confirm('Delete this player?')) return;
+  const player = players[index];
+  
+  try {
+    if (player.id) {
+      await dbClient.from('ajp_tournament_participants').delete().eq('id', player.id);
+    }
+    players.splice(index, 1);
+    renderPlayers();
+    updatePlayerCount();
+    showNotification('✅ Player deleted!');
+  } catch (error) {
+    alert('❌ Error: ' + error.message);
+  }
+}
+
+function renderPlayers() {
+  const tbody = document.getElementById('playersTable');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  
+  players.forEach((p, i) => {
+    const ageOptions = Object.keys(AGE_GROUPS).map(a => 
+      `<option value="${a}" ${p.ageGroup === a ? 'selected' : ''}>${a}</option>`
+    ).join('');
+    
+    const genderOptions = getGenderOptions(p.ageGroup).map(g => 
+      `<option ${p.gender === g ? 'selected' : ''}>${g}</option>`
+    ).join('');
+    
+    const weightOptions = getWeightOptions(p.gender, p.ageGroup)
+      .map(w => `<option value="${w.id}" ${p.weight_class_id === w.id ? 'selected' : ''}>${w.name}</option>`)
+      .join('');
+    
+    const beltOptions = getBeltOptions(p.ageGroup)
+      .map(b => `<option ${p.belt === b ? 'selected' : ''}>${b}</option>`)
+      .join('');
+    
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i + 1}</td>
+      <td><input type="text" value="${p.name}" onchange="updatePlayerField(${i}, 'name', this.value)"></td>
+      <td><input type="text" value="${p.team}" onchange="updatePlayerField(${i}, 'team', this.value)"></td>
+      <td><select onchange="updatePlayerField(${i}, 'ageGroup', this.value)">${ageOptions}</select></td>
+      <td><select onchange="updatePlayerField(${i}, 'gender', this.value)">${genderOptions}</select></td>
+      <td><select onchange="updatePlayerField(${i}, 'weight', this.value)">${weightOptions || '<option value="">-- Select --</option>'}</select></td>
+      <td><select onchange="updatePlayerField(${i}, 'belt', this.value)">${beltOptions}</select></td>
+      <td><input type="number" value="${p.rank}" style="width: 60px" onchange="updatePlayerField(${i}, 'rank', parseInt(this.value))" min="1"></td>
+      <td><button class="btn-delete" onclick="deletePlayer(${i})">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function updatePlayerCount() {
+  const countEl = document.getElementById('playerCount');
+  if (countEl) countEl.innerText = `${players.length} / 200`;
+}
+
+async function syncWithDB() {
+  showNotification('🔄 Syncing...');
+  await loadPlayersFromDB();
+  await loadMats();
+  showNotification('✅ Synced!');
+}
+
+async function clearTournamentPlayersDB() {
+  if (!currentTournamentId || players.length === 0) { alert('No players!'); return; }
+  if (!confirm(`Delete ALL ${players.length} players?`) || !confirm('FINAL CONFIRMATION?')) return;
+  
+  try {
+    await dbClient.from('ajp_tournament_participants').delete().eq('tournament_id', currentTournamentId);
+    players = [];
+    renderPlayers();
+    updatePlayerCount();
+    showNotification('✅ All players cleared!');
+  } catch (error) {
+    alert('❌ Error: ' + error.message);
+  }
+}
+
+function exportToExcel() {
+  if (players.length === 0) { alert('No players!'); return; }
+  let csv = 'Name,Team,Age Group,Gender,Weight,Belt,Rank\n';
+  players.forEach(p => { 
+    csv += `"${p.name}","${p.team}","${p.ageGroup}","${p.gender}","${p.weight}","${p.belt}",${p.rank}\n`; 
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `players_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  showNotification(`✅ Exported ${players.length} players!`);
+}
+
+async function loadMats() {
+  try {
+    const { data, error } = await dbClient
+      .from('ajp_mats')
+      .select('*')
+      .eq('tournament_id', currentTournamentId)
+      .order('mat_number');
+    
+    if (error) {
+      mats = [{
+        id: 'local-mat-1',
+        tournament_id: currentTournamentId,
+        mat_number: 1,
+        name: 'Mat 1',
+        age_groups: [], genders: [], weights: [], belts: []
+      }];
+      currentMat = mats[0].id;
+      renderMats();
+      return;
+    }
+    
+    mats = data || [];
+    if (mats.length === 0) {
+      mats = [{
+        id: 'local-mat-1',
+        tournament_id: currentTournamentId,
+        mat_number: 1,
+        name: 'Mat 1',
+        age_groups: [], genders: [], weights: [], belts: []
+      }];
+      currentMat = mats[0].id;
+    } else {
+      currentMat = mats[0].id;
+    }
+    
+    renderMats();
+    console.log(`✅ Loaded ${mats.length} mats`);
+  } catch (error) {
+    console.error('❌ Error loading mats:', error);
+  }
+}
+
+async function updateMats() {
+  const count = parseInt(document.getElementById('matsCount').value);
+  
+  while (mats.length < count) {
+    mats.push({
+      id: 'local-mat-' + (mats.length + 1),
+      tournament_id: currentTournamentId,
+      mat_number: mats.length + 1,
+      name: `Mat ${mats.length + 1}`,
+      age_groups: [], genders: [], weights: [], belts: []
+    });
+  }
+  
+  if (mats.length > count) mats = mats.slice(0, count);
+  if (!currentMat && mats.length > 0) currentMat = mats[0].id;
+  
+  renderMats();
+  showNotification(`✅ Updated to ${count} mat(s)`);
+}
+
+async function addMatCategory(matId, type, value) {
+  const mat = mats.find(m => m.id === matId);
+  if (!mat) return;
+  
+  let currentList = mat[type];
+  if (typeof currentList === 'string') currentList = JSON.parse(currentList);
+  if (!Array.isArray(currentList)) currentList = [];
+  
+  if (!currentList.includes(value)) {
+    currentList.push(value);
+    mat[type] = currentList;
+    renderMats();
+  }
+}
+
+async function removeMatCategory(matId, type, index) {
+  const mat = mats.find(m => m.id === matId);
+  if (!mat) return;
+  
+  let currentList = mat[type];
+  if (typeof currentList === 'string') currentList = JSON.parse(currentList);
+  if (!Array.isArray(currentList)) currentList = [];
+  
+  currentList.splice(index, 1);
+  mat[type] = currentList;
+  renderMats();
+}
+
+function renderMats() {
+  const grid = document.getElementById('matsGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  
+  if (mats.length === 0) {
+    grid.innerHTML = '<p style="text-align: center; color: #8899aa; padding: 40px;">No mats configured.</p>';
+    return;
+  }
+  
+  const ageGroups = [...new Set(players.map(p => p.ageGroup).filter(a => a))];
+  const genders = [...new Set(players.map(p => p.gender).filter(g => g))];
+  const allWeights = Object.values(WEIGHT_MAP);
+  const belts = [...new Set(players.map(p => p.belt).filter(b => b))];
+  
+  mats.forEach(mat => {
+    const ageGroupsList = typeof mat.age_groups === 'string' ? JSON.parse(mat.age_groups) : (mat.age_groups || []);
+    const gendersList = typeof mat.genders === 'string' ? JSON.parse(mat.genders) : (mat.genders || []);
+    const weightsList = typeof mat.weights === 'string' ? JSON.parse(mat.weights) : (mat.weights || []);
+    const beltsList = typeof mat.belts === 'string' ? JSON.parse(mat.belts) : (mat.belts || []);
+    
+    const div = document.createElement('div');
+    div.className = 'mat-card';
+    div.innerHTML = `
+      <h3 style="color: #fbbf24; margin-bottom: 15px;">🥋 ${mat.name || `Mat ${mat.mat_number}`}</h3>
+      
+      <div style="margin-bottom: 15px;">
+        <strong style="color: #8899aa; font-size: 0.85rem; display: block; margin-bottom: 8px;">AGE GROUPS</strong>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px;">
+          ${ageGroupsList.map((a, i) => `
+            <span class="category-tag">${a} <span style="cursor: pointer; color: #ef4444;" onclick="removeMatCategory('${mat.id}', 'age_groups', ${i})">×</span></span>
+          `).join('') || '<span style="color: #556; font-size: 0.8rem;">No age groups added</span>'}
+        </div>
+        <select onchange="if(this.value) addMatCategory('${mat.id}', 'age_groups', this.value)">
+          <option value="">-- Add Age Group --</option>
+          ${ageGroups.map(a => `<option value="${a}">${a}</option>`).join('')}
+        </select>
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <strong style="color: #8899aa; font-size: 0.85rem; display: block; margin-bottom: 8px;">GENDERS</strong>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px;">
+          ${gendersList.map((g, i) => `
+            <span class="category-tag" style="background: rgba(59, 130, 246, 0.2); color: #3b82f6;">${g} <span style="cursor: pointer; color: #ef4444;" onclick="removeMatCategory('${mat.id}', 'genders', ${i})">×</span></span>
+          `).join('') || '<span style="color: #556; font-size: 0.8rem;">No genders added</span>'}
+        </div>
+        <select onchange="if(this.value) addMatCategory('${mat.id}', 'genders', this.value)">
+          <option value="">-- Add Gender --</option>
+          ${genders.map(g => `<option value="${g}">${g}</option>`).join('')}
+        </select>
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <strong style="color: #8899aa; font-size: 0.85rem; display: block; margin-bottom: 8px;">WEIGHTS</strong>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px;">
+          ${weightsList.map((w, i) => `
+            <span class="category-tag" style="background: rgba(34, 197, 94, 0.2); color: #22c55e;">${w} <span style="cursor: pointer; color: #ef4444;" onclick="removeMatCategory('${mat.id}', 'weights', ${i})">×</span></span>
+          `).join('') || '<span style="color: #556; font-size: 0.8rem;">No weights added</span>'}
+        </div>
+        <select onchange="if(this.value) addMatCategory('${mat.id}', 'weights', this.value)">
+          <option value="">-- Add Weight --</option>
+          ${allWeights.map(w => `<option value="${w}">${w}</option>`).join('')}
+        </select>
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <strong style="color: #8899aa; font-size: 0.85rem; display: block; margin-bottom: 8px;">BELTS</strong>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px;">
+          ${beltsList.map((b, i) => `
+            <span class="category-tag" style="background: rgba(168, 85, 247, 0.2); color: #a855f7;">${b} <span style="cursor: pointer; color: #ef4444;" onclick="removeMatCategory('${mat.id}', 'belts', ${i})">×</span></span>
+          `).join('') || '<span style="color: #556; font-size: 0.8rem;">No belts added</span>'}
+        </div>
+        <select onchange="if(this.value) addMatCategory('${mat.id}', 'belts', this.value)">
+          <option value="">-- Add Belt --</option>
+          ${belts.map(b => `<option value="${b}">${b}</option>`).join('')}
+        </select>
+      </div>
+      
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button class="btn btn-players" style="flex: 1;" onclick="currentMat='${mat.id}'; showView('dashboard')">📋 Open Dashboard</button>
+        <button class="btn btn-new-tab" style="flex: 1;" onclick="openMatInNewTab('${mat.id}')"> Open in New Tab</button>
+      </div>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function openMatInNewTab(matId) {
+  const url = `${window.location.pathname}?tournament_id=${currentTournamentId}&mat=${matId}&standalone=1`;
+  window.open(url, '_blank');
+}
+
+function openCurrentMatInNewTab() {
+  if (!currentMat) {
+    alert('⚠️ No mat selected!');
+    return;
+  }
+  openMatInNewTab(currentMat);
+}
+
+function renderCategories() {
+  const container = document.getElementById('categoriesContainer');
+  if (!container) return;
+  
+  const mat = mats.find(m => m.id === currentMat);
+  if (!mat) {
+    container.innerHTML = '<p style="text-align: center; color: #8899aa; padding: 40px;">No mat selected</p>';
+    return;
+  }
+  
+  document.getElementById('dashboardMatNumber').innerText = mat.mat_number || '1';
+  
+  const matAgeGroups = typeof mat.age_groups === 'string' ? JSON.parse(mat.age_groups) : (mat.age_groups || []);
+  const matGenders = typeof mat.genders === 'string' ? JSON.parse(mat.genders) : (mat.genders || []);
+  const matWeights = typeof mat.weights === 'string' ? JSON.parse(mat.weights) : (mat.weights || []);
+  const matBelts = typeof mat.belts === 'string' ? JSON.parse(mat.belts) : (mat.belts || []);
+  
+  const categoryList = [];
+  
+  matAgeGroups.forEach(ageGroup => {
+    matGenders.forEach(gender => {
+      matWeights.forEach(weight => {
+        matBelts.forEach(belt => {
+          const catPlayers = players.filter(p => 
+            p.ageGroup === ageGroup && p.gender === gender && 
+            p.weight === weight && p.belt === belt && p.name
+          );
+          
+          if (catPlayers.length >= 2) {
+            categoryList.push({
+              key: `${ageGroup}|${gender}|${weight}|${belt}`,
+              ageGroup, gender, weight, belt,
+              players: catPlayers
             });
+          }
+        });
+      });
+    });
+  });
+  
+  if (categoryList.length === 0) {
+    container.innerHTML = '<p style="text-align: center; color: #8899aa; padding: 40px;">No categories found. Add more players or adjust mat filters.</p>';
+    return;
+  }
+  
+  container.innerHTML = categoryList.map(cat => {
+    const fightTime = getFightTime(cat.ageGroup);
+    return `
+      <div onclick="openCategoryBracket('${cat.key}', '${cat.gender}', '${cat.ageGroup}', '${cat.weight}', '${cat.belt}')" style="background: #151d2b; border: 2px solid #2a3548; border-radius: 10px; padding: 20px; cursor: pointer; transition: all 0.3s;">
+        <h3 style="color: #fbbf24; margin-bottom: 10px; font-size: 1.2rem;">
+          ${cat.gender} | 🏅 ${cat.ageGroup} | ⚖️ ${cat.weight} | 🎗️ ${cat.belt}
+        </h3>
+        <div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 10px;">
+          👥 ${cat.players.length} Players | ⏱️ ${fightTime} min |  Bracket System
+        </div>
+        <div style="font-size: 0.85rem; color: #556;">
+          Players: ${cat.players.map(p => p.name).join(', ')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openCategoryBracket(key, gender, ageGroup, weight, belt) {
+  currentCategory = { key, gender, ageGroup, weight, belt };
+  
+  if (!categories[key]) {
+    const catPlayers = players.filter(p => 
+      p.ageGroup === ageGroup && p.gender === gender && 
+      p.weight === weight && p.belt === belt && p.name
+    ).sort((a, b) => a.rank - b.rank);
+    
+    categories[key] = generateBracket(catPlayers, ageGroup, gender, weight, belt);
+  }
+  
+  showView('bracket');
+  renderBracket();
+}
+
+function generateBracket(categoryPlayers, ageGroup, gender, weight, belt) {
+  const n = categoryPlayers.length;
+  let bracketSize = 2;
+  while (bracketSize < n) bracketSize *= 2;
+  
+  const rounds = [];
+  const firstRound = [];
+  
+  for (let i = 0; i < bracketSize / 2; i++) {
+    const p1 = categoryPlayers[i] || null;
+    const p2 = categoryPlayers[bracketSize - 1 - i] || null;
+    
+    let match = {
+      id: `R1_M${i + 1}`,
+      round: 1,
+      p1, p2,
+      winner: null,
+      score1: 0, score2: 0,
+      status: 'pending',
+      suspended: false,
+      bye: false
+    };
+    
+    if (!p2 && p1) { match.winner = 'red'; match.status = 'completed'; match.bye = true; }
+    else if (!p1 && p2) { match.winner = 'blue'; match.status = 'completed'; match.bye = true; }
+    
+    firstRound.push(match);
+  }
+  
+  rounds.push(firstRound);
+  
+  let currentRoundSize = firstRound.length;
+  let roundNum = 2;
+  
+  while (currentRoundSize > 1) {
+    const nextRound = [];
+    for (let i = 0; i < currentRoundSize / 2; i++) {
+      nextRound.push({
+        id: `R${roundNum}_M${i + 1}`,
+        round: roundNum,
+        p1: null, p2: null,
+        winner: null,
+        score1: 0, score2: 0,
+        status: 'pending',
+        suspended: false,
+        bye: false
+      });
+    }
+    rounds.push(nextRound);
+    currentRoundSize = nextRound.length;
+    roundNum++;
+  }
+  
+  propagateBracketWinners(rounds);
+  
+  return { type: 'bracket', players: categoryPlayers, rounds, ageGroup, gender, weight, belt };
+}
+
+function propagateBracketWinners(rounds) {
+  for (let r = 0; r < rounds.length - 1; r++) {
+    const currentRound = rounds[r];
+    const nextRound = rounds[r + 1];
+    
+    for (let i = 0; i < currentRound.length; i++) {
+      const match = currentRound[i];
+      const nextMatchIdx = Math.floor(i / 2);
+      const isPlayer1Slot = i % 2 === 0;
+      
+      if (match.winner) {
+        const winnerPlayer = match.winner === 'red' ? match.p1 : match.p2;
+        if (isPlayer1Slot) nextRound[nextMatchIdx].p1 = winnerPlayer;
+        else nextRound[nextMatchIdx].p2 = winnerPlayer;
+      } else {
+        if (isPlayer1Slot) nextRound[nextMatchIdx].p1 = null;
+        else nextRound[nextMatchIdx].p2 = null;
+      }
+    }
+  }
+}
+
+function renderBracket() {
+  const container = document.getElementById('bracketContent');
+  const title = document.getElementById('bracketTitle');
+  
+  if (!currentCategory || !categories[currentCategory.key]) {
+    container.innerHTML = '<p style="text-align: center; color: #8899aa; padding: 40px;">No bracket generated</p>';
+    return;
+  }
+  
+  const cat = categories[currentCategory.key];
+  title.innerText = `${cat.gender} - ${cat.ageGroup} - ${cat.weight} - ${cat.belt}`;
+  
+  let html = '<div class="bracket-tree">';
+  
+  cat.rounds.forEach((round, rIdx) => {
+    const roundNames = ['Round of 32', 'Round of 16', 'Quarterfinals', 'Semifinals', 'Finals'];
+    const roundName = roundNames[rIdx] || `Round ${rIdx + 1}`;
+    
+    html += `<div class="bracket-round"><div class="round-title">${roundName}</div>`;
+    
+    round.forEach((match, mIdx) => {
+      html += `
+        <div class="bracket-match ${match.status === 'completed' ? 'completed' : ''} ${match.suspended ? 'suspended' : ''}">
+          <div class="match-id">
+            ${match.id}
+            ${match.suspended ? '<span style="color: #f59e0b; margin-left: 5px;">⏸️</span>' : ''}
+          </div>
+          <div class="bracket-player red ${match.winner === 'red' ? 'winner' : ''}">
+            <span>${match.p1 ? match.p1.name : 'TBD'}</span>
+            <span>${match.score1 || 0}</span>
+          </div>
+          <div class="bracket-player blue ${match.winner === 'blue' ? 'winner' : ''}">
+            <span>${match.p2 ? match.p2.name : 'TBD'}</span>
+            <span>${match.score2 || 0}</span>
+          </div>
+          ${match.bye ? '<div style="text-align: center; color: #fbbf24; font-size: 0.75rem; margin-top: 5px;">BYE</div>' : ''}
+          ${match.status !== 'completed' && !match.bye && !match.suspended ? `
+            <button class="play-btn" onclick="startBracketMatch(${rIdx}, ${mIdx})">▶ Play Match</button>
+          ` : ''}
+          ${!match.bye ? `
+            <div style="display: flex; gap: 5px; margin-top: 5px;">
+              <button class="edit-btn" onclick="editMatch(${rIdx}, ${mIdx})" style="flex: 1;">✏️ Edit</button>
+              <button class="edit-btn" onclick="toggleMatchSuspension(${rIdx}, ${mIdx})" style="flex: 1; background: ${match.suspended ? '#22c55e' : '#f59e0b'}; color: #fff;">
+                ${match.suspended ? '▶️ Resume' : '⏸️ Suspend'}
+              </button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    });
+    
+    html += '</div>';
+  });
+  
+  html += '</div>';
+  html += renderMatchSchedule(cat);
+  
+  container.innerHTML = html;
+}
+
+function renderMatchSchedule(cat) {
+  let html = `
+    <div style="margin-top: 40px; padding: 20px; background: #151d2b; border-radius: 12px;">
+      <h3 style="color: #fbbf24; margin-bottom: 20px;">📋 Match Schedule</h3>
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #0a0e17;">
+              <th style="padding: 12px; text-align: left; color: #8899aa; border-bottom: 2px solid #2a3548;">Match</th>
+              <th style="padding: 12px; text-align: left; color: #8899aa; border-bottom: 2px solid #2a3548;">Red Player</th>
+              <th style="padding: 12px; text-align: left; color: #8899aa; border-bottom: 2px solid #2a3548;">Blue Player</th>
+              <th style="padding: 12px; text-align: left; color: #8899aa; border-bottom: 2px solid #2a3548;">Status</th>
+              <th style="padding: 12px; text-align: left; color: #8899aa; border-bottom: 2px solid #2a3548;">Winner</th>
+              <th style="padding: 12px; text-align: left; color: #8899aa; border-bottom: 2px solid #2a3548;">Score</th>
+              <th style="padding: 12px; text-align: left; color: #8899aa; border-bottom: 2px solid #2a3548;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+  `;
+  
+  cat.rounds.forEach((round, rIdx) => {
+    round.forEach((match, mIdx) => {
+      const status = match.suspended ? '⏸️ Suspended' : 
+                     match.bye ? '✅ BYE' : 
+                     match.status === 'completed' ? '✅ Completed' : '⏳ Pending';
+      
+      const winner = match.winner === 'red' ? (match.p1?.name || 'TBD') :
+                     match.winner === 'blue' ? (match.p2?.name || 'TBD') : '-';
+      
+      html += `
+        <tr style="border-bottom: 1px solid #2a3548; ${match.suspended ? 'opacity: 0.5;' : ''}">
+          <td style="padding: 10px; color: #fbbf24; font-weight: bold;">${match.id}</td>
+          <td style="padding: 10px;">${match.p1?.name || 'TBD'}</td>
+          <td style="padding: 10px;">${match.p2?.name || 'TBD'}</td>
+          <td style="padding: 10px;">${status}</td>
+          <td style="padding: 10px; color: #22c55e;">${winner}</td>
+          <td style="padding: 10px;">${match.score1 || 0} - ${match.score2 || 0}</td>
+          <td style="padding: 10px;">
+            <div style="display: flex; gap: 5px;">
+              <button onclick="editMatch(${rIdx}, ${mIdx})" style="padding: 5px 10px; background: #3b82f6; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">✏️ Edit</button>
+              ${!match.bye ? `
+                <button onclick="toggleMatchSuspension(${rIdx}, ${mIdx})" style="padding: 5px 10px; background: ${match.suspended ? '#22c55e' : '#f59e0b'}; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
+                  ${match.suspended ? '▶️' : '⏸️'}
+                </button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+  });
+  
+  html += '</tbody></table></div></div>';
+  return html;
+}
+
+function editMatch(rIdx, mIdx) {
+  const cat = categories[currentCategory.key];
+  const match = cat.rounds[rIdx][mIdx];
+  
+  const availablePlayers = players.filter(p => 
+    p.ageGroup === cat.ageGroup && p.gender === cat.gender && 
+    p.weight === cat.weight && p.belt === cat.belt && p.name
+  );
+  
+  const playerOptions = availablePlayers.map(p => 
+    `<option value="${p.id}" ${match.p1?.id === p.id ? 'selected' : ''}>${p.name} (${p.team || 'Free'})</option>`
+  ).join('');
+  
+  const playerOptions2 = availablePlayers.map(p => 
+    `<option value="${p.id}" ${match.p2?.id === p.id ? 'selected' : ''}>${p.name} (${p.team || 'Free'})</option>`
+  ).join('');
+  
+  const modal = document.createElement('div');
+  modal.className = 'winner-modal';
+  modal.innerHTML = `
+    <div class="winner-modal-content">
+      <h3 style="color: #fbbf24; margin-bottom: 20px;">✏️ Edit Match: ${match.id}</h3>
+      
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; color: #8899aa; margin-bottom: 8px;">🔴 Red Player:</label>
+        <select id="editRedPlayer" style="width: 100%; padding: 10px; background: #0f1724; border: 1px solid #2a3548; color: #fff; border-radius: 6px;">
+          <option value="">-- Select Player --</option>
+          ${playerOptions}
+        </select>
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; color: #8899aa; margin-bottom: 8px;">🔵 Blue Player:</label>
+        <select id="editBluePlayer" style="width: 100%; padding: 10px; background: #0f1724; border: 1px solid #2a3548; color: #fff; border-radius: 6px;">
+          <option value="">-- Select Player --</option>
+          ${playerOptions2}
+        </select>
+      </div>
+      
+      <div style="display: flex; gap: 10px;">
+        <button onclick="saveMatchEdit(${rIdx}, ${mIdx})" class="winner-btn" style="background: #22c55e; margin-bottom: 0;">💾 Save</button>
+        <button onclick="this.closest('.winner-modal').remove()" class="winner-btn cancel" style="margin-bottom: 0;">❌ Cancel</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+}
+
+function saveMatchEdit(rIdx, mIdx) {
+  const cat = categories[currentCategory.key];
+  const match = cat.rounds[rIdx][mIdx];
+  
+  const redPlayerId = document.getElementById('editRedPlayer').value;
+  const bluePlayerId = document.getElementById('editBluePlayer').value;
+  
+  const redPlayer = players.find(p => p.id === redPlayerId);
+  const bluePlayer = players.find(p => p.id === bluePlayerId);
+  
+  if (redPlayer) match.p1 = redPlayer;
+  if (bluePlayer) match.p2 = bluePlayer;
+  
+  match.score1 = 0;
+  match.score2 = 0;
+  match.winner = null;
+  match.status = 'pending';
+  
+  document.querySelector('.winner-modal').remove();
+  renderBracket();
+  showNotification('✅ Match updated!');
+}
+
+function toggleMatchSuspension(rIdx, mIdx) {
+  const cat = categories[currentCategory.key];
+  const match = cat.rounds[rIdx][mIdx];
+  match.suspended = !match.suspended;
+  renderBracket();
+  showNotification(match.suspended ? '⏸️ Match suspended!' : '▶️ Match resumed!');
+}
+
+function showWinnerSelection(match) {
+  const modal = document.createElement('div');
+  modal.className = 'winner-modal';
+  
+  const redName = match.p1?.name || 'Red';
+  const blueName = match.p2?.name || 'Blue';
+  
+  modal.innerHTML = `
+    <div class="winner-modal-content">
+      <h2 style="color: #fbbf24; margin-bottom: 20px; font-size: 2rem;">🏆 Select Winner</h2>
+      
+      <div style="background: #0f1724; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
+        <div style="font-size: 1.3rem; font-weight: bold; color: #fff; margin-bottom: 10px;">
+          ${redName} vs ${blueName}
+        </div>
+        <div style="font-size: 1.1rem; color: #8899aa;">
+          Score: ${match.score1} - ${match.score2}
+        </div>
+      </div>
+      
+      <button onclick="selectWinner('red')" class="winner-btn red">🔴 ${redName} Wins</button>
+      <button onclick="selectWinner('blue')" class="winner-btn blue">🔵 ${blueName} Wins</button>
+      <button onclick="selectWinner('draw')" class="winner-btn draw">🤝 Draw</button>
+      <button onclick="this.closest('.winner-modal').remove()" class="winner-btn cancel">❌ Cancel</button>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+}
+
+function selectWinner(winner) {
+  if (!currentMatch || !currentMatch.categoryKey) return;
+  
+  const cat = categories[currentMatch.categoryKey];
+  const match = cat.rounds[currentMatch.roundIdx][currentMatch.matchIdx];
+  
+  match.winner = winner === 'draw' ? null : winner;
+  match.status = 'completed';
+  
+  document.querySelector('.winner-modal').remove();
+  propagateBracketWinners(cat.rounds);
+  renderBracket();
+  
+  const winnerName = winner === 'red' ? match.p1?.name : 
+                     winner === 'blue' ? match.p2?.name : 'Draw';
+  showNotification(` ${winnerName} wins!`);
+}
+
+function startBracketMatch(rIdx, mIdx) {
+  const cat = categories[currentCategory.key];
+  const match = cat.rounds[rIdx][mIdx];
+  
+  currentMatch = {
+    ...match,
+    categoryKey: currentCategory.key,
+    matchType: 'bracket',
+    roundIdx: rIdx,
+    matchIdx: mIdx
+  };
+  
+  document.getElementById('redName').value = match.p1 ? match.p1.name : '';
+  document.getElementById('redTeam').value = match.p1 ? (match.p1.team || '') : '';
+  document.getElementById('blueName').value = match.p2 ? match.p2.name : '';
+  document.getElementById('blueTeam').value = match.p2 ? (match.p2.team || '') : '';
+  
+  document.getElementById('sbAgeGroup').value = cat.ageGroup;
+  document.getElementById('sbGender').value = cat.gender;
+  document.getElementById('sbWeight').value = cat.weight;
+  document.getElementById('sbBelt').value = cat.belt;
+  
+  const fightTime = getFightTime(cat.ageGroup);
+  document.getElementById('goldenTimeInput').value = getGoldenTime(cat.ageGroup);
+  timeLeft = fightTime * 60;
+  
+  resetScoreboardState();
+  updateTimerDisplay();
+  updateScoreboardDisplay();
+  
+  showView('scoreboard');
+}
+
+// 🎯 نظام إدارة المباريات المتقدم
+function toggleScheduleMode() {
+  autoScheduleMode = document.getElementById('autoScheduleToggle').checked;
+  renderQueue();
+  showNotification(autoScheduleMode ? '🤖 Auto-Schedule Mode ON' : '✋ Manual Mode ON');
+}
+
+function renderQueue() {
+  const container = document.getElementById('queueContainer');
+  if (!container) return;
+  
+  const allMatches = [];
+  Object.keys(categories).forEach(key => {
+    const cat = categories[key];
+    cat.rounds.forEach((round, rIdx) => {
+      round.forEach((m, mIdx) => {
+        if (m.status !== 'completed' && !m.bye && !m.suspended) {
+          allMatches.push({ 
+            ...m, 
+            categoryKey: key, 
+            roundIdx: rIdx, 
+            matchIdx: mIdx,
+            category: cat
+          });
         }
+      });
+    });
+  });
+  
+  if (allMatches.length === 0) {
+    container.innerHTML = '<p style="text-align: center; color: #8899aa; padding: 40px;">No pending matches.</p>';
+    return;
+  }
+  
+  // 🎯 ترتيب المباريات حسب الوضع
+  let sortedMatches = allMatches;
+  if (autoScheduleMode) {
+    sortedMatches = sortMatchesForDiversity(allMatches);
+  }
+  
+  container.innerHTML = sortedMatches.map((m, i) => {
+    const cat = m.category;
+    return `
+      <div class="match-queue-item ${i === 0 ? 'next-match' : ''}">
+        <div class="match-queue-info">
+          <div class="match-queue-players">
+            ${m.p1 ? m.p1.name : 'TBD'} vs ${m.p2 ? m.p2.name : 'TBD'}
+          </div>
+          <div class="match-queue-details">
+            ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt} | ${m.id}
+          </div>
+        </div>
+        <div class="match-queue-actions">
+          <button class="btn btn-add" onclick="startMatchFromQueue('${m.categoryKey}', ${m.roundIdx}, ${m.matchIdx})">▶ Start</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
 
-        // ✅ FIXED: Tab Switching Function
-        function switchTab(tabName) {
-            currentTab = tabName;
-            
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            
-            if (event && event.target) {
-                const clickedTab = event.target.closest('.tab');
-                if (clickedTab) clickedTab.classList.add('active');
-            }
-            
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            const activeContent = document.getElementById(`${tabName}Tab`);
-            if (activeContent) {
-                activeContent.classList.add('active');
-                
-                // ✅ Load data dynamically when tab is opened
-                if (tabName === 'athletes') {
-                    loadAthletes();
-                } else if (tabName === 'brackets') {
-                    loadBrackets();
-                }
-            }
+// 🎯 خوارزمية تنويع المباريات
+function sortMatchesForDiversity(matches) {
+  const lastPlayer = window.lastPlayedPlayer || null;
+  const sorted = [...matches];
+  
+  // ترتيب بحيث لا يلعب نفس اللاعب مرتين متتاليتين
+  sorted.sort((a, b) => {
+    const aHasLastPlayer = (a.p1?.id === lastPlayer || a.p2?.id === lastPlayer) ? 1 : 0;
+    const bHasLastPlayer = (b.p1?.id === lastPlayer || b.p2?.id === lastPlayer) ? 1 : 0;
+    return aHasLastPlayer - bHasLastPlayer;
+  });
+  
+  return sorted;
+}
+
+function startMatchFromQueue(categoryKey, rIdx, mIdx) {
+  currentCategory = { key: categoryKey };
+  startBracketMatch(rIdx, mIdx);
+  
+  // حفظ آخر لاعب لعب
+  const cat = categories[categoryKey];
+  const match = cat.rounds[rIdx][mIdx];
+  if (match.p1) window.lastPlayedPlayer = match.p1.id;
+}
+
+function renderCallUp() {
+  const container = document.getElementById('callupContainer');
+  if (!container) return;
+  
+  const pendingMatches = [];
+  Object.keys(categories).forEach(key => {
+    const cat = categories[key];
+    cat.rounds.forEach(r => {
+      r.forEach(m => {
+        if (m.status !== 'completed' && !m.bye && !m.suspended) {
+          pendingMatches.push({ ...m, categoryKey: key });
         }
+      });
+    });
+  });
+  
+  if (pendingMatches.length === 0) {
+    container.innerHTML = '<p style="text-align: center; color: #8899aa; padding: 40px;">No pending matches.</p>';
+    return;
+  }
+  
+  const next = pendingMatches[0];
+  const cat = categories[next.categoryKey];
+  
+  container.innerHTML = `
+    <div style="background: linear-gradient(135deg, #1e2a3a, #253447); border: 2px solid #fbbf24; border-radius: 12px; padding: 30px; text-align: center;">
+      <div style="font-size: 1rem; color: #8899aa; margin-bottom: 15px;">NEXT MATCH</div>
+      <div style="font-size: 2rem; font-weight: bold; color: #fbbf24; margin: 20px 0;">
+        ${next.p1 ? next.p1.name : 'TBD'} vs ${next.p2 ? next.p2.name : 'TBD'}
+      </div>
+      <div style="color: #8899aa; margin-bottom: 20px; font-size: 1.1rem;">
+        ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt}
+      </div>
+      <div style="display: flex; gap: 15px; justify-content: center;">
+        <button class="btn btn-add" onclick="callPlayer('${next.p1 ? next.p1.name : 'Player 1'}')"> Call ${next.p1 ? next.p1.name : 'Player 1'}</button>
+        <button class="btn btn-add" onclick="callPlayer('${next.p2 ? next.p2.name : 'Player 2'}')">📢 Call ${next.p2 ? next.p2.name : 'Player 2'}</button>
+      </div>
+    </div>
+  `;
+}
 
-        // ✅ NEW: Load Athletes Data
-        async function loadAthletes() {
-            const athletesList = document.getElementById('athletesList');
-            if (!athletesList) return;
-            
-            athletesList.innerHTML = '<div class="loading">Loading athletes...</div>';
-            
-            try {
-                const { data: participants, error } = await dbClient
-                    .from('tournament_participants')
-                    .select('*')
-                    .eq('tournament_id', tournamentId)
-                    .order('ranking', { ascending: true });
+function callPlayer(playerName) {
+  try {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    oscillator.frequency.value = 800;
+    oscillator.type = 'sine';
+    gainNode.gain.value = 0.3;
+    oscillator.start();
+    setTimeout(() => oscillator.stop(), 500);
+  } catch (e) { console.log('Audio not supported'); }
+  showNotification(`📢 Calling: ${playerName}`);
+}
 
-                if (error) throw error;
-
-                if (!participants || participants.length === 0) {
-                    athletesList.innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon"></div>
-                            <p>No athletes registered yet</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                // Group by division for better display
-                const divisions = {};
-                participants.forEach(p => {
-                    const gender = p.gender || 'Unknown';
-                    const ageGroup = p.age_group || p.age || 'All Ages';
-                    const belt = p.belt_level || p.belt || 'All Belts';
-                    const weightClass = p.weight_class || p.weight_class_name || p.division || 'All Weights';
-                    
-                    const divisionKey = `${gender} / ${ageGroup} / ${belt} / ${weightClass}`;
-                    
-                    if (!divisions[divisionKey]) {
-                        divisions[divisionKey] = [];
-                    }
-                    divisions[divisionKey].push(p);
-                });
-
-                let html = '';
-                Object.keys(divisions).forEach(divisionName => {
-                    const athletes = divisions[divisionName];
-                    
-                    html += `
-                        <div style="margin-bottom: 30px;">
-                            <h3 style="color: var(--accent-yellow); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,0.1);">
-                                ${divisionName}
-                            </h3>
-                            <div style="display: grid; gap: 10px;">
-                                ${athletes.map((athlete, idx) => {
-                                    const name = athlete.full_name || athlete.player_name || athlete.name || 'Unknown';
-                                    const team = athlete.team_name || athlete.team || 'Free Agent';
-                                    const initial = name.charAt(0).toUpperCase();
-                                    
-                                    return `
-                                        <div class="athlete-card" style="background: var(--bg-input); padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary-blue); display: flex; align-items: center; gap: 15px;">
-                                            <div class="athlete-avatar">${initial}</div>
-                                            <div class="athlete-info" style="flex: 1;">
-                                                <div class="athlete-name" style="font-weight: 700; color: var(--text-main); font-size: 1.1rem;">${name}</div>
-                                                <div class="athlete-details" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">
-                                                    ${team ? `<span>🏆 ${team}</span>` : ''}
-                                                    ${athlete.weight_class || athlete.weight_class_name ? `<span> • ⚖️ ${athlete.weight_class || athlete.weight_class_name}</span>` : ''}
-                                                    ${athlete.is_suspended ? '<span style="color: var(--danger);"> • ⚠️ Suspended</span>' : ''}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                            <div style="color: var(--text-muted); margin-top: 10px; font-size: 0.9rem;">
-                                Total registrations in this division: ${athletes.length}
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                athletesList.innerHTML = html;
-                
-            } catch (error) {
-                console.error('Error loading athletes:', error);
-                athletesList.innerHTML = `
-                    <div class="empty-state">
-                        <p>Error loading athletes: ${error.message}</p>
-                    </div>
-                `;
-            }
+function renderStandings() {
+  const container = document.getElementById('standingsContainer');
+  if (!container) return;
+  
+  const allPlayers = {};
+  Object.keys(categories).forEach(key => {
+    const cat = categories[key];
+    cat.rounds.forEach(r => {
+      r.forEach(m => {
+        if (m.p1) {
+          if (!allPlayers[m.p1.id]) allPlayers[m.p1.id] = { name: m.p1.name, team: m.p1.team, wins: 0, losses: 0, points: 0, categories: [] };
+          const catLabel = `${cat.ageGroup} - ${cat.weight} - ${cat.belt}`;
+          if (!allPlayers[m.p1.id].categories.includes(catLabel)) allPlayers[m.p1.id].categories.push(catLabel);
+          if (m.winner === 'red') { allPlayers[m.p1.id].wins++; allPlayers[m.p1.id].points += 3; }
+          else if (m.winner === 'blue') allPlayers[m.p1.id].losses++;
         }
-
-        // ✅ NEW: Load Brackets Data
-        async function loadBrackets() {
-            const bracketsContent = document.getElementById('bracketsContent');
-            if (!bracketsContent) return;
-            
-            bracketsContent.innerHTML = '<div class="loading">Loading brackets...</div>';
-            
-            try {
-                const { data: participants, error } = await dbClient
-                    .from('tournament_participants')
-                    .select('*')
-                    .eq('tournament_id', tournamentId);
-
-                if (error) throw error;
-
-                if (!participants || participants.length === 0) {
-                    bracketsContent.innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon"></div>
-                            <h3>${currentLang === 'ar' ? 'لا يوجد مشاركين' : 'No Participants Yet'}</h3>
-                            <p>${currentLang === 'ar' ? 'لم يتم تسجيل أي لاعب حتى الآن' : 'No athletes have registered yet'}</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                // Group participants by division
-                const divisions = {};
-                participants.forEach(p => {
-                    const gender = p.gender || 'Unknown';
-                    const ageGroup = p.age_group || p.age || 'All Ages';
-                    const belt = p.belt_level || p.belt || 'All Belts';
-                    const weightClass = p.weight_class || p.weight_class_name || p.division || 'All Weights';
-                    const giType = p.gi_type || 'Gi';
-                    
-                    const divisionKey = `${gender} / ${ageGroup} / ${belt} / ${weightClass} / ${giType}`;
-                    
-                    if (!divisions[divisionKey]) {
-                        divisions[divisionKey] = [];
-                    }
-                    divisions[divisionKey].push(p);
-                });
-
-                let html = '<div class="brackets-container">';
-                
-                Object.keys(divisions).forEach(divisionName => {
-                    const athletes = divisions[divisionName];
-                    
-                    html += `
-                        <div class="division-group">
-                            <h3 class="division-title">${divisionName}</h3>
-                            <div class="bracket-table">
-                                <div class="bracket-table-header">
-                                    <div>Athlete</div>
-                                    <div>Academy & Affiliation</div>
-                                    <div>Registration Details</div>
-                                </div>
-                    `;
-                    
-                    athletes.forEach(athlete => {
-                        const name = athlete.full_name || athlete.player_name || athlete.name || 'Unknown';
-                        const team = athlete.team_name || athlete.team || 'Free Agent';
-                        const initial = name.charAt(0).toUpperCase();
-                        
-                        html += `
-                            <div class="bracket-table-row">
-                                <div class="athlete-cell">
-                                    <div class="athlete-avatar-small">${initial}</div>
-                                    <div class="athlete-name-cell">${name}</div>
-                                </div>
-                                <div class="academy-cell">${team}</div>
-                                <div class="registration-cell">
-                                    <span class="gender-badge">${athlete.gender || 'N/A'}</span>
-                                    <div>${athlete.age_group || athlete.age || 'All Ages'} / ${athlete.belt_level || athlete.belt || 'All Belts'} • ${athlete.weight_class || athlete.weight_class_name || 'All Weights'} • ${athlete.gi_type || 'Gi'}</div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    html += `
-                            </div>
-                            <div class="total-registrations">Total registrations: ${athletes.length}</div>
-                        </div>
-                    `;
-                });
-                
-                html += '</div>';
-                bracketsContent.innerHTML = html;
-                
-            } catch (error) {
-                console.error('Error loading brackets:', error);
-                bracketsContent.innerHTML = `
-                    <div class="empty-state">
-                        <p>Error loading brackets: ${error.message}</p>
-                    </div>
-                `;
-            }
+        if (m.p2) {
+          if (!allPlayers[m.p2.id]) allPlayers[m.p2.id] = { name: m.p2.name, team: m.p2.team, wins: 0, losses: 0, points: 0, categories: [] };
+          const catLabel = `${cat.ageGroup} - ${cat.weight} - ${cat.belt}`;
+          if (!allPlayers[m.p2.id].categories.includes(catLabel)) allPlayers[m.p2.id].categories.push(catLabel);
+          if (m.winner === 'blue') { allPlayers[m.p2.id].wins++; allPlayers[m.p2.id].points += 3; }
+          else if (m.winner === 'red') allPlayers[m.p2.id].losses++;
         }
+      });
+    });
+  });
+  
+  const sortedPlayers = Object.values(allPlayers).sort((a, b) => b.points - a.points || b.wins - a.wins || a.losses - b.losses);
+  
+  if (sortedPlayers.length === 0) {
+    container.innerHTML = '<p style="text-align: center; color: #8899aa; padding: 40px;">No results yet. Complete some matches to see standings.</p>';
+    return;
+  }
+  
+  container.innerHTML = `
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background: #151d2b;">
+          <th style="padding: 12px; text-align: center;">Rank</th>
+          <th style="padding: 12px; text-align: left;">Player</th>
+          <th style="padding: 12px; text-align: left;">Team</th>
+          <th style="padding: 12px; text-align: left;">Categories</th>
+          <th style="padding: 12px; text-align: center;">Wins</th>
+          <th style="padding: 12px; text-align: center;">Losses</th>
+          <th style="padding: 12px; text-align: center;">Points</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${sortedPlayers.map((p, i) => `
+          <tr style="border-bottom: 1px solid #2a3548;">
+            <td style="padding: 10px; text-align: center; font-weight: bold; font-size: 1.2rem;">
+              ${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}
+            </td>
+            <td style="padding: 10px;"><strong>${p.name}</strong></td>
+            <td style="padding: 10px;">${p.team || 'N/A'}</td>
+            <td style="padding: 10px; font-size: 0.85rem;">${p.categories.join(', ')}</td>
+            <td style="padding: 10px; color: #22c55e; font-weight: bold; text-align: center;">${p.wins}</td>
+            <td style="padding: 10px; color: #ef4444; font-weight: bold; text-align: center;">${p.losses}</td>
+            <td style="padding: 10px; color: #fbbf24; font-weight: bold; text-align: center;">${p.points}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
 
-        async function loadTournamentDetails() {
-            try {
-                const { data: tournament, error: tournamentError } = await dbClient
-                    .from('tournaments')
-                    .select('*')
-                    .eq('id', tournamentId)
-                    .single();
-                
-                if (tournamentError || !tournament) {
-                    document.getElementById('tournamentContent').innerHTML = `
-                        <div class="empty-state">
-                            <div class="icon">❌</div>
-                            <p>Tournament not found</p>
-                        </div>
-                    `;
-                    return;
-                }
+function handleLogoUpload(player, input) {
+  const file = input.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('logoDisplay' + player).src = e.target.result;
+      document.getElementById('logoDisplay' + player).style.display = 'block';
+      document.getElementById('logoPlaceholder' + player).style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+}
 
-                const { count: participantCount } = await dbClient
-                    .from('tournament_participants')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('tournament_id', tournamentId);
+function addScore(player, points) {
+  if (scoreboard[player].isDQ) return;
+  scoreboard[player].history.push({ type: 'score', value: points });
+  scoreboard[player].score += points;
+  updateScoreboardDisplay();
+}
 
-                const { data: divisions } = await dbClient
-                    .from('tournament_divisions')
-                    .select('*')
-                    .eq('tournament_id', tournamentId)
-                    .eq('is_active', true)
-                    .eq('is_visible', true)
-                    .order('sort_order', { ascending: true });
+function subtractScore(player, points) {
+  if (scoreboard[player].isDQ) return;
+  scoreboard[player].history.push({ type: 'subtract', value: points });
+  scoreboard[player].score = Math.max(0, scoreboard[player].score - points);
+  updateScoreboardDisplay();
+}
 
-                const { data: paymentSettings } = await dbClient
-                    .from('tournament_payment_settings')
-                    .select('*')
-                    .eq('tournament_id', tournamentId)
-                    .single();
+function addAdvantage(player) {
+  if (scoreboard[player].isDQ) return;
+  scoreboard[player].history.push({ type: 'advantage' });
+  scoreboard[player].advantages++;
+  updateScoreboardDisplay();
+}
 
-                let organizer = null;
-                if (tournament.organizer_id) {
-                    const { data: orgData } = await dbClient
-                        .from('organizers')
-                        .select('*')
-                        .eq('user_id', tournament.organizer_id)
-                        .single();
-                    organizer = orgData;
-                }
+function addPenalty(player) {
+  if (scoreboard[player].isDQ) return;
+  scoreboard[player].history.push({ type: 'penalty' });
+  scoreboard[player].penalties++;
+  if (scoreboard[player].penalties >= 3) {
+    scoreboard[player].isDQ = true;
+    stopTimer();
+    showNotification('⚠️ Disqualification! 3 penalties!');
+  }
+  updateScoreboardDisplay();
+}
 
-                renderTournament(tournament, organizer, participantCount || 0, divisions || [], paymentSettings);
-            } catch (error) {
-                console.error('Error loading tournament:', error);
-                document.getElementById('tournamentContent').innerHTML = `
-                    <div class="empty-state">
-                        <div class="icon">❌</div>
-                        <p>Error loading tournament details</p>
-                    </div>
-                `;
-            }
-        }
+function undoAction(player) {
+  const h = scoreboard[player].history;
+  if (h.length === 0) return;
+  const last = h.pop();
+  if (last.type === 'score') scoreboard[player].score -= last.value;
+  else if (last.type === 'subtract') scoreboard[player].score += last.value;
+  else if (last.type === 'advantage') scoreboard[player].advantages--;
+  else if (last.type === 'penalty') {
+    scoreboard[player].penalties--;
+    if (scoreboard[player].penalties < 3) scoreboard[player].isDQ = false;
+  }
+  scoreboard[player].score = Math.max(0, scoreboard[player].score);
+  updateScoreboardDisplay();
+}
 
-        function renderTournament(tournament, organizer, participantCount, divisions, paymentSettings) {
-            const storedUser = localStorage.getItem('currentUser');
-            const isLoggedIn = !!storedUser;
-            
-            const startDate = tournament.event_start_date || tournament.tournament_date || tournament.event_date;
-            const endDate = tournament.event_end_date;
-            const location = tournament.location || (currentLang === 'ar' ? 'سيتم الإعلان عنه' : 'To be announced');
-            
-            let dateDisplay = formatDate(startDate);
-            if (endDate && endDate !== startDate) {
-                dateDisplay = `${formatDate(startDate)} - ${formatDate(endDate)}`;
-            }
+function updateScoreboardDisplay() {
+  document.getElementById('redScore').innerText = scoreboard.red.score;
+  document.getElementById('blueScore').innerText = scoreboard.blue.score;
+  document.getElementById('redAdv').innerText = scoreboard.red.advantages;
+  document.getElementById('blueAdv').innerText = scoreboard.blue.advantages;
+  document.getElementById('redPen').innerText = scoreboard.red.penalties;
+  document.getElementById('bluePen').innerText = scoreboard.blue.penalties;
+}
 
-            const bannerImage = tournament.image_url || '';
-            const bannerHtml = bannerImage ? `<img src="${bannerImage}" alt="${tournament.name}">` : '';
+function updateTimerDisplay() {
+  const mins = Math.floor(timeLeft / 60);
+  const secs = timeLeft % 60;
+  document.getElementById('timer').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
 
-            const registerButton = isLoggedIn
-                ? `<button class="btn-register" onclick="window.location.href='player-registration.html?tournament_id=${tournamentId}'">Register Now</button>`
-                : `<button class="btn-secondary" onclick="window.location.href='login.html?redirect=tournament-details.html?tournament_id=${tournamentId}'">Login to Register</button>`;
+function startTimer() {
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) {
+      stopTimer();
+      if (isGoldenTime) { showNotification('⚡ Golden Time ended!'); isGoldenTime = false; }
+      else showNotification("⏰ Time's up!");
+    }
+  }, 1000);
+}
 
-            const entriesHtml = divisions.length > 0
-                ? divisions.map(div => {
-                    const price = div.price || 0;
-                    const priceText = price > 0 ? `$${price} USD` : 'Free';
-                    const details = [];
-                    if (div.age_group) details.push(div.age_group);
-                    if (div.belt_level) details.push(div.belt_level);
-                    if (div.weight_class) details.push(div.weight_class);
-                    if (div.gender) details.push(div.gender);
-                    
-                    return `
-                        <div class="entry-item">
-                            <div class="entry-info">
-                                <div class="entry-name">${div.division_name || div.gi_type}</div>
-                                ${details.length > 0 ? `<div class="entry-details">${details.join(' • ')}</div>` : ''}
-                            </div>
-                            <div class="entry-price ${price === 0 ? 'free' : ''}">${priceText}</div>
-                        </div>
-                    `;
-                }).join('')
-                : `<div style="text-align: center; padding: 30px; color: var(--text-muted);">
-                     <div style="font-size: 3rem; margin-bottom: 10px;">🏆</div>
-                     <p>Divisions will be announced soon</p>
-                   </div>`;
+function pauseTimer() { stopTimer(); }
 
-            const paymentEnabled = paymentSettings?.payment_enabled || false;
-            const paymentBadge = paymentEnabled 
-                ? `<span class="payment-badge online">💳 Online Payment Enabled</span>`
-                : `<span class="payment-badge cash">💵 Cash Payment Only</span>`;
+function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
 
-            document.getElementById('tournamentContent').innerHTML = `
-                <!-- Tournament Header -->
-                <div class="tournament-header">
-                    <div class="tournament-header-content">
-                        <div class="tournament-title-section">
-                            <div class="tournament-logo">
-                                ${bannerImage ? `<img src="${bannerImage}" alt="${tournament.name}">` : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:2rem;">🏆</div>'}
-                            </div>
-                            <div class="tournament-title">
-                                <h1>${tournament.name}</h1>
-                                <p>📅 ${dateDisplay}</p>
-                            </div>
-                        </div>
-                        <div class="tournament-actions">
-                            ${registerButton}
-                        </div>
-                    </div>
-                </div>
+function resetScoreboardState() {
+  stopTimer();
+  isGoldenTime = false;
+  scoreboard = {
+    red: { score: 0, advantages: 0, penalties: 0, history: [], isDQ: false },
+    blue: { score: 0, advantages: 0, penalties: 0, history: [], isDQ: false }
+  };
+  updateScoreboardDisplay();
+}
 
-                <!-- Tabs -->
-                <div class="tabs-container">
-                    <div class="tabs">
-                        <button class="tab active" onclick="switchTab('information')">
-                            <span>📋</span> Information
-                        </button>
-                        <button class="tab" onclick="switchTab('athletes')">
-                            <span>👥</span> Athletes 
-                            <span style="background:var(--accent-yellow);color:var(--black);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${participantCount}</span>
-                        </button>
-                        <button class="tab" onclick="switchTab('brackets')">
-                            <span>🏆</span> Brackets
-                        </button>
-                        <button class="tab" onclick="switchTab('matches')">
-                            <span>⚔️</span> Matches
-                        </button>
-                        <button class="tab" onclick="switchTab('schedule')">
-                            <span>📅</span> Schedule
-                        </button>
-                        <button class="tab" onclick="switchTab('results')">
-                            <span>🏅</span> Results
-                        </button>
-                    </div>
-                </div>
+function resetScoreboard() {
+  resetScoreboardState();
+  if (currentCategory) {
+    const cat = categories[currentCategory.key];
+    timeLeft = getFightTime(cat.ageGroup) * 60;
+  } else timeLeft = 120;
+  updateTimerDisplay();
+}
 
-                <!-- Banner -->
-                ${bannerImage ? `<div class="banner"><div class="banner-image">${bannerHtml}</div></div>` : ''}
+function activateGoldenTime() {
+  const goldenMinutes = parseInt(document.getElementById('goldenTimeInput').value);
+  if (!goldenMinutes || goldenMinutes < 1) { showNotification('Enter valid golden time'); return; }
+  timeLeft = goldenMinutes * 60;
+  isGoldenTime = true;
+  updateTimerDisplay();
+  showNotification(`⚡ Golden Time Activated! ${goldenMinutes} min`);
+}
 
-                <!-- Tab Contents -->
-                <div class="main-content">
-                    <!-- Information Tab -->
-                    <div id="informationTab" class="tab-content active" style="grid-column: 1 / -1;">
-                        <div class="info-section">
-                            <h2>Tournament Information</h2>
-                            <div class="info-meta">
-                                <div class="info-meta-item"><span>📅</span><strong>Date:</strong><span>${dateDisplay}</span></div>
-                                <div class="info-meta-item"><span>📍</span><strong>Location:</strong><span>${location}</span></div>
-                                <div class="info-meta-item"><span>👥</span><strong>Participants:</strong><span>${participantCount} / ${tournament.max_participants || 'Unlimited'}</span></div>
-                                ${tournament.registration_fee > 0 ? `<div class="info-meta-item"><span>💰</span><strong>Base Fee:</strong><span>$${tournament.registration_fee} USD</span></div>` : ''}
-                                <div class="info-meta-item"><span>💳</span><strong>Payment:</strong>${paymentBadge}</div>
-                                ${tournament.sport_type ? `<div class="info-meta-item"><span>🏅</span><strong>Sport:</strong><span>${tournament.sport_type}</span></div>` : ''}
-                            </div>
-                            <h3>About This Tournament</h3>
-                            <p>${tournament.description || 'No description available.'}</p>
-                            <h3>Registration Information</h3>
-                            <p>This tournament is pre-registration only. We do not take registrations after the deadline or registrations at the event!</p>
-                            <ul style="margin: 15px 0; padding-left: 25px; color: var(--text-muted);">
-                                ${tournament.reg_regular_end ? `<li><strong>Normal Registration:</strong> Register before ${formatDate(tournament.reg_regular_end)}</li>` : ''}
-                                ${tournament.reg_late_end ? `<li><strong>Late Registration:</strong> Register before ${formatDate(tournament.reg_late_end)}</li>` : ''}
-                            </ul>
-                            <h3>Rules and Policies</h3>
-                            <p>By registering for this tournament, you confirm that you have thoroughly reviewed the event information and that you agree to comply with all rules and policies.</p>
-                            <h3>Format</h3>
-                            <p>The tournament offers every competitor multiple matches per division regardless of wins and losses. Competitors can get as many as 4 to 6 matches per division!</p>
-                            <h3>Weigh-Ins</h3>
-                            <p>Competitors can weigh in as soon as the event doors open on the day they are competing up until 60 minutes prior to their division start time.</p>
-                            <h3>Brackets and Schedule</h3>
-                            <p>The tournament's brackets and schedule will be posted 48 hours prior to the event.</p>
-                            <h3>Capacity</h3>
-                            <p>Each tournament has a set capacity limit and registration will close early if capacity is reached.</p>
-                            <h3>Refund Policy</h3>
-                            <p>${paymentSettings?.refund_policy || 'A full refund is available until the Normal Registration deadline. After this date, only a full coupon credit is offered.'}</p>
-                        </div>
-                    </div>
+function swapPlayers() {
+  const redName = document.getElementById('redName').value;
+  const blueName = document.getElementById('blueName').value;
+  document.getElementById('redName').value = blueName;
+  document.getElementById('blueName').value = redName;
+  
+  const redTeam = document.getElementById('redTeam').value;
+  const blueTeam = document.getElementById('blueTeam').value;
+  document.getElementById('redTeam').value = blueTeam;
+  document.getElementById('blueTeam').value = redTeam;
+  
+  const tempState = JSON.parse(JSON.stringify(scoreboard.red));
+  scoreboard.red = JSON.parse(JSON.stringify(scoreboard.blue));
+  scoreboard.blue = tempState;
+  updateScoreboardDisplay();
+}
 
-                    <!-- Athletes Tab -->
-                    <div id="athletesTab" class="tab-content" style="grid-column: 1 / -1;">
-                        <div class="info-section">
-                            <h2>Registered Athletes</h2>
-                            <div id="athletesList" class="athletes-list">
-                                <div class="loading">Loading athletes...</div>
-                            </div>
-                        </div>
-                    </div>
+function finishMatch() {
+  stopTimer();
+  
+  const redName = document.getElementById('redName').value || 'Red';
+  const blueName = document.getElementById('blueName').value || 'Blue';
+  const redScore = scoreboard.red.score;
+  const blueScore = scoreboard.blue.score;
+  
+  if (currentMatch && currentMatch.categoryKey) {
+    const cat = categories[currentMatch.categoryKey];
+    const match = cat.rounds[currentMatch.roundIdx][currentMatch.matchIdx];
+    
+    match.score1 = redScore;
+    match.score2 = blueScore;
+    
+    showWinnerSelection(match);
+  }
+}
 
-                    <!-- Brackets Tab -->
-                    <div id="bracketsTab" class="tab-content" style="grid-column: 1 / -1;">
-                        <div class="info-section">
-                            <h2>Brackets</h2>
-                            <div id="bracketsContent">
-                                <div class="coming-soon">
-                                    <div class="icon">🏆</div>
-                                    <h3>Coming Soon</h3>
-                                    <p>Brackets will be posted 48 hours before the tournament starts</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+function backToBracket() { showView('bracket'); }
 
-                    <!-- Matches Tab -->
-                    <div id="matchesTab" class="tab-content" style="grid-column: 1 / -1;">
-                        <div class="info-section">
-                            <h2>Matches</h2>
-                            <div class="coming-soon">
-                                <div class="icon">⚔️</div>
-                                <h3>${currentLang === 'ar' ? 'قريباً' : 'Coming Soon'}</h3>
-                                <p>${currentLang === 'ar' ? 'سيتم نشر جدول المباريات قريباً' : 'Match schedule will be announced soon'}</p>
-                            </div>
-                        </div>
-                    </div>
+function showNotification(message) {
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #22c55e;
+    color: #fff;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    z-index: 10000;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+    animation: slideIn 0.3s ease;
+  `;
+  notification.innerText = message;
+  document.body.appendChild(notification);
+  setTimeout(() => {
+    notification.style.animation = 'slideOut 0.3s ease';
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
 
-                    <!-- Schedule Tab -->
-                    <div id="scheduleTab" class="tab-content" style="grid-column: 1 / -1;">
-                        <div class="info-section">
-                            <h2>Schedule</h2>
-                            <div class="coming-soon">
-                                <div class="icon">📅</div>
-                                <h3>${currentLang === 'ar' ? 'قريباً' : 'Coming Soon'}</h3>
-                                <p>${currentLang === 'ar' ? 'سيتم نشر الجدول الكامل قبل 48 ساعة من الحدث' : 'The full schedule will be posted 48 hours prior to the event'}</p>
-                            </div>
-                        </div>
-                    </div>
+const style = document.createElement('style');
+style.innerText = `
+  @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(400px); opacity: 0; } }
+`;
+document.head.appendChild(style);
+</script>
 
-                    <!-- Results Tab -->
-                    <div id="resultsTab" class="tab-content" style="grid-column: 1 / -1;">
-                        <div class="info-section">
-                            <h2>Results</h2>
-                            <div class="coming-soon">
-                                <div class="icon">🏅</div>
-                                <h3>${currentLang === 'ar' ? 'قريباً' : 'Coming Soon'}</h3>
-                                <p>${currentLang === 'ar' ? 'سيتم نشر النتائج بعد انتهاء البطولة' : 'Results will be posted after the tournament ends'}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        async function handleLogout() {
-            await dbClient.auth.signOut();
-            localStorage.removeItem('currentUser');
-            showLoginButton();
-            window.location.reload();
-        }
-    </script>
 </body>
 </html>
