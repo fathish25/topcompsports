@@ -224,19 +224,6 @@
             border-bottom-color: var(--accent); 
         }
 
-        /* Tab Content */
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease-in;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         /* Banner */
         .banner { 
             max-width: 1200px; 
@@ -493,22 +480,6 @@
             color: var(--danger); 
         }
 
-        /* Coming Soon Message */
-        .coming-soon {
-            text-align: center;
-            padding: 80px 20px;
-            color: var(--text-muted);
-        }
-        .coming-soon .icon {
-            font-size: 5rem;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-        .coming-soon h3 {
-            color: var(--text-main);
-            margin-bottom: 10px;
-        }
-
         /* Loading & Empty */
         .loading { 
             text-align: center; 
@@ -628,7 +599,6 @@
 
         let currentLang = localStorage.getItem('lang') || 'en';
         let tournamentId = null;
-        let currentTab = 'information';
 
         window.onload = async function() {
             checkUserStatus();
@@ -689,30 +659,6 @@
             return date.toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US', { 
                 year: 'numeric', month: 'long', day: 'numeric' 
             });
-        }
-
-        // ✅ FIXED: Tab Switching Function
-        function switchTab(tabName) {
-            currentTab = tabName;
-            
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Add active class to clicked tab
-            event.target.closest('.tab').classList.add('active');
-            
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // Show the selected tab content
-            const activeContent = document.getElementById(`${tabName}Tab`);
-            if (activeContent) {
-                activeContent.classList.add('active');
-            }
         }
 
         async function loadTournamentDetails() {
@@ -856,25 +802,12 @@
                 <!-- Tabs -->
                 <div class="tabs-container">
                     <div class="tabs">
-                        <button class="tab active" onclick="switchTab('information')">
-                            <span>📋</span> Information
-                        </button>
-                        <button class="tab" onclick="switchTab('athletes')">
-                            <span>👥</span> Athletes 
-                            <span style="background:var(--accent);color:var(--bg-dark);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${participantCount}</span>
-                        </button>
-                        <button class="tab" onclick="switchTab('brackets')">
-                            <span></span> Brackets
-                        </button>
-                        <button class="tab" onclick="switchTab('matches')">
-                            <span>⚔️</span> Matches
-                        </button>
-                        <button class="tab" onclick="switchTab('schedule')">
-                            <span>📅</span> Schedule
-                        </button>
-                        <button class="tab" onclick="switchTab('results')">
-                            <span>🏅</span> Results
-                        </button>
+                        <a href="#information" class="tab active"><span>📋</span> Information</a>
+                        <a href="tournament-athletes.html?tournament_id=${tournamentId}" class="tab"><span>👥</span> Athletes <span style="background:var(--accent);color:var(--bg-dark);padding:2px 8px;border-radius:10px;font-size:0.8rem;">${participantCount}</span></a>
+                        <a href="#" class="tab"><span>🏆</span> Brackets</a>
+                        <a href="#" class="tab"><span>⚔️</span> Matches</a>
+                        <a href="#" class="tab"><span>📅</span> Schedule</a>
+                        <a href="#" class="tab"><span></span> Results</a>
                     </div>
                 </div>
 
@@ -885,135 +818,154 @@
                 </div>
                 ` : ''}
 
-                <!-- Tab Contents -->
+                <!-- Main Content -->
                 <div class="main-content">
-                    <!-- Information Tab -->
-                    <div id="informationTab" class="tab-content active" style="grid-column: 1 / -1;">
-                        <div class="info-section">
-                            <h2 data-en="Tournament Information" data-ar="معلومات البطولة">Tournament Information</h2>
-                            
-                            <div class="info-meta">
-                                <div class="info-meta-item">
-                                    <span>📅</span>
-                                    <strong>Date:</strong>
-                                    <span>${dateDisplay}</span>
-                                </div>
-                                <div class="info-meta-item">
-                                    <span>📍</span>
-                                    <strong>Location:</strong>
-                                    <span>${location}</span>
-                                </div>
-                                <div class="info-meta-item">
-                                    <span></span>
-                                    <strong>Participants:</strong>
-                                    <span>${participantCount} / ${tournament.max_participants || 'Unlimited'}</span>
-                                </div>
-                                ${tournament.registration_fee > 0 ? `
-                                <div class="info-meta-item">
-                                    <span>💰</span>
-                                    <strong>Base Fee:</strong>
-                                    <span>$${tournament.registration_fee} USD</span>
+                    <div class="info-section">
+                        <h2>Tournament Information</h2>
+                        
+                        <div class="info-meta">
+                            <div class="info-meta-item">
+                                <span>📅</span>
+                                <strong>Date:</strong>
+                                <span>${dateDisplay}</span>
+                            </div>
+                            <div class="info-meta-item">
+                                <span>📍</span>
+                                <strong>Location:</strong>
+                                <span>${location}</span>
+                            </div>
+                            <div class="info-meta-item">
+                                <span>👥</span>
+                                <strong>Participants:</strong>
+                                <span>${participantCount} / ${tournament.max_participants || 'Unlimited'}</span>
+                            </div>
+                            ${tournament.registration_fee > 0 ? `
+                            <div class="info-meta-item">
+                                <span>💰</span>
+                                <strong>Base Fee:</strong>
+                                <span>$${tournament.registration_fee} USD</span>
+                            </div>
+                            ` : ''}
+                            <div class="info-meta-item">
+                                <span>💳</span>
+                                <strong>Payment:</strong>
+                                ${paymentBadge}
+                            </div>
+                            ${tournament.sport_type ? `
+                            <div class="info-meta-item">
+                                <span>🏅</span>
+                                <strong>Sport:</strong>
+                                <span>${tournament.sport_type}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <h3>About This Tournament</h3>
+                        <p>${tournament.description || 'No description available.'}</p>
+
+                        <h3>Registration Information</h3>
+                        <p>This tournament is pre-registration only. We do not take registrations after the deadline or registrations at the event!</p>
+                        
+                        <ul style="margin: 15px 0; padding-left: 25px; color: var(--text-muted);">
+                            ${tournament.reg_regular_end ? `<li><strong>Normal Registration:</strong> Register before ${formatDate(tournament.reg_regular_end)}</li>` : ''}
+                            ${tournament.reg_late_end ? `<li><strong>Late Registration:</strong> Register before ${formatDate(tournament.reg_late_end)}</li>` : ''}
+                        </ul>
+
+                        <h3>Rules and Policies</h3>
+                        <p>By registering for this tournament, you confirm that you have thoroughly reviewed the event information and that you agree to comply with all rules and policies.</p>
+
+                        <h3>Format</h3>
+                        <p>The tournament offers every competitor multiple matches per division regardless of wins and losses. Competitors can get as many as 4 to 6 matches per division!</p>
+
+                        <h3>Weigh-Ins</h3>
+                        <p>Competitors can weigh in as soon as the event doors open on the day they are competing up until 60 minutes prior to their division start time.</p>
+
+                        <h3>Brackets and Schedule</h3>
+                        <p>The tournament's brackets and schedule will be posted 48 hours prior to the event.</p>
+
+                        <h3>Capacity</h3>
+                        <p>Each tournament has a set capacity limit and registration will close early if capacity is reached.</p>
+
+                        <h3>Refund Policy</h3>
+                        <p>${paymentSettings?.refund_policy || 'A full refund is available until the Normal Registration deadline. After this date, only a full coupon credit is offered.'}</p>
+                    </div>
+
+                    <div class="sidebar">
+                        <!-- Entries -->
+                        <div class="sidebar-card">
+                            <h3>Entries</h3>
+                            <div class="entries-list">
+                                ${entriesHtml}
+                            </div>
+                        </div>
+
+                        <!-- Registration Dates -->
+                        <div class="sidebar-card">
+                            <h3>Registration</h3>
+                            <div class="registration-dates">
+                                ${tournament.reg_regular_start && tournament.reg_regular_end ? `
+                                <div class="reg-date-item">
+                                    <h4>Normal Registration</h4>
+                                    <p>${formatDate(tournament.reg_regular_start)} - ${formatDate(tournament.reg_regular_end)}</p>
                                 </div>
                                 ` : ''}
-                                <div class="info-meta-item">
-                                    <span>💳</span>
-                                    <strong>Payment:</strong>
-                                    ${paymentBadge}
-                                </div>
-                                ${tournament.sport_type ? `
-                                <div class="info-meta-item">
-                                    <span>🏅</span>
-                                    <strong>Sport:</strong>
-                                    <span>${tournament.sport_type}</span>
+                                ${tournament.reg_late_start && tournament.reg_late_end ? `
+                                <div class="reg-date-item late">
+                                    <h4>Late Registration</h4>
+                                    <p>${formatDate(tournament.reg_late_start)} - ${formatDate(tournament.reg_late_end)}</p>
                                 </div>
                                 ` : ''}
-                            </div>
-
-                            <h3>About This Tournament</h3>
-                            <p>${tournament.description || 'No description available.'}</p>
-
-                            <h3>Registration Information</h3>
-                            <p>This tournament is pre-registration only. We do not take registrations after the deadline or registrations at the event!</p>
-                            
-                            <ul style="margin: 15px 0; padding-left: 25px; color: var(--text-muted);">
-                                ${tournament.reg_regular_end ? `<li><strong>Normal Registration:</strong> Register before ${formatDate(tournament.reg_regular_end)}</li>` : ''}
-                                ${tournament.reg_late_end ? `<li><strong>Late Registration:</strong> Register before ${formatDate(tournament.reg_late_end)}</li>` : ''}
-                            </ul>
-
-                            <h3>Rules and Policies</h3>
-                            <p>By registering for this tournament, you confirm that you have thoroughly reviewed the event information and that you agree to comply with all rules and policies.</p>
-
-                            <h3>Format</h3>
-                            <p>The tournament offers every competitor multiple matches per division regardless of wins and losses. Competitors can get as many as 4 to 6 matches per division!</p>
-
-                            <h3>Weigh-Ins</h3>
-                            <p>Competitors can weigh in as soon as the event doors open on the day they are competing up until 60 minutes prior to their division start time.</p>
-
-                            <h3>Brackets and Schedule</h3>
-                            <p>The tournament's brackets and schedule will be posted 48 hours prior to the event.</p>
-
-                            <h3>Capacity</h3>
-                            <p>Each tournament has a set capacity limit and registration will close early if capacity is reached.</p>
-
-                            <h3>Refund Policy</h3>
-                            <p>${paymentSettings?.refund_policy || 'A full refund is available until the Normal Registration deadline. After this date, only a full coupon credit is offered.'}</p>
-                        </div>
-                    </div>
-
-                    <!-- Athletes Tab -->
-                    <div id="athletesTab" class="tab-content" style="grid-column: 1 / -1;">
-                        <div class="info-section">
-                            <h2 data-en="Registered Athletes" data-ar="اللاعبين المسجلين">Registered Athletes</h2>
-                            <div id="athletesList" class="athletes-list">
-                                <div class="loading">Loading athletes...</div>
+                                <div class="reg-date-item">
+                                    <h4>Event Starts</h4>
+                                    <p>${formatDate(startDate)}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Brackets Tab -->
-                    <div id="bracketsTab" class="tab-content" style="grid-column: 1 / -1;">
-                        <div class="info-section">
-                            <h2 data-en="Brackets" data-ar="المجموعات">Brackets</h2>
-                            <div class="coming-soon">
-                                <div class="icon"></div>
-                                <h3>${currentLang === 'ar' ? 'قريباً' : 'Coming Soon'}</h3>
-                                <p>${currentLang === 'ar' ? 'سيتم نشر المجموعات قبل 48 ساعة من بدء البطولة' : 'Brackets will be posted 48 hours before the tournament starts'}</p>
+                        <!-- Location -->
+                        <div class="sidebar-card">
+                            <h3>Location</h3>
+                            <div class="location-card">
+                                <p class="location-address">${location}</p>
+                                <div class="location-map" onclick="window.open('https://maps.google.com/?q=${encodeURIComponent(location)}', '_blank')">
+                                    <span>📍 View on Map</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Matches Tab -->
-                    <div id="matchesTab" class="tab-content" style="grid-column: 1 / -1;">
-                        <div class="info-section">
-                            <h2 data-en="Matches" data-ar="المباريات">Matches</h2>
-                            <div class="coming-soon">
-                                <div class="icon">⚔️</div>
-                                <h3>${currentLang === 'ar' ? 'قريباً' : 'Coming Soon'}</h3>
-                                <p>${currentLang === 'ar' ? 'سيتم نشر جدول المباريات قريباً' : 'Match schedule will be announced soon'}</p>
+                        <!-- Organizer -->
+                        ${organizer ? `
+                        <div class="sidebar-card">
+                            <h3>Organizer</h3>
+                            <div class="organizer-card">
+                                <div class="organizer-name">${organizer.full_name || organizer.organization_name || 'TopCompSports'}</div>
+                                <div class="organizer-info">${organizer.organization_type || 'Professional tournament management'}</div>
+                                <div class="contact-links">
+                                    ${organizer.email ? `<a href="mailto:${organizer.email}" class="contact-link"><span>️</span><span>Email</span></a>` : ''}
+                                    ${organizer.phone ? `<a href="tel:${organizer.phone}" class="contact-link"><span>📞</span><span>Phone</span></a>` : ''}
+                                    ${organizer.whatsapp ? `<a href="https://wa.me/${organizer.whatsapp.replace(/[^0-9]/g, '')}" target="_blank" class="contact-link"><span>💬</span><span>WhatsApp</span></a>` : ''}
+                                    ${organizer.website ? `<a href="${organizer.website}" target="_blank" class="contact-link"><span>🌐</span><span>Website</span></a>` : ''}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                        ` : ''}
 
-                    <!-- Schedule Tab -->
-                    <div id="scheduleTab" class="tab-content" style="grid-column: 1 / -1;">
-                        <div class="info-section">
-                            <h2 data-en="Schedule" data-ar="الجدول">Schedule</h2>
-                            <div class="coming-soon">
-                                <div class="icon">📅</div>
-                                <h3>${currentLang === 'ar' ? 'قريباً' : 'Coming Soon'}</h3>
-                                <p>${currentLang === 'ar' ? 'سيتم نشر الجدول الكامل قبل 48 ساعة من الحدث' : 'The full schedule will be posted 48 hours prior to the event'}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Results Tab -->
-                    <div id="resultsTab" class="tab-content" style="grid-column: 1 / -1;">
-                        <div class="info-section">
-                            <h2 data-en="Results" data-ar="النتائج">Results</h2>
-                            <div class="coming-soon">
-                                <div class="icon">🏅</div>
-                                <h3>${currentLang === 'ar' ? 'قريباً' : 'Coming Soon'}</h3>
-                                <p>${currentLang === 'ar' ? 'سيتم نشر النتائج بعد انتهاء البطولة' : 'Results will be posted after the tournament ends'}</p>
+                        <!-- Cancel/Refund Policy -->
+                        <div class="sidebar-card">
+                            <h3>Cancel/Refund Policy</h3>
+                            <div class="registration-dates">
+                                ${tournament.reg_regular_end ? `
+                                <div class="reg-date-item">
+                                    <h4>Last chance to cancel</h4>
+                                    <p>${formatDate(tournament.reg_regular_end)}</p>
+                                </div>
+                                ` : ''}
+                                ${tournament.reg_late_end ? `
+                                <div class="reg-date-item">
+                                    <h4>Last chance to edit</h4>
+                                    <p>${formatDate(tournament.reg_late_end)}</p>
+                                </div>
+                                ` : ''}
                             </div>
                         </div>
                     </div>
