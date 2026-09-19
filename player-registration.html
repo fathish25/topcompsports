@@ -180,9 +180,12 @@
         let currentUserId = null;
         let currentLang = localStorage.getItem('lang') || 'ar';
 
+        // ✅ القيم المسموح بها في gi_type حسب قاعدة البيانات
+        const ALLOWED_GI_TYPES = ['Gi', 'No-Gi', 'Grappling'];
+
         const translations = {
             ar: {
-                pageTitle: ' التسجيل في البطولة', pageSubtitle: 'قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة',
+                pageTitle: '🏆 التسجيل في البطولة', pageSubtitle: 'قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة',
                 personalInfo: '👤 بياناتك الشخصية (من الحساب)', loading: 'جاري تحميل البيانات...',
                 currentReg: '📋 تسجيلاتك الحالية في البطولة', regCount: 'تسجيل',
                 participationData: '📝 بيانات المشاركة في البطولة (قابل للتعديل)',
@@ -215,7 +218,7 @@
                 selectBelt: 'Select belt...', selectTeam: 'Select team...', noTeams: 'No teams registered',
                 gi: 'Gi', noGi: 'No-Gi', grappling: 'Grappling', selectGi: 'Select...',
                 successAdd: '✅ Registration added successfully!', successDelete: '✅ Registration deleted successfully!',
-                errorDelete: '❌ Error deleting: ', errorRegister: ' Error registering: ',
+                errorDelete: ' Error deleting: ', errorRegister: ' Error registering: ',
                 confirmDelete: 'Are you sure you want to delete this registration?', loginRequired: ' Please login first!',
                 invalidData: ' Invalid data!', email: 'Email', gender: 'Gender',
                 country: 'Country', male: 'Male', female: 'Female', unspecified: 'Unspecified',
@@ -309,7 +312,7 @@
         async function loadAgeDivisions() {
             const { data, error } = await supabaseClient.from('ajp_age_divisions').select('id, name, min_age, max_age').order('min_age');
             if (error) {
-                console.error(' خطأ في جلب الفئات العمرية:', error);
+                console.error('❌ خطأ في جلب الفئات العمرية:', error);
                 return [];
             }
             return data || [];
@@ -344,7 +347,7 @@
         async function loadBeltLevels() {
             const { data, error } = await supabaseClient.from('ajp_belt_levels').select('id, name, sort_order').order('sort_order');
             if (error) {
-                console.error('❌ خطأ في جلب الأحزمة:', error);
+                console.error(' خطأ في جلب الأحزمة:', error);
                 return [];
             }
             
@@ -416,7 +419,6 @@
             
             const t = translations[currentLang];
             
-            // ✅ استخدام الترجمة الصحيحة وعدم وضع "اختر" كقيمة محددة
             let optionsHTML = `<option value="">${t.selectGender}</option>`;
             optionsHTML += '<option value="Boys">Boys</option>';
             optionsHTML += '<option value="Girls">Girls</option>';
@@ -424,7 +426,7 @@
             optionsHTML += '<option value="Women">Women</option>';
             
             select.innerHTML = optionsHTML;
-            select.value = ''; // تأكد من عدم تحديد أي قيمة
+            select.value = '';
         }
 
         function populateBeltLevels() {
@@ -470,12 +472,8 @@
             updateWeightOptions();
         }
 
-        // ✅ دالة لاستخراج الرقم فقط من اسم الوزن
         function extractWeightNumber(weightName) {
             if (!weightName) return '';
-            
-            // استخراج أول رقم من النص
-            // أمثلة: "-16kg (0-16 kg)" -> "16", "16kg" -> "16"
             const match = weightName.match(/(\d+)/);
             return match ? match[1] : weightName;
         }
@@ -502,7 +500,6 @@
                 return;
             }
             
-            // ✅ عرض جميع الأوزان المتاحة لجميع الفئات
             let filteredWeights = weightCategories;
             
             const uniqueWeights = [];
@@ -526,8 +523,6 @@
                 uniqueWeights.forEach((w) => {
                     const minW = w.min_weight !== null && w.min_weight !== undefined ? w.min_weight : 0;
                     const maxW = w.max_weight !== null && w.max_weight !== undefined ? w.max_weight : '';
-                    
-                    // ✅ استخراج الرقم فقط وعرضه
                     const weightNumber = extractWeightNumber(w.name);
                     
                     optionsHTML += `<option value="${w.name}" data-minweight="${minW}" data-maxweight="${maxW}" data-weightid="${w.id || ''}">${weightNumber}</option>`;
@@ -663,6 +658,13 @@
             
             const minWeightVal = selectedWeightOption ? parseFloat(selectedWeightOption.getAttribute('data-minweight') || 0) : 0;
             const weightId = selectedWeightOption ? selectedWeightOption.getAttribute('data-weightid') : null;
+            const giTypeValue = document.getElementById('giType').value;
+
+            // ✅ التحقق من أن gi_type ضمن القيم المسموح بها
+            if (!ALLOWED_GI_TYPES.includes(giTypeValue)) {
+                showAlert('error', `❌ نوع المشاركة غير صالح. القيم المسموح بها: ${ALLOWED_GI_TYPES.join(', ')}`);
+                return;
+            }
 
             const formData = {
                 tournament_id: tournamentId,
@@ -673,10 +675,12 @@
                 weight: minWeightVal,
                 weight_class_id: weightId,
                 belt_level: document.getElementById('belt').value,
-                gi_type: document.getElementById('giType').value,
+                gi_type: giTypeValue, // ✅ القيمة الصحيحة: Gi, No-Gi, أو Grappling
                 team: document.getElementById('teamSelect').value,
                 ranking: parseInt(document.getElementById('ranking').value) || 0
             };
+
+            console.log('📝 Submitting registration:', formData);
 
             try {
                 const { error } = await supabaseClient.from('tournament_participants').insert([formData]).select();
