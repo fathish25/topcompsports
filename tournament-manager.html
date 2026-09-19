@@ -794,20 +794,19 @@ input:checked + .toggle-slider:before {
     </div>
     
     <nav class="nav-menu">
-      <a href="#" class="nav-link">Home</a>
-      <a href="#" class="nav-link">Tournaments</a>
-      <a href="#" class="nav-link active">My Profile</a>
+      <a href="organizer-dashboard.html" class="nav-link"> Dashboard</a>
+      <a href="#" class="nav-link active">Manager</a>
     </nav>
     
     <div class="user-section">
       <div class="user-profile">
         <div class="user-avatar"></div>
-        <span class="user-name">fffaaaaa</span>
+        <span class="user-name" id="userNameDisplay">User</span>
       </div>
-      <button class="btn-logout">Logout</button>
+      <button class="btn-logout" onclick="logout()">Logout</button>
       <div class="language-toggle">
-        <button class="lang-btn">عربي</button>
-        <button class="lang-btn active">English</button>
+        <button class="lang-btn" onclick="changeLanguage('ar')" id="btn-ar">عربي</button>
+        <button class="lang-btn active" onclick="changeLanguage('en')" id="btn-en">English</button>
       </div>
     </div>
   </div>
@@ -816,11 +815,11 @@ input:checked + .toggle-slider:before {
 <div class="tournament-container">
   <div class="tournament-header">
     <div class="tournament-title-section">
-      <h1> Tournament 2026 OZ</h1>
+      <h1 id="tournamentNameDisplay">Loading Tournament...</h1>
       <div class="tournament-subtitle" id="subtitle">Step 1: Players Registration</div>
       <div class="status-badge" id="dbStatus">
-        <span>✅</span>
-        <span>Connected to Database</span>
+        <span>⏳</span>
+        <span>Connecting...</span>
       </div>
     </div>
     
@@ -867,7 +866,7 @@ input:checked + .toggle-slider:before {
       </div>
       
       <button class="btn-proceed" onclick="showView('mats')">
-        <span>🥋</span>
+        <span></span>
         <span>Proceed to Mats Setup →</span>
       </button>
     </div>
@@ -928,7 +927,6 @@ input:checked + .toggle-slider:before {
       <div id="dashboard-queue" class="dashboard-tab" style="display: none;">
         <h3 style="color: #fbbf24; margin-bottom: 20px;"> Match Queue</h3>
         
-        <!--  نظام إدارة المباريات -->
         <div class="schedule-mode-toggle">
           <div>
             <label>🤖 Auto-Schedule Mode (Diverse Matches)</label>
@@ -951,7 +949,7 @@ input:checked + .toggle-slider:before {
       </div>
       
       <div id="dashboard-standings" class="dashboard-tab" style="display: none;">
-        <h3 style="color: #fbbf24; margin-bottom: 20px;">🏆 Final Standings</h3>
+        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Final Standings</h3>
         <div id="standingsContainer"></div>
       </div>
     </div>
@@ -1065,11 +1063,11 @@ input:checked + .toggle-slider:before {
             <button class="btn-adv" onclick="addAdvantage('red')"><span>⭐</span><span>Advantage</span></button>
             <button class="btn-pen" onclick="addPenalty('red')"><span>🟥</span><span>Penalty</span></button>
           </div>
-          <button class="sb-undo-btn" onclick="undoAction('red')">↩️ Undo</button>
+          <button class="sb-undo-btn" onclick="undoAction('red')">️ Undo</button>
         </div>
 
         <div>
-          <div class="sb-panel-header blue"> Blue Player</div>
+          <div class="sb-panel-header blue">🔵 Blue Player</div>
           <div class="sb-counters">
             <div class="sb-counter adv">
               <div class="label">⭐ Advantage</div>
@@ -1113,7 +1111,7 @@ input:checked + .toggle-slider:before {
         <button class="btn btn-settings" onclick="pauseTimer()">⏸ Pause</button>
         <button class="btn btn-players" onclick="finishMatch()">🏁 Finish</button>
         <button class="btn btn-info" onclick="swapPlayers()">🔄 Swap</button>
-        <button class="btn btn-sync" onclick="resetScoreboard()">🔄 Reset</button>
+        <button class="btn btn-sync" onclick="resetScoreboard()"> Reset</button>
       </div>
     </div>
   </div>
@@ -1142,6 +1140,7 @@ let currentMat = null;
 let currentCategory = null;
 let currentMatch = null;
 let dbConnected = false;
+let currentLang = localStorage.getItem('lang') || 'en';
 
 let AGE_GROUPS = {};
 let WEIGHTS = {};
@@ -1157,16 +1156,78 @@ let scoreboard = {
 let timerInterval = null;
 let timeLeft = 120;
 let isGoldenTime = false;
-let autoScheduleMode = false; //  وضع الجدولة التلقائية
+let autoScheduleMode = false;
 
+// Translations
+const translations = {
+  en: {
+    loading: 'Loading Tournament...',
+    players: 'Players',
+    matches: 'Matches',
+    capacity: 'Capacity',
+    step1: 'Step 1: Players Registration',
+    step2: 'Step 2: Mats Setup',
+    dashboard: 'Mat Dashboard',
+    addPlayer: '➕ Add Player',
+    add10: '➕ Add 10',
+    sync: '🔄 Sync with DB',
+    proceed: 'Proceed to Mats Setup →',
+    matsSetup: '🥋 Mats Setup',
+    back: '← Back to Players',
+    numberOfMats: 'Number of Mats:',
+    openDashboard: '🏆 Open Mat Dashboard →',
+    matDashboard: '📋 Mat Dashboard',
+    openNewTab: ' Open Mat in New Tab',
+    backToMats: '← Back to Mats',
+    categories: '📋 Categories',
+    queue: '📋 Queue',
+    callup: '📢 Call-Up',
+    standings: ' Standings'
+  },
+  ar: {
+    loading: 'جاري تحميل البطولة...',
+    players: 'لاعبين',
+    matches: 'مباريات',
+    capacity: 'السعة',
+    step1: 'الخطوة 1: تسجيل اللاعبين',
+    step2: 'الخطوة 2: إعداد الحصائر',
+    dashboard: 'لوحة تحكم الحصة',
+    addPlayer: '➕ إضافة لاعب',
+    add10: '➕ إضافة 10',
+    sync: '🔄 مزامنة مع قاعدة البيانات',
+    proceed: 'الانتقال إلى إعداد الحصائر ←',
+    matsSetup: '🥋 إعداد الحصائر',
+    back: '← العودة للاعبين',
+    numberOfMats: 'عدد الحصائر:',
+    openDashboard: ' فتح لوحة التحكم ←',
+    matDashboard: '📋 لوحة تحكم الحصة',
+    openNewTab: '🪟 فتح في نافذة جديدة',
+    backToMats: '← العودة للحصائر',
+    categories: '📋 التصنيفات',
+    queue: '📋 الطابور',
+    callup: '📢 الاستدعاء',
+    standings: ' الترتيب'
+  }
+};
+
+// ✅ CORRECTED: Remove hardcoded fallback and validate tournament_id
 window.onload = async function() {
   const urlParams = new URLSearchParams(window.location.search);
-  currentTournamentId = urlParams.get('tournament_id') || 'db5ffa84-d0a4-4666-bbb2-7de0482a3d92';
+  currentTournamentId = urlParams.get('tournament_id');
+  
+  if (!currentTournamentId) {
+    alert('⚠️ No tournament selected! Redirecting to dashboard...');
+    window.location.href = 'organizer-dashboard.html';
+    return;
+  }
+  
   await initializeApp();
 };
 
 async function initializeApp() {
   try {
+    // ✅ CORRECTED: Load tournament details first
+    await loadTournamentDetails();
     await loadReferenceData();
     await loadPlayersFromDB();
     await loadMats();
@@ -1174,8 +1235,41 @@ async function initializeApp() {
     updateDBStatus('✅ Connected to Database', '#22c55e');
   } catch (error) {
     console.error('Initialization error:', error);
-    updateDBStatus('❌ Connection Error', '#ef4444');
+    updateDBStatus('❌ Connection Error: ' + error.message, '#ef4444');
   }
+}
+
+// ✅ NEW: Load tournament name from database
+async function loadTournamentDetails() {
+  const { data: tournament, error } = await dbClient
+    .from('tournaments')
+    .select('name, max_participants')
+    .eq('id', currentTournamentId)
+    .single();
+
+  if (error || !tournament) {
+    console.error('Tournament not found:', error);
+    alert('⚠️ Tournament not found or you do not have permission!');
+    window.location.href = 'organizer-dashboard.html';
+    return;
+  }
+
+  document.getElementById('tournamentNameDisplay').innerText = tournament.name || 'Tournament Manager';
+  const maxParticipants = tournament.max_participants || 200;
+  document.getElementById('playerCount').innerText = `0 / ${maxParticipants}`;
+}
+
+function changeLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('lang', lang);
+  document.getElementById('btn-ar').classList.toggle('active', lang === 'ar');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  
+  const t = translations[lang];
+  document.getElementById('subtitle').innerText = t.step1;
+  // Update other UI elements as needed
 }
 
 function updateDBStatus(message, color) {
@@ -1297,10 +1391,11 @@ function showView(viewName) {
   const selectedView = document.getElementById('view-' + viewName);
   if (selectedView) selectedView.classList.add('active');
   
+  const t = translations[currentLang];
   const subtitles = {
-    players: 'Step 1: Players Registration',
-    mats: 'Step 2: Mats Setup',
-    dashboard: 'Mat Dashboard',
+    players: t.step1,
+    mats: t.step2,
+    dashboard: t.dashboard,
     bracket: 'Bracket View',
     scoreboard: 'Scoreboard',
     settings: 'Settings'
@@ -1326,11 +1421,12 @@ function switchDashboardTab(tabName) {
   if (tabName === 'standings') renderStandings();
 }
 
+// ✅ CORRECTED: Use 'tournament_participants' instead of 'ajp_tournament_participants'
 async function loadPlayersFromDB() {
   if (!currentTournamentId) return;
   try {
     const { data: playersData, error: playersError } = await dbClient
-      .from('ajp_tournament_participants')
+      .from('tournament_participants')
       .select('*')
       .eq('tournament_id', currentTournamentId)
       .order('ranking', { ascending: true });
@@ -1338,55 +1434,49 @@ async function loadPlayersFromDB() {
     if (playersError) throw playersError;
     console.log(`✅ Loaded ${playersData?.length || 0} players`);
     
+    // ✅ CORRECTED: Handle text fields for age_group, belt_level, etc.
     players = (playersData || []).map(p => ({
       id: p.id,
       name: p.player_name || '',
       team: p.team || '',
-      ageGroup: AGE_MAP[p.age_group_id] || 'Amateur / Professional',
-      age_group_id: p.age_group_id,
+      ageGroup: p.age_group || 'Amateur / Professional',
       gender: p.gender || 'Men',
-      weight_class_id: p.weight_class_id,
-      weight: WEIGHT_MAP[p.weight_class_id] || '',
-      belt_level_id: p.belt_level_id,
-      belt: BELT_MAP[p.belt_level_id] || 'White',
+      weight: p.weight || 0,
+      belt: p.belt_level || 'White',
       rank: p.ranking || 0,
-      is_suspended: p.is_suspended || false
+      is_suspended: p.is_suspended || false,
+      weight_class_id: p.weight_class_id
     }));
     
-    console.log('✅ Players with weights:', players.filter(p => p.weight).length);
+    console.log('✅ Players loaded:', players.length);
     
     renderPlayers();
     updatePlayerCount();
   } catch (error) {
-    console.error('❌ Error loading players:', error);
+    console.error(' Error loading players:', error);
     updateDBStatus('Error: ' + error.message, '#ef4444');
   }
 }
 
+// ✅ CORRECTED: Use 'tournament_participants' table
 async function addPlayer() {
-  if (players.length >= 200) { alert('Maximum 200 players!'); return; }
-  
-  const firstAgeGroup = Object.keys(AGE_GROUPS)[0];
-  const ageGroupId = AGE_GROUPS[firstAgeGroup]?.id;
-  const gender = 'Boys';
-  const firstWeight = WEIGHTS[gender]?.[firstAgeGroup]?.[0];
-  const weightClassId = firstWeight?.id;
-  const firstBelt = BELTS[0];
-  const beltLevelId = firstBelt?.id;
+  const maxPlayers = 200;
+  if (players.length >= maxPlayers) { alert('Maximum 200 players!'); return; }
   
   try {
     const { data, error } = await dbClient
-      .from('ajp_tournament_participants')
+      .from('tournament_participants')
       .insert({
         tournament_id: currentTournamentId,
         player_name: 'New Player',
         team: 'Free Player',
-        age_group_id: ageGroupId,
-        gender: gender,
-        weight_class_id: weightClassId,
-        belt_level_id: beltLevelId,
+        age_group: 'Amateur / Professional',
+        gender: 'Men',
+        weight: 0,
+        belt_level: 'White',
         ranking: players.length + 1,
-        is_suspended: false
+        is_suspended: false,
+        status: 'approved'
       })
       .select()
       .single();
@@ -1397,13 +1487,10 @@ async function addPlayer() {
       id: data.id,
       name: data.player_name,
       team: data.team || 'Free Player',
-      ageGroup: firstAgeGroup,
-      age_group_id: data.age_group_id,
-      gender: data.gender,
-      weight_class_id: data.weight_class_id,
-      weight: firstWeight?.name || '',
-      belt_level_id: data.belt_level_id,
-      belt: firstBelt?.name || 'White',
+      ageGroup: data.age_group || 'Amateur / Professional',
+      gender: data.gender || 'Men',
+      weight: data.weight || 0,
+      belt: data.belt_level || 'White',
       rank: data.ranking,
       is_suspended: data.is_suspended || false
     });
@@ -1418,26 +1505,21 @@ async function addPlayer() {
 }
 
 async function addPlayers(count) {
+  const maxPlayers = 200;
   const newPlayers = [];
-  const firstAgeGroup = Object.keys(AGE_GROUPS)[0];
-  const ageGroupId = AGE_GROUPS[firstAgeGroup]?.id;
-  const gender = 'Boys';
-  const firstWeight = WEIGHTS[gender]?.[firstAgeGroup]?.[0];
-  const weightClassId = firstWeight?.id;
-  const firstBelt = BELTS[0];
-  const beltLevelId = firstBelt?.id;
   
-  for (let i = 0; i < count && players.length < 200; i++) {
+  for (let i = 0; i < count && players.length < maxPlayers; i++) {
     newPlayers.push({
       tournament_id: currentTournamentId,
       player_name: `Player ${players.length + i + 1}`,
       team: 'Free Player',
-      age_group_id: ageGroupId,
-      gender: gender,
-      weight_class_id: weightClassId,
-      belt_level_id: beltLevelId,
+      age_group: 'Amateur / Professional',
+      gender: 'Men',
+      weight: 0,
+      belt_level: 'White',
       ranking: players.length + i + 1,
-      is_suspended: false
+      is_suspended: false,
+      status: 'approved'
     });
   }
   
@@ -1445,7 +1527,7 @@ async function addPlayers(count) {
   
   try {
     const { data, error } = await dbClient
-      .from('ajp_tournament_participants')
+      .from('tournament_participants')
       .insert(newPlayers)
       .select();
     
@@ -1456,13 +1538,10 @@ async function addPlayers(count) {
         id: p.id,
         name: p.player_name,
         team: p.team || 'Free Player',
-        ageGroup: firstAgeGroup,
-        age_group_id: p.age_group_id,
-        gender: p.gender,
-        weight_class_id: p.weight_class_id,
-        weight: firstWeight?.name || '',
-        belt_level_id: p.belt_level_id,
-        belt: firstBelt?.name || 'White',
+        ageGroup: p.age_group || 'Amateur / Professional',
+        gender: p.gender || 'Men',
+        weight: p.weight || 0,
+        belt: p.belt_level || 'White',
         rank: p.ranking,
         is_suspended: p.is_suspended || false
       });
@@ -1484,25 +1563,18 @@ async function updatePlayerField(index, field, value) {
   if (player.id) {
     const fieldMap = { 
       'name': 'player_name', 
-      'ageGroup': 'age_group_id', 
-      'belt': 'belt_level_id', 
+      'ageGroup': 'age_group', 
+      'belt': 'belt_level', 
       'rank': 'ranking', 
-      'weight': 'weight_class_id', 
+      'weight': 'weight', 
       'gender': 'gender' 
     };
     const dbField = fieldMap[field] || field;
-    let dbValue = value;
-    
-    if (field === 'ageGroup') dbValue = AGE_GROUPS[value]?.id;
-    if (field === 'belt') {
-      const beltObj = BELTS.find(b => b.name === value);
-      dbValue = beltObj?.id;
-    }
     
     try {
       const { error } = await dbClient
-        .from('ajp_tournament_participants')
-        .update({ [dbField]: dbValue })
+        .from('tournament_participants')
+        .update({ [dbField]: value })
         .eq('id', player.id);
       if (error) throw error;
     } catch (error) { 
@@ -1519,7 +1591,7 @@ async function deletePlayer(index) {
   
   try {
     if (player.id) {
-      await dbClient.from('ajp_tournament_participants').delete().eq('id', player.id);
+      await dbClient.from('tournament_participants').delete().eq('id', player.id);
     }
     players.splice(index, 1);
     renderPlayers();
@@ -1545,7 +1617,7 @@ function renderPlayers() {
     ).join('');
     
     const weightOptions = getWeightOptions(p.gender, p.ageGroup)
-      .map(w => `<option value="${w.id}" ${p.weight_class_id === w.id ? 'selected' : ''}>${w.name}</option>`)
+      .map(w => `<option value="${w.name}" ${p.weight === w.name ? 'selected' : ''}>${w.name}</option>`)
       .join('');
     
     const beltOptions = getBeltOptions(p.ageGroup)
@@ -1562,7 +1634,7 @@ function renderPlayers() {
       <td><select onchange="updatePlayerField(${i}, 'weight', this.value)">${weightOptions || '<option value="">-- Select --</option>'}</select></td>
       <td><select onchange="updatePlayerField(${i}, 'belt', this.value)">${beltOptions}</select></td>
       <td><input type="number" value="${p.rank}" style="width: 60px" onchange="updatePlayerField(${i}, 'rank', parseInt(this.value))" min="1"></td>
-      <td><button class="btn-delete" onclick="deletePlayer(${i})">✕</button></td>
+      <td><button class="btn-delete" onclick="deletePlayer(${i})"></button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -1570,11 +1642,14 @@ function renderPlayers() {
 
 function updatePlayerCount() {
   const countEl = document.getElementById('playerCount');
-  if (countEl) countEl.innerText = `${players.length} / 200`;
+  if (countEl) {
+    const maxPlayers = 200;
+    countEl.innerText = `${players.length} / ${maxPlayers}`;
+  }
 }
 
 async function syncWithDB() {
-  showNotification('🔄 Syncing...');
+  showNotification(' Syncing...');
   await loadPlayersFromDB();
   await loadMats();
   showNotification('✅ Synced!');
@@ -1585,7 +1660,7 @@ async function clearTournamentPlayersDB() {
   if (!confirm(`Delete ALL ${players.length} players?`) || !confirm('FINAL CONFIRMATION?')) return;
   
   try {
-    await dbClient.from('ajp_tournament_participants').delete().eq('tournament_id', currentTournamentId);
+    await dbClient.from('tournament_participants').delete().eq('tournament_id', currentTournamentId);
     players = [];
     renderPlayers();
     updatePlayerCount();
@@ -1647,7 +1722,7 @@ async function loadMats() {
     renderMats();
     console.log(`✅ Loaded ${mats.length} mats`);
   } catch (error) {
-    console.error('❌ Error loading mats:', error);
+    console.error(' Error loading mats:', error);
   }
 }
 
@@ -1711,7 +1786,7 @@ function renderMats() {
   
   const ageGroups = [...new Set(players.map(p => p.ageGroup).filter(a => a))];
   const genders = [...new Set(players.map(p => p.gender).filter(g => g))];
-  const allWeights = Object.values(WEIGHT_MAP);
+  const allWeights = [...new Set(players.map(p => p.weight).filter(w => w))];
   const belts = [...new Set(players.map(p => p.belt).filter(b => b))];
   
   mats.forEach(mat => {
@@ -1824,7 +1899,7 @@ function renderCategories() {
         matBelts.forEach(belt => {
           const catPlayers = players.filter(p => 
             p.ageGroup === ageGroup && p.gender === gender && 
-            p.weight === weight && p.belt === belt && p.name
+            p.weight == weight && p.belt === belt && p.name
           );
           
           if (catPlayers.length >= 2) {
@@ -1849,7 +1924,7 @@ function renderCategories() {
     return `
       <div onclick="openCategoryBracket('${cat.key}', '${cat.gender}', '${cat.ageGroup}', '${cat.weight}', '${cat.belt}')" style="background: #151d2b; border: 2px solid #2a3548; border-radius: 10px; padding: 20px; cursor: pointer; transition: all 0.3s;">
         <h3 style="color: #fbbf24; margin-bottom: 10px; font-size: 1.2rem;">
-          ${cat.gender} | 🏅 ${cat.ageGroup} | ⚖️ ${cat.weight} | 🎗️ ${cat.belt}
+          ${cat.gender} |  ${cat.ageGroup} | ⚖️ ${cat.weight} | 🎗️ ${cat.belt}
         </h3>
         <div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 10px;">
           👥 ${cat.players.length} Players | ⏱️ ${fightTime} min |  Bracket System
@@ -1868,7 +1943,7 @@ function openCategoryBracket(key, gender, ageGroup, weight, belt) {
   if (!categories[key]) {
     const catPlayers = players.filter(p => 
       p.ageGroup === ageGroup && p.gender === gender && 
-      p.weight === weight && p.belt === belt && p.name
+      p.weight == weight && p.belt === belt && p.name
     ).sort((a, b) => a.rank - b.rank);
     
     categories[key] = generateBracket(catPlayers, ageGroup, gender, weight, belt);
@@ -2042,7 +2117,7 @@ function renderMatchSchedule(cat) {
     round.forEach((match, mIdx) => {
       const status = match.suspended ? '⏸️ Suspended' : 
                      match.bye ? '✅ BYE' : 
-                     match.status === 'completed' ? '✅ Completed' : '⏳ Pending';
+                     match.status === 'completed' ? '✅ Completed' : ' Pending';
       
       const winner = match.winner === 'red' ? (match.p1?.name || 'TBD') :
                      match.winner === 'blue' ? (match.p2?.name || 'TBD') : '-';
@@ -2080,7 +2155,7 @@ function editMatch(rIdx, mIdx) {
   
   const availablePlayers = players.filter(p => 
     p.ageGroup === cat.ageGroup && p.gender === cat.gender && 
-    p.weight === cat.weight && p.belt === cat.belt && p.name
+    p.weight == cat.weight && p.belt === cat.belt && p.name
   );
   
   const playerOptions = availablePlayers.map(p => 
@@ -2095,7 +2170,7 @@ function editMatch(rIdx, mIdx) {
   modal.className = 'winner-modal';
   modal.innerHTML = `
     <div class="winner-modal-content">
-      <h3 style="color: #fbbf24; margin-bottom: 20px;">✏️ Edit Match: ${match.id}</h3>
+      <h3 style="color: #fbbf24; margin-bottom: 20px;">️ Edit Match: ${match.id}</h3>
       
       <div style="margin-bottom: 20px;">
         <label style="display: block; color: #8899aa; margin-bottom: 8px;">🔴 Red Player:</label>
@@ -2175,7 +2250,7 @@ function showWinnerSelection(match) {
       </div>
       
       <button onclick="selectWinner('red')" class="winner-btn red">🔴 ${redName} Wins</button>
-      <button onclick="selectWinner('blue')" class="winner-btn blue">🔵 ${blueName} Wins</button>
+      <button onclick="selectWinner('blue')" class="winner-btn blue"> ${blueName} Wins</button>
       <button onclick="selectWinner('draw')" class="winner-btn draw">🤝 Draw</button>
       <button onclick="this.closest('.winner-modal').remove()" class="winner-btn cancel">❌ Cancel</button>
     </div>
@@ -2199,7 +2274,7 @@ function selectWinner(winner) {
   
   const winnerName = winner === 'red' ? match.p1?.name : 
                      winner === 'blue' ? match.p2?.name : 'Draw';
-  showNotification(` ${winnerName} wins!`);
+  showNotification(`🏆 ${winnerName} wins!`);
 }
 
 function startBracketMatch(rIdx, mIdx) {
@@ -2235,11 +2310,10 @@ function startBracketMatch(rIdx, mIdx) {
   showView('scoreboard');
 }
 
-// 🎯 نظام إدارة المباريات المتقدم
 function toggleScheduleMode() {
   autoScheduleMode = document.getElementById('autoScheduleToggle').checked;
   renderQueue();
-  showNotification(autoScheduleMode ? '🤖 Auto-Schedule Mode ON' : '✋ Manual Mode ON');
+  showNotification(autoScheduleMode ? ' Auto-Schedule Mode ON' : '✋ Manual Mode ON');
 }
 
 function renderQueue() {
@@ -2269,7 +2343,6 @@ function renderQueue() {
     return;
   }
   
-  // 🎯 ترتيب المباريات حسب الوضع
   let sortedMatches = allMatches;
   if (autoScheduleMode) {
     sortedMatches = sortMatchesForDiversity(allMatches);
@@ -2284,7 +2357,7 @@ function renderQueue() {
             ${m.p1 ? m.p1.name : 'TBD'} vs ${m.p2 ? m.p2.name : 'TBD'}
           </div>
           <div class="match-queue-details">
-            ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt} | ${m.id}
+            ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | ️ ${cat.belt} | ${m.id}
           </div>
         </div>
         <div class="match-queue-actions">
@@ -2295,12 +2368,10 @@ function renderQueue() {
   }).join('');
 }
 
-// 🎯 خوارزمية تنويع المباريات
 function sortMatchesForDiversity(matches) {
   const lastPlayer = window.lastPlayedPlayer || null;
   const sorted = [...matches];
   
-  // ترتيب بحيث لا يلعب نفس اللاعب مرتين متتاليتين
   sorted.sort((a, b) => {
     const aHasLastPlayer = (a.p1?.id === lastPlayer || a.p2?.id === lastPlayer) ? 1 : 0;
     const bHasLastPlayer = (b.p1?.id === lastPlayer || b.p2?.id === lastPlayer) ? 1 : 0;
@@ -2314,7 +2385,6 @@ function startMatchFromQueue(categoryKey, rIdx, mIdx) {
   currentCategory = { key: categoryKey };
   startBracketMatch(rIdx, mIdx);
   
-  // حفظ آخر لاعب لعب
   const cat = categories[categoryKey];
   const match = cat.rounds[rIdx][mIdx];
   if (match.p1) window.lastPlayedPlayer = match.p1.id;
@@ -2374,7 +2444,7 @@ function callPlayer(playerName) {
     oscillator.start();
     setTimeout(() => oscillator.stop(), 500);
   } catch (e) { console.log('Audio not supported'); }
-  showNotification(`📢 Calling: ${playerName}`);
+  showNotification(` Calling: ${playerName}`);
 }
 
 function renderStandings() {
@@ -2428,7 +2498,7 @@ function renderStandings() {
         ${sortedPlayers.map((p, i) => `
           <tr style="border-bottom: 1px solid #2a3548;">
             <td style="padding: 10px; text-align: center; font-weight: bold; font-size: 1.2rem;">
-              ${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}
+              ${i === 0 ? '🥇' : i === 1 ? '' : i === 2 ? '' : i + 1}
             </td>
             <td style="padding: 10px;"><strong>${p.name}</strong></td>
             <td style="padding: 10px;">${p.team || 'N/A'}</td>
@@ -2561,7 +2631,7 @@ function activateGoldenTime() {
   timeLeft = goldenMinutes * 60;
   isGoldenTime = true;
   updateTimerDisplay();
-  showNotification(`⚡ Golden Time Activated! ${goldenMinutes} min`);
+  showNotification(` Golden Time Activated! ${goldenMinutes} min`);
 }
 
 function swapPlayers() {
@@ -2623,6 +2693,11 @@ function showNotification(message) {
     notification.style.animation = 'slideOut 0.3s ease';
     setTimeout(() => notification.remove(), 300);
   }, 3000);
+}
+
+async function logout() {
+  await dbClient.auth.signOut();
+  window.location.href = 'organizer-dashboard.html';
 }
 
 const style = document.createElement('style');
