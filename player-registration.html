@@ -343,7 +343,7 @@
         async function loadBeltLevels() {
             const { data, error } = await supabaseClient.from('ajp_belt_levels').select('id, name, sort_order').order('sort_order');
             if (error) {
-                console.error('❌ خطأ في جلب الأحزمة:', error);
+                console.error(' خطأ في جلب الأحزمة:', error);
                 return [];
             }
             
@@ -412,25 +412,16 @@
         function populateGenderCategory() {
             const select = document.getElementById('genderCategory');
             if (!select) return;
-            const t = translations[currentLang];
             
-            let optionsHTML = `<option value="">${t.selectGender}</option>`;
-            
-            // القيم الثابتة المطلوبة بالضبط
-            if (currentPlayer?.gender === 'Male') {
-                optionsHTML += `<option value="Boys">Boys</option>`;
-                optionsHTML += `<option value="Men">Men</option>`;
-            } else if (currentPlayer?.gender === 'Female') {
-                optionsHTML += `<option value="Girls">Girls</option>`;
-                optionsHTML += `<option value="Women">Women</option>`;
-            } else {
-                optionsHTML += `<option value="Boys">Boys</option>`;
-                optionsHTML += `<option value="Girls">Girls</option>`;
-                optionsHTML += `<option value="Men">Men</option>`;
-                optionsHTML += `<option value="Women">Women</option>`;
-            }
+            // ✅ عرض جميع الفئات الأربع دائماً لجميع اللاعبين
+            let optionsHTML = '<option value="">اختر...</option>';
+            optionsHTML += '<option value="Boys">Boys</option>';
+            optionsHTML += '<option value="Girls">Girls</option>';
+            optionsHTML += '<option value="Men">Men</option>';
+            optionsHTML += '<option value="Women">Women</option>';
             
             select.innerHTML = optionsHTML;
+            console.log('✅ تم تحميل جميع فئات الجنس: Boys, Girls, Men, Women');
         }
 
         function populateBeltLevels() {
@@ -522,7 +513,7 @@
                 let optionsHTML = '';
                 uniqueWeights.forEach((w) => {
                     const minW = w.min_weight !== null && w.min_weight !== undefined ? w.min_weight : 0;
-                    const maxW = w.max_weight !== null && w.max_weight !== undefined ? w.max_weight : '∞';
+                    const maxW = w.max_weight !== null && w.max_weight !== undefined ? w.max_weight : '';
                     const unit = currentLang === 'ar' ? 'كجم' : 'kg';
                     
                     optionsHTML += `<option value="${w.name}" data-minweight="${minW}" data-maxweight="${maxW}" data-weightid="${w.id || ''}">${w.name} (${minW}-${maxW} ${unit})</option>`;
