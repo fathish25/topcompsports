@@ -814,15 +814,15 @@ input:checked + .toggle-slider:before {
       <h1 id="tournamentNameDisplay">Loading Tournament...</h1>
       <div class="tournament-subtitle" id="subtitle">Step 1: Players Registration</div>
       <div class="status-badge" id="dbStatus">
-        <span>⏳</span>
+        <span></span>
         <span>Connecting...</span>
       </div>
     </div>
     
     <div class="action-buttons">
       <button class="btn btn-players" onclick="showView('players')">👥 Players</button>
-      <button class="btn btn-mats" onclick="showView('mats')"> Mats</button>
-      <button class="btn btn-settings" onclick="showView('settings')">️ Settings</button>
+      <button class="btn btn-mats" onclick="showView('mats')">🥋 Mats</button>
+      <button class="btn btn-settings" onclick="showView('settings')">⚙️ Settings</button>
       <button class="btn btn-sync" onclick="syncWithDB()"> Sync</button>
       <button class="btn btn-export" onclick="exportToExcel()">📊 Export Excel</button>
       <button class="btn btn-clear-db" onclick="clearTournamentPlayersDB()">⚠️ Clear DB Players</button>
@@ -832,14 +832,14 @@ input:checked + .toggle-slider:before {
   <div id="view-players" class="view active">
     <div class="section">
       <div class="section-title">
-        <span>👥 Players Registration</span>
+        <span> Players Registration</span>
         <span class="player-count" id="playerCount">0 / 200</span>
       </div>
       
       <div class="button-group">
         <button class="btn btn-add" onclick="addPlayer()">➕ Add Player</button>
-        <button class="btn btn-add" onclick="addPlayers(10)" style="background: #475569;"> Add 10</button>
-        <button class="btn btn-sync" onclick="syncWithDB()" style="background: #f59e0b; color: #000;">🔄 Sync with DB</button>
+        <button class="btn btn-add" onclick="addPlayers(10)" style="background: #475569;">➕ Add 10</button>
+        <button class="btn btn-sync" onclick="syncWithDB()" style="background: #f59e0b; color: #000;"> Sync with DB</button>
       </div>
       
       <div class="table-container">
@@ -862,7 +862,7 @@ input:checked + .toggle-slider:before {
       </div>
       
       <button class="btn-proceed" onclick="showView('mats')">
-        <span></span>
+        <span>🥋</span>
         <span>Proceed to Mats Setup →</span>
       </button>
     </div>
@@ -911,7 +911,7 @@ input:checked + .toggle-slider:before {
       <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; flex-wrap: wrap;">
         <button class="btn btn-add active" onclick="switchDashboardTab('categories')" id="tab-categories-btn">📋 Categories</button>
         <button class="btn btn-sync" onclick="switchDashboardTab('queue')" id="tab-queue-btn">📋 Queue</button>
-        <button class="btn btn-players" onclick="switchDashboardTab('callup')" id="tab-callup-btn">📢 Call-Up</button>
+        <button class="btn btn-players" onclick="switchDashboardTab('callup')" id="tab-callup-btn"> Call-Up</button>
         <button class="btn btn-mats" onclick="switchDashboardTab('standings')" id="tab-standings-btn">🏆 Standings</button>
       </div>
       
@@ -921,7 +921,7 @@ input:checked + .toggle-slider:before {
       </div>
       
       <div id="dashboard-queue" class="dashboard-tab" style="display: none;">
-        <h3 style="color: #fbbf24; margin-bottom: 20px;">📋 Match Queue</h3>
+        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Match Queue</h3>
         
         <div class="schedule-mode-toggle">
           <div>
@@ -940,7 +940,7 @@ input:checked + .toggle-slider:before {
       </div>
       
       <div id="dashboard-callup" class="dashboard-tab" style="display: none;">
-        <h3 style="color: #fbbf24; margin-bottom: 20px;">📢 Call-Up System</h3>
+        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Call-Up System</h3>
         <div id="callupContainer"></div>
       </div>
       
@@ -1032,7 +1032,7 @@ input:checked + .toggle-slider:before {
 
       <div class="sb-controls-area">
         <div>
-          <div class="sb-panel-header red"> Red Player</div>
+          <div class="sb-panel-header red">🔴 Red Player</div>
           <div class="sb-counters">
             <div class="sb-counter adv">
               <div class="label">⭐ Advantage</div>
@@ -1090,7 +1090,7 @@ input:checked + .toggle-slider:before {
             <button class="btn-adv" onclick="addAdvantage('blue')"><span>⭐</span><span>Advantage</span></button>
             <button class="btn-pen" onclick="addPenalty('blue')"><span>🟥</span><span>Penalty</span></button>
           </div>
-          <button class="sb-undo-btn" onclick="undoAction('blue')">️ Undo</button>
+          <button class="sb-undo-btn" onclick="undoAction('blue')">↩️ Undo</button>
         </div>
       </div>
 
@@ -1174,7 +1174,7 @@ window.onload = async function() {
   currentTournamentId = urlParams.get('tournament_id');
   
   if (!currentTournamentId) {
-    alert('️ No tournament selected! Redirecting to dashboard...');
+    alert('⚠️ No tournament selected! Redirecting to dashboard...');
     window.location.href = 'organizer-dashboard.html';
     return;
   }
@@ -1205,7 +1205,7 @@ async function loadTournamentDetails() {
 
   if (error || !tournament) {
     console.error('Tournament not found:', error);
-    alert('️ Tournament not found or you do not have permission!');
+    alert('⚠️ Tournament not found or you do not have permission!');
     window.location.href = 'organizer-dashboard.html';
     return;
   }
@@ -1416,7 +1416,7 @@ async function addPlayer() {
       .insert({
         tournament_id: currentTournamentId,
         player_name: 'New Player',
-        team: 'Free Player',
+        team: 'Free Agent',
         age_group: 'Amateur / Professional',
         gender: 'Men',
         weight: '',
@@ -1433,7 +1433,7 @@ async function addPlayer() {
     players.push({
       id: data.id,
       name: data.player_name,
-      team: data.team || 'Free Player',
+      team: data.team || 'Free Agent',
       ageGroup: data.age_group || 'Amateur / Professional',
       gender: data.gender || 'Men',
       weight: data.weight || '',
@@ -1459,7 +1459,7 @@ async function addPlayers(count) {
     newPlayers.push({
       tournament_id: currentTournamentId,
       player_name: `Player ${players.length + i + 1}`,
-      team: 'Free Player',
+      team: 'Free Agent',
       age_group: 'Amateur / Professional',
       gender: 'Men',
       weight: '',
@@ -1484,7 +1484,7 @@ async function addPlayers(count) {
       players.push({
         id: p.id,
         name: p.player_name,
-        team: p.team || 'Free Player',
+        team: p.team || 'Free Agent',
         ageGroup: p.age_group || 'Amateur / Professional',
         gender: p.gender || 'Men',
         weight: p.weight || '',
@@ -1549,6 +1549,24 @@ async function deletePlayer(index) {
   }
 }
 
+// ✅ FIXED: Function to find weight name by numeric value
+function findWeightNameByValue(weightValue) {
+  if (!weightValue) return '';
+  
+  // Try to match by numeric value
+  const numericValue = parseFloat(weightValue);
+  if (!isNaN(numericValue)) {
+    // Look for weight where min_weight matches the value
+    const foundWeight = ALL_WEIGHTS.find(w => w.min_weight === numericValue);
+    if (foundWeight) {
+      return foundWeight.name;
+    }
+  }
+  
+  // If not found, return the value as-is
+  return weightValue;
+}
+
 function renderPlayers() {
   const tbody = document.getElementById('playersTable');
   if (!tbody) return;
@@ -1563,9 +1581,10 @@ function renderPlayers() {
       `<option ${p.gender === g ? 'selected' : ''}>${g}</option>`
     ).join('');
     
-    // ✅ FIXED: Show unique weights only
+    // ✅ FIXED: Show weight correctly by finding the weight name
+    const weightName = findWeightNameByValue(p.weight);
     const weightOptions = ALL_WEIGHTS
-      .map(w => `<option value="${w.name}" ${p.weight === w.name ? 'selected' : ''}>${w.name}</option>`)
+      .map(w => `<option value="${w.name}" ${weightName === w.name ? 'selected' : ''}>${w.name}</option>`)
       .join('');
     
     const beltOptions = getBeltOptions()
@@ -1597,7 +1616,7 @@ function updatePlayerCount() {
 }
 
 async function syncWithDB() {
-  showNotification(' Syncing...');
+  showNotification('🔄 Syncing...');
   await loadPlayersFromDB();
   await loadMats();
   showNotification('✅ Synced!');
@@ -1746,7 +1765,7 @@ function renderMats() {
     const div = document.createElement('div');
     div.className = 'mat-card';
     div.innerHTML = `
-      <h3 style="color: #fbbf24; margin-bottom: 15px;">🥋 ${mat.name || `Mat ${mat.mat_number}`}</h3>
+      <h3 style="color: #fbbf24; margin-bottom: 15px;"> ${mat.name || `Mat ${mat.mat_number}`}</h3>
       
       <div style="margin-bottom: 15px;">
         <strong style="color: #8899aa; font-size: 0.85rem; display: block; margin-bottom: 8px;">AGE GROUPS</strong>
@@ -1802,7 +1821,7 @@ function renderMats() {
       
       <div style="display: flex; gap: 10px; margin-top: 20px;">
         <button class="btn btn-players" style="flex: 1;" onclick="currentMat='${mat.id}'; showView('dashboard')">📋 Open Dashboard</button>
-        <button class="btn btn-new-tab" style="flex: 1;" onclick="openMatInNewTab('${mat.id}')"> Open in New Tab</button>
+        <button class="btn btn-new-tab" style="flex: 1;" onclick="openMatInNewTab('${mat.id}')">🪟 Open in New Tab</button>
       </div>
     `;
     grid.appendChild(div);
@@ -1872,10 +1891,10 @@ function renderCategories() {
     return `
       <div onclick="openCategoryBracket('${cat.key}', '${cat.gender}', '${cat.ageGroup}', '${cat.weight}', '${cat.belt}')" style="background: #151d2b; border: 2px solid #2a3548; border-radius: 10px; padding: 20px; cursor: pointer; transition: all 0.3s;">
         <h3 style="color: #fbbf24; margin-bottom: 10px; font-size: 1.2rem;">
-          ${cat.gender} | 🏅 ${cat.ageGroup} | ⚖️ ${cat.weight} | ️ ${cat.belt}
+          ${cat.gender} |  ${cat.ageGroup} | ⚖️ ${cat.weight} | 🎗️ ${cat.belt}
         </h3>
         <div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 10px;">
-           ${cat.players.length} Players | ⏱️ ${fightTime} min | 🏆 Bracket System
+           👥 ${cat.players.length} Players | ️ ${fightTime} min |  Bracket System
         </div>
         <div style="font-size: 0.85rem; color: #556;">
           Players: ${cat.players.map(p => p.name).join(', ')}
@@ -2083,7 +2102,7 @@ function renderMatchSchedule(cat) {
               <button onclick="editMatch(${rIdx}, ${mIdx})" style="padding: 5px 10px; background: #3b82f6; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">✏️ Edit</button>
               ${!match.bye ? `
                 <button onclick="toggleMatchSuspension(${rIdx}, ${mIdx})" style="padding: 5px 10px; background: ${match.suspended ? '#22c55e' : '#f59e0b'}; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
-                  ${match.suspended ? '▶️' : '️'}
+                  ${match.suspended ? '▶️' : '⏸️'}
                 </button>
               ` : ''}
             </div>
@@ -2107,11 +2126,11 @@ function editMatch(rIdx, mIdx) {
   );
   
   const playerOptions = availablePlayers.map(p => 
-    `<option value="${p.id}" ${match.p1?.id === p.id ? 'selected' : ''}>${p.name} (${p.team || 'Free'})</option>`
+    `<option value="${p.id}" ${match.p1?.id === p.id ? 'selected' : ''}>${p.name} (${p.team || 'Free Agent'})</option>`
   ).join('');
   
   const playerOptions2 = availablePlayers.map(p => 
-    `<option value="${p.id}" ${match.p2?.id === p.id ? 'selected' : ''}>${p.name} (${p.team || 'Free'})</option>`
+    `<option value="${p.id}" ${match.p2?.id === p.id ? 'selected' : ''}>${p.name} (${p.team || 'Free Agent'})</option>`
   ).join('');
   
   const modal = document.createElement('div');
@@ -2121,7 +2140,7 @@ function editMatch(rIdx, mIdx) {
       <h3 style="color: #fbbf24; margin-bottom: 20px;">✏️ Edit Match: ${match.id}</h3>
       
       <div style="margin-bottom: 20px;">
-        <label style="display: block; color: #8899aa; margin-bottom: 8px;">🔴 Red Player:</label>
+        <label style="display: block; color: #8899aa; margin-bottom: 8px;"> Red Player:</label>
         <select id="editRedPlayer" style="width: 100%; padding: 10px; background: #0f1724; border: 1px solid #2a3548; color: #fff; border-radius: 6px;">
           <option value="">-- Select Player --</option>
           ${playerOptions}
@@ -2137,7 +2156,7 @@ function editMatch(rIdx, mIdx) {
       </div>
       
       <div style="display: flex; gap: 10px;">
-        <button onclick="saveMatchEdit(${rIdx}, ${mIdx})" class="winner-btn" style="background: #22c55e; margin-bottom: 0;"> Save</button>
+        <button onclick="saveMatchEdit(${rIdx}, ${mIdx})" class="winner-btn" style="background: #22c55e; margin-bottom: 0;">✅ Save</button>
         <button onclick="this.closest('.winner-modal').remove()" class="winner-btn cancel" style="margin-bottom: 0;">❌ Cancel</button>
       </div>
     </div>
@@ -2174,7 +2193,7 @@ function toggleMatchSuspension(rIdx, mIdx) {
   const match = cat.rounds[rIdx][mIdx];
   match.suspended = !match.suspended;
   renderBracket();
-  showNotification(match.suspended ? '️ Match suspended!' : '▶️ Match resumed!');
+  showNotification(match.suspended ? '⏸️ Match suspended!' : '▶️ Match resumed!');
 }
 
 function showWinnerSelection(match) {
@@ -2305,7 +2324,7 @@ function renderQueue() {
             ${m.p1 ? m.p1.name : 'TBD'} vs ${m.p2 ? m.p2.name : 'TBD'}
           </div>
           <div class="match-queue-details">
-            ️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt} | ${m.id}
+            ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt} | ${m.id}
           </div>
         </div>
         <div class="match-queue-actions">
@@ -2544,7 +2563,7 @@ function startTimer() {
     updateTimerDisplay();
     if (timeLeft <= 0) {
       stopTimer();
-      if (isGoldenTime) { showNotification('⚡ Golden Time ended!'); isGoldenTime = false; }
+      if (isGoldenTime) { showNotification(' Golden Time ended!'); isGoldenTime = false; }
       else showNotification("⏰ Time's up!");
     }
   }, 1000);
@@ -2575,7 +2594,7 @@ function resetScoreboard() {
 
 function activateGoldenTime() {
   const goldenMinutes = parseInt(document.getElementById('goldenTimeInput').value);
-  if (!goldenMinutes || goldenMinutes < 1) { showNotification('Enter valid golden time'); return; }
+  if (!goldenMinutes || goldenMinutes < 1) { showNotification('️ Enter valid golden time'); return; }
   timeLeft = goldenMinutes * 60;
   isGoldenTime = true;
   updateTimerDisplay();
