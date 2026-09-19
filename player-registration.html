@@ -82,14 +82,14 @@
                 <button class="lang-btn active" id="btnAr" onclick="setLanguage('ar')">عربي</button>
                 <button class="lang-btn" id="btnEn" onclick="setLanguage('en')">English</button>
             </div>
-            <h1 id="pageTitle">🏆 التسجيل في البطولة</h1>
+            <h1 id="pageTitle"> التسجيل في البطولة</h1>
             <p id="pageSubtitle" style="color: rgba(255,255,255,0.7);">قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة</p>
         </div>
 
         <div id="alert" class="alert"></div>
 
         <div class="section">
-            <div class="section-title" id="personalInfoTitle">👤 بياناتك الشخصية (من الحساب)</div>
+            <div class="section-title" id="personalInfoTitle"> بياناتك الشخصية (من الحساب)</div>
             <div id="playerInfo" class="player-info">
                 <div class="loading" id="loadingText">جاري تحميل البيانات...</div>
             </div>
@@ -174,7 +174,7 @@
 
         const translations = {
             ar: {
-                pageTitle: '🏆 التسجيل في البطولة', pageSubtitle: 'قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة',
+                pageTitle: ' التسجيل في البطولة', pageSubtitle: 'قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة',
                 personalInfo: '👤 بياناتك الشخصية (من الحساب)', loading: 'جاري تحميل البيانات...',
                 currentReg: '📋 تسجيلاتك الحالية في البطولة', regCount: 'تسجيل',
                 participationData: '📝 بيانات المشاركة في البطولة (قابل للتعديل)',
@@ -312,7 +312,7 @@
                 .order('min_weight');
             
             if (error) {
-                console.error('❌ خطأ في جلب الأوزان:', error);
+                console.error(' خطأ في جلب الأوزان:', error);
                 return [];
             }
             
@@ -337,7 +337,7 @@
         async function loadBeltLevels() {
             const { data, error } = await supabaseClient.from('ajp_belt_levels').select('id, name, sort_order').order('sort_order');
             if (error) {
-                console.error('❌ خطأ في جلب الأحزمة:', error);
+                console.error(' خطأ في جلب الأحزمة:', error);
                 return [];
             }
             
@@ -450,7 +450,7 @@
         }
 
         function handleAgeGroupChange() {
-            console.log('🔄 Age group changed');
+            console.log(' Age group changed');
             updateWeightOptions();
         }
 
@@ -500,7 +500,7 @@
                 acceptableGenders = ['Male', 'Men', 'Boys', 'Female', 'Women', 'Girls'];
             }
             
-            console.log('🔍 Acceptable genders:', acceptableGenders);
+            console.log(' Acceptable genders:', acceptableGenders);
             
             // فلترة الأوزان حسب الجنس
             let filteredWeights = weightCategories.filter(w => {
@@ -536,7 +536,8 @@
                     const maxW = w.max_weight !== null && w.max_weight !== undefined ? w.max_weight : '∞';
                     const unit = currentLang === 'ar' ? 'كجم' : 'kg';
                     
-                    optionsHTML += `<option value="${w.name}" data-min-weight="${minW}" data-max-weight="${maxW}" data-weight-id="${w.id || ''}">${w.name} (${minW}-${maxW} ${unit})</option>`;
+                    // ✅ استخدام data-minweight و data-maxweight (بدون شرطة)
+                    optionsHTML += `<option value="${w.name}" data-minweight="${minW}" data-maxweight="${maxW}" data-weightid="${w.id || ''}">${w.name} (${minW}-${maxW} ${unit})</option>`;
                     
                     if (idx < 3) {
                         console.log(`  - ${w.name} (Gender: ${w.gender}, Min: ${minW}, Max: ${maxW})`);
@@ -687,7 +688,9 @@
             const ageGroupSelect = document.getElementById('ageGroup');
             const selectedDivision = ageDivisions.find(d => d.id === ageGroupSelect.value);
             
-            const minWeightVal = selectedWeightOption ? (selectedWeightOption.dataset.minWeight || 0) : 0;
+            // ✅ استخدام getAttribute للوصول إلى data attributes بشكل صحيح
+            const minWeightVal = selectedWeightOption ? parseFloat(selectedWeightOption.getAttribute('data-minweight') || 0) : 0;
+            const weightId = selectedWeightOption ? selectedWeightOption.getAttribute('data-weightid') : null;
 
             const formData = {
                 tournament_id: tournamentId,
@@ -695,15 +698,15 @@
                 player_name: currentPlayer.full_name,
                 age_group: selectedDivision?.name || '',
                 gender: currentPlayer.gender,
-                weight: parseFloat(minWeightVal),
-                weight_class_id: selectedWeightOption ? (selectedWeightOption.dataset.weightId || null) : null,
+                weight: minWeightVal,
+                weight_class_id: weightId,
                 belt_level: document.getElementById('belt').value,
                 gi_type: document.getElementById('giType').value,
                 team: document.getElementById('teamSelect').value,
                 ranking: parseInt(document.getElementById('ranking').value) || 0
             };
 
-            console.log('📝 Submitting registration:', formData);
+            console.log(' Submitting registration:', formData);
 
             try {
                 const { error } = await supabaseClient
