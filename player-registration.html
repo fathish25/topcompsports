@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html 通过 html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -15,7 +14,7 @@
             position: absolute;
             top: 20px;
             left: 20px;
-            display: flex; sp flex;
+            display: flex;
             gap: 10px;
             z-index: 10;
         }
@@ -36,7 +35,7 @@
 
         .header { background: rgba(21, 29, 43, 0.95); padding: 30px; border-radius: 16px; margin-bottom: 30px; text-align: center; border: 2px solid #f1c40f; position: relative; }
         .header h1 { color: #f1c40f; font-size: 2rem; margin-bottom: 10px; margin-top: 30px; }
-        .section { background: #151d2b; border-radius: 12px; padding: 25px; margin sp padding: 25px; margin-bottom: 20px; border: 1px solid #2a3548; }
+        .section { background: #151d2b; border-radius: 12px; padding: 25px; margin-bottom: 20px; border: 1px solid #2a3548; }
         .section-title { font-size: 1.3rem; font-weight: bold; color: #f1c40f; margin-bottom: 20px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 8px; font-weight: 600; }
@@ -44,7 +43,7 @@
         .form-group input:focus, .form-group select:focus { outline: none; border-color: #f1c40f; }
         .form-group select:disabled { opacity: 0.5; cursor: not-allowed; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn { padding: 14px 28px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: all 0, 1rem; transition: all 0.3s; width: 100%; }
+        .btn { padding: 14px 28px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: all 0.3s; width: 100%; }
         .btn-primary { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241,196,15,0.3); }
         .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; margin-top: 10px; }
@@ -143,7 +142,7 @@
                         <select id="giType" required>
                             <option value="">اختر...</option>
                             <option value="Gi">بدلة (Gi)</option>
-                            < sp option value="No-Gi">بدون بدلة (No-Gi)</option>
+                            <option value="No-Gi">بدون بدلة (No-Gi)</option>
                             <option value="Grappling">Grappling</option>
                         </select>
                     </div>
@@ -189,7 +188,7 @@
                 participationData: '📝 بيانات المشاركة في البطولة (قابل للتعديل)',
                 ageGroup: 'الفئة العمرية *', genderCategory: 'فئة الجنس *', weight: 'الوزن (كجم) *', belt: 'الحزام *',
                 giType: 'نوع المشاركة *', team: 'اسم الفريق / الأكاديمية *',
-                ranking: 'التصنيف (Ranking)', rankingPlaceholder: '0 = غير مصنف | 1-10 = محلي | 1-1020 = محلي | 1-100 = دولي',
+                ranking: 'التصنيف (Ranking)', rankingPlaceholder: '0 = غير مصنف | 1-10 = محلي | 1-100 = دولي',
                 submit: '✅ إضافة تسجيل جديد', back: '← العودة للصفحة الرئيسية',
                 selectAge: 'اختر الفئة العمرية...', selectGender: 'اختر...', noAge: 'لا توجد فئات متاحة',
                 selectWeightFirst: 'اختر فئة الجنس أولاً', noWeights: 'لا توجد موازين متاحة',
@@ -200,10 +199,10 @@
                 confirmDelete: 'هل أنت متأكد من حذف هذا التسجيل؟', loginRequired: '❌ يرجى تسجيل الدخول أولاً!',
                 invalidData: '❌ بيانات غير صحيحة!', email: 'البريد الإلكتروني', gender: 'الجنس',
                 country: 'الدولة', male: 'ذكر', female: 'أنثى', unspecified: 'غير محدد',
-                category: 'الفئة', type: 'النوع', delete: '🗑️ حذف', registration: 'تسجيل'
+                category: 'الفئة', type: 'النوع', delete: '️ حذف', registration: 'تسجيل'
             },
             en: {
-                pageTitle: ' Tournament Registration', pageSubtitle: 'Register for the tournament - You can register multiple times for different categories',
+                pageTitle: '🏆 Tournament Registration', pageSubtitle: 'Register for the tournament - You can register multiple times for different categories',
                 personalInfo: ' Personal Information (From Account)', loading: 'Loading data...',
                 currentReg: ' Your Current Registrations', regCount: 'Registration(s)',
                 participationData: ' Tournament Participation Data (Editable)',
@@ -247,7 +246,7 @@
             safeSetText('loadingText', t.loading);
             safeSetText('currentRegTitle', t.currentReg);
             safeSetText('participationDataTitle', t.participationData);
-            safeSetText('ageGroupLabel', sp , t.ageGroup);
+            safeSetText('ageGroupLabel', t.ageGroup);
             safeSetText('genderCategoryLabel', t.genderCategory);
             safeSetText('weightLabel', t.weight);
             safeSetText('beltLabel', t.belt);
@@ -381,7 +380,6 @@
             
             if (error) {
                 console.error('Error loading existing registrations:', error);
-                existingRegistr sp , error);
                 existingRegistrations = [];
             } else {
                 existingRegistrations = data || [];
@@ -420,7 +418,7 @@
             let optionsHTML = '<option value="">اختر...</option>';
             optionsHTML += '<option value="Boys">Boys</option>';
             optionsHTML += '<option value="Girls">Girls</option>';
-o    optionsHTML += '<option value="Men">Men</option>';
+            optionsHTML += '<option value="Men">Men</option>';
             optionsHTML += '<option value="Women">Women</option>';
             
             select.innerHTML = optionsHTML;
@@ -431,8 +429,6 @@ o    optionsHTML += '<option value="Men">Men</option>';
             if (!select) return;
             const t = translations[currentLang];
             select.innerHTML = `<option value="">${t.selectBelt}</option>`;
-            
-            if (!beltLevels || beltLevels. sp , t.selectBelt)</option>`;
             
             if (!beltLevels || beltLevels.length === 0) return;
             
@@ -471,16 +467,6 @@ o    optionsHTML += '<option value="Men">Men</option>';
             updateWeightOptions();
         }
 
-        // ✅ دالة جديدة لاستخراج الرقم من اسم الوزن
-        function extractWeightNumber(weightName) {
-            if (!weightName) return '';
-            
-            // إزالة الأحرف والرموز واستخراج الأرقام فقط
-            // أمثلة: "-16kg (0-16 kg)" -> "16", "16kg" -> "16"
-            const match = weightName.match(/(\d+)/);
-            return match ? match[1] : weightName;
-        }
-
         function updateWeightOptions() {
             const ageGroupSelect = document.getElementById('ageGroup');
             const genderCategorySelect = document.getElementById('genderCategory');
@@ -503,7 +489,8 @@ o    optionsHTML += '<option value="Men">Men</option>';
                 return;
             }
             
-            // ✅ عرض جميع الأوزان المتاحة لجميع الفئات
+            // ✅ عرض جميع الأوزان المتاحة لجميع الفئات (حل مؤقت حتى يتم تحديث قاعدة البيانات)
+            // ملاحظة: في الوضع الطبيعي، يجب فلترة الأوزان حسب الجنس، لكن البيانات حالياً ناقصة
             let filteredWeights = weightCategories;
             
             const uniqueWeights = [];
@@ -525,13 +512,11 @@ o    optionsHTML += '<option value="Men">Men</option>';
             } else {
                 let optionsHTML = '';
                 uniqueWeights.forEach((w) => {
-                    const weightNumber = extractWeightNumber(w.name);
                     const minW = w.min_weight !== null && w.min_weight !== undefined ? w.min_weight : 0;
                     const maxW = w.max_weight !== null && w.max_weight !== undefined ? w.max_weight : '';
                     const unit = currentLang === 'ar' ? 'كجم' : 'kg';
                     
-                    // ✅ عرض الرقم فقط بشكل بسيط
-                    optionsHTML += `<option value="${w.name}" data-minweight="${minW}" data-maxweight="${maxW}" data-weightid="${w.id || ''}">${weightNumber}</option>`;
+                    optionsHTML += `<option value="${w.name}" data-minweight="${minW}" data-maxweight="${maxW}" data-weightid="${w.id || ''}">${w.name} (${minW}-${maxW} ${unit})</option>`;
                 });
                 
                 weightSelect.innerHTML = optionsHTML;
@@ -554,7 +539,7 @@ o    optionsHTML += '<option value="Men">Men</option>';
             
             infoDiv.innerHTML = `
                 <h3> ${currentPlayer.full_name || 'Player'}</h3>
-                <div class="info-row"><span class="info-label">${t.email}:</span><span class="info-value">${currentPlayer.email || t.un. unspecified}</span></div>
+                <div class="info-row"><span class="info-label">${t.email}:</span><span class="info-value">${currentPlayer.email || t.unspecified}</span></div>
                 <div class="info-row"><span class="info-label">${t.gender}:</span><span class="info-value">${genderText}</span></div>
                 <div class="info-row"><span class="info-label">${t.country}:</span><span class="info-value">${currentPlayer.country || t.unspecified}</span></div>
             `;
@@ -581,23 +566,10 @@ o    optionsHTML += '<option value="Men">Men</option>';
             container.innerHTML = existingRegistrations.map((reg, index) => {
                 const ageGroup = reg.age_group || t.unspecified;
                 const weight = reg.weight ? `${reg.weight} ${currentLang === 'ar' ? 'كجم' : 'kg'}` : t.unspecified;
-                const belt = reg.belt3);
-                const weight = reg.weight ? `${reg.weight} ${currentLang === 'ar' ? 'كجم' : 'kg'}` : t.unspecified;
                 const belt = reg.belt_level || t.unspecified;
                 const giType = reg.gi_type || t.unspecified;
                 const team = reg.team || t.unspecified;
                 const ranking = (reg.ranking !== null && reg.ranking !== undefined) ? reg.ranking : '-';
-
-                return `
-                    <div class="registration-card">
-                        <div class="registration-card-header">
-                            <div class="registration-card-title">${t.registration} #${index + 1}</div>
-                            <button type="button" class="btn btn-delete" onclick="deleteRegistration('${reg.id}')">${t.delete}</button>
-                        </div>
-                        <div class="registration-card-details">
-                            <div class="registration-card-item">${t.ageGroup}: <span>${ageGroup}</span></div>
-                            <div class="registration-card-item">${t.weight}: <span>${weight}</span></div>
-                            <div class="registration sp , reg.ranking !== undefined) ? reg.ranking : '-';
 
                 return `
                     <div class="registration-card">
