@@ -827,8 +827,8 @@ input:checked + .toggle-slider:before {
       <button class="btn btn-players" onclick="showView('players')">👥 Players</button>
       <button class="btn btn-mats" onclick="showView('mats')">🥋 Mats</button>
       <button class="btn btn-settings" onclick="showView('settings')">⚙️ Settings</button>
-      <button class="btn btn-sync" onclick="syncWithDB()">🔄 Sync</button>
-      <button class="btn btn-export" onclick="exportToExcel()">📊 Export Excel</button>
+      <button class="btn btn-sync" onclick="syncWithDB()"> Sync</button>
+      <button class="btn btn-export" onclick="exportToExcel()"> Export Excel</button>
       <button class="btn btn-clear-db" onclick="clearTournamentPlayersDB()">⚠️ Clear DB Players</button>
     </div>
   </div>
@@ -836,7 +836,7 @@ input:checked + .toggle-slider:before {
   <div id="view-players" class="view active">
     <div class="section">
       <div class="section-title">
-        <span>👥 Players Registration</span>
+        <span> Players Registration</span>
         <span class="player-count" id="playerCount">0 / 200</span>
       </div>
       
@@ -907,7 +907,7 @@ input:checked + .toggle-slider:before {
       <div class="section-title">
         <span>📋 Mat Dashboard</span>
         <div style="display: flex; gap: 10px;">
-          <button class="btn btn-new-tab" onclick="openCurrentMatInNewTab()">🪟 Open Mat in New Tab</button>
+          <button class="btn btn-new-tab" onclick="openCurrentMatInNewTab()"> Open Mat in New Tab</button>
           <button class="btn btn-back" onclick="showView('mats')">← Back to Mats</button>
         </div>
       </div>
@@ -915,7 +915,7 @@ input:checked + .toggle-slider:before {
       <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; flex-wrap: wrap;">
         <button class="btn btn-add active" onclick="switchDashboardTab('categories')" id="tab-categories-btn">📋 Categories</button>
         <button class="btn btn-sync" onclick="switchDashboardTab('queue')" id="tab-queue-btn">📋 Queue</button>
-        <button class="btn btn-players" onclick="switchDashboardTab('callup')" id="tab-callup-btn">📢 Call-Up</button>
+        <button class="btn btn-players" onclick="switchDashboardTab('callup')" id="tab-callup-btn"> Call-Up</button>
         <button class="btn btn-mats" onclick="switchDashboardTab('standings')" id="tab-standings-btn">🏆 Standings</button>
       </div>
       
@@ -1119,7 +1119,7 @@ input:checked + .toggle-slider:before {
   <div id="view-settings" class="view">
     <div class="section">
       <div class="section-title">
-        <span>⚙️ Settings</span>
+        <span>️ Settings</span>
         <button class="btn btn-back" onclick="showView('players')">← Back to Players</button>
       </div>
       <p style="color: #8899aa; text-align: center; padding: 40px;">Settings coming soon...</p>
@@ -1143,7 +1143,7 @@ let dbConnected = false;
 let currentLang = localStorage.getItem('lang') || 'en';
 
 let AGE_GROUPS = {};
-let WEIGHTS = {};
+let ALL_WEIGHTS = []; // ✅ NEW: Store all weights in a flat array
 let BELTS = [];
 let WEIGHT_MAP = {};
 let AGE_MAP = {};
@@ -1168,20 +1168,20 @@ const translations = {
     step1: 'Step 1: Players Registration',
     step2: 'Step 2: Mats Setup',
     dashboard: 'Mat Dashboard',
-    addPlayer: '➕ Add Player',
-    add10: '➕ Add 10',
-    sync: '🔄 Sync with DB',
+    addPlayer: ' Add Player',
+    add10: ' Add 10',
+    sync: ' Sync with DB',
     proceed: 'Proceed to Mats Setup →',
-    matsSetup: '🥋 Mats Setup',
+    matsSetup: ' Mats Setup',
     back: '← Back to Players',
     numberOfMats: 'Number of Mats:',
-    openDashboard: '🏆 Open Mat Dashboard →',
+    openDashboard: ' Open Mat Dashboard →',
     matDashboard: '📋 Mat Dashboard',
     openNewTab: ' Open Mat in New Tab',
     backToMats: '← Back to Mats',
     categories: '📋 Categories',
-    queue: '📋 Queue',
-    callup: '📢 Call-Up',
+    queue: ' Queue',
+    callup: ' Call-Up',
     standings: ' Standings'
   },
   ar: {
@@ -1200,7 +1200,7 @@ const translations = {
     back: '← العودة للاعبين',
     numberOfMats: 'عدد الحصائر:',
     openDashboard: ' فتح لوحة التحكم ←',
-    matDashboard: '📋 لوحة تحكم الحصة',
+    matDashboard: ' لوحة تحكم الحصة',
     openNewTab: '🪟 فتح في نافذة جديدة',
     backToMats: '← العودة للحصائر',
     categories: '📋 التصنيفات',
@@ -1210,7 +1210,6 @@ const translations = {
   }
 };
 
-// ✅ CORRECTED: Remove hardcoded fallback and validate tournament_id
 window.onload = async function() {
   const urlParams = new URLSearchParams(window.location.search);
   currentTournamentId = urlParams.get('tournament_id');
@@ -1226,7 +1225,6 @@ window.onload = async function() {
 
 async function initializeApp() {
   try {
-    // ✅ CORRECTED: Load tournament details first
     await loadTournamentDetails();
     await loadReferenceData();
     await loadPlayersFromDB();
@@ -1239,7 +1237,6 @@ async function initializeApp() {
   }
 }
 
-// ✅ NEW: Load tournament name from database
 async function loadTournamentDetails() {
   const { data: tournament, error } = await dbClient
     .from('tournaments')
@@ -1269,7 +1266,6 @@ function changeLanguage(lang) {
   
   const t = translations[lang];
   document.getElementById('subtitle').innerText = t.step1;
-  // Update other UI elements as needed
 }
 
 function updateDBStatus(message, color) {
@@ -1308,37 +1304,29 @@ async function loadReferenceData() {
     });
     console.log(`✅ Loaded ${Object.keys(AGE_GROUPS).length} age divisions`);
     
+    // ✅ CORRECTED: Load ALL weights into a flat array
     const { data: weightData, error: weightError } = await dbClient
       .from('ajp_weight_classes')
-      .select('id, name, gender, min_weight, max_weight, age_division_id')
+      .select('id, name, gender, min_weight, max_weight')
       .order('min_weight');
     
     if (weightError) throw weightError;
     
-    WEIGHTS = {};
+    ALL_WEIGHTS = [];
     WEIGHT_MAP = {};
-    const uniqueWeights = new Set();
     
     weightData.forEach(wc => {
-      const gender = wc.gender || 'Boys';
-      const ageGroupName = AGE_MAP[wc.age_division_id] || 'Amateur / Professional';
-      
-      if (!WEIGHTS[gender]) WEIGHTS[gender] = {};
-      if (!WEIGHTS[gender][ageGroupName]) WEIGHTS[gender][ageGroupName] = [];
-      
-      WEIGHTS[gender][ageGroupName].push({
+      ALL_WEIGHTS.push({
         id: wc.id,
         name: wc.name,
+        gender: wc.gender || 'Men',
         min_weight: wc.min_weight,
         max_weight: wc.max_weight
       });
-      
-      if (!uniqueWeights.has(wc.name)) {
-        WEIGHT_MAP[wc.id] = wc.name;
-        uniqueWeights.add(wc.name);
-      }
+      WEIGHT_MAP[wc.id] = wc.name;
     });
-    console.log(`✅ Loaded ${weightData.length} weight classes (${uniqueWeights.size} unique)`);
+    
+    console.log(`✅ Loaded ${ALL_WEIGHTS.length} weight classes`);
     
     const { data: beltData, error: beltError } = await dbClient
       .from('ajp_belt_levels')
@@ -1372,11 +1360,10 @@ function getGenderOptions(ageGroup) {
   return ['Men', 'Women'];
 }
 
+// ✅ CORRECTED: Return all weights or filter by gender if needed
 function getWeightOptions(gender, ageGroup) {
-  if (WEIGHTS[gender] && WEIGHTS[gender][ageGroup]) {
-    return WEIGHTS[gender][ageGroup];
-  }
-  return [];
+  // Return all unique weight names
+  return ALL_WEIGHTS;
 }
 
 function getBeltOptions(ageGroup) {
@@ -1421,7 +1408,6 @@ function switchDashboardTab(tabName) {
   if (tabName === 'standings') renderStandings();
 }
 
-// ✅ CORRECTED: Use 'tournament_participants' instead of 'ajp_tournament_participants'
 async function loadPlayersFromDB() {
   if (!currentTournamentId) return;
   try {
@@ -1434,14 +1420,13 @@ async function loadPlayersFromDB() {
     if (playersError) throw playersError;
     console.log(`✅ Loaded ${playersData?.length || 0} players`);
     
-    // ✅ CORRECTED: Handle text fields for age_group, belt_level, etc.
     players = (playersData || []).map(p => ({
       id: p.id,
       name: p.player_name || '',
       team: p.team || '',
       ageGroup: p.age_group || 'Amateur / Professional',
       gender: p.gender || 'Men',
-      weight: p.weight || 0,
+      weight: p.weight || '',
       belt: p.belt_level || 'White',
       rank: p.ranking || 0,
       is_suspended: p.is_suspended || false,
@@ -1458,7 +1443,6 @@ async function loadPlayersFromDB() {
   }
 }
 
-// ✅ CORRECTED: Use 'tournament_participants' table
 async function addPlayer() {
   const maxPlayers = 200;
   if (players.length >= maxPlayers) { alert('Maximum 200 players!'); return; }
@@ -1472,7 +1456,7 @@ async function addPlayer() {
         team: 'Free Player',
         age_group: 'Amateur / Professional',
         gender: 'Men',
-        weight: 0,
+        weight: '',
         belt_level: 'White',
         ranking: players.length + 1,
         is_suspended: false,
@@ -1489,7 +1473,7 @@ async function addPlayer() {
       team: data.team || 'Free Player',
       ageGroup: data.age_group || 'Amateur / Professional',
       gender: data.gender || 'Men',
-      weight: data.weight || 0,
+      weight: data.weight || '',
       belt: data.belt_level || 'White',
       rank: data.ranking,
       is_suspended: data.is_suspended || false
@@ -1515,7 +1499,7 @@ async function addPlayers(count) {
       team: 'Free Player',
       age_group: 'Amateur / Professional',
       gender: 'Men',
-      weight: 0,
+      weight: '',
       belt_level: 'White',
       ranking: players.length + i + 1,
       is_suspended: false,
@@ -1540,7 +1524,7 @@ async function addPlayers(count) {
         team: p.team || 'Free Player',
         ageGroup: p.age_group || 'Amateur / Professional',
         gender: p.gender || 'Men',
-        weight: p.weight || 0,
+        weight: p.weight || '',
         belt: p.belt_level || 'White',
         rank: p.ranking,
         is_suspended: p.is_suspended || false
@@ -1616,7 +1600,8 @@ function renderPlayers() {
       `<option ${p.gender === g ? 'selected' : ''}>${g}</option>`
     ).join('');
     
-    const weightOptions = getWeightOptions(p.gender, p.ageGroup)
+    // ✅ CORRECTED: Show all weights
+    const weightOptions = ALL_WEIGHTS
       .map(w => `<option value="${w.name}" ${p.weight === w.name ? 'selected' : ''}>${w.name}</option>`)
       .join('');
     
@@ -1835,7 +1820,7 @@ function renderMats() {
         </div>
         <select onchange="if(this.value) addMatCategory('${mat.id}', 'weights', this.value)">
           <option value="">-- Add Weight --</option>
-          ${allWeights.map(w => `<option value="${w}">${w}</option>`).join('')}
+          ${ALL_WEIGHTS.map(w => `<option value="${w.name}">${w.name}</option>`).join('')}
         </select>
       </div>
       
@@ -2238,7 +2223,7 @@ function showWinnerSelection(match) {
   
   modal.innerHTML = `
     <div class="winner-modal-content">
-      <h2 style="color: #fbbf24; margin-bottom: 20px; font-size: 2rem;">🏆 Select Winner</h2>
+      <h2 style="color: #fbbf24; margin-bottom: 20px; font-size: 2rem;"> Select Winner</h2>
       
       <div style="background: #0f1724; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
         <div style="font-size: 1.3rem; font-weight: bold; color: #fff; margin-bottom: 10px;">
@@ -2252,7 +2237,7 @@ function showWinnerSelection(match) {
       <button onclick="selectWinner('red')" class="winner-btn red">🔴 ${redName} Wins</button>
       <button onclick="selectWinner('blue')" class="winner-btn blue"> ${blueName} Wins</button>
       <button onclick="selectWinner('draw')" class="winner-btn draw">🤝 Draw</button>
-      <button onclick="this.closest('.winner-modal').remove()" class="winner-btn cancel">❌ Cancel</button>
+      <button onclick="this.closest('.winner-modal').remove()" class="winner-btn cancel"> Cancel</button>
     </div>
   `;
   
@@ -2274,7 +2259,7 @@ function selectWinner(winner) {
   
   const winnerName = winner === 'red' ? match.p1?.name : 
                      winner === 'blue' ? match.p2?.name : 'Draw';
-  showNotification(`🏆 ${winnerName} wins!`);
+  showNotification(` ${winnerName} wins!`);
 }
 
 function startBracketMatch(rIdx, mIdx) {
@@ -2313,7 +2298,7 @@ function startBracketMatch(rIdx, mIdx) {
 function toggleScheduleMode() {
   autoScheduleMode = document.getElementById('autoScheduleToggle').checked;
   renderQueue();
-  showNotification(autoScheduleMode ? ' Auto-Schedule Mode ON' : '✋ Manual Mode ON');
+  showNotification(autoScheduleMode ? ' Auto-Schedule Mode ON' : ' Manual Mode ON');
 }
 
 function renderQueue() {
@@ -2357,7 +2342,7 @@ function renderQueue() {
             ${m.p1 ? m.p1.name : 'TBD'} vs ${m.p2 ? m.p2.name : 'TBD'}
           </div>
           <div class="match-queue-details">
-            ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | ️ ${cat.belt} | ${m.id}
+            ⚖️ ${cat.weight} |  ${cat.ageGroup} | ${cat.gender} | ️ ${cat.belt} | ${m.id}
           </div>
         </div>
         <div class="match-queue-actions">
@@ -2421,7 +2406,7 @@ function renderCallUp() {
         ${next.p1 ? next.p1.name : 'TBD'} vs ${next.p2 ? next.p2.name : 'TBD'}
       </div>
       <div style="color: #8899aa; margin-bottom: 20px; font-size: 1.1rem;">
-        ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt}
+        ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | ️ ${cat.belt}
       </div>
       <div style="display: flex; gap: 15px; justify-content: center;">
         <button class="btn btn-add" onclick="callPlayer('${next.p1 ? next.p1.name : 'Player 1'}')"> Call ${next.p1 ? next.p1.name : 'Player 1'}</button>
