@@ -182,7 +182,7 @@
 
         const translations = {
             ar: {
-                pageTitle: '🏆 التسجيل في البطولة', pageSubtitle: 'قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة',
+                pageTitle: ' التسجيل في البطولة', pageSubtitle: 'قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة',
                 personalInfo: '👤 بياناتك الشخصية (من الحساب)', loading: 'جاري تحميل البيانات...',
                 currentReg: '📋 تسجيلاتك الحالية في البطولة', regCount: 'تسجيل',
                 participationData: '📝 بيانات المشاركة في البطولة (قابل للتعديل)',
@@ -199,7 +199,7 @@
                 confirmDelete: 'هل أنت متأكد من حذف هذا التسجيل؟', loginRequired: '❌ يرجى تسجيل الدخول أولاً!',
                 invalidData: '❌ بيانات غير صحيحة!', email: 'البريد الإلكتروني', gender: 'الجنس',
                 country: 'الدولة', male: 'ذكر', female: 'أنثى', unspecified: 'غير محدد',
-                category: 'الفئة', type: 'النوع', delete: '🗑️ حذف', registration: 'تسجيل'
+                category: 'الفئة', type: 'النوع', delete: '️ حذف', registration: 'تسجيل'
             },
             en: {
                 pageTitle: '🏆 Tournament Registration', pageSubtitle: 'Register for the tournament - You can register multiple times for different categories',
@@ -337,13 +337,14 @@
                 });
             }
             weightCategories = uniqueWeights;
+            console.log('✅ Weight categories loaded:', uniqueWeights.length);
             return uniqueWeights;
         }
 
         async function loadBeltLevels() {
             const { data, error } = await supabaseClient.from('ajp_belt_levels').select('id, name, sort_order').order('sort_order');
             if (error) {
-                console.error(' خطأ في جلب الأحزمة:', error);
+                console.error('❌ خطأ في جلب الأحزمة:', error);
                 return [];
             }
             
@@ -413,7 +414,7 @@
             const select = document.getElementById('genderCategory');
             if (!select) return;
             
-            // ✅ عرض جميع الفئات الأربع دائماً لجميع اللاعبين
+            // ✅ عرض جميع الفئات الأربع دائماً
             let optionsHTML = '<option value="">اختر...</option>';
             optionsHTML += '<option value="Boys">Boys</option>';
             optionsHTML += '<option value="Girls">Girls</option>';
@@ -421,7 +422,6 @@
             optionsHTML += '<option value="Women">Women</option>';
             
             select.innerHTML = optionsHTML;
-            console.log('✅ تم تحميل جميع فئات الجنس: Boys, Girls, Men, Women');
         }
 
         function populateBeltLevels() {
@@ -489,11 +489,9 @@
                 return;
             }
             
-            // فلترة الأوزان بناءً على قيمة gender المطابقة لـ (Boys, Girls, Men, Women)
-            let filteredWeights = weightCategories.filter(w => {
-                if (!w.gender) return true; 
-                return w.gender === selectedGenderCategory;
-            });
+            // ✅ عرض جميع الأوزان المتاحة لجميع الفئات (حل مؤقت حتى يتم تحديث قاعدة البيانات)
+            // ملاحظة: في الوضع الطبيعي، يجب فلترة الأوزان حسب الجنس، لكن البيانات حالياً ناقصة
+            let filteredWeights = weightCategories;
             
             const uniqueWeights = [];
             const seenNames = new Set();
@@ -505,6 +503,8 @@
             });
             
             uniqueWeights.sort((a, b) => (a.min_weight || 0) - (b.min_weight || 0));
+            
+            console.log(`✅ Showing ${uniqueWeights.length} weights for ${selectedGenderCategory}`);
             
             if (uniqueWeights.length === 0) {
                 weightSelect.innerHTML = `<option value="">${t.noWeights}</option>`;
