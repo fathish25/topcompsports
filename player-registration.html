@@ -88,7 +88,7 @@
         <div id="alert" class="alert"></div>
 
         <div class="section">
-            <div class="section-title" id="personalInfoTitle"> بياناتك الشخصية (من الحساب)</div>
+            <div class="section-title" id="personalInfoTitle">👤 بياناتك الشخصية (من الحساب)</div>
             <div id="playerInfo" class="player-info">
                 <div class="loading" id="loadingText">جاري تحميل البيانات...</div>
             </div>
@@ -179,7 +179,7 @@
                 participationData: '📝 بيانات المشاركة في البطولة (قابل للتعديل)',
                 ageGroup: 'الفئة العمرية *', weight: 'الوزن (كجم) *', belt: 'الحزام *',
                 giType: 'نوع المشاركة *', team: 'اسم الفريق / الأكاديمية *',
-                ranking: 'التصنيف (Ranking) - اختياري', rankingPlaceholder: '0 = غير مصنف | 1-10 = محلي | 1-100 = دولي',
+                ranking: 'التصنيف (Ranking)', rankingPlaceholder: '0 = غير مصنف | 1-10 = محلي | 1-100 = دولي',
                 submit: '✅ إضافة تسجيل جديد', back: '← العودة للصفحة الرئيسية',
                 selectAge: 'اختر الفئة العمرية...', noAge: 'لا توجد فئات متاحة',
                 selectWeightFirst: 'اختر الفئة العمرية أولاً', noWeights: 'لا توجد موازين متاحة',
@@ -199,7 +199,7 @@
                 participationData: '📝 Tournament Participation Data (Editable)',
                 ageGroup: 'Age Group *', weight: 'Weight (kg) *', belt: 'Belt *',
                 giType: 'Participation Type *', team: 'Team / Academy Name *',
-                ranking: 'Ranking - Optional', rankingPlaceholder: '0 = Unranked | 1-10 = Local | 1-100 = International',
+                ranking: 'Ranking', rankingPlaceholder: '0 = Unranked | 1-10 = Local | 1-100 = International',
                 submit: '✅ Add New Registration', back: '← Back to Home',
                 selectAge: 'Select age group...', noAge: 'No categories available',
                 selectWeightFirst: 'Select age group first', noWeights: 'No weights available',
@@ -230,7 +230,7 @@
             if (btnAr) btnAr.classList.toggle('active', lang === 'ar');
             if (btnEn) btnEn.classList.toggle('active', lang === 'en');
             
-            const t = translations[lang];
+            const t = translations[currentLang];
             safeSetText('pageTitle', t.pageTitle);
             safeSetText('pageSubtitle', t.pageSubtitle);
             safeSetText('personalInfoTitle', t.personalInfo);
@@ -281,11 +281,7 @@
 
         async function loadAgeDivisions() {
             const { data, error } = await supabaseClient.from('ajp_age_divisions').select('id, name, min_age, max_age').order('min_age');
-            if (error) {
-                console.error('❌ خطأ في جلب الفئات العمرية:', error);
-            } else {
-                console.log('✅ Age divisions loaded:', data?.length || 0);
-            }
+            if (error) console.error('❌ خطأ في جلب الفئات العمرية:', error);
             return data || [];
         }
 
@@ -300,12 +296,9 @@
                 return [];
             }
             
-            console.log('✅ Weight categories loaded from ajp_weight_classes:', data?.length || 0);
-            
-            // إزالة التكرار
+            // إزالة التكرار بناءً على الاسم
             const uniqueWeights = [];
             const seenNames = new Set();
-            
             if (data) {
                 data.forEach(w => {
                     if (!seenNames.has(w.name)) {
@@ -314,8 +307,6 @@
                     }
                 });
             }
-            
-            console.log('✅ Unique weights after removing duplicates:', uniqueWeights.length);
             weightCategories = uniqueWeights;
             return uniqueWeights;
         }
@@ -342,34 +333,22 @@
 
         function populateAgeDivisions() {
             const select = document.getElementById('ageGroup');
-            if (!select) {
-                console.error('❌ ageGroup element not found!');
-                return;
-            }
-            
+            if (!select) return;
             const t = translations[currentLang];
-            
             if (!ageDivisions || ageDivisions.length === 0) {
                 select.innerHTML = `<option value="">${t.noAge}</option>`;
-                console.warn('⚠️ No age divisions available');
                 return;
             }
-            
             let optionsHTML = `<option value="">${t.selectAge}</option>`;
-            
             ageDivisions.forEach((div, index) => {
                 const divId = div.id || '';
                 const divName = div.name || `${currentLang === 'ar' ? 'الفئة' : 'Category'} ${index + 1}`;
                 const minAge = div.min_age || 0;
                 const maxAge = div.max_age || 99;
                 const yearsText = currentLang === 'ar' ? 'سنة' : 'years';
-                
                 optionsHTML += `<option value="${divId}">${divName} (${minAge}-${maxAge} ${yearsText})</option>`;
             });
-            
             select.innerHTML = optionsHTML;
-            console.log('✅ Populated', ageDivisions.length, 'age divisions');
-            console.log('📋 First option value:', select.options[1]?.value);
         }
 
         function populateBeltLevels() {
@@ -403,73 +382,67 @@
             });
         }
 
-        // ✅ دالة معالجة تغيير الفئة العمرية
         function handleAgeGroupChange() {
             console.log('🔄 handleAgeGroupChange called');
-            const ageGroupSelect = document.getElementById('ageGroup');
-            console.log('Selected value:', ageGroupSelect.value);
             updateWeightOptions();
         }
 
-        // ✅ عرض جميع الأوزان المتاحة
+        // ✅ الدالة المصححة لعرض الأوزان (مرنة ولا تمنع المستخدم إذا كانت البيانات غير مكتملة)
         function updateWeightOptions() {
             const ageGroupSelect = document.getElementById('ageGroup');
             const weightSelect = document.getElementById('weight');
             
-            if (!ageGroupSelect || !weightSelect) {
-                console.error('❌ Select elements not found!');
-                return;
-            }
+            if (!ageGroupSelect || !weightSelect) return;
             
             const selectedAgeDivisionId = ageGroupSelect.value;
             const t = translations[currentLang];
             
-            console.log('🔄 updateWeightOptions called');
-            console.log('Selected Age Division ID:', selectedAgeDivisionId);
-            console.log('Total weights in array:', weightCategories.length);
-            
             if (!selectedAgeDivisionId) {
                 weightSelect.innerHTML = `<option value="">${t.selectWeightFirst}</option>`;
                 weightSelect.disabled = true;
-                console.log('⚠️ No age group selected');
                 return;
             }
             
             if (!weightCategories || weightCategories.length === 0) {
                 weightSelect.innerHTML = `<option value="">${t.noWeights}</option>`;
                 weightSelect.disabled = true;
-                console.warn('⚠️ weightCategories is empty!');
                 return;
             }
             
-            // ✅ عرض جميع الأوزان بدون فلترة صارمة
-            let weightsToShow = weightCategories;
+            // 1. محاولة الفلترة حسب الفئة العمرية
+            let filteredWeights = weightCategories.filter(w => w.age_division_id == selectedAgeDivisionId);
             
-            // إزالة التكرار
+            // 2. إذا لم نجد نتائج (بسبب نقص البيانات في قاعدة البيانات)، نعرض كل الأوزان كحل بديل لضمان عدم تعطيل المستخدم
+            if (filteredWeights.length === 0) {
+                console.warn('⚠️ لا توجد أوزان مطابقة للفئة العمرية المحددة في قاعدة البيانات. عرض جميع الأوزان المتاحة.');
+                filteredWeights = weightCategories;
+            }
+            
+            // إزالة التكرار النهائي
             const uniqueWeights = [];
             const seenNames = new Set();
-            weightsToShow.forEach(w => {
+            filteredWeights.forEach(w => {
                 if (!seenNames.has(w.name)) {
                     seenNames.add(w.name);
                     uniqueWeights.push(w);
                 }
             });
             
-            console.log('Unique weights to display:', uniqueWeights.length);
+            // ترتيب الأوزان من الأقل للأكثر
+            uniqueWeights.sort((a, b) => (a.min_weight || 0) - (b.min_weight || 0));
             
-            if (uniqueWeights.length === 0) {
-                weightSelect.innerHTML = `<option value="">${t.noWeights}</option>`;
-                weightSelect.disabled = true;
-            } else {
-                let optionsHTML = '';
-                uniqueWeights.forEach((w, idx) => {
-                    optionsHTML += `<option value="${w.name}" data-min-weight="${w.min_weight}" data-max-weight="${w.max_weight}" data-weight-id="${w.id || ''}">${w.name} (${w.min_weight}-${w.max_weight} ${currentLang === 'ar' ? 'كجم' : 'kg'})</option>`;
-                    if (idx < 3) console.log(`  - ${w.name} (ID: ${w.id}, Division: ${w.age_division_id}, Gender: ${w.gender})`);
-                });
-                weightSelect.innerHTML = optionsHTML;
-                weightSelect.disabled = false;
-                console.log('✅ Loaded', uniqueWeights.length, 'weights successfully');
-            }
+            let optionsHTML = '';
+            uniqueWeights.forEach(w => {
+                const minW = w.min_weight !== null && w.min_weight !== undefined ? w.min_weight : 0;
+                const maxW = w.max_weight !== null && w.max_weight !== undefined ? w.max_weight : '∞';
+                const unit = currentLang === 'ar' ? 'كجم' : 'kg';
+                
+                optionsHTML += `<option value="${w.name}" data-min-weight="${minW}" data-max-weight="${maxW}" data-weight-id="${w.id || ''}">${w.name} (${minW}-${maxW} ${unit})</option>`;
+            });
+            
+            weightSelect.innerHTML = optionsHTML;
+            weightSelect.disabled = false;
+            console.log(`✅ تم تحميل ${uniqueWeights.length} خيار وزن بنجاح.`);
         }
 
         function displayPlayerInfo() {
@@ -486,32 +459,49 @@
             `;
         }
 
+        // ✅ الدالة المصححة لعرض التسجيلات الحالية (مع معالجة القيم الفارغة بشكل أفضل)
         function displayExistingRegistrations() {
             const container = document.getElementById('existingRegistrations');
             const section = document.getElementById('existingRegistrationsSection');
             const countLabel = document.getElementById('registrationsCount');
             if (!container || !section || !countLabel) return;
+
             const t = translations[currentLang];
-            
-            if (!existingRegistrations || existingRegistrations.length === 0) { section.style.display = 'none'; return; }
+
+            if (!existingRegistrations || existingRegistrations.length === 0) { 
+                section.style.display = 'none'; 
+                return; 
+            }
+
             section.style.display = 'block';
             countLabel.textContent = `${existingRegistrations.length} ${t.regCount}`;
-            
-            container.innerHTML = existingRegistrations.map((reg, index) => `
-                <div class="registration-card">
-                    <div class="registration-card-header">
-                        <div class="registration-card-title">${t.registration} #${index + 1}</div>
-                        <button type="button" class="btn btn-delete" onclick="deleteRegistration('${reg.id}')">${t.delete}</button>
+
+            container.innerHTML = existingRegistrations.map((reg, index) => {
+                // معالجة آمنة للقيم الفارغة
+                const ageGroup = reg.age_group || t.unspecified;
+                const weight = reg.weight ? `${reg.weight} ${currentLang === 'ar' ? 'كجم' : 'kg'}` : t.unspecified;
+                const belt = reg.belt_level || t.unspecified;
+                const giType = reg.gi_type || t.unspecified;
+                const team = reg.team || t.unspecified;
+                const ranking = (reg.ranking !== null && reg.ranking !== undefined) ? reg.ranking : '-';
+
+                return `
+                    <div class="registration-card">
+                        <div class="registration-card-header">
+                            <div class="registration-card-title">${t.registration} #${index + 1}</div>
+                            <button type="button" class="btn btn-delete" onclick="deleteRegistration('${reg.id}')">${t.delete}</button>
+                        </div>
+                        <div class="registration-card-details">
+                            <div class="registration-card-item">${t.ageGroup}: <span>${ageGroup}</span></div>
+                            <div class="registration-card-item">${t.weight}: <span>${weight}</span></div>
+                            <div class="registration-card-item">${t.belt}: <span>${belt}</span></div>
+                            <div class="registration-card-item">${t.giType}: <span>${giType}</span></div>
+                            <div class="registration-card-item">${t.team}: <span>${team}</span></div>
+                            <div class="registration-card-item">${t.ranking}: <span>${ranking}</span></div>
+                        </div>
                     </div>
-                    <div class="registration-card-details">
-                        <div class="registration-card-item">${t.category}: <span>${reg.age_group || '-'}</span></div>
-                        <div class="registration-card-item">${t.weight}: <span>${reg.weight || 0} ${currentLang === 'ar' ? 'كجم' : 'kg'}</span></div>
-                        <div class="registration-card-item">${t.belt}: <span>${reg.belt_level || '-'}</span></div>
-                        <div class="registration-card-item">${t.type}: <span>${reg.gi_type || '-'}</span></div>
-                        <div class="registration-card-item">${t.team}: <span>${reg.team || '-'}</span></div>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         async function deleteRegistration(registrationId) {
@@ -528,7 +518,7 @@
         }
 
         window.onload = async () => {
-            console.log(' Page loaded, initializing...');
+            console.log('🚀 Page loaded, initializing...');
             setLanguage(currentLang);
             const urlParams = new URLSearchParams(window.location.search);
             tournamentId = urlParams.get('tournament_id');
@@ -546,7 +536,6 @@
             }
 
             currentUserId = user.id;
-            console.log('🚀 Loading data from database...');
 
             await loadPlayerData(user.id);
             ageDivisions = await loadAgeDivisions();
@@ -561,14 +550,6 @@
             
             await loadExistingRegistrations();
             console.log('✅ All data loaded successfully');
-            
-            // ✅ اختبار: عرض عدد الخيارات
-            setTimeout(() => {
-                const ageSelect = document.getElementById('ageGroup');
-                if (ageSelect) {
-                    console.log('📊 Age Group select has', ageSelect.options.length, 'options');
-                }
-            }, 1000);
         };
 
         document.getElementById('tournamentForm').addEventListener('submit', async (e) => {
@@ -579,14 +560,17 @@
             const ageGroupSelect = document.getElementById('ageGroup');
             const selectedDivision = ageDivisions.find(d => d.id === ageGroupSelect.value);
             
+            // ملاحظة: dataset.minWeight تعمل لأننا كتبناها data-min-weight في HTML
+            const minWeightVal = selectedWeightOption ? (selectedWeightOption.dataset.minWeight || 0) : 0;
+
             const formData = {
                 tournament_id: tournamentId,
                 user_id: currentUserId,
                 player_name: currentPlayer.full_name,
                 age_group: selectedDivision?.name || '',
                 gender: currentPlayer.gender,
-                weight: parseFloat(selectedWeightOption.dataset.minWeight || 0),
-                weight_class_id: selectedWeightOption.dataset.weightId || null,
+                weight: parseFloat(minWeightVal),
+                weight_class_id: selectedWeightOption ? (selectedWeightOption.dataset.weightId || null) : null,
                 belt_level: document.getElementById('belt').value,
                 gi_type: document.getElementById('giType').value,
                 team: document.getElementById('teamSelect').value,
@@ -598,10 +582,10 @@
                 if (error) throw error;
                 showAlert('success', t.successAdd);
                 document.getElementById('tournamentForm').reset();
+                // إعادة تعيين حالة قائمة الأوزان بعد إعادة التعيين
+                document.getElementById('weight').disabled = true;
+                document.getElementById('weight').innerHTML = `<option value="">${t.selectWeightFirst}</option>`;
                 await loadExistingRegistrations();
-                populateAgeDivisions();
-                populateBeltLevels();
-                populateTeams();
             } catch (error) {
                 console.error('Registration error:', error);
                 showAlert('error', t.errorRegister + error.message);
