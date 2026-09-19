@@ -383,7 +383,6 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
 
 .edit-btn:hover { background: #d97706; }
 
-/* Match Queue Styles */
 .match-queue-item {
   background: #151d2b;
   border: 2px solid #2a3548;
@@ -406,9 +405,7 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
   background: rgba(251, 191, 36, 0.1);
 }
 
-.match-queue-info {
-  flex: 1;
-}
+.match-queue-info { flex: 1; }
 
 .match-queue-players {
   font-size: 1.1rem;
@@ -427,7 +424,6 @@ input:focus, select:focus { outline: none; border-color: #fbbf24; }
   gap: 8px;
 }
 
-/* Schedule Mode Toggle */
 .schedule-mode-toggle {
   background: #151d2b;
   border: 2px solid #2a3548;
@@ -794,13 +790,13 @@ input:checked + .toggle-slider:before {
     </div>
     
     <nav class="nav-menu">
-      <a href="organizer-dashboard.html" class="nav-link"> Dashboard</a>
-      <a href="#" class="nav-link active">Manager</a>
+      <a href="organizer-dashboard.html" class="nav-link">🏠 Dashboard</a>
+      <a href="#" class="nav-link active">⚙️ Manager</a>
     </nav>
     
     <div class="user-section">
       <div class="user-profile">
-        <div class="user-avatar"></div>
+        <div class="user-avatar">👤</div>
         <span class="user-name" id="userNameDisplay">User</span>
       </div>
       <button class="btn-logout" onclick="logout()">Logout</button>
@@ -825,10 +821,10 @@ input:checked + .toggle-slider:before {
     
     <div class="action-buttons">
       <button class="btn btn-players" onclick="showView('players')">👥 Players</button>
-      <button class="btn btn-mats" onclick="showView('mats')">🥋 Mats</button>
-      <button class="btn btn-settings" onclick="showView('settings')">⚙️ Settings</button>
+      <button class="btn btn-mats" onclick="showView('mats')"> Mats</button>
+      <button class="btn btn-settings" onclick="showView('settings')">️ Settings</button>
       <button class="btn btn-sync" onclick="syncWithDB()"> Sync</button>
-      <button class="btn btn-export" onclick="exportToExcel()"> Export Excel</button>
+      <button class="btn btn-export" onclick="exportToExcel()">📊 Export Excel</button>
       <button class="btn btn-clear-db" onclick="clearTournamentPlayersDB()">⚠️ Clear DB Players</button>
     </div>
   </div>
@@ -836,13 +832,13 @@ input:checked + .toggle-slider:before {
   <div id="view-players" class="view active">
     <div class="section">
       <div class="section-title">
-        <span> Players Registration</span>
+        <span>👥 Players Registration</span>
         <span class="player-count" id="playerCount">0 / 200</span>
       </div>
       
       <div class="button-group">
         <button class="btn btn-add" onclick="addPlayer()">➕ Add Player</button>
-        <button class="btn btn-add" onclick="addPlayers(10)" style="background: #475569;">➕ Add 10</button>
+        <button class="btn btn-add" onclick="addPlayers(10)" style="background: #475569;"> Add 10</button>
         <button class="btn btn-sync" onclick="syncWithDB()" style="background: #f59e0b; color: #000;">🔄 Sync with DB</button>
       </div>
       
@@ -896,7 +892,7 @@ input:checked + .toggle-slider:before {
       <div id="matsGrid" class="mats-grid"></div>
       
       <button class="btn-proceed" onclick="showView('dashboard')">
-        <span>🏆</span>
+        <span></span>
         <span>Open Mat Dashboard →</span>
       </button>
     </div>
@@ -907,7 +903,7 @@ input:checked + .toggle-slider:before {
       <div class="section-title">
         <span>📋 Mat Dashboard</span>
         <div style="display: flex; gap: 10px;">
-          <button class="btn btn-new-tab" onclick="openCurrentMatInNewTab()"> Open Mat in New Tab</button>
+          <button class="btn btn-new-tab" onclick="openCurrentMatInNewTab()">🪟 Open Mat in New Tab</button>
           <button class="btn btn-back" onclick="showView('mats')">← Back to Mats</button>
         </div>
       </div>
@@ -915,17 +911,17 @@ input:checked + .toggle-slider:before {
       <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; flex-wrap: wrap;">
         <button class="btn btn-add active" onclick="switchDashboardTab('categories')" id="tab-categories-btn">📋 Categories</button>
         <button class="btn btn-sync" onclick="switchDashboardTab('queue')" id="tab-queue-btn">📋 Queue</button>
-        <button class="btn btn-players" onclick="switchDashboardTab('callup')" id="tab-callup-btn"> Call-Up</button>
+        <button class="btn btn-players" onclick="switchDashboardTab('callup')" id="tab-callup-btn">📢 Call-Up</button>
         <button class="btn btn-mats" onclick="switchDashboardTab('standings')" id="tab-standings-btn">🏆 Standings</button>
       </div>
       
       <div id="dashboard-categories" class="dashboard-tab active">
-        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Categories - Mat <span id="dashboardMatNumber">1</span></h3>
+        <h3 style="color: #fbbf24; margin-bottom: 20px;">📋 Categories - Mat <span id="dashboardMatNumber">1</span></h3>
         <div id="categoriesContainer" style="display: grid; gap: 15px;"></div>
       </div>
       
       <div id="dashboard-queue" class="dashboard-tab" style="display: none;">
-        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Match Queue</h3>
+        <h3 style="color: #fbbf24; margin-bottom: 20px;">📋 Match Queue</h3>
         
         <div class="schedule-mode-toggle">
           <div>
@@ -949,7 +945,7 @@ input:checked + .toggle-slider:before {
       </div>
       
       <div id="dashboard-standings" class="dashboard-tab" style="display: none;">
-        <h3 style="color: #fbbf24; margin-bottom: 20px;"> Final Standings</h3>
+        <h3 style="color: #fbbf24; margin-bottom: 20px;">🏆 Final Standings</h3>
         <div id="standingsContainer"></div>
       </div>
     </div>
@@ -1036,7 +1032,7 @@ input:checked + .toggle-slider:before {
 
       <div class="sb-controls-area">
         <div>
-          <div class="sb-panel-header red">🔴 Red Player</div>
+          <div class="sb-panel-header red"> Red Player</div>
           <div class="sb-counters">
             <div class="sb-counter adv">
               <div class="label">⭐ Advantage</div>
@@ -1063,7 +1059,7 @@ input:checked + .toggle-slider:before {
             <button class="btn-adv" onclick="addAdvantage('red')"><span>⭐</span><span>Advantage</span></button>
             <button class="btn-pen" onclick="addPenalty('red')"><span>🟥</span><span>Penalty</span></button>
           </div>
-          <button class="sb-undo-btn" onclick="undoAction('red')">️ Undo</button>
+          <button class="sb-undo-btn" onclick="undoAction('red')">↩️ Undo</button>
         </div>
 
         <div>
@@ -1094,7 +1090,7 @@ input:checked + .toggle-slider:before {
             <button class="btn-adv" onclick="addAdvantage('blue')"><span>⭐</span><span>Advantage</span></button>
             <button class="btn-pen" onclick="addPenalty('blue')"><span>🟥</span><span>Penalty</span></button>
           </div>
-          <button class="sb-undo-btn" onclick="undoAction('blue')">↩️ Undo</button>
+          <button class="sb-undo-btn" onclick="undoAction('blue')">️ Undo</button>
         </div>
       </div>
 
@@ -1111,7 +1107,7 @@ input:checked + .toggle-slider:before {
         <button class="btn btn-settings" onclick="pauseTimer()">⏸ Pause</button>
         <button class="btn btn-players" onclick="finishMatch()">🏁 Finish</button>
         <button class="btn btn-info" onclick="swapPlayers()">🔄 Swap</button>
-        <button class="btn btn-sync" onclick="resetScoreboard()"> Reset</button>
+        <button class="btn btn-sync" onclick="resetScoreboard()">🔄 Reset</button>
       </div>
     </div>
   </div>
@@ -1119,7 +1115,7 @@ input:checked + .toggle-slider:before {
   <div id="view-settings" class="view">
     <div class="section">
       <div class="section-title">
-        <span>️ Settings</span>
+        <span>⚙️ Settings</span>
         <button class="btn btn-back" onclick="showView('players')">← Back to Players</button>
       </div>
       <p style="color: #8899aa; text-align: center; padding: 40px;">Settings coming soon...</p>
@@ -1143,7 +1139,7 @@ let dbConnected = false;
 let currentLang = localStorage.getItem('lang') || 'en';
 
 let AGE_GROUPS = {};
-let ALL_WEIGHTS = []; // ✅ NEW: Store all weights in a flat array
+let ALL_WEIGHTS = [];
 let BELTS = [];
 let WEIGHT_MAP = {};
 let AGE_MAP = {};
@@ -1158,55 +1154,18 @@ let timeLeft = 120;
 let isGoldenTime = false;
 let autoScheduleMode = false;
 
-// Translations
 const translations = {
   en: {
     loading: 'Loading Tournament...',
-    players: 'Players',
-    matches: 'Matches',
-    capacity: 'Capacity',
     step1: 'Step 1: Players Registration',
     step2: 'Step 2: Mats Setup',
-    dashboard: 'Mat Dashboard',
-    addPlayer: ' Add Player',
-    add10: ' Add 10',
-    sync: ' Sync with DB',
-    proceed: 'Proceed to Mats Setup →',
-    matsSetup: ' Mats Setup',
-    back: '← Back to Players',
-    numberOfMats: 'Number of Mats:',
-    openDashboard: ' Open Mat Dashboard →',
-    matDashboard: '📋 Mat Dashboard',
-    openNewTab: ' Open Mat in New Tab',
-    backToMats: '← Back to Mats',
-    categories: '📋 Categories',
-    queue: ' Queue',
-    callup: ' Call-Up',
-    standings: ' Standings'
+    dashboard: 'Mat Dashboard'
   },
   ar: {
     loading: 'جاري تحميل البطولة...',
-    players: 'لاعبين',
-    matches: 'مباريات',
-    capacity: 'السعة',
     step1: 'الخطوة 1: تسجيل اللاعبين',
     step2: 'الخطوة 2: إعداد الحصائر',
-    dashboard: 'لوحة تحكم الحصة',
-    addPlayer: '➕ إضافة لاعب',
-    add10: '➕ إضافة 10',
-    sync: '🔄 مزامنة مع قاعدة البيانات',
-    proceed: 'الانتقال إلى إعداد الحصائر ←',
-    matsSetup: '🥋 إعداد الحصائر',
-    back: '← العودة للاعبين',
-    numberOfMats: 'عدد الحصائر:',
-    openDashboard: ' فتح لوحة التحكم ←',
-    matDashboard: ' لوحة تحكم الحصة',
-    openNewTab: '🪟 فتح في نافذة جديدة',
-    backToMats: '← العودة للحصائر',
-    categories: '📋 التصنيفات',
-    queue: '📋 الطابور',
-    callup: '📢 الاستدعاء',
-    standings: ' الترتيب'
+    dashboard: 'لوحة تحكم الحصة'
   }
 };
 
@@ -1215,7 +1174,7 @@ window.onload = async function() {
   currentTournamentId = urlParams.get('tournament_id');
   
   if (!currentTournamentId) {
-    alert('⚠️ No tournament selected! Redirecting to dashboard...');
+    alert('️ No tournament selected! Redirecting to dashboard...');
     window.location.href = 'organizer-dashboard.html';
     return;
   }
@@ -1246,7 +1205,7 @@ async function loadTournamentDetails() {
 
   if (error || !tournament) {
     console.error('Tournament not found:', error);
-    alert('⚠️ Tournament not found or you do not have permission!');
+    alert('️ Tournament not found or you do not have permission!');
     window.location.href = 'organizer-dashboard.html';
     return;
   }
@@ -1304,7 +1263,7 @@ async function loadReferenceData() {
     });
     console.log(`✅ Loaded ${Object.keys(AGE_GROUPS).length} age divisions`);
     
-    // ✅ CORRECTED: Load ALL weights into a flat array
+    // ✅ FIXED: Load unique weights only (remove duplicates by name)
     const { data: weightData, error: weightError } = await dbClient
       .from('ajp_weight_classes')
       .select('id, name, gender, min_weight, max_weight')
@@ -1314,19 +1273,25 @@ async function loadReferenceData() {
     
     ALL_WEIGHTS = [];
     WEIGHT_MAP = {};
+    const seenWeightNames = new Set();
     
     weightData.forEach(wc => {
-      ALL_WEIGHTS.push({
-        id: wc.id,
-        name: wc.name,
-        gender: wc.gender || 'Men',
-        min_weight: wc.min_weight,
-        max_weight: wc.max_weight
-      });
-      WEIGHT_MAP[wc.id] = wc.name;
+      // ✅ Only add if this weight name hasn't been seen before
+      if (!seenWeightNames.has(wc.name)) {
+        seenWeightNames.add(wc.name);
+        
+        ALL_WEIGHTS.push({
+          id: wc.id,
+          name: wc.name,
+          gender: wc.gender || 'Men',
+          min_weight: wc.min_weight,
+          max_weight: wc.max_weight
+        });
+        WEIGHT_MAP[wc.id] = wc.name;
+      }
     });
     
-    console.log(`✅ Loaded ${ALL_WEIGHTS.length} weight classes`);
+    console.log(`✅ Loaded ${ALL_WEIGHTS.length} unique weight classes (from ${weightData.length} total)`);
     
     const { data: beltData, error: beltError } = await dbClient
       .from('ajp_belt_levels')
@@ -1360,13 +1325,11 @@ function getGenderOptions(ageGroup) {
   return ['Men', 'Women'];
 }
 
-// ✅ CORRECTED: Return all weights or filter by gender if needed
-function getWeightOptions(gender, ageGroup) {
-  // Return all unique weight names
+function getWeightOptions() {
   return ALL_WEIGHTS;
 }
 
-function getBeltOptions(ageGroup) {
+function getBeltOptions() {
   return [...new Set(BELTS.map(b => b.name))];
 }
 
@@ -1438,7 +1401,7 @@ async function loadPlayersFromDB() {
     renderPlayers();
     updatePlayerCount();
   } catch (error) {
-    console.error(' Error loading players:', error);
+    console.error('❌ Error loading players:', error);
     updateDBStatus('Error: ' + error.message, '#ef4444');
   }
 }
@@ -1600,12 +1563,12 @@ function renderPlayers() {
       `<option ${p.gender === g ? 'selected' : ''}>${g}</option>`
     ).join('');
     
-    // ✅ CORRECTED: Show all weights
+    // ✅ FIXED: Show unique weights only
     const weightOptions = ALL_WEIGHTS
       .map(w => `<option value="${w.name}" ${p.weight === w.name ? 'selected' : ''}>${w.name}</option>`)
       .join('');
     
-    const beltOptions = getBeltOptions(p.ageGroup)
+    const beltOptions = getBeltOptions()
       .map(b => `<option ${p.belt === b ? 'selected' : ''}>${b}</option>`)
       .join('');
     
@@ -1616,10 +1579,10 @@ function renderPlayers() {
       <td><input type="text" value="${p.team}" onchange="updatePlayerField(${i}, 'team', this.value)"></td>
       <td><select onchange="updatePlayerField(${i}, 'ageGroup', this.value)">${ageOptions}</select></td>
       <td><select onchange="updatePlayerField(${i}, 'gender', this.value)">${genderOptions}</select></td>
-      <td><select onchange="updatePlayerField(${i}, 'weight', this.value)">${weightOptions || '<option value="">-- Select --</option>'}</select></td>
+      <td><select onchange="updatePlayerField(${i}, 'weight', this.value)"><option value="">-- Select --</option>${weightOptions}</select></td>
       <td><select onchange="updatePlayerField(${i}, 'belt', this.value)">${beltOptions}</select></td>
       <td><input type="number" value="${p.rank}" style="width: 60px" onchange="updatePlayerField(${i}, 'rank', parseInt(this.value))" min="1"></td>
-      <td><button class="btn-delete" onclick="deletePlayer(${i})"></button></td>
+      <td><button class="btn-delete" onclick="deletePlayer(${i})">✕</button></td>
     `;
     tbody.appendChild(tr);
   });
@@ -1707,7 +1670,7 @@ async function loadMats() {
     renderMats();
     console.log(`✅ Loaded ${mats.length} mats`);
   } catch (error) {
-    console.error(' Error loading mats:', error);
+    console.error('❌ Error loading mats:', error);
   }
 }
 
@@ -1909,10 +1872,10 @@ function renderCategories() {
     return `
       <div onclick="openCategoryBracket('${cat.key}', '${cat.gender}', '${cat.ageGroup}', '${cat.weight}', '${cat.belt}')" style="background: #151d2b; border: 2px solid #2a3548; border-radius: 10px; padding: 20px; cursor: pointer; transition: all 0.3s;">
         <h3 style="color: #fbbf24; margin-bottom: 10px; font-size: 1.2rem;">
-          ${cat.gender} |  ${cat.ageGroup} | ⚖️ ${cat.weight} | 🎗️ ${cat.belt}
+          ${cat.gender} | 🏅 ${cat.ageGroup} | ⚖️ ${cat.weight} | ️ ${cat.belt}
         </h3>
         <div style="color: #8899aa; font-size: 0.9rem; margin-bottom: 10px;">
-          👥 ${cat.players.length} Players | ⏱️ ${fightTime} min |  Bracket System
+           ${cat.players.length} Players | ⏱️ ${fightTime} min | 🏆 Bracket System
         </div>
         <div style="font-size: 0.85rem; color: #556;">
           Players: ${cat.players.map(p => p.name).join(', ')}
@@ -2102,7 +2065,7 @@ function renderMatchSchedule(cat) {
     round.forEach((match, mIdx) => {
       const status = match.suspended ? '⏸️ Suspended' : 
                      match.bye ? '✅ BYE' : 
-                     match.status === 'completed' ? '✅ Completed' : ' Pending';
+                     match.status === 'completed' ? '✅ Completed' : '⏳ Pending';
       
       const winner = match.winner === 'red' ? (match.p1?.name || 'TBD') :
                      match.winner === 'blue' ? (match.p2?.name || 'TBD') : '-';
@@ -2120,7 +2083,7 @@ function renderMatchSchedule(cat) {
               <button onclick="editMatch(${rIdx}, ${mIdx})" style="padding: 5px 10px; background: #3b82f6; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">✏️ Edit</button>
               ${!match.bye ? `
                 <button onclick="toggleMatchSuspension(${rIdx}, ${mIdx})" style="padding: 5px 10px; background: ${match.suspended ? '#22c55e' : '#f59e0b'}; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem;">
-                  ${match.suspended ? '▶️' : '⏸️'}
+                  ${match.suspended ? '▶️' : '️'}
                 </button>
               ` : ''}
             </div>
@@ -2155,7 +2118,7 @@ function editMatch(rIdx, mIdx) {
   modal.className = 'winner-modal';
   modal.innerHTML = `
     <div class="winner-modal-content">
-      <h3 style="color: #fbbf24; margin-bottom: 20px;">️ Edit Match: ${match.id}</h3>
+      <h3 style="color: #fbbf24; margin-bottom: 20px;">✏️ Edit Match: ${match.id}</h3>
       
       <div style="margin-bottom: 20px;">
         <label style="display: block; color: #8899aa; margin-bottom: 8px;">🔴 Red Player:</label>
@@ -2174,7 +2137,7 @@ function editMatch(rIdx, mIdx) {
       </div>
       
       <div style="display: flex; gap: 10px;">
-        <button onclick="saveMatchEdit(${rIdx}, ${mIdx})" class="winner-btn" style="background: #22c55e; margin-bottom: 0;">💾 Save</button>
+        <button onclick="saveMatchEdit(${rIdx}, ${mIdx})" class="winner-btn" style="background: #22c55e; margin-bottom: 0;"> Save</button>
         <button onclick="this.closest('.winner-modal').remove()" class="winner-btn cancel" style="margin-bottom: 0;">❌ Cancel</button>
       </div>
     </div>
@@ -2211,7 +2174,7 @@ function toggleMatchSuspension(rIdx, mIdx) {
   const match = cat.rounds[rIdx][mIdx];
   match.suspended = !match.suspended;
   renderBracket();
-  showNotification(match.suspended ? '⏸️ Match suspended!' : '▶️ Match resumed!');
+  showNotification(match.suspended ? '️ Match suspended!' : '▶️ Match resumed!');
 }
 
 function showWinnerSelection(match) {
@@ -2223,7 +2186,7 @@ function showWinnerSelection(match) {
   
   modal.innerHTML = `
     <div class="winner-modal-content">
-      <h2 style="color: #fbbf24; margin-bottom: 20px; font-size: 2rem;"> Select Winner</h2>
+      <h2 style="color: #fbbf24; margin-bottom: 20px; font-size: 2rem;">🏆 Select Winner</h2>
       
       <div style="background: #0f1724; padding: 20px; border-radius: 10px; margin-bottom: 30px;">
         <div style="font-size: 1.3rem; font-weight: bold; color: #fff; margin-bottom: 10px;">
@@ -2234,10 +2197,10 @@ function showWinnerSelection(match) {
         </div>
       </div>
       
-      <button onclick="selectWinner('red')" class="winner-btn red">🔴 ${redName} Wins</button>
-      <button onclick="selectWinner('blue')" class="winner-btn blue"> ${blueName} Wins</button>
+      <button onclick="selectWinner('red')" class="winner-btn red"> ${redName} Wins</button>
+      <button onclick="selectWinner('blue')" class="winner-btn blue">🔵 ${blueName} Wins</button>
       <button onclick="selectWinner('draw')" class="winner-btn draw">🤝 Draw</button>
-      <button onclick="this.closest('.winner-modal').remove()" class="winner-btn cancel"> Cancel</button>
+      <button onclick="this.closest('.winner-modal').remove()" class="winner-btn cancel">❌ Cancel</button>
     </div>
   `;
   
@@ -2259,7 +2222,7 @@ function selectWinner(winner) {
   
   const winnerName = winner === 'red' ? match.p1?.name : 
                      winner === 'blue' ? match.p2?.name : 'Draw';
-  showNotification(` ${winnerName} wins!`);
+  showNotification(`🏆 ${winnerName} wins!`);
 }
 
 function startBracketMatch(rIdx, mIdx) {
@@ -2298,7 +2261,7 @@ function startBracketMatch(rIdx, mIdx) {
 function toggleScheduleMode() {
   autoScheduleMode = document.getElementById('autoScheduleToggle').checked;
   renderQueue();
-  showNotification(autoScheduleMode ? ' Auto-Schedule Mode ON' : ' Manual Mode ON');
+  showNotification(autoScheduleMode ? '🤖 Auto-Schedule Mode ON' : '✋ Manual Mode ON');
 }
 
 function renderQueue() {
@@ -2342,7 +2305,7 @@ function renderQueue() {
             ${m.p1 ? m.p1.name : 'TBD'} vs ${m.p2 ? m.p2.name : 'TBD'}
           </div>
           <div class="match-queue-details">
-            ⚖️ ${cat.weight} |  ${cat.ageGroup} | ${cat.gender} | ️ ${cat.belt} | ${m.id}
+            ️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt} | ${m.id}
           </div>
         </div>
         <div class="match-queue-actions">
@@ -2406,10 +2369,10 @@ function renderCallUp() {
         ${next.p1 ? next.p1.name : 'TBD'} vs ${next.p2 ? next.p2.name : 'TBD'}
       </div>
       <div style="color: #8899aa; margin-bottom: 20px; font-size: 1.1rem;">
-        ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | ️ ${cat.belt}
+        ⚖️ ${cat.weight} | 🏅 ${cat.ageGroup} | ${cat.gender} | 🎗️ ${cat.belt}
       </div>
       <div style="display: flex; gap: 15px; justify-content: center;">
-        <button class="btn btn-add" onclick="callPlayer('${next.p1 ? next.p1.name : 'Player 1'}')"> Call ${next.p1 ? next.p1.name : 'Player 1'}</button>
+        <button class="btn btn-add" onclick="callPlayer('${next.p1 ? next.p1.name : 'Player 1'}')">📢 Call ${next.p1 ? next.p1.name : 'Player 1'}</button>
         <button class="btn btn-add" onclick="callPlayer('${next.p2 ? next.p2.name : 'Player 2'}')">📢 Call ${next.p2 ? next.p2.name : 'Player 2'}</button>
       </div>
     </div>
@@ -2429,7 +2392,7 @@ function callPlayer(playerName) {
     oscillator.start();
     setTimeout(() => oscillator.stop(), 500);
   } catch (e) { console.log('Audio not supported'); }
-  showNotification(` Calling: ${playerName}`);
+  showNotification(`📢 Calling: ${playerName}`);
 }
 
 function renderStandings() {
@@ -2483,7 +2446,7 @@ function renderStandings() {
         ${sortedPlayers.map((p, i) => `
           <tr style="border-bottom: 1px solid #2a3548;">
             <td style="padding: 10px; text-align: center; font-weight: bold; font-size: 1.2rem;">
-              ${i === 0 ? '🥇' : i === 1 ? '' : i === 2 ? '' : i + 1}
+              ${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}
             </td>
             <td style="padding: 10px;"><strong>${p.name}</strong></td>
             <td style="padding: 10px;">${p.team || 'N/A'}</td>
@@ -2616,7 +2579,7 @@ function activateGoldenTime() {
   timeLeft = goldenMinutes * 60;
   isGoldenTime = true;
   updateTimerDisplay();
-  showNotification(` Golden Time Activated! ${goldenMinutes} min`);
+  showNotification(`⚡ Golden Time Activated! ${goldenMinutes} min`);
 }
 
 function swapPlayers() {
