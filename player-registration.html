@@ -172,7 +172,7 @@
 
         const translations = {
             ar: {
-                pageTitle: ' التسجيل في البطولة', pageSubtitle: 'قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة',
+                pageTitle: '🏆 التسجيل في البطولة', pageSubtitle: 'قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة',
                 personalInfo: '👤 بياناتك الشخصية (من الحساب)', loading: 'جاري تحميل البيانات...',
                 currentReg: '📋 تسجيلاتك الحالية في البطولة', regCount: 'تسجيل',
                 participationData: '📝 بيانات المشاركة في البطولة (قابل للتعديل)',
@@ -189,10 +189,10 @@
                 confirmDelete: 'هل أنت متأكد من حذف هذا التسجيل؟', loginRequired: '❌ يرجى تسجيل الدخول أولاً!',
                 invalidData: '❌ بيانات غير صحيحة!', email: 'البريد الإلكتروني', gender: 'الجنس',
                 country: 'الدولة', male: 'ذكر', female: 'أنثى', unspecified: 'غير محدد',
-                category: 'الفئة', type: 'النوع', delete: '️ حذف', registration: 'تسجيل'
+                category: 'الفئة', type: 'النوع', delete: '🗑️ حذف', registration: 'تسجيل'
             },
             en: {
-                pageTitle: ' Tournament Registration', pageSubtitle: 'Register for the tournament - You can register multiple times for different categories',
+                pageTitle: '🏆 Tournament Registration', pageSubtitle: 'Register for the tournament - You can register multiple times for different categories',
                 personalInfo: '👤 Personal Information (From Account)', loading: 'Loading data...',
                 currentReg: '📋 Your Current Registrations', regCount: 'Registration(s)',
                 participationData: '📝 Tournament Participation Data (Editable)',
@@ -205,15 +205,14 @@
                 selectBelt: 'Select belt...', selectTeam: 'Select team...', noTeams: 'No teams registered',
                 gi: 'Gi', noGi: 'No-Gi', selectGi: 'Select...',
                 successAdd: '✅ Registration added successfully!', successDelete: '✅ Registration deleted successfully!',
-                errorDelete: '❌ Error deleting: ', errorRegister: ' Error registering: ',
-                confirmDelete: 'Are you sure you want to delete this registration?', loginRequired: '❌ Please login first!',
-                invalidData: '❌ Invalid data!', email: 'Email', gender: 'Gender',
+                errorDelete: '❌ Error deleting: ', errorRegister: '❌ Error registering: ',
+                confirmDelete: 'Are you sure you want to delete this registration?', loginRequired: ' Please login first!',
+                invalidData: ' Invalid data!', email: 'Email', gender: 'Gender',
                 country: 'Country', male: 'Male', female: 'Female', unspecified: 'Unspecified',
-                category: 'Category', type: 'Type', delete: '🗑️ Delete', registration: 'Registration'
+                category: 'Category', type: 'Type', delete: '️ Delete', registration: 'Registration'
             }
         };
 
-        // ✅ إصلاح: فحص null لكل عنصر قبل التحديث
         function safeSetText(id, text) {
             const el = document.getElementById(id);
             if (el) el.textContent = text;
@@ -231,8 +230,6 @@
             if (btnEn) btnEn.classList.toggle('active', lang === 'en');
             
             const t = translations[lang];
-            
-            // ✅ استخدام safeSetText بدلاً من التعيين المباشر
             safeSetText('pageTitle', t.pageTitle);
             safeSetText('pageSubtitle', t.pageSubtitle);
             safeSetText('personalInfoTitle', t.personalInfo);
@@ -252,7 +249,6 @@
             safeSetText('submitBtn', t.submit);
             safeSetText('backBtn', t.back);
             
-            // تحديث القوائم المنسدلة فقط إذا كانت فارغة أو تحتوي على خيار واحد
             const ageSelect = document.getElementById('ageGroup');
             if (ageSelect && ageSelect.options.length <= 1) {
                 ageSelect.options[0].textContent = t.selectAge;
@@ -303,21 +299,43 @@
         async function loadAgeDivisions() {
             const { data, error } = await supabaseClient.from('ajp_age_divisions').select('id, name, min_age, max_age').order('min_age');
             if (error) {
-                console.error('❌ خطأ في جلب الفئات العمرية (قد يكون بسبب RLS):', error);
+                console.error('❌ خطأ في جلب الفئات العمرية:', error);
             } else {
                 console.log('✅ Age divisions loaded:', data?.length || 0);
-                if (data && data.length > 0) {
-                    console.log('📊 Sample age division:', JSON.stringify(data[0]));
-                }
             }
             return data || [];
         }
 
         async function loadWeightCategories() {
-            const { data, error } = await supabaseClient.from('ajp_weight_classes').select('id, name, min_weight, max_weight, gender, age_division_id').order('min_weight');
-            if (error) console.error(' خطأ في جلب الأوزان:', error);
-            else console.log('✅ Weight categories loaded from ajp_weight_classes:', data?.length || 0);
-            return data || [];
+            // ✅ استخراج البيانات من جدول ajp_weight_classes
+            const { data, error } = await supabaseClient
+                .from('ajp_weight_classes')
+                .select('id, name, min_weight, max_weight, gender, age_division_id')
+                .order('min_weight');
+            
+            if (error) {
+                console.error('❌ خطأ في جلب الأوزان من ajp_weight_classes:', error);
+                return [];
+            }
+            
+            console.log('✅ Weight categories loaded from ajp_weight_classes:', data?.length || 0);
+            
+            // ✅ إزالة التكرار بناءً على اسم الوزن فقط
+            const uniqueWeights = [];
+            const seenNames = new Set();
+            
+            if (data) {
+                data.forEach(w => {
+                    if (!seenNames.has(w.name)) {
+                        seenNames.add(w.name);
+                        uniqueWeights.push(w);
+                    }
+                });
+            }
+            
+            console.log('✅ Unique weights after removing duplicates:', uniqueWeights.length);
+            weightCategories = uniqueWeights;
+            return uniqueWeights;
         }
 
         async function loadBeltLevels() {
@@ -328,7 +346,7 @@
 
         async function loadTeams() {
             const { data, error } = await supabaseClient.from('teams').select('name, city, country').eq('is_active', true).order('name');
-            if (error) console.error('❌ خطأ في جلب الفرق:', error);
+            if (error) console.error(' خطأ في جلب الفرق:', error);
             return data || [];
         }
 
@@ -340,7 +358,6 @@
             return existingRegistrations;
         }
 
-        // ✅ إصلاح: بناء HTML كامل للقائمة بدلاً من appendChild
         function populateAgeDivisions() {
             const select = document.getElementById('ageGroup');
             if (!select) {
@@ -352,11 +369,10 @@
             
             if (!ageDivisions || ageDivisions.length === 0) {
                 select.innerHTML = `<option value="">${t.noAge}</option>`;
-                console.warn('⚠️ جدول ajp_age_divisions فارغ أو محجوب بسبب سياسات RLS.');
+                console.warn('⚠️ جدول ajp_age_divisions فارغ أو محجوب.');
                 return;
             }
             
-            // ✅ بناء HTML كامل دفعة واحدة
             let optionsHTML = `<option value="">${t.selectAge}</option>`;
             
             ageDivisions.forEach((div, index) => {
@@ -371,7 +387,6 @@
             
             select.innerHTML = optionsHTML;
             console.log('✅ Populated', ageDivisions.length, 'age divisions');
-            console.log('📊 First option value:', select.options[1]?.value);
         }
 
         function populateBeltLevels() {
@@ -421,20 +436,26 @@
             
             if (!weightCategories || weightCategories.length === 0) {
                 weightSelect.innerHTML = `<option value="">${t.noWeights}</option>`;
+                console.warn('️ weightCategories array is empty!');
                 return;
             }
+            
+            console.log('🔄 Updating weights for division:', selectedAgeDivisionId);
+            console.log('Total weights in array:', weightCategories.length);
             
             const genderMap = { 'Male': 'Men', 'Female': 'Women', 'Men': 'Men', 'Women': 'Women', 'Boys': 'Boys', 'Girls': 'Girls' };
             const targetGender = genderMap[currentPlayer?.gender] || 'Men';
             
-            // استخراج البيانات من ajp_weight_classes: مطابقة الفئة العمرية أو كونها عامة (null)، ومطابقة الجنس أو كونه عاماً
+            // ✅ فلترة الأوزان: مطابقة الفئة العمرية أو كونها عامة (null)، ومطابقة الجنس أو كونه عاماً
             const filteredWeights = weightCategories.filter(w => {
                 const ageMatch = (w.age_division_id === null || String(w.age_division_id) === String(selectedAgeDivisionId));
                 const genderMatch = (w.gender === 'All' || w.gender === null || w.gender === targetGender);
                 return ageMatch && genderMatch;
             });
             
-            // إزالة التكرار لضمان ظهور كل وزن مرة واحدة فقط
+            console.log('Filtered weights count:', filteredWeights.length);
+            
+            // ✅ إزالة التكرار (مزدوج للتأكد)
             const uniqueWeights = [];
             const seenNames = new Set();
             filteredWeights.forEach(w => {
@@ -443,6 +464,8 @@
                     uniqueWeights.push(w);
                 }
             });
+            
+            console.log('Unique weights after filtering:', uniqueWeights.length);
             
             if (uniqueWeights.length === 0) {
                 weightSelect.innerHTML = `<option value="">${t.noWeights}</option>`;
@@ -534,7 +557,7 @@
 
             await loadPlayerData(user.id);
             ageDivisions = await loadAgeDivisions();
-            weightCategories = await loadWeightCategories();
+            weightCategories = await loadWeightCategories(); // ✅ يتم الاستخراج من ajp_weight_classes
             beltLevels = await loadBeltLevels();
             
             populateAgeDivisions();
