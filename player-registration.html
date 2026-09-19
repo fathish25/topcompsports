@@ -133,6 +133,7 @@
                             <option value="">اختر...</option>
                             <option value="Gi">بدلة (Gi)</option>
                             <option value="No-Gi">بدون بدلة (No-Gi)</option>
+                            <option value="Grappling">Grappling</option>
                         </select>
                     </div>
                 </div>
@@ -180,10 +181,10 @@
                 giType: 'نوع المشاركة *', team: 'اسم الفريق / الأكاديمية *',
                 ranking: 'التصنيف (Ranking) - اختياري', rankingPlaceholder: '0 = غير مصنف | 1-10 = محلي | 1-100 = دولي',
                 submit: '✅ إضافة تسجيل جديد', back: '← العودة للصفحة الرئيسية',
-                selectAge: 'اختر الفئة العمرية...', noAge: 'لا توجد فئات متاحة (تحقق من RLS أو بيانات الجدول)',
+                selectAge: 'اختر الفئة العمرية...', noAge: 'لا توجد فئات متاحة',
                 selectWeightFirst: 'اختر الفئة العمرية أولاً', noWeights: 'لا توجد موازين متاحة',
                 selectBelt: 'اختر الحزام...', selectTeam: 'اختر الفريق...', noTeams: 'لا توجد فرق مسجلة',
-                gi: 'بدلة (Gi)', noGi: 'بدون بدلة (No-Gi)', selectGi: 'اختر...',
+                gi: 'بدلة (Gi)', noGi: 'بدون بدلة (No-Gi)', grappling: 'Grappling', selectGi: 'اختر...',
                 successAdd: '✅ تم إضافة التسجيل بنجاح!', successDelete: '✅ تم حذف التسجيل بنجاح!',
                 errorDelete: '❌ خطأ في الحذف: ', errorRegister: '❌ خطأ في التسجيل: ',
                 confirmDelete: 'هل أنت متأكد من حذف هذا التسجيل؟', loginRequired: '❌ يرجى تسجيل الدخول أولاً!',
@@ -200,16 +201,16 @@
                 giType: 'Participation Type *', team: 'Team / Academy Name *',
                 ranking: 'Ranking - Optional', rankingPlaceholder: '0 = Unranked | 1-10 = Local | 1-100 = International',
                 submit: '✅ Add New Registration', back: '← Back to Home',
-                selectAge: 'Select age group...', noAge: 'No categories available (Check DB/RLS)',
+                selectAge: 'Select age group...', noAge: 'No categories available',
                 selectWeightFirst: 'Select age group first', noWeights: 'No weights available',
                 selectBelt: 'Select belt...', selectTeam: 'Select team...', noTeams: 'No teams registered',
-                gi: 'Gi', noGi: 'No-Gi', selectGi: 'Select...',
+                gi: 'Gi', noGi: 'No-Gi', grappling: 'Grappling', selectGi: 'Select...',
                 successAdd: '✅ Registration added successfully!', successDelete: '✅ Registration deleted successfully!',
                 errorDelete: '❌ Error deleting: ', errorRegister: '❌ Error registering: ',
-                confirmDelete: 'Are you sure you want to delete this registration?', loginRequired: ' Please login first!',
-                invalidData: ' Invalid data!', email: 'Email', gender: 'Gender',
+                confirmDelete: 'Are you sure you want to delete this registration?', loginRequired: '❌ Please login first!',
+                invalidData: '❌ Invalid data!', email: 'Email', gender: 'Gender',
                 country: 'Country', male: 'Male', female: 'Female', unspecified: 'Unspecified',
-                category: 'Category', type: 'Type', delete: '️ Delete', registration: 'Registration'
+                category: 'Category', type: 'Type', delete: '🗑️ Delete', registration: 'Registration'
             }
         };
 
@@ -249,29 +250,11 @@
             safeSetText('submitBtn', t.submit);
             safeSetText('backBtn', t.back);
             
-            const ageSelect = document.getElementById('ageGroup');
-            if (ageSelect && ageSelect.options.length <= 1) {
-                ageSelect.options[0].textContent = t.selectAge;
-            }
-            
-            const weightSelect = document.getElementById('weight');
-            if (weightSelect && weightSelect.disabled) {
-                weightSelect.options[0].textContent = t.selectWeightFirst;
-            }
-            
-            const beltSelect = document.getElementById('belt');
-            if (beltSelect && beltSelect.options.length <= 1) {
-                beltSelect.options[0].textContent = t.selectBelt;
-            }
-            
-            const teamSelect = document.getElementById('teamSelect');
-            if (teamSelect && teamSelect.options.length <= 1) {
-                teamSelect.options[0].textContent = t.selectTeam;
-            }
-            
             const giSelect = document.getElementById('giType');
-            if (giSelect && giSelect.options[0] && giSelect.options[0].value === '') {
-                giSelect.innerHTML = `<option value="">${t.selectGi}</option><option value="Gi">${t.gi}</option><option value="No-Gi">${t.noGi}</option>`;
+            if (giSelect) {
+                const currentValue = giSelect.value;
+                giSelect.innerHTML = `<option value="">${t.selectGi}</option><option value="Gi">${t.gi}</option><option value="No-Gi">${t.noGi}</option><option value="Grappling">${t.grappling}</option>`;
+                giSelect.value = currentValue;
             }
 
             if (currentPlayer) displayPlayerInfo();
@@ -307,20 +290,19 @@
         }
 
         async function loadWeightCategories() {
-            // ✅ استخراج البيانات من جدول ajp_weight_classes
             const { data, error } = await supabaseClient
                 .from('ajp_weight_classes')
                 .select('id, name, min_weight, max_weight, gender, age_division_id')
                 .order('min_weight');
             
             if (error) {
-                console.error('❌ خطأ في جلب الأوزان من ajp_weight_classes:', error);
+                console.error('❌ خطأ في جلب الأوزان:', error);
                 return [];
             }
             
             console.log('✅ Weight categories loaded from ajp_weight_classes:', data?.length || 0);
             
-            // ✅ إزالة التكرار بناءً على اسم الوزن فقط
+            // إزالة التكرار
             const uniqueWeights = [];
             const seenNames = new Set();
             
@@ -346,7 +328,7 @@
 
         async function loadTeams() {
             const { data, error } = await supabaseClient.from('teams').select('name, city, country').eq('is_active', true).order('name');
-            if (error) console.error(' خطأ في جلب الفرق:', error);
+            if (error) console.error('❌ خطأ في جلب الفرق:', error);
             return data || [];
         }
 
@@ -360,16 +342,12 @@
 
         function populateAgeDivisions() {
             const select = document.getElementById('ageGroup');
-            if (!select) {
-                console.error('❌ عنصر ageGroup غير موجود في DOM!');
-                return;
-            }
+            if (!select) return;
             
             const t = translations[currentLang];
             
             if (!ageDivisions || ageDivisions.length === 0) {
                 select.innerHTML = `<option value="">${t.noAge}</option>`;
-                console.warn('⚠️ جدول ajp_age_divisions فارغ أو محجوب.');
                 return;
             }
             
@@ -420,11 +398,16 @@
             });
         }
 
+        // ✅ إصلاح: عرض جميع الأوزان المتاحة بدون فلترة صارمة
         function updateWeightOptions() {
             const selectedAgeDivisionId = document.getElementById('ageGroup').value;
             const weightSelect = document.getElementById('weight');
             if (!weightSelect) return;
             const t = translations[currentLang];
+            
+            console.log('🔄 Updating weights...');
+            console.log('Selected Age Division:', selectedAgeDivisionId);
+            console.log('Total weights available:', weightCategories.length);
             
             weightSelect.innerHTML = `<option value="">${t.loading}</option>`;
             weightSelect.disabled = true;
@@ -436,26 +419,37 @@
             
             if (!weightCategories || weightCategories.length === 0) {
                 weightSelect.innerHTML = `<option value="">${t.noWeights}</option>`;
-                console.warn('️ weightCategories array is empty!');
                 return;
             }
-            
-            console.log('🔄 Updating weights for division:', selectedAgeDivisionId);
-            console.log('Total weights in array:', weightCategories.length);
             
             const genderMap = { 'Male': 'Men', 'Female': 'Women', 'Men': 'Men', 'Women': 'Women', 'Boys': 'Boys', 'Girls': 'Girls' };
             const targetGender = genderMap[currentPlayer?.gender] || 'Men';
             
-            // ✅ فلترة الأوزان: مطابقة الفئة العمرية أو كونها عامة (null)، ومطابقة الجنس أو كونه عاماً
-            const filteredWeights = weightCategories.filter(w => {
-                const ageMatch = (w.age_division_id === null || String(w.age_division_id) === String(selectedAgeDivisionId));
-                const genderMatch = (w.gender === 'All' || w.gender === null || w.gender === targetGender);
+            // ✅ فلترة مرنة جداً: تعرض كل الأوزان المتاحة
+            let filteredWeights = weightCategories.filter(w => {
+                // عرض الوزن إذا كان عاماً أو يطابق الفئة
+                const ageMatch = (w.age_division_id === null || 
+                                 w.age_division_id === undefined || 
+                                 String(w.age_division_id) === String(selectedAgeDivisionId));
+                
+                // عرض الوزن إذا كان للجنس العام أو يطابق
+                const genderMatch = (w.gender === 'All' || 
+                                    w.gender === null || 
+                                    w.gender === undefined ||
+                                    w.gender === targetGender);
+                
                 return ageMatch && genderMatch;
             });
             
-            console.log('Filtered weights count:', filteredWeights.length);
+            // إذا لم يتم العثور على أوزان، اعرض كل الأوزان المتاحة (fallback)
+            if (filteredWeights.length === 0) {
+                console.warn('⚠️ No weights matched strict filter. Showing all weights...');
+                filteredWeights = weightCategories;
+            }
             
-            // ✅ إزالة التكرار (مزدوج للتأكد)
+            console.log('Filtered weights:', filteredWeights.length);
+            
+            // إزالة التكرار
             const uniqueWeights = [];
             const seenNames = new Set();
             filteredWeights.forEach(w => {
@@ -465,18 +459,16 @@
                 }
             });
             
-            console.log('Unique weights after filtering:', uniqueWeights.length);
-            
             if (uniqueWeights.length === 0) {
                 weightSelect.innerHTML = `<option value="">${t.noWeights}</option>`;
             } else {
                 let optionsHTML = '';
                 uniqueWeights.forEach(w => {
-                    optionsHTML += `<option value="${w.name}" data-min-weight="${w.min_weight}" data-max-weight="${w.max_weight}" data-weight-id="${w.id}">${w.name} (${w.min_weight}-${w.max_weight} ${currentLang === 'ar' ? 'كجم' : 'kg'})</option>`;
+                    optionsHTML += `<option value="${w.name}" data-min-weight="${w.min_weight}" data-max-weight="${w.max_weight}" data-weight-id="${w.id || ''}">${w.name} (${w.min_weight}-${w.max_weight} ${currentLang === 'ar' ? 'كجم' : 'kg'})</option>`;
                 });
                 weightSelect.innerHTML = optionsHTML;
                 weightSelect.disabled = false;
-                console.log('✅ Loaded', uniqueWeights.length, 'unique weights from ajp_weight_classes');
+                console.log('✅ Loaded', uniqueWeights.length, 'weights');
             }
         }
 
@@ -553,11 +545,11 @@
             }
 
             currentUserId = user.id;
-            console.log('🚀 Loading data from database tables...');
+            console.log('🚀 Loading data...');
 
             await loadPlayerData(user.id);
             ageDivisions = await loadAgeDivisions();
-            weightCategories = await loadWeightCategories(); // ✅ يتم الاستخراج من ajp_weight_classes
+            weightCategories = await loadWeightCategories();
             beltLevels = await loadBeltLevels();
             
             populateAgeDivisions();
@@ -567,7 +559,7 @@
             populateTeams();
             
             await loadExistingRegistrations();
-            console.log('✅ All data loaded successfully');
+            console.log('✅ All data loaded');
         };
 
         document.getElementById('tournamentForm').addEventListener('submit', async (e) => {
