@@ -104,7 +104,7 @@
         </div>
 
         <div class="section">
-            <div class="section-title" id="participationDataTitle">📝 بيانات المشاركة في البطولة (قابل للتعديل)</div>
+            <div class="section-title" id="participationDataTitle"> بيانات المشاركة في البطولة (قابل للتعديل)</div>
             <form id="tournamentForm">
                 <div class="form-row">
                     <div class="form-group">
@@ -194,16 +194,15 @@
                 selectWeightFirst: 'اختر فئة الجنس أولاً', noWeights: 'لا توجد موازين متاحة',
                 selectBelt: 'اختر الحزام...', selectTeam: 'اختر الفريق...', noTeams: 'لا توجد فرق مسجلة',
                 gi: 'بدلة (Gi)', noGi: 'بدون بدلة (No-Gi)', grappling: 'Grappling', selectGi: 'اختر...',
-                men: 'رجال (Men)', women: 'نساء (Women)', boys: 'أطفال/ناشئين (Boys)', girls: 'بنات/ناشئات (Girls)',
                 successAdd: '✅ تم إضافة التسجيل بنجاح!', successDelete: '✅ تم حذف التسجيل بنجاح!',
                 errorDelete: '❌ خطأ في الحذف: ', errorRegister: '❌ خطأ في التسجيل: ',
                 confirmDelete: 'هل أنت متأكد من حذف هذا التسجيل؟', loginRequired: '❌ يرجى تسجيل الدخول أولاً!',
                 invalidData: '❌ بيانات غير صحيحة!', email: 'البريد الإلكتروني', gender: 'الجنس',
                 country: 'الدولة', male: 'ذكر', female: 'أنثى', unspecified: 'غير محدد',
-                category: 'الفئة', type: 'النوع', delete: '️ حذف', registration: 'تسجيل'
+                category: 'الفئة', type: 'النوع', delete: '🗑️ حذف', registration: 'تسجيل'
             },
             en: {
-                pageTitle: ' Tournament Registration', pageSubtitle: 'Register for the tournament - You can register multiple times for different categories',
+                pageTitle: '🏆 Tournament Registration', pageSubtitle: 'Register for the tournament - You can register multiple times for different categories',
                 personalInfo: ' Personal Information (From Account)', loading: 'Loading data...',
                 currentReg: ' Your Current Registrations', regCount: 'Registration(s)',
                 participationData: ' Tournament Participation Data (Editable)',
@@ -215,7 +214,6 @@
                 selectWeightFirst: 'Select gender category first', noWeights: 'No weights available',
                 selectBelt: 'Select belt...', selectTeam: 'Select team...', noTeams: 'No teams registered',
                 gi: 'Gi', noGi: 'No-Gi', grappling: 'Grappling', selectGi: 'Select...',
-                men: 'Men', women: 'Women', boys: 'Boys', girls: 'Girls',
                 successAdd: '✅ Registration added successfully!', successDelete: '✅ Registration deleted successfully!',
                 errorDelete: '❌ Error deleting: ', errorRegister: ' Error registering: ',
                 confirmDelete: 'Are you sure you want to delete this registration?', loginRequired: ' Please login first!',
@@ -269,7 +267,7 @@
                 giSelect.value = currentValue;
             }
 
-            // تحديث قائمة فئة الجنس (دائماً 4 خيارات)
+            // تحديث قائمة فئة الجنس
             populateGenderCategory();
 
             if (currentPlayer) displayPlayerInfo();
@@ -326,7 +324,7 @@
                 .order('min_weight');
             
             if (error) {
-                console.error('❌ خطأ في جلب الأوزان:', error);
+                console.error(' خطأ في جلب الأوزان:', error);
                 return [];
             }
             
@@ -422,27 +420,30 @@
             console.log('✅ Populated', ageDivisions.length, 'age divisions');
         }
 
-        // ✅ دالة فئة الجنس - تعرض دائماً القيم الأربع الثابتة
         function populateGenderCategory() {
             const select = document.getElementById('genderCategory');
             if (!select) return;
             const t = translations[currentLang];
             
-            // القيم الأربع الثابتة دائماً لجميع اللاعبين
-            const genderOptions = [
-                { value: 'Boys', label: t.boys },
-                { value: 'Girls', label: t.girls },
-                { value: 'Men', label: t.men },
-                { value: 'Women', label: t.women }
-            ];
-            
+            // القيم الثابتة كما طلبت
             let optionsHTML = `<option value="">${t.selectGender}</option>`;
-            genderOptions.forEach(opt => {
-                optionsHTML += `<option value="${opt.value}">${opt.label}</option>`;
-            });
+            
+            if (currentPlayer?.gender === 'Male') {
+                optionsHTML += `<option value="Boys">Boys</option>`;
+                optionsHTML += `<option value="Men">Men</option>`;
+            } else if (currentPlayer?.gender === 'Female') {
+                optionsHTML += `<option value="Girls">Girls</option>`;
+                optionsHTML += `<option value="Women">Women</option>`;
+            } else {
+                // إذا كان الجنس غير محدد، اعرض كل الخيارات
+                optionsHTML += `<option value="Boys">Boys</option>`;
+                optionsHTML += `<option value="Girls">Girls</option>`;
+                optionsHTML += `<option value="Men">Men</option>`;
+                optionsHTML += `<option value="Women">Women</option>`;
+            }
             
             select.innerHTML = optionsHTML;
-            console.log('✅ Populated gender category with 4 fixed options: Boys, Girls, Men, Women');
+            console.log('✅ Populated gender category options');
         }
 
         function populateBeltLevels() {
@@ -452,7 +453,7 @@
             select.innerHTML = `<option value="">${t.selectBelt}</option>`;
             
             if (!beltLevels || beltLevels.length === 0) {
-                console.warn('⚠️ No belt levels available');
+                console.warn('️ No belt levels available');
                 return;
             }
             
@@ -492,7 +493,7 @@
         }
 
         function handleGenderCategoryChange() {
-            console.log(' Gender category changed');
+            console.log('🔄 Gender category changed');
             updateWeightOptions();
         }
 
@@ -513,13 +514,13 @@
             
             console.log('🔍 Selected age division ID:', selectedAgeDivisionId);
             console.log('🔍 Selected gender category:', selectedGenderCategory);
-            console.log('🔍 Total weight categories:', weightCategories.length);
+            console.log(' Total weight categories:', weightCategories.length);
             
             // يجب اختيار فئة الجنس أولاً
             if (!selectedGenderCategory) {
                 weightSelect.innerHTML = `<option value="">${t.selectWeightFirst}</option>`;
                 weightSelect.disabled = true;
-                console.log('⚠️ No gender category selected yet');
+                console.log('️ No gender category selected yet');
                 return;
             }
             
@@ -530,7 +531,7 @@
                 return;
             }
             
-            // فلترة الأوزان حسب فئة الجنس المختارة (Boys, Girls, Men, Women)
+            // فلترة الأوزان حسب فئة الجنس المختارة
             let filteredWeights = weightCategories.filter(w => {
                 if (!w.gender) return true; // إذا لم يكن هناك جنس محدد، اعرض الوزن
                 return w.gender === selectedGenderCategory;
@@ -556,12 +557,12 @@
             if (uniqueWeights.length === 0) {
                 weightSelect.innerHTML = `<option value="">${t.noWeights}</option>`;
                 weightSelect.disabled = true;
-                console.warn('⚠️ No weights found for this gender category');
+                console.warn('️ No weights found for this gender category');
             } else {
                 let optionsHTML = '';
                 uniqueWeights.forEach((w, idx) => {
                     const minW = w.min_weight !== null && w.min_weight !== undefined ? w.min_weight : 0;
-                    const maxW = w.max_weight !== null && w.max_weight !== undefined ? w.max_weight : '∞';
+                    const maxW = w.max_weight !== null && w.max_weight !== undefined ? w.max_weight : '';
                     const unit = currentLang === 'ar' ? 'كجم' : 'kg';
                     
                     optionsHTML += `<option value="${w.name}" data-minweight="${minW}" data-maxweight="${maxW}" data-weightid="${w.id || ''}">${w.name} (${minW}-${maxW} ${unit})</option>`;
@@ -596,6 +597,9 @@
                 <div class="info-row"><span class="info-label">${t.gender}:</span><span class="info-value">${genderText}</span></div>
                 <div class="info-row"><span class="info-label">${t.country}:</span><span class="info-value">${currentPlayer.country || t.unspecified}</span></div>
             `;
+            
+            // تحديث قائمة فئة الجنس بعد تحميل بيانات اللاعب
+            populateGenderCategory();
         }
 
         function displayExistingRegistrations() {
