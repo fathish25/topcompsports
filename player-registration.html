@@ -8,9 +8,33 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; min-height: 100vh; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; }
-        .header { background: rgba(21, 29, 43, 0.95); padding: 30px; border-radius: 16px; margin-bottom: 30px; text-align: center; border: 2px solid #f1c40f; }
-        .header h1 { color: #f1c40f; font-size: 2rem; margin-bottom: 10px; }
+        .container { max-width: 900px; margin: 0 auto; position: relative; }
+        
+        .lang-switcher {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        html[dir="ltr"] .lang-switcher { left: auto; right: 20px; }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            border: 1px solid #f1c40f;
+            background: transparent;
+            color: #f1c40f;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .lang-btn.active { background: #f1c40f; color: #0a0e17; }
+        .lang-btn:hover:not(.active) { background: rgba(241, 196, 15, 0.1); }
+
+        .header { background: rgba(21, 29, 43, 0.95); padding: 30px; border-radius: 16px; margin-bottom: 30px; text-align: center; border: 2px solid #f1c40f; position: relative; }
+        .header h1 { color: #f1c40f; font-size: 2rem; margin-bottom: 10px; margin-top: 30px; }
         .section { background: #151d2b; border-radius: 12px; padding: 25px; margin-bottom: 20px; border: 1px solid #2a3548; }
         .section-title { font-size: 1.3rem; font-weight: bold; color: #f1c40f; margin-bottom: 20px; border-bottom: 2px solid #2a3548; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .form-group { margin-bottom: 20px; }
@@ -45,46 +69,51 @@
         @media (max-width: 600px) { 
             .form-row { grid-template-columns: 1fr; }
             .registration-card-details { grid-template-columns: 1fr; }
+            .lang-switcher { position: relative; top: 0; left: 0; right: 0; margin-bottom: 15px; justify-content: center; }
+            .header h1 { margin-top: 0; font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏆 التسجيل في البطولة</h1>
-            <p style="color: rgba(255,255,255,0.7);">قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة</p>
+            <div class="lang-switcher">
+                <button class="lang-btn active" id="btnAr" onclick="setLanguage('ar')">عربي</button>
+                <button class="lang-btn" id="btnEn" onclick="setLanguage('en')">English</button>
+            </div>
+            <h1 id="pageTitle">🏆 التسجيل في البطولة</h1>
+            <p id="pageSubtitle" style="color: rgba(255,255,255,0.7);">قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة</p>
         </div>
 
         <div id="alert" class="alert"></div>
 
         <div class="section">
-            <div class="section-title">👤 بياناتك الشخصية (من الحساب)</div>
+            <div class="section-title" id="personalInfoTitle">👤 بياناتك الشخصية (من الحساب)</div>
             <div id="playerInfo" class="player-info">
-                <div class="loading">جاري تحميل البيانات...</div>
+                <div class="loading" id="loadingText">جاري تحميل البيانات...</div>
             </div>
         </div>
 
-        <!-- التسجيلات الحالية -->
         <div class="section" id="existingRegistrationsSection" style="display: none;">
             <div class="section-title">
-                <span>📋 تسجيلاتك الحالية في البطولة</span>
+                <span id="currentRegTitle">📋 تسجيلاتك الحالية في البطولة</span>
                 <span id="registrationsCount" style="background: rgba(241,196,15,0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.85rem;"></span>
             </div>
             <div id="existingRegistrations" class="existing-registrations"></div>
         </div>
 
         <div class="section">
-            <div class="section-title">📝 بيانات المشاركة في البطولة (قابل للتعديل)</div>
+            <div class="section-title" id="participationDataTitle">📝 بيانات المشاركة في البطولة (قابل للتعديل)</div>
             <form id="tournamentForm">
                 <div class="form-row">
                     <div class="form-group">
-                        <label>الفئة العمرية *</label>
+                        <label id="ageGroupLabel">الفئة العمرية *</label>
                         <select id="ageGroup" required onchange="updateWeightOptions()">
                             <option value="">جاري تحميل الفئات...</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>الوزن (كجم) *</label>
+                        <label id="weightLabel">الوزن (كجم) *</label>
                         <select id="weight" required disabled>
                             <option value="">اختر الفئة العمرية أولاً</option>
                         </select>
@@ -93,13 +122,13 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label>الحزام *</label>
+                        <label id="beltLabel">الحزام *</label>
                         <select id="belt" required>
                             <option value="">جاري تحميل الأحزمة...</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>نوع المشاركة *</label>
+                        <label id="giTypeLabel">نوع المشاركة *</label>
                         <select id="giType" required>
                             <option value="">اختر...</option>
                             <option value="Gi">بدلة (Gi)</option>
@@ -109,19 +138,19 @@
                 </div>
 
                 <div class="form-group">
-                    <label>اسم الفريق / الأكاديمية *</label>
+                    <label id="teamLabel">اسم الفريق / الأكاديمية *</label>
                     <select id="teamSelect" required>
                         <option value="">جاري تحميل الفرق...</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label>التصنيف (Ranking) - اختياري</label>
+                    <label id="rankingLabel">التصنيف (Ranking) - اختياري</label>
                     <input type="number" id="ranking" placeholder="0 = غير مصنف | 1-10 = محلي | 1-100 = دولي" min="0" value="0">
                 </div>
 
-                <button type="submit" class="btn btn-primary">✅ إضافة تسجيل جديد</button>
-                <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">← العودة للصفحة الرئيسية</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">✅ إضافة تسجيل جديد</button>
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'" id="backBtn">← العودة للصفحة الرئيسية</button>
             </form>
         </div>
     </div>
@@ -129,7 +158,6 @@
     <script>
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
-        
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         let currentPlayer = null;
@@ -138,149 +166,182 @@
         let teamsList = [];
         let ageDivisions = [];
         let beltLevels = [];
-        let availableDivisionIds = [];
         let existingRegistrations = [];
         let currentUserId = null;
+        let currentLang = localStorage.getItem('lang') || 'ar';
+
+        const translations = {
+            ar: {
+                pageTitle: '🏆 التسجيل في البطولة', pageSubtitle: 'قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة',
+                personalInfo: '👤 بياناتك الشخصية (من الحساب)', loading: 'جاري تحميل البيانات...',
+                currentReg: '📋 تسجيلاتك الحالية في البطولة', regCount: 'تسجيل',
+                participationData: '📝 بيانات المشاركة في البطولة (قابل للتعديل)',
+                ageGroup: 'الفئة العمرية *', weight: 'الوزن (كجم) *', belt: 'الحزام *',
+                giType: 'نوع المشاركة *', team: 'اسم الفريق / الأكاديمية *',
+                ranking: 'التصنيف (Ranking) - اختياري', rankingPlaceholder: '0 = غير مصنف | 1-10 = محلي | 1-100 = دولي',
+                submit: '✅ إضافة تسجيل جديد', back: '← العودة للصفحة الرئيسية',
+                selectAge: 'اختر الفئة العمرية...', noAge: 'لا توجد فئات متاحة (تحقق من RLS أو بيانات الجدول)',
+                selectWeightFirst: 'اختر الفئة العمرية أولاً', noWeights: 'لا توجد موازين متاحة',
+                selectBelt: 'اختر الحزام...', selectTeam: 'اختر الفريق...', noTeams: 'لا توجد فرق مسجلة',
+                gi: 'بدلة (Gi)', noGi: 'بدون بدلة (No-Gi)', selectGi: 'اختر...',
+                successAdd: '✅ تم إضافة التسجيل بنجاح!', successDelete: '✅ تم حذف التسجيل بنجاح!',
+                errorDelete: '❌ خطأ في الحذف: ', errorRegister: '❌ خطأ في التسجيل: ',
+                confirmDelete: 'هل أنت متأكد من حذف هذا التسجيل؟', loginRequired: '❌ يرجى تسجيل الدخول أولاً!',
+                invalidData: '❌ بيانات غير صحيحة!', email: 'البريد الإلكتروني', gender: 'الجنس',
+                country: 'الدولة', male: 'ذكر', female: 'أنثى', unspecified: 'غير محدد',
+                category: 'الفئة', type: 'النوع', delete: '🗑️ حذف', registration: 'تسجيل'
+            },
+            en: {
+                pageTitle: '🏆 Tournament Registration', pageSubtitle: 'Register for the tournament - You can register multiple times for different categories',
+                personalInfo: '👤 Personal Information (From Account)', loading: 'Loading data...',
+                currentReg: '📋 Your Current Registrations', regCount: 'Registration(s)',
+                participationData: '📝 Tournament Participation Data (Editable)',
+                ageGroup: 'Age Group *', weight: 'Weight (kg) *', belt: 'Belt *',
+                giType: 'Participation Type *', team: 'Team / Academy Name *',
+                ranking: 'Ranking - Optional', rankingPlaceholder: '0 = Unranked | 1-10 = Local | 1-100 = International',
+                submit: '✅ Add New Registration', back: '← Back to Home',
+                selectAge: 'Select age group...', noAge: 'No categories available (Check DB/RLS)',
+                selectWeightFirst: 'Select age group first', noWeights: 'No weights available',
+                selectBelt: 'Select belt...', selectTeam: 'Select team...', noTeams: 'No teams registered',
+                gi: 'Gi', noGi: 'No-Gi', selectGi: 'Select...',
+                successAdd: '✅ Registration added successfully!', successDelete: '✅ Registration deleted successfully!',
+                errorDelete: '❌ Error deleting: ', errorRegister: '❌ Error registering: ',
+                confirmDelete: 'Are you sure you want to delete this registration?', loginRequired: '❌ Please login first!',
+                invalidData: '❌ Invalid data!', email: 'Email', gender: 'Gender',
+                country: 'Country', male: 'Male', female: 'Female', unspecified: 'Unspecified',
+                category: 'Category', type: 'Type', delete: '🗑️ Delete', registration: 'Registration'
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+            
+            document.getElementById('btnAr').classList.toggle('active', lang === 'ar');
+            document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+            
+            const t = translations[lang];
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('pageSubtitle').textContent = t.pageSubtitle;
+            document.getElementById('personalInfoTitle').textContent = t.personalInfo;
+            document.getElementById('loadingText').textContent = t.loading;
+            document.getElementById('currentRegTitle').textContent = t.currentReg;
+            document.getElementById('participationDataTitle').textContent = t.participationData;
+            document.getElementById('ageGroupLabel').textContent = t.ageGroup;
+            document.getElementById('weightLabel').textContent = t.weight;
+            document.getElementById('beltLabel').textContent = t.belt;
+            document.getElementById('giTypeLabel').textContent = t.giType;
+            document.getElementById('teamLabel').textContent = t.team;
+            document.getElementById('rankingLabel').textContent = t.ranking;
+            document.getElementById('ranking').placeholder = t.rankingPlaceholder;
+            document.getElementById('submitBtn').textContent = t.submit;
+            document.getElementById('backBtn').textContent = t.back;
+            
+            // تحديث القوائم المنسدلة
+            const ageSelect = document.getElementById('ageGroup');
+            if (ageSelect.options.length <= 1) ageSelect.options[0].textContent = t.selectAge;
+            
+            const weightSelect = document.getElementById('weight');
+            if (weightSelect.disabled) weightSelect.options[0].textContent = t.selectWeightFirst;
+            
+            const beltSelect = document.getElementById('belt');
+            if (beltSelect.options.length <= 1) beltSelect.options[0].textContent = t.selectBelt;
+            
+            const teamSelect = document.getElementById('teamSelect');
+            if (teamSelect.options.length <= 1) teamSelect.options[0].textContent = t.selectTeam;
+            
+            const giSelect = document.getElementById('giType');
+            if (giSelect.options[0].value === '') {
+                giSelect.innerHTML = `<option value="">${t.selectGi}</option><option value="Gi">${t.gi}</option><option value="No-Gi">${t.noGi}</option>`;
+            }
+
+            if (currentPlayer) displayPlayerInfo();
+            if (existingRegistrations.length > 0) displayExistingRegistrations();
+        }
 
         async function loadPlayerData(userId) {
             try {
-                const { data: athlete, error: athleteError } = await supabaseClient
-                    .from('athletes')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .single();
-                
+                const { data: athlete, error: athleteError } = await supabaseClient.from('athletes').select('*').eq('user_id', userId).single();
                 if (athleteError || !athlete) {
                     const { data: { user } } = await supabaseClient.auth.getUser();
-                    currentPlayer = { 
-                        full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'لاعب', 
-                        email: user.email || '', 
-                        gender: user.user_metadata?.gender || 'Male',
-                        country: user.user_metadata?.country || ''
-                    };
+                    currentPlayer = { full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'لاعب', email: user.email || '', gender: user.user_metadata?.gender || 'Male', country: user.user_metadata?.country || '' };
                 } else {
-                    currentPlayer = {
-                        full_name: athlete.full_name || athlete.name || 'لاعب',
-                        email: athlete.email || '',
-                        gender: athlete.gender || 'Male',
-                        country: athlete.country || ''
-                    };
+                    currentPlayer = { full_name: athlete.full_name || athlete.name || 'لاعب', email: athlete.email || '', gender: athlete.gender || 'Male', country: athlete.country || '' };
                 }
                 displayPlayerInfo();
             } catch (error) {
                 console.error('Error loading player:', error);
                 const { data: { user } } = await supabaseClient.auth.getUser();
-                currentPlayer = { 
-                    full_name: user?.user_metadata?.full_name || 'لاعب', 
-                    email: user?.email || '', 
-                    gender: 'Male',
-                    country: ''
-                };
+                currentPlayer = { full_name: user?.user_metadata?.full_name || 'لاعب', email: user?.email || '', gender: 'Male', country: '' };
                 displayPlayerInfo();
             }
         }
 
         async function loadAgeDivisions() {
-            const { data, error } = await supabaseClient
-                .from('ajp_age_divisions')
-                .select('*')
-                .order('min_age');
-            console.log('✅ Age divisions loaded:', data?.length || 0);
+            const { data, error } = await supabaseClient.from('ajp_age_divisions').select('id, name, min_age, max_age').order('min_age');
+            if (error) {
+                console.error('❌ خطأ في جلب الفئات العمرية (قد يكون بسبب RLS):', error);
+                alert('تنبيه: لا يمكن جلب الفئات العمرية. يرجى التحقق من سياسة RLS لجدول ajp_age_divisions في Supabase.');
+            } else {
+                console.log('✅ Age divisions loaded:', data?.length || 0, data);
+            }
             return data || [];
         }
 
         async function loadWeightCategories() {
-            const { data, error } = await supabaseClient
-                .from('ajp_weight_classes')
-                .select('*')
-                .order('min_weight');
-            
-            console.log('✅ Weight categories loaded from ajp_weight_classes:', data?.length || 0);
-            
-            if (data && data.length > 0) {
-                // ✅ استبعاد null من القائمة للتحقق من الفئات المحددة فقط
-                availableDivisionIds = [...new Set(data.map(w => w.age_division_id).filter(id => id !== null))];
-                console.log('📋 Available specific division IDs:', availableDivisionIds);
-            }
+            const { data, error } = await supabaseClient.from('ajp_weight_classes').select('id, name, min_weight, max_weight, gender, age_division_id').order('min_weight');
+            if (error) console.error('❌ خطأ في جلب الأوزان:', error);
+            else console.log('✅ Weight categories loaded from ajp_weight_classes:', data?.length || 0);
             return data || [];
         }
 
         async function loadBeltLevels() {
-            const { data, error } = await supabaseClient
-                .from('ajp_belt_levels')
-                .select('*')
-                .order('sort_order');
-            console.log('✅ Belt levels loaded:', data?.length || 0);
+            const { data, error } = await supabaseClient.from('ajp_belt_levels').select('name').order('sort_order');
+            if (error) console.error('❌ خطأ في جلب الأحزمة:', error);
             return data || [];
         }
 
         async function loadTeams() {
-            const { data, error } = await supabaseClient
-                .from('teams')
-                .select('id, name, city, country')
-                .eq('is_active', true)
-                .order('name');
+            const { data, error } = await supabaseClient.from('teams').select('name, city, country').eq('is_active', true).order('name');
+            if (error) console.error('❌ خطأ في جلب الفرق:', error);
             return data || [];
         }
 
         async function loadExistingRegistrations() {
-            const { data, error } = await supabaseClient
-                .from('tournament_participants')
-                .select('*')
-                .eq('user_id', currentUserId)
-                .eq('tournament_id', tournamentId)
-                .order('created_at', { ascending: false });
-            
-            if (error) {
-                console.error('Error loading existing registrations:', error);
-                return [];
-            }
+            const { data, error } = await supabaseClient.from('tournament_participants').select('*').eq('user_id', currentUserId).eq('tournament_id', tournamentId).order('created_at', { ascending: false });
+            if (error) console.error('Error loading existing registrations:', error);
             existingRegistrations = data || [];
             displayExistingRegistrations();
-            return data || [];
+            return existingRegistrations;
         }
 
         function populateAgeDivisions() {
             const select = document.getElementById('ageGroup');
-            select.innerHTML = '<option value="">اختر الفئة...</option>';
+            const t = translations[currentLang];
+            select.innerHTML = `<option value="">${t.selectAge}</option>`;
             
-            if (ageDivisions.length === 0) {
-                select.innerHTML = '<option value="">لا توجد فئات متاحة</option>';
+            if (!ageDivisions || ageDivisions.length === 0) {
+                select.innerHTML = `<option value="">${t.noAge}</option>`;
+                console.warn('⚠️ جدول ajp_age_divisions فارغ أو محجوب بسبب سياسات RLS. يرجى التحقق من قاعدة البيانات.');
                 return;
             }
             
-            // ✅ التحقق مما إذا كانت هناك أوزان عامة (age_division_id = null)
-            const hasGeneralWeights = weightCategories.some(w => w.age_division_id === null);
-            
-            let divisionsToShow = ageDivisions;
-            
-            // إذا لم تكن هناك أوزان عامة، اعرض فقط الفئات التي لها أوزان محددة
-            if (!hasGeneralWeights && availableDivisionIds.length > 0) {
-                divisionsToShow = ageDivisions.filter(div => availableDivisionIds.includes(div.id));
-            }
-            
-            console.log('📊 Divisions to show:', divisionsToShow.length, 'of', ageDivisions.length);
-            
-            if (divisionsToShow.length === 0) {
-                select.innerHTML = '<option value="">لا توجد فئات متاحة</option>';
-                return;
-            }
-            
-            divisionsToShow.forEach((div, index) => {
+            ageDivisions.forEach((div, index) => {
                 const option = document.createElement('option');
                 option.value = div.id;
-                option.textContent = div.name || `الفئة ${index + 1} (${div.min_age || 0}-${div.max_age || 99} سنة)`;
+                option.textContent = div.name || `${currentLang === 'ar' ? 'الفئة' : 'Category'} ${index + 1} (${div.min_age || 0}-${div.max_age || 99} ${currentLang === 'ar' ? 'سنة' : 'years'})`;
                 select.appendChild(option);
             });
-            
-            console.log('✅ Populated', divisionsToShow.length, 'age divisions');
+            console.log('✅ Populated', ageDivisions.length, 'age divisions');
         }
 
         function populateBeltLevels() {
             const select = document.getElementById('belt');
-            select.innerHTML = '<option value="">اختر الحزام...</option>';
-            if (beltLevels.length === 0) return;
-            
+            const t = translations[currentLang];
+            select.innerHTML = `<option value="">${t.selectBelt}</option>`;
+            if (!beltLevels || beltLevels.length === 0) return;
             beltLevels.forEach(belt => {
                 const option = document.createElement('option');
                 option.value = belt.name;
@@ -291,9 +352,10 @@
 
         function populateTeams() {
             const select = document.getElementById('teamSelect');
-            select.innerHTML = '<option value="">اختر الفريق...</option>';
-            if (teamsList.length === 0) {
-                select.innerHTML = '<option value="">لا توجد فرق مسجلة</option>';
+            const t = translations[currentLang];
+            select.innerHTML = `<option value="">${t.selectTeam}</option>`;
+            if (!teamsList || teamsList.length === 0) {
+                select.innerHTML = `<option value="">${t.noTeams}</option>`;
                 return;
             }
             teamsList.forEach(team => {
@@ -307,36 +369,34 @@
         function updateWeightOptions() {
             const selectedAgeDivisionId = document.getElementById('ageGroup').value;
             const weightSelect = document.getElementById('weight');
+            const t = translations[currentLang];
             
-            weightSelect.innerHTML = '<option value="">جاري التحميل...</option>';
+            weightSelect.innerHTML = `<option value="">${t.loading}</option>`;
             weightSelect.disabled = true;
             
             if (!selectedAgeDivisionId) {
-                weightSelect.innerHTML = '<option value="">اختر الفئة العمرية أولاً</option>';
+                weightSelect.innerHTML = `<option value="">${t.selectWeightFirst}</option>`;
                 return;
             }
             
-            if (weightCategories.length === 0) {
-                weightSelect.innerHTML = '<option value="">لا توجد موازين</option>';
+            if (!weightCategories || weightCategories.length === 0) {
+                weightSelect.innerHTML = `<option value="">${t.noWeights}</option>`;
                 return;
             }
             
-            const genderMap = {
-                'Male': 'Men', 'Female': 'Women', 'Men': 'Men', 'Women': 'Women', 'Boys': 'Boys', 'Girls': 'Girls'
-            };
+            const genderMap = { 'Male': 'Men', 'Female': 'Women', 'Men': 'Men', 'Women': 'Women', 'Boys': 'Boys', 'Girls': 'Girls' };
             const targetGender = genderMap[currentPlayer?.gender] || 'Men';
             
-            // ✅ فلترة الأوزان: تطابق الفئة المختارة أو تكون عامة (null)، وتطابق الجنس أو تكون عامة ('All' أو null)
+            // استخراج البيانات من ajp_weight_classes: مطابقة الفئة العمرية أو كونها عامة (null)، ومطابقة الجنس أو كونه عاماً
             const filteredWeights = weightCategories.filter(w => {
-                const ageMatch = (w.age_division_id === null || w.age_division_id === selectedAgeDivisionId);
+                const ageMatch = (w.age_division_id === null || String(w.age_division_id) === String(selectedAgeDivisionId));
                 const genderMatch = (w.gender === 'All' || w.gender === null || w.gender === targetGender);
                 return ageMatch && genderMatch;
             });
             
-            // ✅ إزالة التكرار لضمان ظهور كل وزن مرة واحدة فقط
+            // إزالة التكرار لضمان ظهور كل وزن مرة واحدة فقط
             const uniqueWeights = [];
             const seenNames = new Set();
-            
             filteredWeights.forEach(w => {
                 if (!seenNames.has(w.name)) {
                     seenNames.add(w.name);
@@ -345,34 +405,32 @@
             });
             
             if (uniqueWeights.length === 0) {
-                weightSelect.innerHTML = '<option value="">لا توجد موازين متاحة</option>';
+                weightSelect.innerHTML = `<option value="">${t.noWeights}</option>`;
             } else {
                 uniqueWeights.forEach(w => {
                     const option = document.createElement('option');
                     option.value = w.name;
-                    option.textContent = `${w.name} (${w.min_weight}-${w.max_weight} كجم)`;
+                    option.textContent = `${w.name} (${w.min_weight}-${w.max_weight} ${currentLang === 'ar' ? 'كجم' : 'kg'})`;
                     option.dataset.minWeight = w.min_weight;
                     option.dataset.maxWeight = w.max_weight;
                     option.dataset.weightId = w.id;
                     weightSelect.appendChild(option);
                 });
                 weightSelect.disabled = false;
-                console.log('✅ Loaded', uniqueWeights.length, 'unique weights');
+                console.log('✅ Loaded', uniqueWeights.length, 'unique weights from ajp_weight_classes');
             }
         }
 
         function displayPlayerInfo() {
             const infoDiv = document.getElementById('playerInfo');
-            if (!currentPlayer) {
-                infoDiv.innerHTML = '<div class="loading">خطأ في تحميل البيانات</div>';
-                return;
-            }
-            const genderText = currentPlayer.gender === 'Male' ? 'ذكر' : currentPlayer.gender === 'Female' ? 'أنثى' : currentPlayer.gender || 'غير محدد';
+            const t = translations[currentLang];
+            if (!currentPlayer) { infoDiv.innerHTML = `<div class="loading">${t.noAge}</div>`; return; }
+            const genderText = currentPlayer.gender === 'Male' ? t.male : currentPlayer.gender === 'Female' ? t.female : t.unspecified;
             infoDiv.innerHTML = `
-                <h3>👤 ${currentPlayer.full_name || 'لاعب'}</h3>
-                <div class="info-row"><span class="info-label">البريد الإلكتروني:</span><span class="info-value">${currentPlayer.email || 'غير متوفر'}</span></div>
-                <div class="info-row"><span class="info-label">الجنس:</span><span class="info-value">${genderText}</span></div>
-                <div class="info-row"><span class="info-label">الدولة:</span><span class="info-value">${currentPlayer.country || 'غير محدد'}</span></div>
+                <h3>👤 ${currentPlayer.full_name || 'Player'}</h3>
+                <div class="info-row"><span class="info-label">${t.email}:</span><span class="info-value">${currentPlayer.email || t.unspecified}</span></div>
+                <div class="info-row"><span class="info-label">${t.gender}:</span><span class="info-value">${genderText}</span></div>
+                <div class="info-row"><span class="info-label">${t.country}:</span><span class="info-value">${currentPlayer.country || t.unspecified}</span></div>
             `;
         }
 
@@ -380,64 +438,63 @@
             const container = document.getElementById('existingRegistrations');
             const section = document.getElementById('existingRegistrationsSection');
             const countLabel = document.getElementById('registrationsCount');
+            const t = translations[currentLang];
             
-            if (existingRegistrations.length === 0) {
-                section.style.display = 'none';
-                return;
-            }
+            if (!existingRegistrations || existingRegistrations.length === 0) { section.style.display = 'none'; return; }
             section.style.display = 'block';
-            countLabel.textContent = `${existingRegistrations.length} تسجيل`;
+            countLabel.textContent = `${existingRegistrations.length} ${t.regCount}`;
             
             container.innerHTML = existingRegistrations.map((reg, index) => `
                 <div class="registration-card">
                     <div class="registration-card-header">
-                        <div class="registration-card-title">تسجيل #${index + 1}</div>
-                        <button type="button" class="btn btn-delete" onclick="deleteRegistration('${reg.id}')">🗑️ حذف</button>
+                        <div class="registration-card-title">${t.registration} #${index + 1}</div>
+                        <button type="button" class="btn btn-delete" onclick="deleteRegistration('${reg.id}')">${t.delete}</button>
                     </div>
                     <div class="registration-card-details">
-                        <div class="registration-card-item">الفئة: <span>${reg.age_group || '-'}</span></div>
-                        <div class="registration-card-item">الوزن: <span>${reg.weight || 0} كجم</span></div>
-                        <div class="registration-card-item">الحزام: <span>${reg.belt_level || '-'}</span></div>
-                        <div class="registration-card-item">النوع: <span>${reg.gi_type || '-'}</span></div>
-                        <div class="registration-card-item">الفريق: <span>${reg.team || '-'}</span></div>
+                        <div class="registration-card-item">${t.category}: <span>${reg.age_group || '-'}</span></div>
+                        <div class="registration-card-item">${t.weight}: <span>${reg.weight || 0} ${currentLang === 'ar' ? 'كجم' : 'kg'}</span></div>
+                        <div class="registration-card-item">${t.belt}: <span>${reg.belt_level || '-'}</span></div>
+                        <div class="registration-card-item">${t.type}: <span>${reg.gi_type || '-'}</span></div>
+                        <div class="registration-card-item">${t.team}: <span>${reg.team || '-'}</span></div>
                     </div>
                 </div>
             `).join('');
         }
 
         async function deleteRegistration(registrationId) {
-            if (!confirm('هل أنت متأكد من حذف هذا التسجيل؟')) return;
+            const t = translations[currentLang];
+            if (!confirm(t.confirmDelete)) return;
             try {
                 const { error } = await supabaseClient.from('tournament_participants').delete().eq('id', registrationId);
                 if (error) throw error;
-                showAlert('success', '✅ تم حذف التسجيل بنجاح!');
+                showAlert('success', t.successDelete);
                 await loadExistingRegistrations();
             } catch (error) {
-                showAlert('error', '❌ خطأ في الحذف: ' + error.message);
+                showAlert('error', t.errorDelete + error.message);
             }
         }
 
         window.onload = async () => {
+            setLanguage(currentLang);
             const urlParams = new URLSearchParams(window.location.search);
             tournamentId = urlParams.get('tournament_id');
             
             const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
             if (authError || !user) {
-                showAlert('error', '❌ يرجى تسجيل الدخول أولاً!');
+                showAlert('error', translations[currentLang].loginRequired);
                 setTimeout(() => window.location.href = 'login.html?redirect=player-registration.html?tournament_id=' + tournamentId, 2000);
                 return;
             }
 
             if (!tournamentId) {
-                showAlert('error', '❌ بيانات غير صحيحة!');
+                showAlert('error', translations[currentLang].invalidData);
                 return;
             }
 
             currentUserId = user.id;
-            console.log('🚀 Loading data from tables...');
+            console.log('🚀 Loading data from database tables...');
 
             await loadPlayerData(user.id);
-            
             ageDivisions = await loadAgeDivisions();
             weightCategories = await loadWeightCategories();
             beltLevels = await loadBeltLevels();
@@ -454,7 +511,7 @@
 
         document.getElementById('tournamentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+            const t = translations[currentLang];
             const weightSelect = document.getElementById('weight');
             const selectedWeightOption = weightSelect.options[weightSelect.selectedIndex];
             const ageGroupSelect = document.getElementById('ageGroup');
@@ -477,8 +534,7 @@
             try {
                 const { error } = await supabaseClient.from('tournament_participants').insert([formData]).select();
                 if (error) throw error;
-                
-                showAlert('success', '✅ تم إضافة التسجيل بنجاح!');
+                showAlert('success', t.successAdd);
                 document.getElementById('tournamentForm').reset();
                 await loadExistingRegistrations();
                 populateAgeDivisions();
@@ -486,7 +542,7 @@
                 populateTeams();
             } catch (error) {
                 console.error('Registration error:', error);
-                showAlert('error', '❌ خطأ في التسجيل: ' + error.message);
+                showAlert('error', t.errorRegister + error.message);
             }
         });
 
