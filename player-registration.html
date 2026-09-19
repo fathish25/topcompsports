@@ -172,7 +172,7 @@
 
         const translations = {
             ar: {
-                pageTitle: '🏆 التسجيل في البطولة', pageSubtitle: 'قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة',
+                pageTitle: ' التسجيل في البطولة', pageSubtitle: 'قم بتسجيل مشاركتك في البطولة - يمكنك التسجيل أكثر من مرة لفئات مختلفة',
                 personalInfo: '👤 بياناتك الشخصية (من الحساب)', loading: 'جاري تحميل البيانات...',
                 currentReg: '📋 تسجيلاتك الحالية في البطولة', regCount: 'تسجيل',
                 participationData: '📝 بيانات المشاركة في البطولة (قابل للتعديل)',
@@ -189,10 +189,10 @@
                 confirmDelete: 'هل أنت متأكد من حذف هذا التسجيل؟', loginRequired: '❌ يرجى تسجيل الدخول أولاً!',
                 invalidData: '❌ بيانات غير صحيحة!', email: 'البريد الإلكتروني', gender: 'الجنس',
                 country: 'الدولة', male: 'ذكر', female: 'أنثى', unspecified: 'غير محدد',
-                category: 'الفئة', type: 'النوع', delete: '🗑️ حذف', registration: 'تسجيل'
+                category: 'الفئة', type: 'النوع', delete: '️ حذف', registration: 'تسجيل'
             },
             en: {
-                pageTitle: '🏆 Tournament Registration', pageSubtitle: 'Register for the tournament - You can register multiple times for different categories',
+                pageTitle: ' Tournament Registration', pageSubtitle: 'Register for the tournament - You can register multiple times for different categories',
                 personalInfo: '👤 Personal Information (From Account)', loading: 'Loading data...',
                 currentReg: '📋 Your Current Registrations', regCount: 'Registration(s)',
                 participationData: '📝 Tournament Participation Data (Editable)',
@@ -205,7 +205,7 @@
                 selectBelt: 'Select belt...', selectTeam: 'Select team...', noTeams: 'No teams registered',
                 gi: 'Gi', noGi: 'No-Gi', selectGi: 'Select...',
                 successAdd: '✅ Registration added successfully!', successDelete: '✅ Registration deleted successfully!',
-                errorDelete: '❌ Error deleting: ', errorRegister: '❌ Error registering: ',
+                errorDelete: '❌ Error deleting: ', errorRegister: ' Error registering: ',
                 confirmDelete: 'Are you sure you want to delete this registration?', loginRequired: '❌ Please login first!',
                 invalidData: '❌ Invalid data!', email: 'Email', gender: 'Gender',
                 country: 'Country', male: 'Male', female: 'Female', unspecified: 'Unspecified',
@@ -213,52 +213,73 @@
             }
         };
 
+        // ✅ إصلاح: فحص null لكل عنصر قبل التحديث
+        function safeSetText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('lang', lang);
             document.documentElement.lang = lang;
             document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
             
-            document.getElementById('btnAr').classList.toggle('active', lang === 'ar');
-            document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+            const btnAr = document.getElementById('btnAr');
+            const btnEn = document.getElementById('btnEn');
+            if (btnAr) btnAr.classList.toggle('active', lang === 'ar');
+            if (btnEn) btnEn.classList.toggle('active', lang === 'en');
             
             const t = translations[lang];
-            document.getElementById('pageTitle').textContent = t.pageTitle;
-            document.getElementById('pageSubtitle').textContent = t.pageSubtitle;
-            document.getElementById('personalInfoTitle').textContent = t.personalInfo;
-            document.getElementById('loadingText').textContent = t.loading;
-            document.getElementById('currentRegTitle').textContent = t.currentReg;
-            document.getElementById('participationDataTitle').textContent = t.participationData;
-            document.getElementById('ageGroupLabel').textContent = t.ageGroup;
-            document.getElementById('weightLabel').textContent = t.weight;
-            document.getElementById('beltLabel').textContent = t.belt;
-            document.getElementById('giTypeLabel').textContent = t.giType;
-            document.getElementById('teamLabel').textContent = t.team;
-            document.getElementById('rankingLabel').textContent = t.ranking;
-            document.getElementById('ranking').placeholder = t.rankingPlaceholder;
-            document.getElementById('submitBtn').textContent = t.submit;
-            document.getElementById('backBtn').textContent = t.back;
             
-            // تحديث القوائم المنسدلة
+            // ✅ استخدام safeSetText بدلاً من التعيين المباشر
+            safeSetText('pageTitle', t.pageTitle);
+            safeSetText('pageSubtitle', t.pageSubtitle);
+            safeSetText('personalInfoTitle', t.personalInfo);
+            safeSetText('loadingText', t.loading);
+            safeSetText('currentRegTitle', t.currentReg);
+            safeSetText('participationDataTitle', t.participationData);
+            safeSetText('ageGroupLabel', t.ageGroup);
+            safeSetText('weightLabel', t.weight);
+            safeSetText('beltLabel', t.belt);
+            safeSetText('giTypeLabel', t.giType);
+            safeSetText('teamLabel', t.team);
+            safeSetText('rankingLabel', t.ranking);
+            
+            const rankingInput = document.getElementById('ranking');
+            if (rankingInput) rankingInput.placeholder = t.rankingPlaceholder;
+            
+            safeSetText('submitBtn', t.submit);
+            safeSetText('backBtn', t.back);
+            
+            // تحديث القوائم المنسدلة فقط إذا كانت فارغة أو تحتوي على خيار واحد
             const ageSelect = document.getElementById('ageGroup');
-            if (ageSelect.options.length <= 1) ageSelect.options[0].textContent = t.selectAge;
+            if (ageSelect && ageSelect.options.length <= 1) {
+                ageSelect.options[0].textContent = t.selectAge;
+            }
             
             const weightSelect = document.getElementById('weight');
-            if (weightSelect.disabled) weightSelect.options[0].textContent = t.selectWeightFirst;
+            if (weightSelect && weightSelect.disabled) {
+                weightSelect.options[0].textContent = t.selectWeightFirst;
+            }
             
             const beltSelect = document.getElementById('belt');
-            if (beltSelect.options.length <= 1) beltSelect.options[0].textContent = t.selectBelt;
+            if (beltSelect && beltSelect.options.length <= 1) {
+                beltSelect.options[0].textContent = t.selectBelt;
+            }
             
             const teamSelect = document.getElementById('teamSelect');
-            if (teamSelect.options.length <= 1) teamSelect.options[0].textContent = t.selectTeam;
+            if (teamSelect && teamSelect.options.length <= 1) {
+                teamSelect.options[0].textContent = t.selectTeam;
+            }
             
             const giSelect = document.getElementById('giType');
-            if (giSelect.options[0].value === '') {
+            if (giSelect && giSelect.options[0] && giSelect.options[0].value === '') {
                 giSelect.innerHTML = `<option value="">${t.selectGi}</option><option value="Gi">${t.gi}</option><option value="No-Gi">${t.noGi}</option>`;
             }
 
             if (currentPlayer) displayPlayerInfo();
-            if (existingRegistrations.length > 0) displayExistingRegistrations();
+            if (existingRegistrations && existingRegistrations.length > 0) displayExistingRegistrations();
         }
 
         async function loadPlayerData(userId) {
@@ -283,16 +304,18 @@
             const { data, error } = await supabaseClient.from('ajp_age_divisions').select('id, name, min_age, max_age').order('min_age');
             if (error) {
                 console.error('❌ خطأ في جلب الفئات العمرية (قد يكون بسبب RLS):', error);
-                alert('تنبيه: لا يمكن جلب الفئات العمرية. يرجى التحقق من سياسة RLS لجدول ajp_age_divisions في Supabase.');
             } else {
-                console.log('✅ Age divisions loaded:', data?.length || 0, data);
+                console.log('✅ Age divisions loaded:', data?.length || 0);
+                if (data && data.length > 0) {
+                    console.log('📊 Sample age division:', JSON.stringify(data[0]));
+                }
             }
             return data || [];
         }
 
         async function loadWeightCategories() {
             const { data, error } = await supabaseClient.from('ajp_weight_classes').select('id, name, min_weight, max_weight, gender, age_division_id').order('min_weight');
-            if (error) console.error('❌ خطأ في جلب الأوزان:', error);
+            if (error) console.error(' خطأ في جلب الأوزان:', error);
             else console.log('✅ Weight categories loaded from ajp_weight_classes:', data?.length || 0);
             return data || [];
         }
@@ -317,28 +340,43 @@
             return existingRegistrations;
         }
 
+        // ✅ إصلاح: بناء HTML كامل للقائمة بدلاً من appendChild
         function populateAgeDivisions() {
             const select = document.getElementById('ageGroup');
-            const t = translations[currentLang];
-            select.innerHTML = `<option value="">${t.selectAge}</option>`;
-            
-            if (!ageDivisions || ageDivisions.length === 0) {
-                select.innerHTML = `<option value="">${t.noAge}</option>`;
-                console.warn('⚠️ جدول ajp_age_divisions فارغ أو محجوب بسبب سياسات RLS. يرجى التحقق من قاعدة البيانات.');
+            if (!select) {
+                console.error('❌ عنصر ageGroup غير موجود في DOM!');
                 return;
             }
             
+            const t = translations[currentLang];
+            
+            if (!ageDivisions || ageDivisions.length === 0) {
+                select.innerHTML = `<option value="">${t.noAge}</option>`;
+                console.warn('⚠️ جدول ajp_age_divisions فارغ أو محجوب بسبب سياسات RLS.');
+                return;
+            }
+            
+            // ✅ بناء HTML كامل دفعة واحدة
+            let optionsHTML = `<option value="">${t.selectAge}</option>`;
+            
             ageDivisions.forEach((div, index) => {
-                const option = document.createElement('option');
-                option.value = div.id;
-                option.textContent = div.name || `${currentLang === 'ar' ? 'الفئة' : 'Category'} ${index + 1} (${div.min_age || 0}-${div.max_age || 99} ${currentLang === 'ar' ? 'سنة' : 'years'})`;
-                select.appendChild(option);
+                const divId = div.id || '';
+                const divName = div.name || `${currentLang === 'ar' ? 'الفئة' : 'Category'} ${index + 1}`;
+                const minAge = div.min_age || 0;
+                const maxAge = div.max_age || 99;
+                const yearsText = currentLang === 'ar' ? 'سنة' : 'years';
+                
+                optionsHTML += `<option value="${divId}">${divName} (${minAge}-${maxAge} ${yearsText})</option>`;
             });
+            
+            select.innerHTML = optionsHTML;
             console.log('✅ Populated', ageDivisions.length, 'age divisions');
+            console.log('📊 First option value:', select.options[1]?.value);
         }
 
         function populateBeltLevels() {
             const select = document.getElementById('belt');
+            if (!select) return;
             const t = translations[currentLang];
             select.innerHTML = `<option value="">${t.selectBelt}</option>`;
             if (!beltLevels || beltLevels.length === 0) return;
@@ -352,6 +390,7 @@
 
         function populateTeams() {
             const select = document.getElementById('teamSelect');
+            if (!select) return;
             const t = translations[currentLang];
             select.innerHTML = `<option value="">${t.selectTeam}</option>`;
             if (!teamsList || teamsList.length === 0) {
@@ -369,6 +408,7 @@
         function updateWeightOptions() {
             const selectedAgeDivisionId = document.getElementById('ageGroup').value;
             const weightSelect = document.getElementById('weight');
+            if (!weightSelect) return;
             const t = translations[currentLang];
             
             weightSelect.innerHTML = `<option value="">${t.loading}</option>`;
@@ -407,15 +447,11 @@
             if (uniqueWeights.length === 0) {
                 weightSelect.innerHTML = `<option value="">${t.noWeights}</option>`;
             } else {
+                let optionsHTML = '';
                 uniqueWeights.forEach(w => {
-                    const option = document.createElement('option');
-                    option.value = w.name;
-                    option.textContent = `${w.name} (${w.min_weight}-${w.max_weight} ${currentLang === 'ar' ? 'كجم' : 'kg'})`;
-                    option.dataset.minWeight = w.min_weight;
-                    option.dataset.maxWeight = w.max_weight;
-                    option.dataset.weightId = w.id;
-                    weightSelect.appendChild(option);
+                    optionsHTML += `<option value="${w.name}" data-min-weight="${w.min_weight}" data-max-weight="${w.max_weight}" data-weight-id="${w.id}">${w.name} (${w.min_weight}-${w.max_weight} ${currentLang === 'ar' ? 'كجم' : 'kg'})</option>`;
                 });
+                weightSelect.innerHTML = optionsHTML;
                 weightSelect.disabled = false;
                 console.log('✅ Loaded', uniqueWeights.length, 'unique weights from ajp_weight_classes');
             }
@@ -423,6 +459,7 @@
 
         function displayPlayerInfo() {
             const infoDiv = document.getElementById('playerInfo');
+            if (!infoDiv) return;
             const t = translations[currentLang];
             if (!currentPlayer) { infoDiv.innerHTML = `<div class="loading">${t.noAge}</div>`; return; }
             const genderText = currentPlayer.gender === 'Male' ? t.male : currentPlayer.gender === 'Female' ? t.female : t.unspecified;
@@ -438,6 +475,7 @@
             const container = document.getElementById('existingRegistrations');
             const section = document.getElementById('existingRegistrationsSection');
             const countLabel = document.getElementById('registrationsCount');
+            if (!container || !section || !countLabel) return;
             const t = translations[currentLang];
             
             if (!existingRegistrations || existingRegistrations.length === 0) { section.style.display = 'none'; return; }
@@ -548,6 +586,7 @@
 
         function showAlert(type, message) {
             const alert = document.getElementById('alert');
+            if (!alert) return;
             alert.className = `alert alert-${type} show`;
             alert.textContent = message;
             setTimeout(() => alert.classList.remove('show'), 5000);
