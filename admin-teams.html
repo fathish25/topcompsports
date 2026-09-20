@@ -787,16 +787,12 @@
             }
         }
 
-        // ==========================================
-        // ✅ الدالة المصححة للحذف (Soft Delete)
-        // ==========================================
         async function deleteTeam(id) {
-            if (!confirm(currentLang === 'ar' ? '⚠️ هل أنت متأكد من حذف هذا الفريق؟ سيتم تعطيله بدلاً من حذفه نهائياً للحفاظ على سلامة البيانات.' : '⚠️ Are you sure you want to delete this team? It will be disabled instead of permanently deleted to maintain data integrity.')) {
+            if (!confirm(currentLang === 'ar' ? '️ هل أنت متأكد من حذف هذا الفريق؟ سيتم تعطيله بدلاً من حذفه نهائياً للحفاظ على سلامة البيانات.' : '⚠️ Are you sure you want to delete this team? It will be disabled instead of permanently deleted to maintain data integrity.')) {
                 return;
             }
 
             try {
-                // 1. التحقق من وجود لاعبين مرتبطين
                 const { count: athletesCount, error: countError } = await supabaseClient
                     .from('athletes')
                     .select('*', { count: 'exact', head: true })
@@ -811,7 +807,6 @@
                     );
                 }
 
-                // 2. تنفيذ "الحذف الناعم" (تعطيل الفريق)
                 const { error } = await supabaseClient
                     .from('teams')
                     .update({
@@ -824,7 +819,6 @@
 
                 if (error) throw error;
 
-                // 3. عرض رسالة النجاح وإعادة تحميل الجدول
                 showAlert(currentLang === 'ar' ? '✅ تم تعطيل/حذف الفريق بنجاح' : '✅ Team disabled/deleted successfully', 'success');
                 await loadTeams();
                 
