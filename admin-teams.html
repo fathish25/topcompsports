@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ... نفس الـ CSS السابق ... */
         :root {
             --primary-blue: #2563EB;
             --dark-blue: #1d4ed8;
@@ -661,12 +662,17 @@
 
             try {
                 // 1. التحقق من وجود لاعبين مرتبطين
+                console.log('🔍 Checking for associated athletes...');
                 const { count: athletesCount, error: countError } = await supabaseClient
                     .from('athletes')
                     .select('*', { count: 'exact', head: true })
                     .eq('team_id', id);
 
-                if (countError) console.warn('Could not check athletes:', countError);
+                if (countError) {
+                    console.warn('⚠️ Could not check athletes:', countError);
+                } else {
+                    console.log('👥 Found', athletesCount, 'athletes in this team');
+                }
 
                 // 2. منع الحذف إذا كان هناك لاعبين (لتجنب أخطاء قاعدة البيانات)
                 if (athletesCount > 0) {
@@ -680,23 +686,34 @@
                 }
 
                 // 3. الحذف النهائي (Hard Delete)
-                const { error } = await supabaseClient
+                console.log('🗑️ Attempting to delete team from database...');
+                const { data, error } = await supabaseClient
                     .from('teams')
                     .delete()
-                    .eq('id', id);
+                    .eq('id', id)
+                    .select(); // إضافة .select() للحصول على البيانات المحذوفة
 
                 if (error) {
                     console.error('❌ Delete error:', error);
+                    console.error('Error details:', JSON.stringify(error, null, 2));
                     throw error;
                 }
 
+                console.log('✅ Delete response:', data);
+
                 // 4. نجاح العملية وإعادة التحميل
                 showAlert(currentLang === 'ar' ? '✅ تم حذف الفريق نهائياً من قاعدة البيانات' : '✅ Team permanently deleted from database', 'success');
+                
+                // إعادة تحميل البيانات للتأكد من الحذف
+                console.log('🔄 Reloading teams...');
                 await loadTeams();
                 console.log('✅ Team deleted successfully from database');
                 
             } catch (error) {
                 console.error('❌ Delete error:', error);
+                console.error('Error message:', error.message);
+                console.error('Error details:', error.details);
+                console.error('Error hint:', error.hint);
                 showAlert('Error: ' + error.message, 'error');
             }
         }
