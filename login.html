@@ -28,10 +28,11 @@
         }
 
         .logo { text-align: center; margin-bottom: 30px; }
-        .logo-icon { 
-            width: 70px; height: 70px; background: #FFB800; border-radius: 15px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 36px; font-weight: bold; color: #0A0A0A; margin: 0 auto 15px;
+        .logo-img { 
+            width: 80px; 
+            height: auto; 
+            margin: 0 auto 15px;
+            display: block;
         }
         .logo-text { font-size: 24px; font-weight: bold; color: #FFB800; }
 
@@ -61,46 +62,85 @@
         .alert-success { background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #10b981; }
         .alert-info { background: rgba(14,165,233,0.2); border: 1px solid #0ea5e9; color: #0ea5e9; }
 
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .forgot-password a {
+            color: #0066CC;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .forgot-password a:hover {
+            text-decoration: underline;
+            color: #3399FF;
+        }
+
         .signup-link { text-align: center; margin-top: 20px; color: rgba(255,255,255,0.6); }
         .signup-link a { color: #FFB800; text-decoration: none; font-weight: 600; }
         .signup-link a:hover { text-decoration: underline; }
 
+        .lang-switcher { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; }
+        .lang-btn {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .lang-btn.active { background: #0066CC; border-color: #0066CC; }
+
         @media (max-width: 480px) {
             .login-container { padding: 30px 20px; }
             .login-header h1 { font-size: 1.5rem; }
+            .lang-switcher { top: 10px; right: 10px; }
+            .forgot-password { text-align: left; }
         }
     </style>
 </head>
 <body>
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+        <button class="lang-btn" onclick="setLanguage('ar')">AR</button>
+    </div>
+
     <div class="login-container">
         <div class="logo">
-            <div class="logo-icon">T</div>
+            <img src="logo2.png" alt="TopCompSports Logo" class="logo-img">
             <div class="logo-text">TopCompSports</div>
         </div>
 
         <div class="login-header">
-            <h1>Welcome Back</h1>
-            <p>Sign in to your TopCompSports account</p>
+            <h1 data-en="Welcome Back" data-ar="مرحباً بعودتك">Welcome Back</h1>
+            <p data-en="Sign in to your TopCompSports account" data-ar="سجل الدخول إلى حسابك في TopCompSports">Sign in to your TopCompSports account</p>
         </div>
 
         <div id="alert" class="alert"></div>
 
         <form id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group">
-                <label class="form-label">Email Address</label>
-                <input type="email" class="form-input" id="email" required placeholder="your.email@example.com" autocomplete="off">
+                <label class="form-label" data-en="Email Address" data-ar="البريد الإلكتروني">Email Address</label>
+                <input type="email" class="form-input" id="email" required placeholder="your.email@example.com" autocomplete="off" data-en-placeholder="your.email@example.com" data-ar-placeholder="your.email@example.com">
             </div>
 
             <div class="form-group">
-                <label class="form-label">Password</label>
-                <input type="password" class="form-input" id="password" required placeholder="Enter your password" autocomplete="off">
+                <label class="form-label" data-en="Password" data-ar="كلمة المرور">Password</label>
+                <input type="password" class="form-input" id="password" required placeholder="Enter your password" autocomplete="off" data-en-placeholder="Enter your password" data-ar-placeholder="أدخل كلمة المرور">
             </div>
 
-            <button type="submit" class="btn btn-primary" id="submitBtn">Sign In →</button>
+            <div class="forgot-password">
+                <a href="forgot-password.html" data-en="Forgot Password?" data-ar="نسيت كلمة المرور؟">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="submitBtn" data-en="Sign In →" data-ar="← تسجيل الدخول">Sign In →</button>
         </form>
 
         <div class="signup-link">
-            Don't have an account? <a href="signup.html">Create one</a>
+            <span data-en="Don't have an account?" data-ar="ليس لديك حساب؟">Don't have an account?</span>
+            <a href="signup.html" data-en="Create one" data-ar="إنشاء حساب">Create one</a>
         </div>
     </div>
 
@@ -108,6 +148,27 @@
         const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let currentLang = 'en';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            document.documentElement.lang = lang;
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const text = el.getAttribute(`data-${lang}`);
+                if (text) el.textContent = text;
+            });
+            
+            document.querySelectorAll('[data-en-placeholder]').forEach(el => {
+                const placeholder = el.getAttribute(`data-${lang}-placeholder`);
+                if (placeholder) el.placeholder = placeholder;
+            });
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
 
         function showAlert(type, message) {
             const alert = document.getElementById('alert');
@@ -124,21 +185,27 @@
             const submitBtn = document.getElementById('submitBtn');
 
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Signing in...';
+            submitBtn.textContent = currentLang === 'ar' ? 'جاري تسجيل الدخول...' : 'Signing in...';
 
             try {
                 const result = await dbClient.auth.signInWithPassword({ email: email, password: password });
 
                 if (result.error) {
                     if (result.error.message.includes('Email not confirmed')) {
-                        showAlert('info', '📧 Please check your email and confirm your account.');
+                        showAlert('info', currentLang === 'ar' 
+                            ? '📧 يرجى التحقق من بريدك الإلكتروني وتأكيد حسابك.' 
+                            : '📧 Please check your email and confirm your account.');
                     } else if (result.error.message.includes('Invalid login credentials')) {
-                        showAlert('error', '❌ Invalid email or password.');
+                        showAlert('error', currentLang === 'ar' 
+                            ? ' البريد الإلكتروني أو كلمة المرور غير صحيحة.' 
+                            : '❌ Invalid email or password.');
                     } else {
-                        showAlert('error', '❌ ' + result.error.message);
+                        showAlert('error', currentLang === 'ar' 
+                            ? '❌ ' + result.error.message 
+                            : '❌ ' + result.error.message);
                     }
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Sign In →';
+                    submitBtn.textContent = currentLang === 'ar' ? '← تسجيل الدخول' : 'Sign In →';
                     return;
                 }
 
@@ -162,7 +229,6 @@
                     };
                 }
 
-                // حفظ بيانات المستخدم في المتصفح
                 const userData = {
                     id: result.data.user.id,
                     email: result.data.user.email,
@@ -174,8 +240,9 @@
 
                 localStorage.setItem('currentUser', JSON.stringify(userData));
 
-                // ✅ التوجيه المباشر إلى الصفحة الرئيسية دائماً
-                showAlert('success', '✅ Login successful! Redirecting to home page...');
+                showAlert('success', currentLang === 'ar' 
+                    ? '✅ تم تسجيل الدخول بنجاح! جاري التوجيه...' 
+                    : '✅ Login successful! Redirecting to home page...');
 
                 setTimeout(function() {
                     console.log('🚀 Redirecting to index.html');
@@ -184,16 +251,20 @@
 
             } catch (error) {
                 console.error('Login error:', error);
-                showAlert('error', '❌ Error: ' + error.message);
+                showAlert('error', currentLang === 'ar' 
+                    ? '❌ خطأ: ' + error.message 
+                    : '❌ Error: ' + error.message);
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Sign In →';
+                submitBtn.textContent = currentLang === 'ar' ? '← تسجيل الدخول' : 'Sign In →';
             }
         }
 
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('confirmed') === 'true') {
-                showAlert('success', '✅ Email confirmed! You can now sign in.');
+                showAlert('success', currentLang === 'ar' 
+                    ? '✅ تم تأكيد البريد الإلكتروني! يمكنك الآن تسجيل الدخول.' 
+                    : '✅ Email confirmed! You can now sign in.');
             }
             if (urlParams.get('email')) {
                 document.getElementById('email').value = urlParams.get('email');
