@@ -11,7 +11,7 @@
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- ملف الترجمة -->
+    <!-- ملف الترجمة (اختياري، الكود أدناه يحتوي على احتياطي في حال لم يتم تحميله) -->
     <script src="translations.js"></script>
     
     <style>
@@ -423,21 +423,11 @@
         }
 
         /* ===== RTL Support ===== */
-        [dir="rtl"] .signup-left {
-            text-align: right;
-        }
-
-        [dir="rtl"] .signup-header {
-            text-align: right;
-        }
-
-        [dir="rtl"] .form-label {
-            text-align: right;
-        }
-
-        [dir="rtl"] .login-link {
-            text-align: center;
-        }
+        [dir="rtl"] .signup-left { text-align: right; }
+        [dir="rtl"] .signup-header { text-align: right; }
+        [dir="rtl"] .form-label { text-align: right; }
+        [dir="rtl"] .login-link { text-align: center; }
+        [dir="rtl"] .form-input, [dir="rtl"] .form-select { text-align: right; }
     </style>
 </head>
 <body>
@@ -535,7 +525,7 @@
                         <label class="form-label" data-en="label_password">Password *</label>
                         <input type="password" class="form-input" id="password" required 
                                data-placeholder-en="placeholder_password"
-                               placeholder="Minimum 6 characters" minlength="6" autocomplete="new-password">
+                               placeholder="Minimum 8 characters" minlength="8" autocomplete="new-password">
                     </div>
                     <div class="form-group">
                         <label class="form-label" data-en="label_confirm_password">Confirm Password *</label>
@@ -574,26 +564,6 @@
                             <option value="Oman">Oman - عمان</option>
                             <option value="Jordan">Jordan - الأردن</option>
                             <option value="Lebanon">Lebanon - لبنان</option>
-                            <option value="Morocco">Morocco - المغرب</option>
-                            <option value="Tunisia">Tunisia - تونس</option>
-                            <option value="Algeria">Algeria - الجزائر</option>
-                            <option value="Libya">Libya - ليبيا</option>
-                            <option value="Iraq">Iraq - العراق</option>
-                            <option value="Palestine">Palestine - فلسطين</option>
-                            <option value="Yemen">Yemen - اليمن</option>
-                            <option value="Sudan">Sudan - السودان</option>
-                            <option value="Somalia">Somalia - الصومال</option>
-                            <option value="United States">United States</option>
-                            <option value="United Kingdom">United Kingdom</option>
-                            <option value="Canada">Canada</option>
-                            <option value="Australia">Australia</option>
-                            <option value="Germany">Germany</option>
-                            <option value="France">France</option>
-                            <option value="Spain">Spain</option>
-                            <option value="Italy">Italy</option>
-                            <option value="Netherlands">Netherlands</option>
-                            <option value="Brazil">Brazil</option>
-                            <option value="Argentina">Argentina</option>
                             <option value="Other">Other - أخرى</option>
                         </select>
                     </div>
@@ -601,7 +571,7 @@
                         <label class="form-label" data-en="label_phone">Phone Number</label>
                         <input type="tel" class="form-input" id="phone" 
                                data-placeholder-en="placeholder_phone"
-                               placeholder="+1 (234) 567-8900">
+                               placeholder="+966 50 123 4567">
                     </div>
                 </div>
 
@@ -617,7 +587,7 @@
 
     <!-- ===== Footer ===== -->
     <footer class="signup-footer">
-        <p class="footer-text" data-en="footer_text">© 2026 TopCompSports - Professional tournament management for Jiu-Jitsu competitions</p>
+        <p class="footer-text" data-en="footer_text">© 2026 TopCompSports - Professional tournament management</p>
     </footer>
 
     <script>
@@ -626,18 +596,99 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // ===== Translation Dictionary (Fallback if translations.js fails) =====
+        const fallbackTranslations = {
+            en: {
+                signup_title: "Create Your Account - TopCompSports",
+                nav_home: "Home", nav_tournaments: "Tournaments", nav_features: "Features", nav_organizer: "Organizer", btn_login: "Login",
+                signup_left_title: "Start your journey today.", signup_left_desc: "Join thousands of athletes, coaches, and organizers building the future of competition.",
+                signup_right_title: "Make your mark.", signup_right_desc: "Create your account to get started",
+                user_type_label: "I am joining as", type_athlete: "Athlete", type_coach: "Coach", type_organizer: "Organizer",
+                label_full_name: "Full Name *", placeholder_full_name: "Enter your full name",
+                label_email: "Email Address *", placeholder_email: "your.email@example.com",
+                label_password: "Password *", placeholder_password: "Minimum 8 characters",
+                label_confirm_password: "Confirm Password *", placeholder_confirm_password: "Re-enter password",
+                label_date_of_birth: "Date of Birth", label_gender: "Gender", placeholder_gender: "Select gender",
+                gender_male: "Male", gender_female: "Female",
+                label_country: "Country", placeholder_country: "Select your country",
+                label_phone: "Phone Number", placeholder_phone: "+966 50 123 4567",
+                btn_create_account: "Create Account →", login_link_text: "Already have an account?", login_link: "Sign in",
+                footer_text: "© 2026 TopCompSports - Professional tournament management",
+                alert_select_type: "❌ Please select your user type (Athlete, Coach, or Organizer)",
+                alert_password_mismatch: "❌ Passwords do not match!",
+                alert_password_short: "❌ Password must be at least 8 characters!",
+                alert_checking_email: "⏳ Checking email availability...",
+                alert_email_exists: "❌ This email is already registered. Please use a different email or login.",
+                alert_creating: "⏳ Creating your account...",
+                alert_success: "✅ Account created successfully! Please check your email to confirm your account.",
+                alert_error: "❌ Error: "
+            },
+            ar: {
+                signup_title: "إنشاء حسابك - TopCompSports",
+                nav_home: "الرئيسية", nav_tournaments: "البطولات", nav_features: "المميزات", nav_organizer: "منظم", btn_login: "تسجيل الدخول",
+                signup_left_title: "ابدأ رحلتك اليوم.", signup_left_desc: "انضم إلى آلاف الرياضيين والمدربين والمنظمين الذين يصنعون مستقبل المنافسات.",
+                signup_right_title: "اصنع بصمتك.", signup_right_desc: "أنشئ حسابك للبدء",
+                user_type_label: "أنا أنضم كـ", type_athlete: "رياضي", type_coach: "مدرب", type_organizer: "منظم",
+                label_full_name: "الاسم الكامل *", placeholder_full_name: "أدخل اسمك الكامل",
+                label_email: "البريد الإلكتروني *", placeholder_email: "your.email@example.com",
+                label_password: "كلمة المرور *", placeholder_password: "8 أحرف على الأقل",
+                label_confirm_password: "تأكيد كلمة المرور *", placeholder_confirm_password: "أعد إدخال كلمة المرور",
+                label_date_of_birth: "تاريخ الميلاد", label_gender: "النوع", placeholder_gender: "اختر النوع",
+                gender_male: "ذكر", gender_female: "أنثى",
+                label_country: "الدولة", placeholder_country: "اختر دولتك",
+                label_phone: "رقم الهاتف", placeholder_phone: "+966 50 123 4567",
+                btn_create_account: "← إنشاء الحساب", login_link_text: "لديك حساب بالفعل؟", login_link: "تسجيل الدخول",
+                footer_text: "© 2026 TopCompSports - الإدارة الاحترافية لبطولات الجوجيتسو",
+                alert_select_type: "❌ يرجى اختيار نوع المستخدم (رياضي، مدرب، أو منظم)",
+                alert_password_mismatch: "❌ كلمات المرور غير متطابقة!",
+                alert_password_short: "❌ يجب أن تكون كلمة المرور 8 أحرف على الأقل!",
+                alert_checking_email: "⏳ جاري التحقق من توفر البريد الإلكتروني...",
+                alert_email_exists: "❌ هذا البريد الإلكتروني مسجل مسبقاً. يرجى استخدام بريد آخر أو تسجيل الدخول.",
+                alert_creating: "⏳ جاري إنشاء الحساب...",
+                alert_success: "✅ تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتأكيد الحساب.",
+                alert_error: "❌ خطأ: "
+            }
+        };
+
+        // ===== Language Switcher Function =====
+        function setLanguage(lang) {
+            localStorage.setItem('selectedLanguage', lang);
+            document.documentElement.lang = lang;
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+            // Determine which translation object to use
+            const dict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : fallbackTranslations[lang];
+
+            // Update text content
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const key = el.getAttribute('data-en');
+                if (dict[key]) el.textContent = dict[key];
+            });
+
+            // Update placeholders
+            document.querySelectorAll('[data-placeholder-en]').forEach(el => {
+                const key = el.getAttribute('data-placeholder-en');
+                if (dict[key]) el.placeholder = dict[key];
+            });
+
+            // Update active button state
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+            });
+        }
+
         // ===== User Type Selection =====
         function selectUserType(type) {
             document.querySelectorAll('.user-type-option').forEach(opt => opt.classList.remove('active'));
             document.getElementById(`type-${type}`).classList.add('active');
             document.getElementById('userType').value = type;
             
-            // عرض النوع المختار
+            const lang = localStorage.getItem('selectedLanguage') || 'en';
+            const typeNames = { athlete: lang === 'ar' ? 'رياضي' : 'Athlete', coach: lang === 'ar' ? 'مدرب' : 'Coach', organizer: lang === 'ar' ? 'منظم' : 'Organizer' };
+            
             const display = document.getElementById('userTypeDisplay');
             display.style.display = 'block';
-            display.textContent = `✅ Joining as: ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-            
-            console.log('✅ User type selected:', type);
+            display.textContent = `✅ ${lang === 'ar' ? 'تنضم كـ: ' : 'Joining as: '}${typeNames[type]}`;
         }
 
         // ===== Show Alert =====
@@ -649,30 +700,11 @@
             setTimeout(() => alert.classList.remove('show'), 8000);
         }
 
-        // ===== Check if Email Exists =====
-        async function checkEmailExists(email) {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('users')
-                    .select('email')
-                    .eq('email', email.toLowerCase())
-                    .maybeSingle();
-                
-                if (error) {
-                    console.error('Check email error:', error);
-                    return false;
-                }
-                return data !== null;
-            } catch (error) {
-                console.error('Error:', error);
-                return false;
-            }
-        }
-
-        // ===== Get Translation =====
+        // ===== Helper: Get Translation =====
         function t(key) {
             const lang = localStorage.getItem('selectedLanguage') || 'en';
-            return translations[lang][key] || translations['en'][key] || key;
+            const dict = (typeof translations !== 'undefined' && translations[lang]) ? translations[lang] : fallbackTranslations[lang];
+            return dict[key] || key;
         }
 
         // ===== Handle Signup =====
@@ -690,16 +722,6 @@
             const country = document.getElementById('country').value;
             const phone = document.getElementById('phone').value.trim();
 
-            console.log('📋 Signup Data:', {
-                userType,
-                fullName,
-                email,
-                dateOfBirth,
-                gender,
-                country,
-                phone
-            });
-
             // 1. Validate User Type
             if (!userType) {
                 showAlert('error', t('alert_select_type'));
@@ -712,43 +734,36 @@
                 return;
             }
 
-            // 3. Validate Password Length
-            if (password.length < 6) {
+            // 3. Validate Password Length (Supabase requires min 6, but 8 is best practice)
+            if (password.length < 8) {
                 showAlert('error', t('alert_password_short'));
                 return;
             }
 
-            // 4. Check if email already exists
-            showAlert('info', t('alert_checking_email'));
-            const emailExists = await checkEmailExists(email);
-            
-            if (emailExists) {
-                showAlert('error', t('alert_email_exists'));
-                return;
-            }
-
-            // 5. Disable button during signup
+            // 4. Disable button during signup
             submitBtn.disabled = true;
             submitBtn.textContent = t('alert_creating');
+            showAlert('info', t('alert_checking_email'));
 
             try {
-                // 6. Sign up with Supabase Auth
-                console.log(' Creating auth user with user_type:', userType);
-                
+                // 5. Sign up with Supabase Auth (Metadata will trigger the handle_new_user function)
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
                     options: {
                         data: {
                             full_name: fullName,
-                            user_type: userType  // ✅ إرسال نوع المستخدم
+                            user_type: userType,
+                            date_of_birth: dateOfBirth || null,
+                            gender: gender || null,
+                            country: country || null,
+                            phone: phone || null
                         }
                     }
                 });
 
                 if (authError) {
-                    console.error('Auth error:', authError);
-                    if (authError.message.includes('already registered')) {
+                    if (authError.message.includes('already registered') || authError.message.includes('User already registered')) {
                         showAlert('error', t('alert_email_exists'));
                     } else {
                         showAlert('error', t('alert_error') + authError.message);
@@ -758,98 +773,41 @@
                     return;
                 }
 
-                console.log('✅ Auth user created:', authData.user);
-                console.log('📊 User metadata:', authData.user.user_metadata);
+                console.log('✅ Auth user created:', authData.user.id);
 
-                // 7. انتظار لحظة حتى يتم إنشاء المستخدم في جدول users عبر الـ Trigger
-                await new Promise(resolve => setTimeout(resolve, 1500));
-
-                // 8. تحديث بيانات المستخدم في جدول users
-                console.log('💾 Updating users table...');
+                // 6. Fallback: Ensure data is in public.users table (The trigger should do this, but this guarantees it)
+                // We use upsert to avoid conflicts if the trigger already ran
                 const { error: updateError } = await supabaseClient
                     .from('users')
-                    .update({
+                    .upsert({
+                        id: authData.user.id,
+                        email: email,
                         full_name: fullName,
-                        user_type: userType,  // ✅ تحديث user_type في جدول users
+                        user_type: userType,
                         date_of_birth: dateOfBirth || null,
                         gender: gender || null,
                         country: country || null,
                         phone: phone || null,
                         updated_at: new Date().toISOString()
-                    })
-                    .eq('id', authData.user.id);
+                    }, { onConflict: 'id' });
 
                 if (updateError) {
-                    console.error('❌ Update error:', updateError);
+                    console.warn('⚠️ Users table upsert warning:', updateError.message);
+                    // We don't stop here because the auth user was created successfully
                 } else {
-                    console.log('✅ Users table updated successfully');
+                    console.log('✅ Users table synced successfully');
                 }
 
-                // 9. إنشاء السجل في الجدول المناسب
-                console.log(`📝 Creating record in ${userType}s table...`);
-                let tableError = null;
-                
-                if (userType === 'athlete') {
-                    const { error } = await supabaseClient
-                        .from('athletes')
-                        .insert([{
-                            user_id: authData.user.id,
-                            full_name: fullName,
-                            email: email,
-                            phone: phone || null,
-                            country: country || null,
-                            date_of_birth: dateOfBirth || null,
-                            gender: gender || null,
-                            verification_status: 'pending'
-                        }]);
-                    tableError = error;
-                } else if (userType === 'coach') {
-                    const { error } = await supabaseClient
-                        .from('coaches')
-                        .insert([{
-                            user_id: authData.user.id,
-                            full_name: fullName,
-                            email: email,
-                            phone: phone || null,
-                            country: country || null,
-                            date_of_birth: dateOfBirth || null,
-                            gender: gender || null,
-                            verification_status: 'pending'
-                        }]);
-                    tableError = error;
-                } else if (userType === 'organizer') {
-                    const { error } = await supabaseClient
-                        .from('organizers')
-                        .insert([{
-                            user_id: authData.user.id,
-                            full_name: fullName,
-                            email: email,
-                            phone: phone || null,
-                            country: country || null,
-                            date_of_birth: dateOfBirth || null,
-                            gender: gender || null,
-                            verification_status: 'pending'
-                        }]);
-                    tableError = error;
-                }
-
-                if (tableError) {
-                    console.error('❌ Table error:', tableError);
-                    showAlert('error', t('alert_table_error'));
-                } else {
-                    console.log(`✅ ${userType} record created successfully`);
-                }
-
-                // 10. Success!
+                // 7. Success!
                 showAlert('success', t('alert_success'));
                 
-                // 11. Clear form
+                // 8. Clear form
                 document.getElementById('signupForm').reset();
                 document.querySelectorAll('.user-type-option').forEach(opt => opt.classList.remove('active'));
                 document.getElementById('userType').value = '';
                 document.getElementById('userTypeDisplay').style.display = 'none';
 
-                // 12. Redirect to login after 4 seconds
+                // 9. Redirect to login after 4 seconds
                 setTimeout(() => {
                     window.location.href = 'login.html?email=' + encodeURIComponent(email);
                 }, 4000);
@@ -861,6 +819,12 @@
                 submitBtn.textContent = t('btn_create_account');
             }
         }
+
+        // ===== Initialize Language on Load =====
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('selectedLanguage') || 'en';
+            setLanguage(savedLang);
+        });
     </script>
 </body>
 </html>
