@@ -59,11 +59,12 @@
         .page-title { font-size: 2.5rem; font-weight: 900; color: var(--dark-blue); text-align: center; margin-bottom: 40px; }
         .profile-card { background: var(--white); border-radius: 20px; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); border: 2px solid #E2E8F0; }
         .profile-header { text-align: center; margin-bottom: 40px; padding-bottom: 30px; border-bottom: 2px solid #E2E8F0; }
-        .profile-avatar { width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 4px solid var(--accent-yellow); background: var(--gradient-blue); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 60px; }
+        .profile-avatar { width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 4px solid var(--accent-yellow); background: var(--gradient-blue); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 60px; cursor: pointer; transition: all 0.3s; }
+        .profile-avatar:hover { transform: scale(1.05); box-shadow: 0 5px 20px rgba(0,102,204,0.4); }
         .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .profile-name { font-size: 1.8rem; font-weight: 700; color: var(--dark-blue); margin-bottom: 8px; }
         .profile-email { color: var(--primary-blue); font-size: 1.1rem; margin-bottom: 20px; }
-        .upload-btn { background: var(--primary-blue); color: var(--white); padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .upload-btn { background: var(--primary-blue); color: var(--white); padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; margin-top: 10px; }
         .upload-btn:hover { background: var(--dark-blue); transform: translateY(-2px); }
 
         .form-group { margin-bottom: 20px; }
@@ -207,10 +208,14 @@
 
         <div id="profileContent" class="profile-card" style="display: none;">
             <div class="profile-header">
-                <div class="profile-avatar" id="profileAvatar"><span>👤</span></div>
+                <div class="profile-avatar" id="profileAvatar" onclick="document.getElementById('profilePic').click()">
+                    <span>👤</span>
+                </div>
                 <div class="profile-name" id="profileName">User Name</div>
                 <div class="profile-email" id="profileEmail">user@email.com</div>
-                <button class="upload-btn" onclick="document.getElementById('profilePic').click()"> <span data-en="change_photo">Change Photo</span></button>
+                <button class="upload-btn" onclick="document.getElementById('profilePic').click()"> 
+                    <span data-en="change_photo">Change Photo</span>
+                </button>
                 <input type="file" id="profilePic" accept="image/*" onchange="handleProfilePicUpload(event)" style="display: none;">
             </div>
 
@@ -313,7 +318,12 @@
     <script>
         // 1. الاتصال بقاعدة البيانات
         const db = window.supabaseClient;
-        if (!db) console.error('❌ Supabase client not loaded.');
+        if (!db) {
+            console.error('❌ Supabase client not loaded. Initializing...');
+            const SUPABASE_URL = 'https://ngiclnkmbvzjhylwhzyn.supabase.co';
+            const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5naWNsbmttYnZ6amh5bHdoenluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzNDg4MzgsImV4cCI6MjEwMzkyNDgzOH0.6ourM74pyo5B4dggygmJI9Ysclumfwh-Xh08cS6qY5w';
+            window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
 
         let currentUser = null;
         let profilePictureFile = null;
@@ -424,37 +434,58 @@
             }
         }
 
-        // 6. رفع صورة البروفايل
+        // 6. رفع صورة البروفايل - تحسين معالجة الأخطاء
         async function handleProfilePicUpload(event) {
             const file = event.target.files[0];
-            if (!file || file.size > 5 * 1024 * 1024 || !file.type.startsWith('image/')) {
-                showAlert('error', 'File must be an image under 5MB');
+            if (!file) {
+                showAlert('error', 'No file selected');
                 return;
             }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showAlert('error', 'File size must be less than 5MB');
+                return;
+            }
+            
+            if (!file.type.startsWith('image/')) {
+                showAlert('error', 'File must be an image (JPG, PNG, GIF)');
+                return;
+            }
+
             profilePictureFile = file;
+            
+            // عرض معاينة فورية
             const reader = new FileReader();
             reader.onload = (e) => { 
                 document.getElementById('profileAvatar').innerHTML = 
                     `<img src="${e.target.result}" alt="Profile">`; 
             };
             reader.readAsDataURL(file);
-            showAlert('success', 'Photo selected. Click Save to upload.');
+            
+            showAlert('success', '✅ Photo selected. Click "Save Changes" to upload.');
+            console.log(' Photo ready to upload:', file.name, 'Size:', (file.size / 1024).toFixed(2) + 'KB');
         }
 
         // 7. رفع وثيقة الهوية (2 MB)
         async function handleIDDocumentUpload(event) {
             const file = event.target.files[0];
-            if (!file || file.size > 2 * 1024 * 1024) {
+            if (!file) {
+                showAlert('error', 'No file selected');
+                return;
+            }
+            
+            if (file.size > 2 * 1024 * 1024) {
                 showAlert('error', 'File size must be less than 2MB');
                 return;
             }
+            
             idDocumentFile = file;
             document.getElementById('idDocumentPreview').style.display = 'block';
             document.getElementById('idDocumentName').textContent = file.name;
-            showAlert('success', 'ID document selected. Click Save to upload.');
+            showAlert('success', '✅ ID document selected. Click "Save Changes" to upload.');
         }
 
-        // 8. حفظ تحديثات البروفايل
+        // 8. حفظ تحديثات البروفايل - تحسين رفع الصور
         async function handleProfileUpdate(e) {
             e.preventDefault();
             const saveBtn = document.getElementById('saveBtn');
@@ -476,91 +507,116 @@
 
                 console.log('💾 Updating profile:', profileData);
 
-                // رفع صورة البروفايل
+                // رفع صورة البروفايل إذا تم اختيار ملف جديد
                 if (profilePictureFile) {
                     try {
+                        console.log('📤 Uploading profile picture...');
                         const fileExt = profilePictureFile.name.split('.').pop();
-                        const filePath = `${currentUser.id}/${currentUser.id}-profile.${fileExt}`;
+                        const fileName = `${currentUser.id}-profile.${fileExt}`;
+                        const filePath = `${currentUser.id}/${fileName}`;
                         
-                        const { error: uploadError } = await db.storage
+                        // محاولة الرفع إلى bucket 'profiles'
+                        const { data: uploadData, error: uploadError } = await db.storage
                             .from('profiles')
-                            .upload(filePath, profilePictureFile, { upsert: true });
-                            
-                        if (!uploadError) {
-                            const { data: { publicUrl } } = db.storage
-                                .from('profiles')
-                                .getPublicUrl(filePath);
-                            profileData.profile_picture_url = publicUrl;
-                            console.log('✅ Picture uploaded:', publicUrl);
-                        } else {
-                            console.error('❌ Upload error:', uploadError);
+                            .upload(filePath, profilePictureFile, { 
+                                upsert: true,
+                                cacheControl: '3600'
+                            });
+                        
+                        if (uploadError) {
+                            console.error('❌ Storage upload error:', uploadError);
+                            throw new Error(`Failed to upload image: ${uploadError.message}`);
                         }
-                    } catch (err) { 
-                        console.warn('⚠️ Picture upload skipped:', err); 
+                        
+                        console.log('✅ Upload successful:', uploadData);
+                        
+                        // الحصول على الرابط العام
+                        const { data: { publicUrl } } = db.storage
+                            .from('profiles')
+                            .getPublicUrl(filePath);
+                        
+                        profileData.profile_picture_url = publicUrl;
+                        console.log('✅ Picture URL:', publicUrl);
+                        
+                    } catch (err) {
+                        console.error('❌ Profile picture upload failed:', err);
+                        showAlert('error', `Failed to upload picture: ${err.message}`);
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = '💾 <span data-en="btn_save">Save Changes</span>';
+                        return;
                     }
                 }
 
-                // رفع وثيقة الهوية
+                // رفع وثيقة الهوية إذا تم اختيار ملف جديد
                 if (idDocumentFile) {
                     try {
+                        console.log('📤 Uploading ID document...');
                         const fileExt = idDocumentFile.name.split('.').pop();
-                        const filePath = `${currentUser.id}/${currentUser.id}-id-document.${fileExt}`;
+                        const fileName = `${currentUser.id}-id-document.${fileExt}`;
+                        const filePath = `${currentUser.id}/${fileName}`;
                         
-                        const { error: uploadError } = await db.storage
+                        const { data: uploadData, error: uploadError } = await db.storage
                             .from('id_documents')
-                            .upload(filePath, idDocumentFile, { upsert: true });
-                            
-                        if (!uploadError) {
-                            const { data: { publicUrl } } = db.storage
-                                .from('id_documents')
-                                .getPublicUrl(filePath);
-                            profileData.id_document_url = publicUrl;
-                            console.log('✅ ID document uploaded:', publicUrl);
-                        } else {
+                            .upload(filePath, idDocumentFile, { 
+                                upsert: true,
+                                cacheControl: '3600'
+                            });
+                        
+                        if (uploadError) {
                             console.error('❌ ID document upload error:', uploadError);
+                            throw new Error(`Failed to upload ID: ${uploadError.message}`);
                         }
-                    } catch (err) { 
-                        console.warn('⚠️ ID document upload skipped:', err); 
+                        
+                        const { data: { publicUrl } } = db.storage
+                            .from('id_documents')
+                            .getPublicUrl(filePath);
+                        
+                        profileData.id_document_url = publicUrl;
+                        console.log('✅ ID document URL:', publicUrl);
+                        
+                    } catch (err) {
+                        console.error('❌ ID document upload failed:', err);
+                        showAlert('error', `Failed to upload ID document: ${err.message}`);
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = '💾 <span data-en="btn_save">Save Changes</span>';
+                        return;
                     }
                 }
 
                 // حفظ البيانات في جدول users
-                const { error: upsertError } = await db
+                console.log('💾 Saving to database...');
+                const { data: updatedProfile, error: upsertError } = await db
                     .from('users')
-                    .upsert(profileData, { onConflict: 'id' });
+                    .upsert(profileData, { onConflict: 'id' })
+                    .select();
 
                 if (upsertError) {
                     console.error('❌ Database update error:', upsertError);
-                    throw upsertError;
+                    throw new Error(`Database error: ${upsertError.message}`);
                 }
 
-                // حفظ رابط الوثيقة في الجدول الفرعي
-                let tableUpdateError = null;
-                if (userType === 'organizer') {
-                    const { error } = await db.from('organizers').update({ id_document_url: profileData.id_document_url }).eq('user_id', currentUser.id);
-                    tableUpdateError = error;
-                } else if (userType === 'coach') {
-                    const { error } = await db.from('coaches').update({ id_document_url: profileData.id_document_url }).eq('user_id', currentUser.id);
-                    tableUpdateError = error;
-                } else if (userType === 'athlete') {
-                    const { error } = await db.from('athletes').update({ id_document_url: profileData.id_document_url }).eq('user_id', currentUser.id);
-                    tableUpdateError = error;
-                }
-
-                if (tableUpdateError) {
-                    console.warn('⚠️ Table update warning:', tableUpdateError);
-                }
-
-                console.log('✅ Profile updated successfully');
+                console.log('✅ Profile saved successfully:', updatedProfile);
                 showAlert('success', '✅ Profile updated successfully!');
                 
                 // تحديث localStorage
                 const localData = JSON.parse(localStorage.getItem('currentUser') || '{}');
                 localData.full_name = profileData.full_name;
                 localData.user_type = profileData.user_type;
-                localData.profile_picture_url = profileData.profile_picture_url;
-                localData.id_document_url = profileData.id_document_url;
+                if (profileData.profile_picture_url) {
+                    localData.profile_picture_url = profileData.profile_picture_url;
+                }
+                if (profileData.id_document_url) {
+                    localData.id_document_url = profileData.id_document_url;
+                }
                 localStorage.setItem('currentUser', JSON.stringify(localData));
+
+                // إعادة تعيين الملفات
+                profilePictureFile = null;
+                idDocumentFile = null;
+                document.getElementById('profilePic').value = '';
+                if (document.getElementById('idDocument')) {
+                    document.getElementById('idDocument').value = '';
+                }
 
                 setTimeout(() => { window.location.reload(); }, 1500);
 
@@ -569,13 +625,13 @@
                 showAlert('error', '❌ Error: ' + error.message);
             } finally {
                 saveBtn.disabled = false;
-                saveBtn.innerHTML = ' <span data-en="btn_save">Save Changes</span>';
+                saveBtn.innerHTML = '💾 <span data-en="btn_save">Save Changes</span>';
             }
         }
 
         // 9. تسجيل الخروج
         async function handleLogout() {
-            if (confirm('Are you sure?')) {
+            if (confirm('Are you sure you want to logout?')) {
                 await db.auth.signOut();
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem('userProfile');
