@@ -7,7 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ... نفس الـ CSS السابق ... */
         :root {
             --primary-blue: #2563EB;
             --dark-blue: #1d4ed8;
@@ -615,7 +614,7 @@
         }
 
         async function confirmSuspend() {
-            console.log('⏸️ confirmSuspend called');
+            console.log('️ confirmSuspend called');
             const reason = document.getElementById('suspendReason').value.trim();
             if (!reason) {
                 alert(currentLang === 'ar' ? 'يرجى إدخال سبب التعليق' : 'Please enter a reason for suspension');
@@ -631,7 +630,7 @@
                 closeSuspendModal();
                 loadTeams();
             } catch (error) {
-                console.error('❌ Suspend error:', error);
+                console.error(' Suspend error:', error);
                 showAlert('Error: ' + error.message, 'error');
             }
         }
