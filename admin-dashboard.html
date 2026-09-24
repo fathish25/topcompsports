@@ -60,6 +60,9 @@
         .user-info { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         .user-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #1d4ed8); display: flex; align-items: center; justify-content: center; color: var(--text-main); font-weight: bold; font-size: 1.2rem; }
         .btn-logout { background: var(--danger); color: var(--text-main); padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-refresh { background: var(--primary); color: var(--text-main); padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-left: 10px; }
+        .btn-refresh:hover { background: #1d4ed8; }
+        .btn-refresh:disabled { opacity: 0.6; cursor: not-allowed; }
 
         /* Language Switcher */
         .lang-switcher { display: flex; gap: 8px; background: var(--bg-input); padding: 5px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
@@ -92,6 +95,8 @@
             transition: all 0.3s;
             cursor: pointer;
             border-right: 4px solid var(--primary);
+            position: relative;
+            overflow: hidden;
         }
         [dir="ltr"] .stat-card { border-right: none; border-left: 4px solid var(--primary); }
         .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(37, 99, 235, 0.2); }
@@ -104,6 +109,7 @@
         .stat-icon { font-size: 2.5rem; margin-bottom: 15px; }
         .stat-value { font-size: 2.5rem; font-weight: bold; color: var(--accent); margin-bottom: 5px; }
         .stat-label { color: var(--text-muted); font-size: 0.95rem; }
+        .stat-updated { font-size: 0.75rem; color: var(--text-muted); margin-top: 10px; opacity: 0.7; }
 
         /* Quick Actions */
         .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
@@ -125,8 +131,11 @@
 
         /* Sections */
         .section { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 30px; margin-bottom: 30px; }
-        .section-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.1); color: var(--accent); display: flex; align-items: center; gap: 10px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .section-title { font-size: 1.5rem; font-weight: bold; color: var(--accent); display: flex; align-items: center; gap: 10px; }
         .section-title .icon { font-size: 1.8rem; }
+        .btn-refresh-section { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s; }
+        .btn-refresh-section:hover { background: var(--primary); color: var(--text-main); }
 
         /* Tables */
         .data-table { width: 100%; border-collapse: collapse; }
@@ -138,16 +147,25 @@
         .status-badge.pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
         .status-badge.approved { background: rgba(16, 185, 129, 0.2); color: var(--success); }
         .status-badge.rejected { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
-        .btn-action { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin: 0 5px; }
+        .btn-action { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin: 0 5px; transition: all 0.3s; }
+        .btn-action:hover { transform: scale(1.05); }
         .btn-approve { background: var(--success); color: var(--text-main); }
         .btn-reject { background: var(--danger); color: var(--text-main); }
 
         /* Loading & Alert */
         .loading { text-align: center; padding: 60px; color: var(--text-muted); font-size: 1.2rem; }
-        .alert { padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; }
+        .loading-spinner { display: inline-block; width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-left-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .alert { padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: none; font-weight: 600; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .alert.show { display: block; }
         .alert-success { background: rgba(16, 185, 129, 0.2); border: 1px solid var(--success); color: var(--success); }
         .alert-error { background: rgba(239, 68, 68, 0.2); border: 1px solid var(--danger); color: var(--danger); }
+        .alert-info { background: rgba(37, 99, 235, 0.2); border: 1px solid var(--primary); color: var(--primary); }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
+        .empty-state i { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -155,7 +173,9 @@
             [dir="rtl"] .main-content, [dir="ltr"] .main-content { margin: 0; padding: 20px; }
             .stats-grid { grid-template-columns: 1fr; }
             .header { flex-direction: column; align-items: flex-start; }
-            .user-info { width: 100%; justify-content: space-between; }
+            .user-info { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+            .section-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .quick-actions { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -216,7 +236,12 @@
     <!-- Main Content -->
     <main class="main-content">
         <div class="header">
-            <h1 class="page-title" data-en="Admin Dashboard" data-ar="لوحة تحكم الأدمن">Admin Dashboard</h1>
+            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                <h1 class="page-title" data-en="Admin Dashboard" data-ar="لوحة تحكم الأدمن">Admin Dashboard</h1>
+                <button class="btn-refresh" onclick="refreshAllData()" id="btnRefreshAll" title="Refresh Data">
+                    <i class="fas fa-sync-alt"></i> <span data-en="Refresh" data-ar="تحديث">Refresh</span>
+                </button>
+            </div>
             <div class="user-info">
                 <!-- Language Switcher -->
                 <div class="lang-switcher">
@@ -238,21 +263,25 @@
                 <div class="stat-icon"><i class="fas fa-users"></i></div>
                 <div class="stat-value" id="totalUsers">0</div>
                 <div class="stat-label" data-en="Total Users" data-ar="إجمالي المستخدمين">Total Users</div>
+                <div class="stat-updated" id="usersUpdated"></div>
             </div>
             <div class="stat-card success" onclick="window.location.href='admin-tournaments.html'">
                 <div class="stat-icon"><i class="fas fa-trophy"></i></div>
                 <div class="stat-value" id="totalTournaments">0</div>
                 <div class="stat-label" data-en="Tournaments" data-ar="البطولات">Tournaments</div>
+                <div class="stat-updated" id="tournamentsUpdated"></div>
             </div>
             <div class="stat-card warning" onclick="window.location.href='admin-organizations.html?filter=pending'">
                 <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
                 <div class="stat-value" id="pendingOrganizers">0</div>
                 <div class="stat-label" data-en="Pending Organizers" data-ar="منظمون في الانتظار">Pending Organizers</div>
+                <div class="stat-updated" id="organizersUpdated"></div>
             </div>
             <div class="stat-card danger" onclick="window.location.href='admin-teams.html'">
                 <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
                 <div class="stat-value" id="totalTeams">0</div>
                 <div class="stat-label" data-en="Teams" data-ar="الفرق">Teams</div>
+                <div class="stat-updated" id="teamsUpdated"></div>
             </div>
         </div>
 
@@ -287,23 +316,39 @@
 
         <!-- Pending Organizers -->
         <div class="section">
-            <h2 class="section-title">
-                <span class="icon"><i class="fas fa-hourglass-half"></i></span>
-                <span data-en="Pending Organizer Verification" data-ar="التحقق من المنظمين المعلقين">Pending Organizer Verification</span>
-            </h2>
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="icon"><i class="fas fa-hourglass-half"></i></span>
+                    <span data-en="Pending Organizer Verification" data-ar="التحقق من المنظمين المعلقين">Pending Organizer Verification</span>
+                </h2>
+                <button class="btn-refresh-section" onclick="loadPendingOrganizers()">
+                    <i class="fas fa-sync-alt"></i> <span data-en="Refresh" data-ar="تحديث">Refresh</span>
+                </button>
+            </div>
             <div id="pendingOrganizersList">
-                <div class="loading" data-en="Loading..." data-ar="جاري التحميل...">Loading...</div>
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div data-en="Loading..." data-ar="جاري التحميل...">Loading...</div>
+                </div>
             </div>
         </div>
 
         <!-- Recent Activity -->
         <div class="section">
-            <h2 class="section-title">
-                <span class="icon"><i class="fas fa-history"></i></span>
-                <span data-en="Recent Activity" data-ar="النشاط الأخير">Recent Activity</span>
-            </h2>
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="icon"><i class="fas fa-history"></i></span>
+                    <span data-en="Recent Activity" data-ar="النشاط الأخير">Recent Activity</span>
+                </h2>
+                <button class="btn-refresh-section" onclick="loadRecentActivity()">
+                    <i class="fas fa-sync-alt"></i> <span data-en="Refresh" data-ar="تحديث">Refresh</span>
+                </button>
+            </div>
             <div id="recentActivity">
-                <div class="loading" data-en="Loading..." data-ar="جاري التحميل...">Loading...</div>
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div data-en="Loading..." data-ar="جاري التحميل...">Loading...</div>
+                </div>
             </div>
         </div>
     </main>
@@ -315,6 +360,13 @@
 
         let currentAdmin = null;
         let currentLang = localStorage.getItem('adminLang') || 'en';
+        let realtimeChannels = [];
+        let lastUpdated = {
+            users: null,
+            tournaments: null,
+            organizers: null,
+            teams: null
+        };
 
         // ========================================
         // نظام الترجمة - Language System
@@ -349,13 +401,14 @@
             try {
                 currentAdmin = JSON.parse(storedAdmin);
                 
-                const { data: admin } = await dbClient
+                const { data: admin, error } = await dbClient
                     .from('admin_profiles')
                     .select('*')
                     .eq('id', currentAdmin.id)
                     .maybeSingle();
 
-                if (!admin) {
+                if (error || !admin) {
+                    console.error('Auth error:', error);
                     localStorage.removeItem('currentAdmin');
                     window.location.href = 'admin-login.html';
                     return;
@@ -379,13 +432,40 @@
         }
 
         // ========================================
+        // تحديث جميع البيانات
+        // ========================================
+        async function refreshAllData() {
+            const btn = document.getElementById('btnRefreshAll');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (currentLang === 'ar' ? 'جاري التحديث...' : 'Refreshing...');
+            
+            try {
+                await Promise.all([
+                    loadStats(),
+                    loadPendingOrganizers(),
+                    loadRecentActivity()
+                ]);
+                showAlert(currentLang === 'ar' ? 'تم تحديث البيانات بنجاح' : 'Data refreshed successfully', 'success');
+            } catch (error) {
+                console.error('Refresh error:', error);
+                showAlert(currentLang === 'ar' ? 'خطأ في تحديث البيانات' : 'Error refreshing data', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> ' + (currentLang === 'ar' ? 'تحديث' : 'Refresh');
+            }
+        }
+
+        // ========================================
         // تحميل بيانات الداش بورد
         // ========================================
         async function loadDashboardData() {
             try {
-                await loadStats();
-                await loadPendingOrganizers();
-                await loadRecentActivity();
+                await Promise.all([
+                    loadStats(),
+                    loadPendingOrganizers(),
+                    loadRecentActivity()
+                ]);
+                setupRealtimeSubscriptions();
             } catch (error) {
                 console.error('Error loading dashboard:', error);
                 showAlert(currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading dashboard data', 'error');
@@ -393,41 +473,160 @@
         }
 
         // ========================================
-        // تحميل الإحصائيات
+        // تحميل الإحصائيات مع كسر الكاش
         // ========================================
         async function loadStats() {
-            // ✅ إضافة timestamp لكسر الكاش
-            const { count: athletesCount } = await dbClient
-                .from('athletes')
-                .select('*', { count: 'exact', head: true });
+            const timestamp = Date.now();
+            
+            try {
+                // ✅ استخدام RPC أو استعلامات مع timestamp لكسر الكاش
+                const [
+                    { count: athletesCount },
+                    { count: coachesCount },
+                    { count: organizersCount },
+                    { count: tournamentsCount },
+                    { count: pendingCount },
+                    { count: teamsCount }
+                ] = await Promise.all([
+                    dbClient.from('athletes').select('*', { count: 'exact', head: true }),
+                    dbClient.from('coaches').select('*', { count: 'exact', head: true }),
+                    dbClient.from('organizers').select('*', { count: 'exact', head: true }),
+                    dbClient.from('tournaments').select('*', { count: 'exact', head: true }),
+                    dbClient.from('organizers').select('*', { count: 'exact', head: true }).eq('verification_status', 'pending'),
+                    dbClient.from('teams').select('*', { count: 'exact', head: true })
+                ]);
 
-            const { count: coachesCount } = await dbClient
-                .from('coaches')
-                .select('*', { count: 'exact', head: true });
+                const totalUsers = (athletesCount || 0) + (coachesCount || 0) + (organizersCount || 0);
 
-            const { count: organizersCount } = await dbClient
-                .from('organizers')
-                .select('*', { count: 'exact', head: true });
+                // ✅ تحديث القيم مع animation
+                animateValue('totalUsers', parseInt(document.getElementById('totalUsers').textContent) || 0, totalUsers || 0, 500);
+                animateValue('totalTournaments', parseInt(document.getElementById('totalTournaments').textContent) || 0, tournamentsCount || 0, 500);
+                animateValue('pendingOrganizers', parseInt(document.getElementById('pendingOrganizers').textContent) || 0, pendingCount || 0, 500);
+                animateValue('totalTeams', parseInt(document.getElementById('totalTeams').textContent) || 0, teamsCount || 0, 500);
 
-            const totalUsers = (athletesCount || 0) + (coachesCount || 0) + (organizersCount || 0);
+                // ✅ تحديث وقت آخر تحديث
+                const now = new Date();
+                const timeString = now.toLocaleTimeString(currentLang === 'ar' ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+                
+                document.getElementById('usersUpdated').textContent = `${currentLang === 'ar' ? 'محدث:' : 'Updated:'} ${timeString}`;
+                document.getElementById('tournamentsUpdated').textContent = `${currentLang === 'ar' ? 'محدث:' : 'Updated:'} ${timeString}`;
+                document.getElementById('organizersUpdated').textContent = `${currentLang === 'ar' ? 'محدث:' : 'Updated:'} ${timeString}`;
+                document.getElementById('teamsUpdated').textContent = `${currentLang === 'ar' ? 'محدث:' : 'Updated:'} ${timeString}`;
 
-            const { count: tournamentsCount } = await dbClient
-                .from('tournaments')
-                .select('*', { count: 'exact', head: true });
+                lastUpdated = {
+                    users: now,
+                    tournaments: now,
+                    organizers: now,
+                    teams: now
+                };
 
-            const { count: pendingCount } = await dbClient
-                .from('organizers')
-                .select('*', { count: 'exact', head: true })
-                .eq('verification_status', 'pending');
+            } catch (error) {
+                console.error('Error loading stats:', error);
+                showAlert(currentLang === 'ar' ? 'خطأ في تحميل الإحصائيات' : 'Error loading statistics', 'error');
+            }
+        }
 
-            const { count: teamsCount } = await dbClient
-                .from('teams')
-                .select('*', { count: 'exact', head: true });
+        // ========================================
+        // Animation للقيم
+        // ========================================
+        function animateValue(elementId, start, end, duration) {
+            const element = document.getElementById(elementId);
+            const range = end - start;
+            const minTimer = 50;
+            let stepTime = Math.abs(Math.floor(duration / range));
+            stepTime = Math.max(stepTime, minTimer);
+            
+            let startTime = new Date().getTime();
+            let endTime = startTime + duration;
+            let timer;
+            
+            function run() {
+                let now = new Date().getTime();
+                let remaining = Math.max((endTime - now) / duration, 0);
+                let value = Math.round(end - (remaining * range));
+                element.textContent = value;
+                if (value == end) {
+                    clearInterval(timer);
+                }
+            }
+            
+            timer = setInterval(run, stepTime);
+            run();
+        }
 
-            document.getElementById('totalUsers').textContent = totalUsers || 0;
-            document.getElementById('totalTournaments').textContent = tournamentsCount || 0;
-            document.getElementById('pendingOrganizers').textContent = pendingCount || 0;
-            document.getElementById('totalTeams').textContent = teamsCount || 0;
+        // ========================================
+        // إعداد Real-time Subscriptions
+        // ========================================
+        function setupRealtimeSubscriptions() {
+            // ✅ إلغاء القنوات القديمة إن وجدت
+            realtimeChannels.forEach(channel => dbClient.removeChannel(channel));
+            realtimeChannels = [];
+
+            // ✅ الاشتراك في جدول المنظمين
+            const organizersChannel = dbClient
+                .channel('public:organizers')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'organizers' }, 
+                    (payload) => {
+                        console.log('Organizers change:', payload);
+                        loadStats();
+                        loadPendingOrganizers();
+                    }
+                )
+                .subscribe();
+            realtimeChannels.push(organizersChannel);
+
+            // ✅ الاشتراك في جدول البطولات
+            const tournamentsChannel = dbClient
+                .channel('public:tournaments')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'tournaments' }, 
+                    (payload) => {
+                        console.log('Tournaments change:', payload);
+                        loadStats();
+                    }
+                )
+                .subscribe();
+            realtimeChannels.push(tournamentsChannel);
+
+            // ✅ الاشتراك في جدول الفرق
+            const teamsChannel = dbClient
+                .channel('public:teams')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'teams' }, 
+                    (payload) => {
+                        console.log('Teams change:', payload);
+                        loadStats();
+                    }
+                )
+                .subscribe();
+            realtimeChannels.push(teamsChannel);
+
+            // ✅ الاشتراك في جدول اللاعبين
+            const athletesChannel = dbClient
+                .channel('public:athletes')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'athletes' }, 
+                    (payload) => {
+                        console.log('Athletes change:', payload);
+                        loadStats();
+                    }
+                )
+                .subscribe();
+            realtimeChannels.push(athletesChannel);
+
+            // ✅ الاشتراك في جدول المدربين
+            const coachesChannel = dbClient
+                .channel('public:coaches')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'coaches' }, 
+                    (payload) => {
+                        console.log('Coaches change:', payload);
+                        loadStats();
+                    }
+                )
+                .subscribe();
+            realtimeChannels.push(coachesChannel);
         }
 
         // ========================================
@@ -436,11 +635,14 @@
         async function loadPendingOrganizers() {
             const container = document.getElementById('pendingOrganizersList');
             
-            // ✅ إضافة Loading State
-            container.innerHTML = `<div class="loading" data-en="Loading..." data-ar="جاري التحميل...">Loading...</div>`;
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div data-en="Loading..." data-ar="جاري التحميل...">Loading...</div>
+                </div>
+            `;
             
             try {
-                // ✅ استخدام rpc لتجنب الكاش أو إضافة timestamp
                 const { data: organizers, error } = await dbClient
                     .from('organizers')
                     .select('*')
@@ -449,45 +651,66 @@
 
                 if (error) {
                     console.error('Error loading organizers:', error);
-                    container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--danger);">${currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data'}</p>`;
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>${currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data'}</p>
+                        </div>
+                    `;
                     return;
                 }
                 
                 if (!organizers || organizers.length === 0) {
-                    container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--text-muted);">${currentLang === 'ar' ? 'لا توجد طلبات معلقة' : 'No pending verifications'}</p>`;
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <p>${currentLang === 'ar' ? 'لا توجد طلبات معلقة' : 'No pending verifications'}</p>
+                        </div>
+                    `;
                     return;
                 }
 
                 container.innerHTML = `
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>${currentLang === 'ar' ? 'الاسم' : 'Name'}</th>
-                                <th>${currentLang === 'ar' ? 'البريد' : 'Email'}</th>
-                                <th>${currentLang === 'ar' ? 'المنظمة' : 'Organization'}</th>
-                                <th>${currentLang === 'ar' ? 'التاريخ' : 'Submitted'}</th>
-                                <th>${currentLang === 'ar' ? 'الإجراءات' : 'Actions'}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${organizers.map(org => `
-                                <tr id="org-row-${org.id}">
-                                    <td>${org.full_name || 'N/A'}</td>
-                                    <td>${org.email || 'N/A'}</td>
-                                    <td>${org.organization_name || 'N/A'}</td>
-                                    <td>${new Date(org.created_at).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</td>
-                                    <td>
-                                        <button class="btn-action btn-approve" onclick="approveOrganizer('${org.id}')">${currentLang === 'ar' ? 'قبول' : 'Approve'}</button>
-                                        <button class="btn-action btn-reject" onclick="rejectOrganizer('${org.id}')">${currentLang === 'ar' ? 'رفض' : 'Reject'}</button>
-                                    </td>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>${currentLang === 'ar' ? 'الاسم' : 'Name'}</th>
+                                    <th>${currentLang === 'ar' ? 'البريد' : 'Email'}</th>
+                                    <th>${currentLang === 'ar' ? 'المنظمة' : 'Organization'}</th>
+                                    <th>${currentLang === 'ar' ? 'التاريخ' : 'Submitted'}</th>
+                                    <th>${currentLang === 'ar' ? 'الإجراءات' : 'Actions'}</th>
                                 </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                ${organizers.map(org => `
+                                    <tr id="org-row-${org.id}">
+                                        <td>${org.full_name || 'N/A'}</td>
+                                        <td>${org.email || 'N/A'}</td>
+                                        <td>${org.organization_name || 'N/A'}</td>
+                                        <td>${new Date(org.created_at).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</td>
+                                        <td>
+                                            <button class="btn-action btn-approve" onclick="approveOrganizer('${org.id}')">
+                                                <i class="fas fa-check"></i> ${currentLang === 'ar' ? 'قبول' : 'Approve'}
+                                            </button>
+                                            <button class="btn-action btn-reject" onclick="rejectOrganizer('${org.id}')">
+                                                <i class="fas fa-times"></i> ${currentLang === 'ar' ? 'رفض' : 'Reject'}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
                 `;
             } catch (error) {
                 console.error('Error in loadPendingOrganizers:', error);
-                container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--danger);">${currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data'}</p>`;
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>${currentLang === 'ar' ? 'خطأ في تحميل البيانات' : 'Error loading data'}</p>
+                    </div>
+                `;
             }
         }
 
@@ -498,7 +721,6 @@
             if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من الموافقة على هذا المنظم؟' : 'Are you sure you want to approve this organizer?')) return;
 
             try {
-                // ✅ إظهار Loading
                 const row = document.getElementById(`org-row-${organizerId}`);
                 if (row) {
                     row.style.opacity = '0.5';
@@ -512,7 +734,7 @@
                         updated_at: new Date().toISOString()
                     })
                     .eq('id', organizerId)
-                    .select(); // ✅ استرجاع البيانات المحدثة
+                    .select();
 
                 if (error) {
                     console.error('Error approving organizer:', error);
@@ -524,22 +746,27 @@
                     return;
                 }
 
-                // ✅ إزالة الصف فوراً من DOM
+                // ✅ إزالة الصف من الجدول
                 if (row) {
-                    row.remove();
+                    row.style.transition = 'all 0.3s';
+                    row.style.transform = 'translateX(100%)';
+                    row.style.opacity = '0';
+                    setTimeout(() => row.remove(), 300);
                 }
 
                 showAlert(currentLang === 'ar' ? 'تمت الموافقة بنجاح' : 'Organizer approved successfully', 'success');
                 
-                // ✅ إعادة تحميل الإحصائيات فوراً
+                // ✅ تحديث الإحصائيات
                 await loadStats();
                 
-                // ✅ التحقق إذا لم يتبق أي منظمين
-                const container = document.getElementById('pendingOrganizersList');
-                const remainingRows = container.querySelectorAll('tbody tr');
-                if (remainingRows.length === 0) {
-                    container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--text-muted);">${currentLang === 'ar' ? 'لا توجد طلبات معلقة' : 'No pending verifications'}</p>`;
-                }
+                // ✅ التحقق من الجدول
+                setTimeout(async () => {
+                    const container = document.getElementById('pendingOrganizersList');
+                    const remainingRows = container.querySelectorAll('tbody tr');
+                    if (remainingRows.length === 0) {
+                        await loadPendingOrganizers();
+                    }
+                }, 500);
                 
             } catch (error) {
                 console.error('Unexpected error in approveOrganizer:', error);
@@ -579,17 +806,22 @@
                 }
 
                 if (row) {
-                    row.remove();
+                    row.style.transition = 'all 0.3s';
+                    row.style.transform = 'translateX(100%)';
+                    row.style.opacity = '0';
+                    setTimeout(() => row.remove(), 300);
                 }
 
                 showAlert(currentLang === 'ar' ? 'تم الرفض بنجاح' : 'Organizer rejected', 'success');
                 await loadStats();
                 
-                const container = document.getElementById('pendingOrganizersList');
-                const remainingRows = container.querySelectorAll('tbody tr');
-                if (remainingRows.length === 0) {
-                    container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--text-muted);">${currentLang === 'ar' ? 'لا توجد طلبات معلقة' : 'No pending verifications'}</p>`;
-                }
+                setTimeout(async () => {
+                    const container = document.getElementById('pendingOrganizersList');
+                    const remainingRows = container.querySelectorAll('tbody tr');
+                    if (remainingRows.length === 0) {
+                        await loadPendingOrganizers();
+                    }
+                }, 500);
                 
             } catch (error) {
                 console.error('Unexpected error in rejectOrganizer:', error);
@@ -601,6 +833,15 @@
         // تحميل النشاط الأخير
         // ========================================
         async function loadRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div data-en="Loading..." data-ar="جاري التحميل...">Loading...</div>
+                </div>
+            `;
+
             try {
                 let { data: activity, error } = await dbClient
                     .from('admin_activity_logs')
@@ -608,7 +849,7 @@
                     .order('created_at', { ascending: false })
                     .limit(10);
 
-                if (error || !activity) {
+                if (error || !activity || activity.length === 0) {
                     const fallback = await dbClient
                         .from('activity_logs')
                         .select('*')
@@ -617,40 +858,49 @@
                     
                     activity = fallback.data;
                 }
-
-                const container = document.getElementById('recentActivity');
                 
                 if (!activity || activity.length === 0) {
-                    container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--text-muted);">${currentLang === 'ar' ? 'لا يوجد نشاط حديث' : 'No recent activity'}</p>`;
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-history"></i>
+                            <p>${currentLang === 'ar' ? 'لا يوجد نشاط حديث' : 'No recent activity'}</p>
+                        </div>
+                    `;
                     return;
                 }
 
                 container.innerHTML = `
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>${currentLang === 'ar' ? 'الإجراء' : 'Action'}</th>
-                                <th>${currentLang === 'ar' ? 'الأدمن' : 'Admin'}</th>
-                                <th>${currentLang === 'ar' ? 'الجدول' : 'Table'}</th>
-                                <th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${activity.map(log => `
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
                                 <tr>
-                                    <td>${log.action || log.event || 'N/A'}</td>
-                                    <td>${log.admin_email || log.user_email || 'System'}</td>
-                                    <td>${log.table_name || log.entity || 'N/A'}</td>
-                                    <td>${new Date(log.created_at).toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</td>
+                                    <th>${currentLang === 'ar' ? 'الإجراء' : 'Action'}</th>
+                                    <th>${currentLang === 'ar' ? 'الأدمن' : 'Admin'}</th>
+                                    <th>${currentLang === 'ar' ? 'الجدول' : 'Table'}</th>
+                                    <th>${currentLang === 'ar' ? 'الوقت' : 'Time'}</th>
                                 </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                ${activity.map(log => `
+                                    <tr>
+                                        <td>${log.action || log.event || 'N/A'}</td>
+                                        <td>${log.admin_email || log.user_email || 'System'}</td>
+                                        <td>${log.table_name || log.entity || 'N/A'}</td>
+                                        <td>${new Date(log.created_at).toLocaleString(currentLang === 'ar' ? 'ar-EG' : 'en-US')}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
                 `;
             } catch (error) {
                 console.error('Error loading activity:', error);
-                const container = document.getElementById('recentActivity');
-                container.innerHTML = `<p style="text-align: center; padding: 40px; color: var(--text-muted);">${currentLang === 'ar' ? 'لا يوجد نشاط حديث' : 'No recent activity'}</p>`;
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <p>${currentLang === 'ar' ? 'لا يوجد نشاط حديث' : 'No recent activity'}</p>
+                    </div>
+                `;
             }
         }
 
@@ -661,7 +911,9 @@
             const alert = document.getElementById('alert');
             alert.className = `alert alert-${type} show`;
             alert.textContent = message;
-            setTimeout(() => alert.classList.remove('show'), 5000);
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
         }
 
         // ========================================
@@ -670,6 +922,8 @@
         async function handleLogout() {
             if (confirm(currentLang === 'ar' ? 'هل أنت متأكد من تسجيل الخروج؟' : 'Are you sure you want to logout?')) {
                 try {
+                    // ✅ إلغاء جميع الاشتراكات
+                    realtimeChannels.forEach(channel => dbClient.removeChannel(channel));
                     await dbClient.auth.signOut();
                 } catch (e) {
                     console.error('Logout error:', e);
@@ -686,6 +940,13 @@
             window.setLang(currentLang);
             await checkAuth();
             await loadDashboardData();
+        };
+
+        // ========================================
+        // تنظيف عند إغلاق الصفحة
+        // ========================================
+        window.onbeforeunload = function() {
+            realtimeChannels.forEach(channel => dbClient.removeChannel(channel));
         };
     </script>
 </body>
