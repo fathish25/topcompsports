@@ -1,180 +1,68 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organizer Management - TopCompSports Admin</title>
+    <title>إدارة الجهات المنظمة - TopCompSports Admin</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg-dark: #0a0e17; --bg-card: #151d2b; --bg-input: rgba(255,255,255,0.05);
-            --primary: #2563EB; --accent: #f1c40f; --accent-dark: #d4a017;
-            --text-main: #ffffff; --text-muted: rgba(255,255,255,0.7);
-            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
-        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg-dark); color: var(--text-main); min-height: 100vh; }
-        
-        .sidebar { 
-            width: 280px; 
-            background: rgba(21, 29, 43, 0.98); 
-            border-left: 2px solid var(--primary); 
-            position: fixed; 
-            height: 100vh; 
-            padding: 20px; 
-            right: 0; 
-            overflow-y: auto; 
-            z-index: 100; 
-            display: flex;
-            flex-direction: column;
-        }
-        [dir="ltr"] .sidebar { right: auto; left: 0; border-left: none; border-right: 2px solid var(--primary); }
-        
-        .logo { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            padding: 20px; 
-            margin-bottom: 30px; 
-            border-bottom: 2px solid rgba(255,255,255,0.1); 
-        }
-        .logo-icon { 
-            width: 50px; 
-            height: 50px; 
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark)); 
-            border-radius: 12px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 28px; 
-            font-weight: bold; 
-            color: var(--bg-dark); 
-        }
-        .logo-text { 
-            font-size: 22px; 
-            font-weight: bold; 
-        }
-        
-        .nav-menu { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
-            flex: 1;
-        }
-        .nav-item { 
-            padding: 15px 20px; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            transition: all 0.3s; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            font-size: 15px; 
-            text-decoration: none; 
-            color: var(--text-main); 
-        }
-        .nav-item:hover { 
-            background: rgba(255,255,255,0.05); 
-        }
-        .nav-item.active { 
-            background: linear-gradient(135deg, var(--primary), #1d4ed8); 
-        }
-        .nav-item .icon {
-            font-size: 1.3rem;
-            width: 24px;
-            text-align: center;
-        }
-        
-        .role-badge {
-            background: var(--accent);
-            color: var(--bg-dark);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            margin-top: auto;
-            display: block;
-            text-align: center;
-        }
-        
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: #fff; }
+        .sidebar { width: 280px; background: rgba(21, 29, 43, 0.98); border-left: 2px solid #2563EB; position: fixed; height: 100vh; padding: 20px; right: 0; overflow-y: auto; }
+        .logo { display: flex; align-items: center; gap: 15px; padding: 20px; margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #f1c40f, #d4a017); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; color: #0a0e17; }
+        .logo-text { font-size: 22px; font-weight: bold; }
+        .nav-menu { display: flex; flex-direction: column; gap: 10px; }
+        .nav-item { padding: 15px 20px; border-radius: 10px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 12px; font-size: 15px; text-decoration: none; color: #fff; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); }
+        .nav-item.active { background: linear-gradient(135deg, #2563EB, #1d4ed8); }
         .main-content { margin-right: 280px; padding: 40px; }
-        [dir="ltr"] .main-content { margin-right: 0; margin-left: 280px; }
-        
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
         .page-title { font-size: 32px; font-weight: bold; }
-        .header-actions { display: flex; align-items: center; gap: 15px; }
-        
-        .lang-switcher { display: flex; gap: 10px; }
-        .lang-btn { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .lang-btn.active { background: var(--primary); color: var(--text-main); }
-        
-        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: var(--bg-dark); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(241, 196, 15, 0.3); }
-        .btn-danger { background: linear-gradient(135deg, var(--danger), #dc2626); color: var(--text-main); }
-        .btn-success { background: linear-gradient(135deg, var(--success), #059669); color: var(--text-main); }
-        .btn-warning { background: linear-gradient(135deg, var(--warning), #d97706); color: var(--text-main); }
-        .btn-info { background: linear-gradient(135deg, var(--primary), #1d4ed8); color: var(--text-main); }
-        .btn-sm { padding: 6px 12px; font-size: 12px; }
-
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
-        .stat-value { font-size: 32px; font-weight: bold; color: var(--accent); }
-        .stat-label { color: var(--text-muted); font-size: 14px; margin-top: 5px; }
-
-        .section { background: var(--bg-card); border-radius: 16px; padding: 30px; margin-bottom: 30px; }
-        .section-title { font-size: 24px; font-weight: bold; margin-bottom: 25px; color: var(--accent); }
-        .filters { display: grid; grid-template-columns: 2fr 1fr auto; gap: 15px; margin-bottom: 25px; align-items: end; }
-        .form-input, .form-select { background: var(--bg-input); border: 2px solid rgba(255,255,255,0.1); color: var(--text-main); padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; }
-        .form-input:focus, .form-select:focus { outline: none; border-color: var(--accent); }
-        .form-label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 13px; }
-        select.form-select option { background-color: var(--bg-card) !important; color: var(--text-main) !important; }
-
-        .org-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 15px; transition: all 0.3s; }
-        .org-card:hover { border-color: var(--primary); background: rgba(37, 99, 235, 0.05); }
-        .org-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-        .org-name { font-size: 20px; font-weight: bold; color: var(--accent); }
-        .org-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
-        .info-item { display: flex; gap: 10px; align-items: center; }
-        .info-label { color: var(--text-muted); font-size: 13px; }
-        .info-value { font-weight: 600; }
-        .action-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
-
+        .section { background: #151d2b; border-radius: 16px; padding: 30px; margin-bottom: 30px; }
+        .section-title { font-size: 24px; font-weight: bold; margin-bottom: 25px; color: #f1c40f; }
+        .btn { padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 14px; }
+        .btn-primary { background: linear-gradient(135deg, #f1c40f, #d4a017); color: #0a0e17; }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff; }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+        .btn-warning { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: right; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
+        th { background: rgba(241, 196, 15, 0.1); color: #f1c40f; font-weight: bold; }
+        tr:hover { background: rgba(255,255,255,0.03); }
         .status-badge { padding: 5px 12px; border-radius: 12px; font-size: 12px; font-weight: bold; display: inline-block; }
-        .status-verified { background: rgba(16, 185, 129, 0.2); color: var(--success); }
-        .status-pending { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
-        .status-suspended { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .status-verified { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .status-suspended { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .filters { display: grid; grid-template-columns: 2fr 1fr auto; gap: 15px; margin-bottom: 25px; align-items: end; }
+        .form-input, .form-select { background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; width: 100%; }
+        .form-input:focus, .form-select:focus { outline: none; border-color: #f1c40f; }
+        .form-label { display: block; margin-bottom: 8px; color: rgba(255,255,255,0.8); font-size: 13px; }
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #151d2b; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; }
+        .stat-value { font-size: 32px; font-weight: bold; color: #f1c40f; }
+        .stat-label { color: rgba(255,255,255,0.7); font-size: 14px; margin-top: 5px; }
+        .action-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+        .org-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+        .org-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; }
+        .org-name { font-size: 20px; font-weight: bold; color: #f1c40f; }
+        .org-info { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 15px; }
+        .info-item { display: flex; gap: 10px; }
+        .info-label { color: rgba(255,255,255,0.6); font-size: 13px; }
+        .info-value { font-weight: 600; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal-overlay.active { display: flex; }
-        .modal { background: var(--bg-card); border-radius: 16px; padding: 30px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid rgba(255,255,255,0.1); }
-        .modal-title { font-size: 22px; font-weight: bold; color: var(--accent); }
-        .close-modal { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); }
-        .close-modal:hover { color: var(--text-main); }
+        .modal { background: #151d2b; border-radius: 16px; padding: 30px; max-width: 500px; width: 90%; }
+        .modal-title { font-size: 22px; font-weight: bold; color: #f1c40f; margin-bottom: 20px; }
         .form-group { margin-bottom: 15px; }
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-        .modal-actions .btn { flex: 1; justify-content: center; }
-
-        .user-images { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        .image-box { text-align: center; }
-        .image-box img { width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; border: 2px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); cursor: pointer; }
-        .image-box p { margin-top: 8px; font-size: 13px; color: var(--text-muted); font-weight: 600; }
-        .image-box .no-image { width: 100%; height: 150px; background: rgba(255,255,255,0.03); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 3rem; border: 2px dashed rgba(255,255,255,0.1); }
-        
-        .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
-        .detail-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
-        .detail-label { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
-        .detail-value { font-weight: 600; color: var(--text-main); word-break: break-word; }
-
+        .modal-actions .btn { flex: 1; }
         @media (max-width: 1024px) {
             .sidebar { width: 100%; position: relative; height: auto; }
-            .main-content { margin-right: 0; margin-left: 0; padding: 20px; }
+            .main-content { margin-right: 0; }
             .filters { grid-template-columns: 1fr; }
             .stats-row { grid-template-columns: 1fr; }
-            .user-images { grid-template-columns: 1fr; }
-            .details-grid { grid-template-columns: 1fr; }
+            .org-info { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -185,254 +73,93 @@
             <div class="logo-text">TopCompSports</div>
         </div>
         <div class="nav-menu">
-            <a class="nav-item" href="admin-dashboard.html">
-                <span class="icon"><i class="fas fa-chart-line"></i></span>
-                <span data-en="Dashboard" data-ar="لوحة التحكم">Dashboard</span>
-            </a>
-            <a class="nav-item" href="admin-users.html">
-                <span class="icon"><i class="fas fa-users"></i></span>
-                <span data-en="Users" data-ar="المستخدمون">Users</span>
-            </a>
-            <a class="nav-item" href="admin-athletes.html">
-                <span class="icon"><i class="fas fa-running"></i></span>
-                <span data-en="Athletes" data-ar="اللاعبون">Athletes</span>
-            </a>
-            <a class="nav-item" href="admin-athlete-documents.html">
-                <span class="icon"><i class="fas fa-id-card"></i></span>
-                <span data-en="Athlete Documents" data-ar="وثائق اللاعبين">Athlete Documents</span>
-            </a>
-            <a class="nav-item" href="admin-coaches.html">
-                <span class="icon"><i class="fas fa-chalkboard-teacher"></i></span>
-                <span data-en="Coaches" data-ar="المدربون">Coaches</span>
-            </a>
-            <a class="nav-item" href="admin-teams.html">
-                <span class="icon"><i class="fas fa-shield-alt"></i></span>
-                <span data-en="Teams" data-ar="الفرق">Teams</span>
-            </a>
-            <a class="nav-item active" href="admin-organizations.html">
-                <span class="icon"><i class="fas fa-building"></i></span>
-                <span data-en="Organizers" data-ar="الجهات المنظمة">Organizers</span>
-            </a>
-            <a class="nav-item" href="admin-tournaments.html">
-                <span class="icon"><i class="fas fa-trophy"></i></span>
-                <span data-en="Tournaments" data-ar="البطولات">Tournaments</span>
-            </a>
-            <a class="nav-item" href="admin-reports.html">
-                <span class="icon"><i class="fas fa-chart-bar"></i></span>
-                <span data-en="Reports" data-ar="التقارير">Reports</span>
-            </a>
-            <a class="nav-item" href="admin-settings.html">
-                <span class="icon"><i class="fas fa-cog"></i></span>
-                <span data-en="Settings" data-ar="الإعدادات">Settings</span>
-            </a>
+            <a class="nav-item" href="admin-dashboard.html">📊 لوحة التحكم</a>
+            <a class="nav-item" href="admin-tournaments.html">🏆 البطولات</a>
+            <a class="nav-item" href="admin-users.html"> المستخدمون</a>
+            <a class="nav-item" href="admin-registrations.html">📝 التسجيلات</a>
+            <a class="nav-item active">🏢 الجهات المنظمة</a>
+            <a class="nav-item" href="admin-reports.html">📈 التقارير</a>
+            <a class="nav-item" href="admin-settings.html">⚙️ الإعدادات</a>
+            <a class="nav-item" onclick="logout()">🚪 تسجيل الخروج</a>
         </div>
-        <div class="role-badge" data-en="Super Admin" data-ar="سوبر أدمن">Super Admin</div>
     </div>
 
     <div class="main-content">
         <div class="header">
-            <h1 class="page-title" data-en="Organizer Management" data-ar="إدارة الجهات المنظمة">Organizer Management</h1>
-            <div class="header-actions">
-                <div class="lang-switcher">
-                    <button class="lang-btn active" onclick="window.setLang('en')">EN</button>
-                    <button class="lang-btn" onclick="window.setLang('ar')">AR</button>
-                </div>
-                <button class="btn btn-primary" onclick="showCreateModal()">
-                    <i class="fas fa-plus"></i> 
-                    <span data-en="Add Organizer" data-ar="إضافة جهة منظمة">Add Organizer</span>
-                </button>
-            </div>
+            <h1 class="page-title">إدارة الجهات المنظمة</h1>
+            <button class="btn btn-primary" onclick="showCreateModal()">➕ إضافة جهة منظمة</button>
         </div>
 
         <div class="stats-row">
             <div class="stat-card">
                 <div class="stat-value" id="statTotal">0</div>
-                <div class="stat-label" data-en="Total Organizers" data-ar="إجمالي الجهات">Total Organizers</div>
+                <div class="stat-label">إجمالي الجهات</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="statVerified">0</div>
-                <div class="stat-label" data-en="Verified" data-ar="المُتحقق منها">Verified</div>
+                <div class="stat-label">المُتحقق منها</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value" id="statPending">0</div>
-                <div class="stat-label" data-en="Pending" data-ar="قيد الانتظار">Pending</div>
+                <div class="stat-label">قيد الانتظار</div>
             </div>
         </div>
 
         <div class="section">
-            <h2 class="section-title" data-en="Organizers List" data-ar="قائمة الجهات المنظمة">Organizers List</h2>
+            <h2 class="section-title">قائمة الجهات المنظمة</h2>
             
             <div class="filters">
                 <div>
-                    <label class="form-label" data-en="Search" data-ar="بحث">Search</label>
-                    <input type="text" class="form-input" id="searchOrg" data-placeholder-en="Search by name or email..." data-placeholder-ar="ابحث بالاسم أو البريد..." placeholder="Search by name or email..." onkeyup="loadOrganizations()">
+                    <label class="form-label">بحث</label>
+                    <input type="text" class="form-input" id="searchOrg" placeholder="ابحث بالاسم أو البريد..." onkeyup="loadOrganizations()">
                 </div>
                 <div>
-                    <label class="form-label" data-en="Status" data-ar="الحالة">Status</label>
+                    <label class="form-label">الحالة</label>
                     <select class="form-select" id="filterStatus" onchange="loadOrganizations()">
-                        <option value="" data-en="All Statuses" data-ar="جميع الحالات">All Statuses</option>
-                        <option value="verified" data-en="Verified" data-ar="مُتحقق منها">Verified</option>
-                        <option value="pending" data-en="Pending" data-ar="قيد الانتظار">Pending</option>
-                        <option value="suspended" data-en="Suspended" data-ar="موقوفة">Suspended</option>
+                        <option value="">جميع الحالات</option>
+                        <option value="verified">مُتحقق منها</option>
+                        <option value="pending">قيد الانتظار</option>
+                        <option value="suspended">موقوفة</option>
                     </select>
                 </div>
                 <div>
-                    <label class="form-label" data-en="Action" data-ar="إجراء">Action</label>
-                    <button class="btn btn-primary" onclick="loadOrganizations()" style="width: 100%;">
-                        <i class="fas fa-sync-alt"></i> 
-                        <span data-en="Refresh" data-ar="تحديث">Refresh</span>
-                    </button>
+                    <button class="btn btn-primary" onclick="loadOrganizations()" style="width: 100%;">🔄 تحديث</button>
                 </div>
             </div>
 
             <div id="organizationsList">
-                <div style="text-align: center; padding: 40px; color: var(--text-muted);" data-en="Loading..." data-ar="جاري التحميل...">Loading...</div>
+                <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">جاري التحميل...</div>
             </div>
         </div>
     </div>
 
-    <!-- View Details Modal -->
-    <div class="modal-overlay" id="viewModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title" data-en="Organizer Details" data-ar="تفاصيل الجهة المنظمة">Organizer Details</h3>
-                <button class="close-modal" onclick="closeViewModal()">&times;</button>
-            </div>
-            <div id="viewModalContent"></div>
-        </div>
-    </div>
-
-    <!-- Create Modal -->
+    <!-- Modal إضافة جهة -->
     <div class="modal-overlay" id="createModal">
         <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title" data-en="Add New Organizer" data-ar="إضافة جهة منظمة جديدة">Add New Organizer</h3>
-                <button class="close-modal" onclick="closeCreateModal()">&times;</button>
-            </div>
-            <div class="details-grid">
-                <div class="form-group">
-                    <label class="form-label" data-en="Organization Name" data-ar="اسم المنظمة">Organization Name</label>
-                    <input type="text" class="form-input" id="orgName">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" data-en="Email" data-ar="البريد الإلكتروني">Email</label>
-                    <input type="email" class="form-input" id="orgEmail">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" data-en="Password" data-ar="كلمة المرور">Password</label>
-                    <input type="password" class="form-input" id="orgPassword">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" data-en="Phone" data-ar="الهاتف">Phone</label>
-                    <input type="text" class="form-input" id="orgPhone">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" data-en="Country" data-ar="الدولة">Country</label>
-                    <input type="text" class="form-input" id="orgCountry">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" data-en="City" data-ar="المدينة">City</label>
-                    <input type="text" class="form-input" id="orgCity">
-                </div>
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-success" onclick="createOrganization()">
-                    <i class="fas fa-check"></i> 
-                    <span data-en="Create" data-ar="إنشاء">Create</span>
-                </button>
-                <button class="btn btn-danger" onclick="closeCreateModal()">
-                    <i class="fas fa-times"></i> 
-                    <span data-en="Cancel" data-ar="إلغاء">Cancel</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Modal -->
-    <div class="modal-overlay" id="editModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title" data-en="Edit Organizer" data-ar="تعديل بيانات الجهة المنظمة">Edit Organizer</h3>
-                <button class="close-modal" onclick="closeEditModal()">&times;</button>
-            </div>
-            <form id="editForm" onsubmit="saveEdit(event)">
-                <input type="hidden" id="editId">
-                <div class="details-grid">
-                    <div class="form-group">
-                        <label class="form-label" data-en="Full Name" data-ar="الاسم الكامل">Full Name</label>
-                        <input type="text" class="form-input" id="editFullName" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-en="Organization Name" data-ar="اسم المنظمة">Organization Name</label>
-                        <input type="text" class="form-input" id="editOrgName">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-en="Email" data-ar="البريد الإلكتروني">Email</label>
-                        <input type="email" class="form-input" id="editEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-en="Phone" data-ar="الهاتف">Phone</label>
-                        <input type="text" class="form-input" id="editPhone">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-en="Country" data-ar="الدولة">Country</label>
-                        <input type="text" class="form-input" id="editCountry">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-en="City" data-ar="المدينة">City</label>
-                        <input type="text" class="form-input" id="editCity">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-en="Website" data-ar="الموقع الإلكتروني">Website</label>
-                        <input type="url" class="form-input" id="editWebsite">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-en="Verification Status" data-ar="حالة التحقق">Verification Status</label>
-                        <select class="form-select" id="editVerification">
-                            <option value="pending" data-en="Pending" data-ar="قيد الانتظار">Pending</option>
-                            <option value="approved" data-en="Approved" data-ar="معتمد">Approved</option>
-                            <option value="rejected" data-en="Rejected" data-ar="مرفوض">Rejected</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" data-en="Bio / Notes" data-ar="نبذة / ملاحظات">Bio / Notes</label>
-                    <textarea class="form-input" id="editBio" rows="3"></textarea>
-                </div>
-                <div class="modal-actions">
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save"></i> 
-                        <span data-en="Save" data-ar="حفظ">Save</span>
-                    </button>
-                    <button type="button" class="btn btn-danger" onclick="closeEditModal()">
-                        <i class="fas fa-times"></i> 
-                        <span data-en="Cancel" data-ar="إلغاء">Cancel</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Suspend Modal -->
-    <div class="modal-overlay" id="suspendModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title" data-en="Suspend Organizer" data-ar="تعليق الجهة المنظمة">Suspend Organizer</h3>
-                <button class="close-modal" onclick="closeSuspendModal()">&times;</button>
+            <h3 class="modal-title">إضافة جهة منظمة جديدة</h3>
+            <div class="form-group">
+                <label class="form-label">اسم المنظمة</label>
+                <input type="text" class="form-input" id="orgName" placeholder="أدخل اسم المنظمة">
             </div>
             <div class="form-group">
-                <label class="form-label" data-en="Reason for Suspension (Required)" data-ar="سبب التعليق (إلزامي)">Reason for Suspension (Required)</label>
-                <textarea class="form-input" id="suspendReason" rows="4" data-placeholder-en="Enter the reason..." data-placeholder-ar="أدخل السبب..."></textarea>
+                <label class="form-label">البريد الإلكتروني</label>
+                <input type="email" class="form-input" id="orgEmail" placeholder="email@example.com">
+            </div>
+            <div class="form-group">
+                <label class="form-label">كلمة المرور</label>
+                <input type="password" class="form-input" id="orgPassword" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+                <label class="form-label">الدولة</label>
+                <input type="text" class="form-input" id="orgCountry" placeholder="الدولة">
+            </div>
+            <div class="form-group">
+                <label class="form-label">المدينة</label>
+                <input type="text" class="form-input" id="orgCity" placeholder="المدينة">
             </div>
             <div class="modal-actions">
-                <button class="btn btn-warning" onclick="confirmSuspend()">
-                    <i class="fas fa-ban"></i> 
-                    <span data-en="Confirm Suspend" data-ar="تأكيد التعليق">Confirm Suspend</span>
-                </button>
-                <button class="btn btn-danger" onclick="closeSuspendModal()">
-                    <i class="fas fa-times"></i> 
-                    <span data-en="Cancel" data-ar="إلغاء">Cancel</span>
-                </button>
+                <button class="btn btn-success" onclick="createOrganization()">✅ إنشاء</button>
+                <button class="btn btn-danger" onclick="closeModal()">❌ إلغاء</button>
             </div>
         </div>
     </div>
@@ -443,41 +170,10 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let allOrganizations = [];
-        let currentLang = localStorage.getItem('selectedLanguage') || 'en';
-        let suspendTargetId = null;
 
         window.onload = async () => {
             await checkAuth();
-            window.setLang(currentLang);
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            const filterParam = urlParams.get('filter');
-            if (filterParam === 'pending') {
-                document.getElementById('filterStatus').value = 'pending';
-            }
-            
             await loadOrganizations();
-        };
-
-        window.setLang = function(lang) {
-            currentLang = lang;
-            localStorage.setItem('selectedLanguage', lang);
-            document.documentElement.lang = lang;
-            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-            
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if ((lang === 'en' && btn.textContent.trim() === 'EN') || (lang === 'ar' && btn.textContent.trim() === 'AR')) {
-                    btn.classList.add('active');
-                }
-            });
-            
-            document.querySelectorAll('[data-en][data-ar]').forEach(el => {
-                el.textContent = lang === 'ar' ? el.dataset.ar : el.dataset.en;
-            });
-            document.querySelectorAll('[data-placeholder-en][data-placeholder-ar]').forEach(el => {
-                el.placeholder = lang === 'ar' ? el.dataset.placeholderAr : el.dataset.placeholderEn;
-            });
         };
 
         async function checkAuth() {
@@ -493,262 +189,160 @@
 
             const { data, error } = await supabaseClient
                 .from('organizers')
-                .select('id, user_id, full_name, org_name, email, country, city, phone, verification_status, is_suspended, suspension_reason, profile_photo_url, id_document_url, website, bio, created_at')
+                .select('*')
                 .order('created_at', { ascending: false });
 
-            if (error) { console.error('Error:', error); return; }
+            if (error) {
+                console.error('Error:', error);
+                return;
+            }
 
-            allOrganizations = (data || []).map(org => {
-                let status = 'pending';
-                if (org.is_suspended) status = 'suspended';
-                else if (org.verification_status === 'approved') status = 'verified';
-                return { ...org, status };
-            });
+            allOrganizations = data || [];
 
+            // تطبيق الفلاتر
             let filtered = allOrganizations;
             if (search) {
                 filtered = filtered.filter(o => 
                     (o.org_name && o.org_name.toLowerCase().includes(search)) ||
-                    (o.full_name && o.full_name.toLowerCase().includes(search)) ||
-                    (o.email && o.email.toLowerCase().includes(search))
+                    (o.email && o.email.toLowerCase().includes(search)) ||
+                    (o.full_name && o.full_name.toLowerCase().includes(search))
                 );
             }
             if (statusFilter) filtered = filtered.filter(o => o.status === statusFilter);
 
+            // تحديث الإحصائيات
             document.getElementById('statTotal').textContent = allOrganizations.length;
             document.getElementById('statVerified').textContent = allOrganizations.filter(o => o.status === 'verified').length;
             document.getElementById('statPending').textContent = allOrganizations.filter(o => o.status === 'pending').length;
 
+            // عرض البيانات
             const listDiv = document.getElementById('organizationsList');
+            
             if (filtered.length === 0) {
-                listDiv.innerHTML = `<div style="text-align: center; padding: 40px; color: var(--text-muted);" data-en="No organizers found" data-ar="لا توجد جهات منظمة">No organizers found</div>`;
+                listDiv.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.5);">لا توجد جهات منظمة</div>';
                 return;
             }
 
-            listDiv.innerHTML = filtered.map(org => {
-                const statusClass = org.status === 'verified' ? 'status-verified' : org.status === 'suspended' ? 'status-suspended' : 'status-pending';
-                const statusText = { verified: currentLang === 'ar' ? 'مُتحقق منها' : 'Verified', suspended: currentLang === 'ar' ? 'موقوفة' : 'Suspended', pending: currentLang === 'ar' ? 'قيد الانتظار' : 'Pending' }[org.status];
-                const name = org.org_name || org.full_name || (currentLang === 'ar' ? 'بدون اسم' : 'No Name');
+            listDiv.innerHTML = filtered.map((org, i) => {
+                const statusClass = org.status === 'verified' ? 'status-verified' : 
+                                   org.status === 'suspended' ? 'status-suspended' : 'status-pending';
+                const statusText = { verified: 'مُتحقق منها', suspended: 'موقوفة', pending: 'قيد الانتظار' }[org.status] || org.status;
 
                 return `
                     <div class="org-card">
                         <div class="org-header">
                             <div>
-                                <div class="org-name">${name}</div>
-                                <div style="color: var(--text-muted); font-size: 14px; margin-top: 5px;">${org.email || '-'}</div>
+                                <div class="org-name">${org.org_name || org.full_name || 'بدون اسم'}</div>
+                                <div style="color: rgba(255,255,255,0.6); font-size: 14px; margin-top: 5px;">${org.email || '-'}</div>
                             </div>
                             <span class="status-badge ${statusClass}">${statusText}</span>
                         </div>
                         <div class="org-info">
-                            <div class="info-item"><span class="info-label"></span><span class="info-value">${org.city || '-'}, ${org.country || '-'}</span></div>
-                            <div class="info-item"><span class="info-label">📞</span><span class="info-value">${org.phone || '-'}</span></div>
-                            <div class="info-item"><span class="info-label">📅</span><span class="info-value">${org.created_at ? new Date(org.created_at).toLocaleDateString(currentLang === 'ar' ? 'ar-SA' : 'en-US') : '-'}</span></div>
+                            <div class="info-item">
+                                <span class="info-label">📍 الموقع:</span>
+                                <span class="info-value">${org.city || '-'}, ${org.country || '-'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">📞 الهاتف:</span>
+                                <span class="info-value">${org.phone || '-'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">📅 تاريخ التسجيل:</span>
+                                <span class="info-value">${org.created_at ? new Date(org.created_at).toLocaleDateString('ar-SA') : '-'}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">🏆 عدد البطولات:</span>
+                                <span class="info-value">${org.tournament_count || 0}</span>
+                            </div>
                         </div>
-                        <div class="action-btns">
-                            <button class="btn btn-info btn-sm" onclick="viewOrganization('${org.id}')">
-                                <i class="fas fa-eye"></i> 
-                                <span data-en="View" data-ar="عرض">View</span>
-                            </button>
-                            <button class="btn btn-primary btn-sm" onclick="editOrganization('${org.id}')">
-                                <i class="fas fa-edit"></i> 
-                                <span data-en="Edit" data-ar="تعديل">Edit</span>
-                            </button>
-                            ${org.status !== 'verified' ? `<button class="btn btn-success btn-sm" onclick="verifyOrganization('${org.id}')">
-                                <i class="fas fa-check"></i> 
-                                <span data-en="Verify" data-ar="تحقق">Verify</span>
-                            </button>` : ''}
-                            ${org.status !== 'suspended' ? `<button class="btn btn-warning btn-sm" onclick="openSuspendModal('${org.id}')">
-                                <i class="fas fa-ban"></i> 
-                                <span data-en="Suspend" data-ar="تعليق">Suspend</span>
-                            </button>` : `<button class="btn btn-success btn-sm" onclick="activateOrganization('${org.id}')">
-                                <i class="fas fa-play"></i> 
-                                <span data-en="Activate" data-ar="تنشيط">Activate</span>
-                            </button>`}
-                            <button class="btn btn-danger btn-sm" onclick="deleteOrganization('${org.id}')">
-                                <i class="fas fa-trash"></i> 
-                                <span data-en="Delete" data-ar="حذف">Delete</span>
-                            </button>
+                        <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            ${org.status !== 'verified' ? `<button class="btn btn-success" onclick="verifyOrganization('${org.id}')" style="padding: 8px 15px; font-size: 13px;">✅ تحقق</button>` : ''}
+                            ${org.status !== 'suspended' ? `<button class="btn btn-warning" onclick="suspendOrganization('${org.id}')" style="padding: 8px 15px; font-size: 13px;">️ إيقاف</button>` : ''}
+                            <button class="btn btn-danger" onclick="deleteOrganization('${org.id}')" style="padding: 8px 15px; font-size: 13px;">🗑️ حذف</button>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        function viewOrganization(id) {
-            const org = allOrganizations.find(o => o.id === id);
-            if (!org) return;
-            
-            const statusText = { verified: currentLang === 'ar' ? 'مُتحقق منها' : 'Verified', suspended: currentLang === 'ar' ? 'موقوفة' : 'Suspended', pending: currentLang === 'ar' ? 'قيد الانتظار' : 'Pending' }[org.status];
-            const reasonText = org.suspension_reason ? `<p style="color: var(--danger); margin-top: 10px; font-weight: 600;"><i class="fas fa-exclamation-triangle"></i> ${currentLang === 'ar' ? 'سبب التعليق:' : 'Suspension Reason:'} ${org.suspension_reason}</p>` : '';
-
-            const profilePhotoHtml = org.profile_photo_url ? 
-                `<img src="${org.profile_photo_url}" alt="Profile" onclick="window.open('${org.profile_photo_url}', '_blank')">` :
-                `<div class="no-image"><i class="fas fa-user"></i></div>`;
-
-            const idDocumentHtml = org.id_document_url ? 
-                `<img src="${org.id_document_url}" alt="ID Document" onclick="window.open('${org.id_document_url}', '_blank')">` :
-                `<div class="no-image"><i class="fas fa-id-card"></i></div>`;
-
-            document.getElementById('viewModalContent').innerHTML = `
-                <div class="details-grid">
-                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الاسم' : 'Name'}</div><div class="detail-value">${org.full_name || '-'}</div></div>
-                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'اسم المنظمة' : 'Organization'}</div><div class="detail-value">${org.org_name || '-'}</div></div>
-                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'البريد' : 'Email'}</div><div class="detail-value">${org.email || '-'}</div></div>
-                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الهاتف' : 'Phone'}</div><div class="detail-value">${org.phone || '-'}</div></div>
-                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الدولة' : 'Country'}</div><div class="detail-value">${org.country || '-'}</div></div>
-                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'المدينة' : 'City'}</div><div class="detail-value">${org.city || '-'}</div></div>
-                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الموقع' : 'Website'}</div><div class="detail-value">${org.website ? `<a href="${org.website}" target="_blank" style="color: var(--primary);">${org.website}</a>` : '-'}</div></div>
-                    <div class="detail-item"><div class="detail-label">${currentLang === 'ar' ? 'الحالة' : 'Status'}</div><div class="detail-value">${statusText}</div></div>
-                </div>
-                ${org.bio ? `<div class="detail-item" style="margin-bottom: 15px;"><div class="detail-label">${currentLang === 'ar' ? 'نبذة' : 'Bio'}</div><div class="detail-value" style="font-weight: normal; line-height: 1.5;">${org.bio}</div></div>` : ''}
-                ${reasonText}
-                <div class="user-images">
-                    <div class="image-box">
-                        ${profilePhotoHtml}
-                        <p>${currentLang === 'ar' ? 'صورة البروفايل' : 'Profile Photo'}</p>
-                    </div>
-                    <div class="image-box">
-                        ${idDocumentHtml}
-                        <p>${currentLang === 'ar' ? 'صورة الهوية' : 'ID Document'}</p>
-                    </div>
-                </div>
-            `;
-            document.getElementById('viewModal').classList.add('active');
+        function showCreateModal() {
+            document.getElementById('createModal').classList.add('active');
         }
 
-        function editOrganization(id) {
-            const org = allOrganizations.find(o => o.id === id);
-            if (!org) return;
-
-            document.getElementById('editId').value = org.id;
-            document.getElementById('editFullName').value = org.full_name || '';
-            document.getElementById('editOrgName').value = org.org_name || '';
-            document.getElementById('editEmail').value = org.email || '';
-            document.getElementById('editPhone').value = org.phone || '';
-            document.getElementById('editCountry').value = org.country || '';
-            document.getElementById('editCity').value = org.city || '';
-            document.getElementById('editWebsite').value = org.website || '';
-            document.getElementById('editVerification').value = org.verification_status || 'pending';
-            document.getElementById('editBio').value = org.bio || '';
-
-            document.getElementById('editModal').classList.add('active');
-        }
-
-        async function saveEdit(e) {
-            e.preventDefault();
-            const updateData = {
-                full_name: document.getElementById('editFullName').value,
-                org_name: document.getElementById('editOrgName').value,
-                email: document.getElementById('editEmail').value,
-                phone: document.getElementById('editPhone').value,
-                country: document.getElementById('editCountry').value,
-                city: document.getElementById('editCity').value,
-                website: document.getElementById('editWebsite').value,
-                verification_status: document.getElementById('editVerification').value,
-                bio: document.getElementById('editBio').value,
-                updated_at: new Date().toISOString()
-            };
-
-            try {
-                const { error } = await supabaseClient.from('organizers').update(updateData).eq('id', document.getElementById('editId').value);
-                if (error) throw error;
-                
-                alert(currentLang === 'ar' ? '✅ تم التعديل بنجاح' : '✅ Updated successfully');
-                closeEditModal();
-                loadOrganizations();
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
-        }
-
-        function closeViewModal() { document.getElementById('viewModal').classList.remove('active'); }
-        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
-        function closeCreateModal() { 
+        function closeModal() {
             document.getElementById('createModal').classList.remove('active');
-            ['orgName', 'orgEmail', 'orgPassword', 'orgPhone', 'orgCountry', 'orgCity'].forEach(id => document.getElementById(id).value = '');
-        }
-        function showCreateModal() { document.getElementById('createModal').classList.add('active'); }
-        
-        function openSuspendModal(id) {
-            suspendTargetId = id;
-            document.getElementById('suspendReason').value = '';
-            document.getElementById('suspendModal').classList.add('active');
-        }
-        function closeSuspendModal() { 
-            document.getElementById('suspendModal').classList.remove('active'); 
-            suspendTargetId = null;
+            document.getElementById('orgName').value = '';
+            document.getElementById('orgEmail').value = '';
+            document.getElementById('orgPassword').value = '';
+            document.getElementById('orgCountry').value = '';
+            document.getElementById('orgCity').value = '';
         }
 
         async function createOrganization() {
-            const orgName = document.getElementById('orgName').value.trim();
-            const email = document.getElementById('orgEmail').value.trim();
+            const orgName = document.getElementById('orgName').value;
+            const email = document.getElementById('orgEmail').value;
             const password = document.getElementById('orgPassword').value;
-            const phone = document.getElementById('orgPhone').value.trim();
-            const country = document.getElementById('orgCountry').value.trim();
-            const city = document.getElementById('orgCity').value.trim();
+            const country = document.getElementById('orgCountry').value;
+            const city = document.getElementById('orgCity').value;
 
             if (!orgName || !email || !password) {
-                alert(currentLang === 'ar' ? 'الرجاء ملء الحقول المطلوبة' : 'Please fill required fields');
+                alert('الرجاء ملء الحقول المطلوبة');
                 return;
             }
 
-            const btn = document.querySelector('#createModal .btn-success');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            // إنشاء حساب organizer
+            const { data: userData, error: authError } = await supabaseClient.auth.admin.createUser({
+                email: email,
+                password: password,
+                email_confirm: true
+            });
 
-            try {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                const response = await fetch(`${SUPABASE_URL}/functions/v1/create-regular-user`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
-                    body: JSON.stringify({ email, password, full_name: orgName, role: 'organizer', org_name: orgName, phone, country, city })
-                });
-                
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || 'Failed to create organizer');
-                
-                alert(currentLang === 'ar' ? '✅ تم إنشاء الجهة المنظمة بنجاح' : '✅ Organizer created successfully');
-                closeCreateModal();
-                loadOrganizations();
-            } catch (error) {
-                alert('Error: ' + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fas fa-check"></i> <span data-en="Create" data-ar="إنشاء">Create</span>`;
+            if (authError) {
+                alert('خطأ في إنشاء الحساب: ' + authError.message);
+                return;
             }
+
+            // إضافة إلى جدول organizers
+            const { error: insertError } = await supabaseClient.from('organizers').insert({
+                id: userData.user.id,
+                org_name: orgName,
+                full_name: orgName,
+                email: email,
+                country: country,
+                city: city,
+                status: 'pending',
+                created_at: new Date().toISOString()
+            });
+
+            if (insertError) {
+                alert('خطأ: ' + insertError.message);
+                return;
+            }
+
+            alert('تم إنشاء الجهة المنظمة بنجاح');
+            closeModal();
+            loadOrganizations();
         }
 
         async function verifyOrganization(id) {
-            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من التحقق من هذه الجهة؟' : 'Are you sure you want to verify this organizer?')) return;
-            const { error } = await supabaseClient.from('organizers').update({ verification_status: 'approved', updated_at: new Date().toISOString() }).eq('id', id);
-            if (error) { alert('Error: ' + error.message); return; }
-            alert(currentLang === 'ar' ? 'تم التحقق بنجاح' : 'Verified successfully');
+            const { error } = await supabaseClient.from('organizers').update({ status: 'verified' }).eq('id', id);
+            if (error) { alert('خطأ: ' + error.message); return; }
+            alert('تم التحقق من الجهة المنظمة');
             loadOrganizations();
         }
 
-        async function confirmSuspend() {
-            const reason = document.getElementById('suspendReason').value.trim();
-            if (!reason) { alert(currentLang === 'ar' ? 'يرجى إدخال سبب التعليق' : 'Please enter a reason for suspension'); return; }
-            const { error } = await supabaseClient.from('organizers').update({ is_suspended: true, suspension_reason: reason, updated_at: new Date().toISOString() }).eq('id', suspendTargetId);
-            if (error) { alert('Error: ' + error.message); return; }
-            alert(currentLang === 'ar' ? '✅ تم تعليق الجهة بنجاح' : '✅ Organizer suspended successfully');
-            closeSuspendModal();
-            loadOrganizations();
-        }
-
-        async function activateOrganization(id) {
-            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من تنشيط هذه الجهة؟' : 'Are you sure you want to activate this organizer?')) return;
-            const { error } = await supabaseClient.from('organizers').update({ is_suspended: false, suspension_reason: null, updated_at: new Date().toISOString() }).eq('id', id);
-            if (error) { alert('Error: ' + error.message); return; }
-            alert(currentLang === 'ar' ? '✅ تم تنشيط الجهة بنجاح' : '✅ Organizer activated successfully');
+        async function suspendOrganization(id) {
+            const { error } = await supabaseClient.from('organizers').update({ status: 'suspended' }).eq('id', id);
+            if (error) { alert('خطأ: ' + error.message); return; }
+            alert('تم إيقاف الجهة المنظمة');
             loadOrganizations();
         }
 
         async function deleteOrganization(id) {
-            if (!confirm(currentLang === 'ar' ? 'هل أنت متأكد من حذف هذه الجهة المنظمة؟' : 'Are you sure you want to delete this organizer?')) return;
+            if (!confirm('هل أنت متأكد من حذف هذه الجهة المنظمة؟')) return;
             const { error } = await supabaseClient.from('organizers').delete().eq('id', id);
-            if (error) { alert('Error: ' + error.message); return; }
-            alert(currentLang === 'ar' ? 'تم الحذف بنجاح' : 'Deleted successfully');
+            if (error) { alert('خطأ: ' + error.message); return; }
+            alert('تم الحذف بنجاح');
             loadOrganizations();
         }
 
